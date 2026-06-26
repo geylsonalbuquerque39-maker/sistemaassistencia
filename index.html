@@ -730,7 +730,14 @@ function abrirListaBase(){
 
 function abrirBusca(){
 
-    alert("Tela de busca");
+    document.getElementById("telaInicio").style.display = "none";
+    document.getElementById("telaBusca").style.display = "block";
+    document.getElementById("telaFicha").style.display = "none";
+
+    document.getElementById("baseBusca").innerHTML = baseAtual;
+
+    garantirCSV();
+}
 }
 
 </script>
