@@ -2,17 +2,27 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Assistência Técnica</title>
 
 <style>
-html, body{
+
+*{
     margin:0;
     padding:0;
-    width:100%;
-    height:100%;
+    box-sizing:border-box;
     font-family:Segoe UI, Arial;
-    background:#eef3f8;
 }
+
+body{
+    background:#eef3f8;
+    overflow-x:hidden;
+}
+
+/* =========================
+SIDEBAR
+========================= */
 
 .sidebar{
     position:fixed;
@@ -23,6 +33,8 @@ html, body{
     background:#001b3d;
     color:white;
     padding:35px 25px;
+    z-index:1000;
+    transition:.3s;
 }
 
 .logo{
@@ -31,7 +43,9 @@ html, body{
     line-height:34px;
 }
 
-.logo span{color:#1ea5ff;}
+.logo span{
+    color:#1ea5ff;
+}
 
 .sublogo{
     color:#1ea5ff;
@@ -52,7 +66,8 @@ html, body{
     margin-bottom:15px;
     font-size:20px;
     cursor:pointer;
-    border-radius:8px;
+    border-radius:10px;
+    transition:.2s;
 }
 
 .menu:hover,
@@ -60,127 +75,211 @@ html, body{
     background:#006cff;
 }
 
+/* =========================
+MAIN
+========================= */
+
 .main{
     margin-left:300px;
     min-height:100vh;
-    background:#eef3f8;
+    transition:.3s;
 }
 
 .topbar{
-    height:110px;
     background:white;
+    min-height:110px;
     padding:25px 45px;
     position:relative;
     box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
 
 .company{
-    font-size:28px;
+    font-size:30px;
     font-weight:bold;
+    color:#001b3d;
 }
 
 .datetime{
     position:absolute;
-    right:55px;
-    top:25px;
+    right:45px;
+    top:20px;
     color:#001b3d;
     font-size:18px;
     font-weight:bold;
 }
 
+.datetime div{
+    margin-bottom:10px;
+}
+
+/* =========================
+BOTÃO BASE
+========================= */
+
+.base-box{
+    position:absolute;
+    right:45px;
+    top:70px;
+    z-index:50;
+}
+
+.btn-base{
+    background:#ff9800;
+    color:white;
+    border:none;
+    border-radius:12px;
+    padding:10px 22px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+
+.btn-base:hover{
+    background:#ff7b00;
+}
+
+.lista-base{
+    display:none;
+    background:white;
+    margin-top:8px;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 4px 15px rgba(0,0,0,.2);
+}
+
+.lista-base div{
+    padding:12px 20px;
+    cursor:pointer;
+    color:#001b3d;
+    font-weight:bold;
+}
+
+.lista-base div:hover{
+    background:#eef3f8;
+}
+
+/* =========================
+TÍTULO
+========================= */
+
 .title{
     text-align:center;
-    margin-top:45px;
+    margin-top:50px;
     color:#001b3d;
 }
 
 .title h1{
-    font-size:60px;
-    margin:0;
+    font-size:64px;
+    font-weight:900;
 }
 
 .title p{
+    margin-top:15px;
     font-size:24px;
-    margin:10px 0;
 }
 
 .underline{
-    width:160px;
+    width:170px;
     height:5px;
     background:#0074ff;
-    margin:15px auto;
+    margin:18px auto;
 }
 
-.cards-table{
+/* =========================
+CARDS
+========================= */
+
+.cards{
     width:1150px;
-    margin:45px auto;
-    border-spacing:25px;
+    max-width:95%;
+    margin:50px auto;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:30px;
 }
 
 .card{
-    width:500px;
-    height:175px;
     background:#0046b8;
-    color:white;
+    border-radius:18px;
+    min-height:180px;
     position:relative;
-    padding:30px 35px;
+    overflow:hidden;
     cursor:pointer;
-    border-radius:14px;
-    box-shadow:0 8px 18px rgba(0,0,0,.22);
+    transition:.2s;
+    box-shadow:0 8px 18px rgba(0,0,0,.18);
 }
 
 .card:hover{
-    background:#006cff;
     transform:scale(1.02);
+    background:#0062ff;
+}
+
+.card-bar{
+    position:absolute;
+    left:0;
+    top:0;
+    width:95px;
+    height:100%;
+    background:#0057e0;
 }
 
 .icon{
     position:absolute;
-    left:35px;
-    top:40px;
-    width:90px;
-    height:90px;
+    left:42px;
+    top:50%;
+    transform:translateY(-50%);
+    width:95px;
+    height:95px;
+    border-radius:50%;
     background:white;
     color:#001b3d;
-    border-radius:50%;
     text-align:center;
-    line-height:90px;
+    line-height:95px;
     font-size:48px;
     font-weight:bold;
+    z-index:2;
 }
 
-.texto-card{
-    position:absolute;
-    left:155px;
-    top:32px;
+.card-content{
+    padding:38px 40px 35px 165px;
+    color:white;
 }
 
-.card h2{
-    margin:0;
-    font-size:30px;
-    line-height:36px;
+.card-content h2{
+    font-size:42px;
+    line-height:44px;
 }
 
-.card p{
-    font-size:18px;
-    margin-top:12px;
+.card-content p{
+    margin-top:15px;
+    font-size:22px;
+    opacity:.95;
 }
 
 .arrow{
     position:absolute;
-    right:32px;
-    top:50px;
-    font-size:70px;
+    right:30px;
+    top:50%;
+    transform:translateY(-50%);
+    font-size:75px;
+    color:white;
 }
 
+/* =========================
+TELAS
+========================= */
+
+#telaBusca,
 #telaFicha{
     display:none;
-    width:1050px;
+    width:1100px;
+    max-width:95%;
     margin:35px auto;
     background:white;
     border:2px solid #001b3d;
+    border-radius:12px;
     padding:25px;
-    color:#001b3d;
 }
 
 .ficha-topo{
@@ -191,297 +290,449 @@ html, body{
 }
 
 .ficha-topo h2{
-    margin:0;
-    font-size:34px;
+    font-size:40px;
+    color:#001b3d;
 }
 
 .ficha-linha{
+    padding:14px 0;
     border-bottom:1px dashed #001b3d;
-    padding:12px 0;
     font-size:20px;
 }
 
 .ficha-label{
-    font-weight:bold;
+    width:250px;
     display:inline-block;
-    width:180px;
+    font-weight:bold;
+    color:#001b3d;
 }
 
 .ficha-box{
     margin-top:25px;
     border:1px solid #001b3d;
-    padding:15px;
-    font-size:20px;
-    min-height:80px;
+    padding:20px;
+    border-radius:10px;
+    font-size:18px;
 }
 
+.busca-input{
+    width:75%;
+    height:52px;
+    border:2px solid #001b3d;
+    border-radius:10px;
+    padding:0 18px;
+    font-size:22px;
+}
+
+.btn-buscar,
 .btn-voltar{
-    margin-top:25px;
     background:#0046b8;
     color:white;
-    border:0;
-    padding:14px 35px;
-    font-size:18px;
+    border:none;
+    border-radius:10px;
+    padding:14px 28px;
     cursor:pointer;
+    font-size:18px;
+    margin-top:15px;
 }
 
+.btn-buscar:hover,
+.btn-voltar:hover{
+    background:#006cff;
+}
+
+.resultado{
+    margin-top:20px;
+}
+
+.item-resultado{
+    background:#eef3f8;
+    border-left:6px solid #0046b8;
+    padding:18px;
+    border-radius:8px;
+    margin-bottom:12px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.item-resultado:hover{
+    background:#dce9f8;
+}
+
+/* =========================
+FOOTER
+========================= */
+
 .footer{
-    height:55px;
+    height:60px;
     background:#001b3d;
     color:white;
     text-align:center;
-    line-height:55px;
-    font-size:17px;
-    margin-top:35px;
+    line-height:60px;
+    margin-top:40px;
+    font-size:18px;
 }
+
+/* =========================
+BOTÃO MOBILE
+========================= */
+
+.mobile-menu-btn{
+    display:none;
+    position:absolute;
+    left:20px;
+    top:22px;
+    font-size:34px;
+    color:#001b3d;
+    cursor:pointer;
+    z-index:1001;
+}
+
+/* =========================
+RESPONSIVO
+========================= */
+
+@media(max-width:950px){
+
+    .sidebar{
+        left:-100%;
+        width:320px;
+    }
+
+    .sidebar.mobile-open{
+        left:0;
+    }
+
+    .main{
+        margin-left:0;
+    }
+
+    .mobile-menu-btn{
+        display:block;
+    }
+
+    .topbar{
+        padding:85px 20px 20px;
+    }
+
+    .company{
+        font-size:18px;
+        margin-top:10px;
+    }
+
+    .datetime{
+        position:relative;
+        right:auto;
+        top:auto;
+        margin-top:15px;
+        font-size:16px;
+    }
+
+    .base-box{
+        position:absolute;
+        right:20px;
+        top:20px;
+    }
+
+    .title{
+        padding:0 20px;
+    }
+
+    .title h1{
+        font-size:30px;
+        line-height:34px;
+    }
+
+    .title p{
+        font-size:16px;
+        line-height:24px;
+    }
+
+    .cards{
+        grid-template-columns:1fr;
+        width:100%;
+        padding:0 18px;
+        gap:20px;
+    }
+
+    .card{
+        min-height:145px;
+    }
+
+    .card-bar{
+        width:75px;
+    }
+
+    .icon{
+        width:78px;
+        height:78px;
+        line-height:78px;
+        font-size:38px;
+        left:36px;
+    }
+
+    .card-content{
+        padding:25px 25px 25px 130px;
+    }
+
+    .card-content h2{
+        font-size:22px;
+        line-height:28px;
+    }
+
+    .card-content p{
+        font-size:15px;
+        margin-top:8px;
+    }
+
+    .arrow{
+        display:none;
+    }
+
+    #telaBusca,
+    #telaFicha{
+        width:95%;
+        padding:18px;
+    }
+
+    .ficha-topo h2{
+        font-size:28px;
+    }
+
+    .ficha-linha{
+        font-size:16px;
+    }
+
+    .ficha-label{
+        width:100%;
+        margin-bottom:5px;
+    }
+
+    .busca-input{
+        width:100%;
+        font-size:18px;
+    }
+
+    .btn-buscar{
+        width:100%;
+        margin-left:0;
+    }
+
+    .footer{
+        font-size:14px;
+        padding:0 15px;
+    }
+
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="sidebar">
-    <div class="logo">ASSISTÊNCIA<br><span>TÉCNICA</span></div>
-    <div class="sublogo">LOGÍSTICA REVERSA</div>
+<div class="sidebar" id="sidebar">
+
+    <div class="logo">
+        ASSISTÊNCIA<br>
+        <span>TÉCNICA</span>
+    </div>
+
+    <div class="sublogo">
+        LOGÍSTICA REVERSA
+    </div>
 
     <div class="line"></div>
 
-    <div class="menu active" onclick="voltarInicio()">⌂ Página Inicial</div>
+    <div class="menu active">⌂ Página Inicial</div>
     <div class="menu">▣ Coleta de O.S</div>
     <div class="menu">↩ C.I Devoluções</div>
-    <div class="menu" onclick="consultarOS()">⌕ Consultar O.S</div>
+    <div class="menu" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu">▥ Relatórios</div>
-    <div class="menu" onclick="atualizarCacheManual()">⟳ Atualizar Dados</div>
+    <div class="menu">⟳ Atualizar Dados</div>
+
 </div>
 
 <div class="main">
 
     <div class="topbar">
+
+        <div class="mobile-menu-btn" onclick="toggleMenu()">
+            ☰
+        </div>
+
         <div>Bem-vindo,</div>
-        <div class="company">Claudino SA Lojas</div>
+
+        <div class="company">
+            Claudino SA Lojas de Departamentos
+        </div>
 
         <div class="datetime">
-            <div id="dataHoje"></div><br>
+            <div id="dataHoje"></div>
             <div id="horaAtual"></div>
         </div>
+
+        <div class="base-box">
+
+            <button class="btn-base" onclick="abrirListaBase()">
+                BASE: <span id="textoBase">ILR</span> ▼
+            </button>
+
+            <div class="lista-base" id="listaBase">
+                <div>ILR</div>
+                <div>IMP</div>
+            </div>
+
+        </div>
+
     </div>
 
     <div id="telaInicio">
+
         <div class="title">
             <h1>ASSISTÊNCIA TÉCNICA</h1>
-            <p>LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO</p>
+
+            <p>
+                LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO
+            </p>
+
             <div class="underline"></div>
         </div>
 
-        <table class="cards-table">
-            <tr>
-                <td>
-                    <div class="card">
-                        <div class="icon">▣</div>
-                        <div class="texto-card">
-                            <h2>COLETA DE<br>ORDENS DE SERVIÇO</h2>
-                            <p>Registrar novas ordens de serviço</p>
-                        </div>
-                        <div class="arrow">›</div>
-                    </div>
-                </td>
+        <div class="cards">
 
-                <td>
-                    <div class="card">
-                        <div class="icon">↩</div>
-                        <div class="texto-card">
-                            <h2>C.I<br>DEVOLUÇÕES</h2>
-                            <p>Registrar e controlar devoluções</p>
-                        </div>
-                        <div class="arrow">›</div>
-                    </div>
-                </td>
-            </tr>
+            <div class="card">
 
-            <tr>
-                <td>
-                    <div class="card" onclick="consultarOS()">
-                        <div class="icon">⌕</div>
-                        <div class="texto-card">
-                            <h2>CONSULTAR O.S</h2>
-                            <p>Pesquisar e acompanhar ordens de serviço</p>
-                        </div>
-                        <div class="arrow">›</div>
-                    </div>
-                </td>
+                <div class="card-bar"></div>
 
-                <td>
-                    <div class="card">
-                        <div class="icon">▥</div>
-                        <div class="texto-card">
-                            <h2>RELATÓRIOS</h2>
-                            <p>Visualizar relatórios e indicadores</p>
-                        </div>
-                        <div class="arrow">›</div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </div>
+                <div class="icon">▣</div>
 
-    <div id="telaFicha">
-        <div class="ficha-topo">
-            <h2>ORDEM DE SERVIÇO</h2>
-            <div>Assistência Técnica / Logística Reversa</div>
+                <div class="card-content">
+                    <h2>COLETA DE<br>ORDENS DE SERVIÇO</h2>
+
+                    <p>
+                        Registrar novas ordens de serviço
+                    </p>
+                </div>
+
+                <div class="arrow">›</div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-bar"></div>
+
+                <div class="icon">↩</div>
+
+                <div class="card-content">
+                    <h2>C.I<br>DEVOLUÇÕES</h2>
+
+                    <p>
+                        Registrar e controlar devoluções
+                    </p>
+                </div>
+
+                <div class="arrow">›</div>
+
+            </div>
+
+            <div class="card" onclick="abrirBusca()">
+
+                <div class="card-bar"></div>
+
+                <div class="icon">⌕</div>
+
+                <div class="card-content">
+                    <h2>CONSULTAR O.S</h2>
+
+                    <p>
+                        Pesquisar por O.S, série, cliente ou produto
+                    </p>
+                </div>
+
+                <div class="arrow">›</div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-bar"></div>
+
+                <div class="icon">▥</div>
+
+                <div class="card-content">
+                    <h2>RELATÓRIOS</h2>
+
+                    <p>
+                        Visualizar relatórios e indicadores
+                    </p>
+                </div>
+
+                <div class="arrow">›</div>
+
+            </div>
+
         </div>
 
-        <div class="ficha-linha"><span class="ficha-label">O.S:</span><span id="fOS"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Data:</span><span id="fData"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">PDV:</span><span id="fPDV"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Produto:</span><span id="fProduto"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Cor:</span><span id="fCor"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Nº Série:</span><span id="fSerie"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Técnico:</span><span id="fTecnico"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Rack:</span><span id="fRack"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Status:</span><span id="fStatus"></span></div>
-
-        <div class="ficha-box">
-            <b>Observações:</b><br>
-            Dados importados automaticamente da planilha online.
-        </div>
-
-        <button class="btn-voltar" onclick="voltarInicio()">Voltar</button>
     </div>
 
-    <div class="footer">Sistema de Assistência Técnica - Logística Reversa</div>
+    <div class="footer">
+        Sistema de Assistência Técnica - Logística Reversa
+    </div>
+
 </div>
 
 <script>
-const urlCSV = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTIeFcwq3BjMqk_93QTashFFBor9bueaWFVzbLdU8utIzm4aShhwjgskdOv_LG4wgLlpRDq_VvQwEXw/pub?gid=868143536&single=true&output=csv";
-
-let cacheCSV = "";
 
 function atualizarHora(){
+
     const agora = new Date();
 
     document.getElementById("dataHoje").innerHTML =
-        "▣ " + agora.toLocaleDateString("pt-BR", {
-            weekday:"long",
-            day:"2-digit",
-            month:"long",
-            year:"numeric"
-        });
+        "▣ " +
+        agora.toLocaleDateString(
+            "pt-BR",
+            {
+                weekday:"long",
+                day:"2-digit",
+                month:"long",
+                year:"numeric"
+            }
+        );
 
     document.getElementById("horaAtual").innerHTML =
-        "◷ " + agora.toLocaleTimeString("pt-BR");
+        "◷ " +
+        agora.toLocaleTimeString("pt-BR");
 }
 
-async function baixarCSV(){
-    const resp = await fetch(urlCSV);
-    cacheCSV = await resp.text();
-    localStorage.setItem("rexpedlr_cache", cacheCSV);
-}
+setInterval(atualizarHora,1000);
 
-async function atualizarCacheManual(){
-    try{
-        await baixarCSV();
-        alert("Dados atualizados com sucesso.");
-    }catch(e){
-        alert("Erro ao atualizar dados: " + e.message);
-    }
-}
-
-async function garantirCSV(){
-    if(cacheCSV !== ""){
-        return cacheCSV;
-    }
-
-    const cacheLocal = localStorage.getItem("rexpedlr_cache");
-
-    if(cacheLocal){
-        cacheCSV = cacheLocal;
-        return cacheCSV;
-    }
-
-    await baixarCSV();
-    return cacheCSV;
-}
-
-function voltarInicio(){
-    document.getElementById("telaInicio").style.display = "block";
-    document.getElementById("telaFicha").style.display = "none";
-}
-
-function parseCSVLine(line){
-    const result = [];
-    let current = "";
-    let insideQuotes = false;
-
-    for(let i = 0; i < line.length; i++){
-        const char = line[i];
-
-        if(char === '"'){
-            insideQuotes = !insideQuotes;
-        }else if(char === "," && !insideQuotes){
-            result.push(current);
-            current = "";
-        }else{
-            current += char;
-        }
-    }
-
-    result.push(current);
-    return result;
-}
-
-async function consultarOS(){
-    const osDigitada = prompt("Digite o número da O.S:");
-
-    if(!osDigitada){
-        return;
-    }
-
-    const osLimpa = osDigitada.replace(/\s/g, "");
-
-    try{
-        const csv = await garantirCSV();
-        const linhas = csv.split(/\r?\n/);
-
-        let encontrada = null;
-
-        for(let i = 1; i < linhas.length; i++){
-            const colunas = parseCSVLine(linhas[i]);
-
-            if(!colunas[0]) continue;
-
-            const osLinha = colunas[0].replace(/\s/g, "");
-
-            if(osLinha === osLimpa){
-                encontrada = colunas;
-                break;
-            }
-        }
-
-        if(!encontrada){
-            alert("O.S não encontrada: " + osLimpa);
-            return;
-        }
-
-        document.getElementById("fOS").innerHTML = encontrada[0] || "";
-        document.getElementById("fData").innerHTML = encontrada[1] || "";
-        document.getElementById("fPDV").innerHTML = encontrada[2] || "";
-        document.getElementById("fProduto").innerHTML = encontrada[7] || "";
-        document.getElementById("fCor").innerHTML = encontrada[8] || "";
-        document.getElementById("fSerie").innerHTML = encontrada[9] || "";
-        document.getElementById("fTecnico").innerHTML = encontrada[11] || "";
-        document.getElementById("fRack").innerHTML = encontrada[12] || "";
-        document.getElementById("fStatus").innerHTML = encontrada[13] || "";
-
-        document.getElementById("telaInicio").style.display = "none";
-        document.getElementById("telaFicha").style.display = "block";
-
-    }catch(e){
-        alert("Erro ao consultar O.S: " + e.message);
-    }
-}
-
-setInterval(atualizarHora, 1000);
 atualizarHora();
-baixarCSV().catch(() => {});
+
+function toggleMenu(){
+
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("mobile-open");
+}
+
+function abrirListaBase(){
+
+    const lista =
+        document.getElementById("listaBase");
+
+    lista.style.display =
+        lista.style.display === "block"
+        ? "none"
+        : "block";
+}
+
+function abrirBusca(){
+
+    alert("Tela de busca");
+}
+
 </script>
 
 </body>
