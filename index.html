@@ -6,516 +6,88 @@
 <title>Assistência Técnica</title>
 
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:Segoe UI, Arial;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
+body{background:#eef3f8;overflow-x:hidden}
 
-body{
-    background:#eef3f8;
-    overflow-x:hidden;
-}
+.sidebar{position:fixed;left:0;top:0;width:300px;height:100%;background:#001b3d;color:white;padding:35px 25px;z-index:1000;transition:.3s}
+.logo{font-size:30px;font-weight:bold;line-height:34px}
+.logo span{color:#1ea5ff}
+.sublogo{color:#1ea5ff;margin-top:18px;font-size:18px}
+.line{height:1px;background:#244466;margin:32px 0}
+.menu{height:58px;line-height:58px;padding-left:20px;margin-bottom:15px;font-size:20px;cursor:pointer;border-radius:10px;transition:.2s}
+.menu:hover,.menu.active{background:#006cff}
 
-.sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    width:300px;
-    height:100%;
-    background:#001b3d;
-    color:white;
-    padding:35px 25px;
-    z-index:1000;
-    transition:.3s;
-}
+.main{margin-left:300px;min-height:100vh}
+.topbar{background:white;min-height:110px;padding:25px 45px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.company{font-size:30px;font-weight:bold;color:#001b3d}
+.datetime{position:absolute;right:45px;top:20px;color:#001b3d;font-size:18px;font-weight:bold}
+.datetime div{margin-bottom:10px}
 
-.mobile-close{
-    display:none;
-    font-size:34px;
-    cursor:pointer;
-    margin-bottom:25px;
-}
+.base-box{position:absolute;right:45px;top:70px;z-index:50}
+.btn-base{background:#ff9800;color:white;border:none;border-radius:12px;padding:10px 22px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
+.lista-base{display:none;background:white;margin-top:8px;border-radius:10px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+.lista-base div{padding:12px 20px;cursor:pointer;color:#001b3d;font-weight:bold}
 
-.logo{
-    font-size:30px;
-    font-weight:bold;
-    line-height:34px;
-}
+.title{text-align:center;margin-top:50px;color:#001b3d}
+.title h1{font-size:64px;font-weight:900}
+.title p{margin-top:15px;font-size:24px}
+.underline{width:170px;height:5px;background:#0074ff;margin:18px auto}
 
-.logo span{
-    color:#1ea5ff;
-}
+.cards{width:1150px;max-width:95%;margin:50px auto;display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.card{background:#0046b8;border-radius:18px;min-height:180px;position:relative;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:0 8px 18px rgba(0,0,0,.18)}
+.card:hover{transform:scale(1.02);background:#0062ff}
+.card-bar{position:absolute;left:0;top:0;width:95px;height:100%;background:#0057e0}
+.icon{position:absolute;left:42px;top:50%;transform:translateY(-50%);width:95px;height:95px;border-radius:50%;background:white;color:#001b3d;text-align:center;line-height:95px;font-size:48px;font-weight:bold;z-index:2}
+.card-content{padding:38px 40px 35px 165px;color:white}
+.card-content h2{font-size:36px;line-height:40px}
+.card-content p{margin-top:15px;font-size:20px}
+.arrow{position:absolute;right:30px;top:50%;transform:translateY(-50%);font-size:75px;color:white}
 
-.sublogo{
-    color:#1ea5ff;
-    margin-top:18px;
-    font-size:18px;
-}
+#telaBusca,#telaFicha,#telaCI{display:none}
+#telaBusca,#telaFicha{width:1100px;max-width:95%;margin:35px auto;background:white;border:2px solid #001b3d;border-radius:12px;padding:25px}
 
-.line{
-    height:1px;
-    background:#244466;
-    margin:32px 0;
-}
+.ficha-topo{text-align:center;border-bottom:2px solid #001b3d;padding-bottom:15px;margin-bottom:20px}
+.ficha-topo h2{font-size:40px;color:#001b3d}
+.ficha-linha{padding:14px 0;border-bottom:1px dashed #001b3d;font-size:20px}
+.ficha-label{width:250px;display:inline-block;font-weight:bold;color:#001b3d}
+.ficha-box{margin-top:25px;border:1px solid #001b3d;padding:20px;border-radius:10px;font-size:18px}
 
-.menu{
-    height:58px;
-    line-height:58px;
-    padding-left:20px;
-    margin-bottom:15px;
-    font-size:20px;
-    cursor:pointer;
-    border-radius:10px;
-    transition:.2s;
-}
+.busca-input{width:75%;height:52px;border:2px solid #001b3d;border-radius:10px;padding:0 18px;font-size:22px}
+.btn-buscar,.btn-voltar{background:#0046b8;color:white;border:none;border-radius:10px;padding:14px 28px;cursor:pointer;font-size:18px;margin-top:15px;margin-right:10px}
+.resultado{margin-top:20px}
+.item-resultado{background:#eef3f8;border-left:6px solid #0046b8;padding:18px;border-radius:8px;margin-bottom:12px;cursor:pointer;font-size:18px}
+.status-msg{margin-top:18px;font-size:18px;font-weight:bold}
 
-.menu:hover,
-.menu.active{
-    background:#006cff;
-}
-
-.base-menu-mobile{
-    display:none;
-    margin-bottom:20px;
-}
-
-.main{
-    margin-left:300px;
-    min-height:100vh;
-    transition:.3s;
-}
-
-.topbar{
-    background:white;
-    min-height:110px;
-    padding:25px 45px;
-    position:relative;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-}
-
-.company{
-    font-size:30px;
-    font-weight:bold;
-    color:#001b3d;
-}
-
-.datetime{
-    position:absolute;
-    right:45px;
-    top:20px;
-    color:#001b3d;
-    font-size:18px;
-    font-weight:bold;
-}
-
-.datetime div{
-    margin-bottom:10px;
-}
-
-.base-box{
-    position:absolute;
-    right:45px;
-    top:70px;
-    z-index:50;
-}
-
-.btn-base{
-    background:#ff9800;
-    color:white;
-    border:none;
-    border-radius:12px;
-    padding:10px 22px;
-    font-size:16px;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 4px 12px rgba(0,0,0,.25);
-}
-
-.btn-base:hover{
-    background:#ff7b00;
-}
-
-.lista-base{
-    display:none;
-    background:white;
-    margin-top:8px;
-    border-radius:10px;
-    overflow:hidden;
-    box-shadow:0 4px 15px rgba(0,0,0,.2);
-}
-
-.lista-base div{
-    padding:12px 20px;
-    cursor:pointer;
-    color:#001b3d;
-    font-weight:bold;
-}
-
-.lista-base div:hover{
-    background:#eef3f8;
-}
-
-.title{
-    text-align:center;
-    margin-top:50px;
-    color:#001b3d;
-}
-
-.title h1{
-    font-size:64px;
-    font-weight:900;
-}
-
-.title p{
-    margin-top:15px;
-    font-size:24px;
-}
-
-.underline{
-    width:170px;
-    height:5px;
-    background:#0074ff;
-    margin:18px auto;
-}
-
-.cards{
-    width:1150px;
-    max-width:95%;
-    margin:50px auto;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:30px;
-}
-
-.card{
-    background:#0046b8;
-    border-radius:18px;
-    min-height:180px;
-    position:relative;
-    overflow:hidden;
-    cursor:pointer;
-    transition:.2s;
-    box-shadow:0 8px 18px rgba(0,0,0,.18);
-}
-
-.card:hover{
-    transform:scale(1.02);
-    background:#0062ff;
-}
-
-.card-bar{
-    position:absolute;
-    left:0;
-    top:0;
-    width:95px;
-    height:100%;
-    background:#0057e0;
-}
-
-.icon{
-    position:absolute;
-    left:42px;
-    top:50%;
-    transform:translateY(-50%);
-    width:95px;
-    height:95px;
-    border-radius:50%;
-    background:white;
-    color:#001b3d;
-    text-align:center;
-    line-height:95px;
-    font-size:48px;
-    font-weight:bold;
-    z-index:2;
-}
-
-.card-content{
-    padding:38px 40px 35px 165px;
-    color:white;
-}
-
-.card-content h2{
-    font-size:42px;
-    line-height:44px;
-}
-
-.card-content p{
-    margin-top:15px;
-    font-size:22px;
-    opacity:.95;
-}
-
-.arrow{
-    position:absolute;
-    right:30px;
-    top:50%;
-    transform:translateY(-50%);
-    font-size:75px;
-    color:white;
-}
-
-#telaBusca,
-#telaFicha{
-    display:none;
-    width:1100px;
-    max-width:95%;
-    margin:35px auto;
-    background:white;
-    border:2px solid #001b3d;
-    border-radius:12px;
-    padding:25px;
-}
-
-.ficha-topo{
-    text-align:center;
-    border-bottom:2px solid #001b3d;
-    padding-bottom:15px;
-    margin-bottom:20px;
-}
-
-.ficha-topo h2{
-    font-size:40px;
-    color:#001b3d;
-}
-
-.ficha-linha{
-    padding:14px 0;
-    border-bottom:1px dashed #001b3d;
-    font-size:20px;
-}
-
-.ficha-label{
-    width:250px;
-    display:inline-block;
-    font-weight:bold;
-    color:#001b3d;
-}
-
-.ficha-box{
-    margin-top:25px;
-    border:1px solid #001b3d;
-    padding:20px;
-    border-radius:10px;
-    font-size:18px;
-}
-
-.busca-input{
-    width:75%;
-    height:52px;
-    border:2px solid #001b3d;
-    border-radius:10px;
-    padding:0 18px;
-    font-size:22px;
-}
-
-.btn-buscar,
-.btn-voltar{
-    background:#0046b8;
-    color:white;
-    border:none;
-    border-radius:10px;
-    padding:14px 28px;
-    cursor:pointer;
-    font-size:18px;
-    margin-top:15px;
-}
-
-.resultado{
-    margin-top:20px;
-}
-
-.item-resultado{
-    background:#eef3f8;
-    border-left:6px solid #0046b8;
-    padding:18px;
-    border-radius:8px;
-    margin-bottom:12px;
-    cursor:pointer;
-    font-size:18px;
-}
-
-.status-msg{
-    margin-top:18px;
-    font-size:18px;
-    font-weight:bold;
-}
-
-.footer{
-    height:60px;
-    background:#001b3d;
-    color:white;
-    text-align:center;
-    line-height:60px;
-    margin-top:40px;
-    font-size:18px;
-}
-
-.mobile-menu-btn{
-    display:none;
-    position:absolute;
-    left:20px;
-    top:22px;
-    font-size:34px;
-    color:#001b3d;
-    cursor:pointer;
-    z-index:1001;
-}
+.footer{height:60px;background:#001b3d;color:white;text-align:center;line-height:60px;margin-top:40px;font-size:18px}
+.mobile-menu-btn{display:none;position:absolute;left:20px;top:22px;font-size:34px;color:#001b3d;cursor:pointer;z-index:1001}
 
 @media(max-width:950px){
-
-    .sidebar{
-        left:-100%;
-        width:100%;
-        height:100%;
-        overflow:auto;
-    }
-
-    .sidebar.mobile-open{
-        left:0;
-    }
-
-    .mobile-close{
-        display:block;
-    }
-
-    .base-menu-mobile{
-        display:block;
-    }
-
-    .main{
-        margin-left:0;
-    }
-
-    .mobile-menu-btn{
-        display:block;
-    }
-
-    .topbar{
-        min-height:80px;
-        padding:20px;
-        background:#eef3f8;
-        box-shadow:none;
-    }
-
-    .topbar-info,
-    .datetime{
-        display:none;
-    }
-
-    .base-box{
-        position:absolute;
-        right:20px;
-        top:20px;
-    }
-
-    .title{
-        padding:0 20px;
-        margin-top:45px;
-    }
-
-    .title h1{
-        font-size:30px;
-        line-height:34px;
-    }
-
-    .title p{
-        font-size:16px;
-        line-height:24px;
-    }
-
-    .cards{
-        grid-template-columns:1fr;
-        width:100%;
-        padding:0 18px;
-        gap:20px;
-        margin:45px auto;
-    }
-
-    .card{
-        min-height:145px;
-        background:transparent;
-        box-shadow:none;
-        overflow:visible;
-    }
-
-    .card-bar{
-        width:55px;
-        height:140px;
-        border-radius:12px;
-        background:#0046b8;
-        box-shadow:0 8px 18px rgba(0,0,0,.20);
-    }
-
-    .icon{
-        width:76px;
-        height:76px;
-        line-height:76px;
-        font-size:36px;
-        left:36px;
-        background:white;
-        box-shadow:0 8px 20px rgba(0,0,0,.08);
-    }
-
-    .card-content{
-        padding:18px 20px 18px 125px;
-        color:#001b3d;
-    }
-
-    .card-content h2{
-        font-size:24px;
-        line-height:30px;
-    }
-
-    .card-content p{
-        color:#4e5b6d;
-        font-size:16px;
-        line-height:24px;
-        margin-top:10px;
-    }
-
-    .arrow{
-        display:none;
-    }
-
-    #telaBusca,
-    #telaFicha{
-        width:95%;
-        padding:18px;
-    }
-
-    .ficha-topo h2{
-        font-size:28px;
-    }
-
-    .ficha-linha{
-        font-size:16px;
-    }
-
-    .ficha-label{
-        width:100%;
-        display:block;
-        margin-bottom:5px;
-    }
-
-    .busca-input{
-        width:100%;
-        font-size:18px;
-    }
-
-    .btn-buscar,
-    .btn-voltar{
-        width:100%;
-        margin-left:0;
-    }
-
-    .footer{
-        font-size:14px;
-        padding:10px 15px;
-        height:auto;
-        line-height:22px;
-    }
+    .sidebar{left:-100%;width:320px}
+    .sidebar.mobile-open{left:0}
+    .main{margin-left:0}
+    .mobile-menu-btn{display:block}
+    .topbar{padding:85px 20px 20px}
+    .company{font-size:18px;margin-top:10px}
+    .datetime{position:relative;right:auto;top:auto;margin-top:15px;font-size:16px}
+    .base-box{position:absolute;right:20px;top:20px}
+    .title{padding:0 20px}
+    .title h1{font-size:30px;line-height:34px}
+    .title p{font-size:16px;line-height:24px}
+    .cards{grid-template-columns:1fr;width:100%;padding:0 18px;gap:20px}
+    .card{min-height:145px;background:transparent;box-shadow:none;overflow:visible}
+    .card-bar{width:55px;height:140px;border-radius:12px;background:#0046b8;box-shadow:0 8px 18px rgba(0,0,0,.20)}
+    .icon{width:76px;height:76px;line-height:76px;font-size:36px;left:36px}
+    .card-content{padding:18px 20px 18px 125px;color:#001b3d}
+    .card-content h2{font-size:24px;line-height:30px}
+    .card-content p{color:#4e5b6d;font-size:16px;line-height:24px}
+    .arrow{display:none}
+    #telaBusca,#telaFicha{width:95%;padding:18px}
+    .ficha-topo h2{font-size:28px}
+    .ficha-linha{font-size:16px}
+    .ficha-label{width:100%;display:block;margin-bottom:5px}
+    .busca-input{width:100%;font-size:18px}
+    .btn-buscar,.btn-voltar{width:100%;margin-left:0;margin-right:0}
+    .footer{font-size:14px;padding:10px 15px;height:auto;line-height:22px}
 }
 </style>
 </head>
@@ -523,193 +95,135 @@ body{
 <body>
 
 <div class="sidebar" id="sidebar">
-
-    <div class="mobile-close" onclick="toggleMenu()">×</div>
-
-    <div class="logo">
-        ASSISTÊNCIA<br>
-        <span>TÉCNICA</span>
-    </div>
-
+    <div class="logo">ASSISTÊNCIA<br><span>TÉCNICA</span></div>
     <div class="sublogo">LOGÍSTICA REVERSA</div>
-
     <div class="line"></div>
-
-    <div class="base-menu-mobile">
-        <button class="btn-base" onclick="abrirListaBase('listaBaseMenu')">
-            BASE: <span id="textoBaseMenu">ILR</span> ▼
-        </button>
-
-        <div class="lista-base" id="listaBaseMenu">
-            <div onclick="trocarBase('ILR')">ILR</div>
-            <div onclick="trocarBase('IMP')">IMP</div>
-        </div>
-    </div>
 
     <div class="menu active" onclick="voltarInicio()">⌂ Página Inicial</div>
     <div class="menu">▣ Coleta de O.S</div>
-    <div class="menu">↩ C.I Devoluções</div>
+    <div class="menu" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
     <div class="menu" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu">▥ Relatórios</div>
     <div class="menu" onclick="atualizarDados()">⟳ Atualizar Dados</div>
-
-    <div class="line"></div>
-
-    <div class="topbar-info-mobile">
-        <div>Bem-vindo,</div>
-        <div style="font-size:22px;font-weight:bold;margin:8px 0;">
-            Claudino SA Lojas de Departamentos
-        </div>
-        <div id="dataHojeMenu"></div>
-        <div id="horaAtualMenu"></div>
-    </div>
-
 </div>
 
 <div class="main">
 
-    <div class="topbar">
+<div class="topbar">
+    <div class="mobile-menu-btn" onclick="toggleMenu()">☰</div>
+    <div>Bem-vindo,</div>
+    <div class="company">Claudino SA Lojas de Departamentos</div>
 
-        <div class="mobile-menu-btn" onclick="toggleMenu()">☰</div>
-
-        <div class="topbar-info">
-            <div>Bem-vindo,</div>
-            <div class="company">Claudino SA Lojas de Departamentos</div>
-        </div>
-
-        <div class="datetime">
-            <div id="dataHoje"></div>
-            <div id="horaAtual"></div>
-        </div>
-
-        <div class="base-box">
-            <button class="btn-base" onclick="abrirListaBase('listaBaseTop')">
-                BASE: <span id="textoBase">ILR</span> ▼
-            </button>
-
-            <div class="lista-base" id="listaBaseTop">
-                <div onclick="trocarBase('ILR')">ILR</div>
-                <div onclick="trocarBase('IMP')">IMP</div>
-            </div>
-        </div>
-
+    <div class="datetime">
+        <div id="dataHoje"></div>
+        <div id="horaAtual"></div>
     </div>
 
-    <div id="telaInicio">
-
-        <div class="title">
-            <h1>ASSISTÊNCIA TÉCNICA</h1>
-            <p>LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO</p>
-            <div class="underline"></div>
+    <div class="base-box">
+        <button class="btn-base" onclick="abrirListaBase()">BASE: <span id="textoBase">ILR</span> ▼</button>
+        <div class="lista-base" id="listaBase">
+            <div onclick="trocarBase('ILR')">ILR</div>
+            <div onclick="trocarBase('IMP')">IMP</div>
         </div>
+    </div>
+</div>
 
-        <div class="cards">
-
-            <div class="card">
-                <div class="card-bar"></div>
-                <div class="icon">▣</div>
-                <div class="card-content">
-                    <h2>COLETA DE<br>ORDENS DE SERVIÇO</h2>
-                    <p>Registrar novas ordens de serviço</p>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-            <div class="card">
-                <div class="card-bar"></div>
-                <div class="icon">↩</div>
-                <div class="card-content">
-                    <h2>C.I<br>DEVOLUÇÕES</h2>
-                    <p>Registrar e controlar devoluções</p>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-            <div class="card" onclick="abrirBusca()">
-                <div class="card-bar"></div>
-                <div class="icon">⌕</div>
-                <div class="card-content">
-                    <h2>CONSULTAR O.S</h2>
-                    <p>Pesquisar por O.S, série, cliente ou produto</p>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-            <div class="card">
-                <div class="card-bar"></div>
-                <div class="icon">▥</div>
-                <div class="card-content">
-                    <h2>RELATÓRIOS</h2>
-                    <p>Visualizar relatórios e indicadores</p>
-                </div>
-                <div class="arrow">›</div>
-            </div>
-
-        </div>
-
+<div id="telaInicio">
+    <div class="title">
+        <h1>ASSISTÊNCIA TÉCNICA</h1>
+        <p>LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO</p>
+        <div class="underline"></div>
     </div>
 
-    <div id="telaBusca">
-
-        <div class="ficha-topo">
-            <h2>CONSULTAR ORDEM DE SERVIÇO</h2>
-            <div>Base atual: <b id="baseBusca">ILR</b></div>
+    <div class="cards">
+        <div class="card">
+            <div class="card-bar"></div><div class="icon">▣</div>
+            <div class="card-content"><h2>COLETA DE<br>ORDENS DE SERVIÇO</h2><p>Registrar novas ordens de serviço</p></div>
+            <div class="arrow">›</div>
         </div>
 
-        <input
-            id="campoBusca"
-            class="busca-input"
-            type="text"
-            placeholder="Digite O.S, série, cliente ou produto..."
-            onkeyup="buscarAutomatico()"
-        >
-
-        <button class="btn-buscar" onclick="buscarAutomatico()">Buscar</button>
-
-        <div id="msgBusca" class="status-msg"></div>
-        <div id="resultadosBusca" class="resultado"></div>
-
-        <button class="btn-voltar" onclick="voltarInicio()">Voltar</button>
-
-    </div>
-
-    <div id="telaFicha">
-
-        <div class="ficha-topo">
-            <h2>ORDEM DE SERVIÇO</h2>
-            <div>Assistência Técnica / Logística Reversa</div>
+        <div class="card" onclick="abrirTelaCI()">
+            <div class="card-bar"></div><div class="icon">↩</div>
+            <div class="card-content"><h2>C.I<br>DEVOLUÇÕES</h2><p>Escolher e editar documentos de devolução</p></div>
+            <div class="arrow">›</div>
         </div>
 
-        <div class="ficha-linha"><span class="ficha-label">O.S:</span><span id="fOS"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Data:</span><span id="fData"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">PDV:</span><span id="fPDV"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Cliente:</span><span id="fCliente"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Produto:</span><span id="fProduto"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Cor:</span><span id="fCor"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Nº Série:</span><span id="fSerie"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Técnico:</span><span id="fTecnico"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Rack:</span><span id="fRack"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Status:</span><span id="fStatus"></span></div>
-
-        <div class="ficha-linha"><span class="ficha-label">Análise do Defeito:</span><span id="fAnaliseDefeito"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Obs. Status:</span><span id="fObsStatus"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Obs. Ordem Serviço:</span><span id="fObsOS"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Status da OS:</span><span id="fStatusOS"></span></div>
-        <div class="ficha-linha"><span class="ficha-label">Dt. Recb/AT:</span><span id="fDtRecbAT"></span></div>
-
-        <div class="ficha-box">
-            <b>Observações:</b><br>
-            Dados importados automaticamente da planilha online.
+        <div class="card" onclick="abrirBusca()">
+            <div class="card-bar"></div><div class="icon">⌕</div>
+            <div class="card-content"><h2>CONSULTAR O.S</h2><p>Pesquisar por O.S, série, cliente ou produto</p></div>
+            <div class="arrow">›</div>
         </div>
 
-        <button class="btn-voltar" onclick="abrirBusca()">Voltar para busca</button>
-        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+        <div class="card">
+            <div class="card-bar"></div><div class="icon">▥</div>
+            <div class="card-content"><h2>RELATÓRIOS</h2><p>Visualizar relatórios e indicadores</p></div>
+            <div class="arrow">›</div>
+        </div>
+    </div>
+</div>
 
+<div id="telaCI">
+    <div class="title">
+        <h1>C.I DEVOLUÇÕES</h1>
+        <p>Selecione a C.I para editar</p>
+        <div class="underline"></div>
     </div>
 
-    <div class="footer">
-        Sistema de Assistência Técnica - Logística Reversa
+    <div class="cards">
+        <div class="card" onclick="abrirCI('regiao')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I REGIÃO</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('teresina')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I TEREZINA</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('pmr')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I PMR</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('geit')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I GEIT</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('assurant')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I ASSURANT</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('outros')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I OUTROS</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
     </div>
+</div>
+
+<div id="telaBusca">
+    <div class="ficha-topo">
+        <h2>CONSULTAR ORDEM DE SERVIÇO</h2>
+        <div>Base atual: <b id="baseBusca">ILR</b></div>
+    </div>
+
+    <input id="campoBusca" class="busca-input" type="text" placeholder="Digite O.S, série, cliente ou produto..." onkeyup="buscarAutomatico()">
+    <button class="btn-buscar" onclick="buscarAutomatico()">Buscar</button>
+
+    <div id="msgBusca" class="status-msg"></div>
+    <div id="resultadosBusca" class="resultado"></div>
+
+    <button class="btn-voltar" onclick="voltarInicio()">Voltar</button>
+</div>
+
+<div id="telaFicha">
+    <div class="ficha-topo">
+        <h2>ORDEM DE SERVIÇO</h2>
+        <div>Assistência Técnica / Logística Reversa</div>
+    </div>
+
+    <div class="ficha-linha"><span class="ficha-label">O.S:</span><span id="fOS"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Data:</span><span id="fData"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">PDV:</span><span id="fPDV"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Cliente:</span><span id="fCliente"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Produto:</span><span id="fProduto"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Cor:</span><span id="fCor"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Nº Série:</span><span id="fSerie"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Técnico:</span><span id="fTecnico"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Rack:</span><span id="fRack"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Status:</span><span id="fStatus"></span></div>
+
+    <div class="ficha-linha"><span class="ficha-label">Análise do Defeito:</span><span id="fAnaliseDefeito"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Obs. Status:</span><span id="fObsStatus"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Obs. Ordem Serviço:</span><span id="fObsOS"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Status da OS:</span><span id="fStatusOS"></span></div>
+    <div class="ficha-linha"><span class="ficha-label">Dt. Recb/AT:</span><span id="fDtRecbAT"></span></div>
+
+    <div class="ficha-box"><b>Observações:</b><br>Dados importados automaticamente da planilha online.</div>
+
+    <button class="btn-voltar" onclick="abrirBusca()">Voltar para busca</button>
+    <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+</div>
+
+<div class="footer">Sistema de Assistência Técnica - Logística Reversa</div>
 
 </div>
 
@@ -722,53 +236,71 @@ const urlILR =
 const urlIMP =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgCtE4QozXivh1D1NiJa5ogr9kimTwlgJ_E2kaexyj1CZFazTs5ep6BYVI3zQ1sdkHK9FQcFRyAqCD/pub?gid=885845663&single=true&output=csv";
 
+const idPlanilhaCI = "1f_PHzolTB018EQi6Ho5Xh0pI23NU7STVmDuF-7fpXYE";
+
+const linksCIEdit = {
+    regiao:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=546284772#gid=546284772",
+    teresina:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=2077587325#gid=2077587325",
+    pmr:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=324543846#gid=324543846",
+    geit:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=2126848667#gid=2126848667",
+    assurant:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=1058368228#gid=1058368228",
+    outros:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=1457022937#gid=1457022937"
+};
+
 let cacheCSV = "";
 let linhasPlanilha = [];
 let cabecalhoPlanilha = [];
 
 function atualizarHora(){
     const agora = new Date();
-
-    const data =
-        "▣ " +
-        agora.toLocaleDateString("pt-BR", {
-            weekday:"long",
-            day:"2-digit",
-            month:"long",
-            year:"numeric"
-        });
-
-    const hora =
-        "◷ " +
-        agora.toLocaleTimeString("pt-BR");
-
-    document.getElementById("dataHoje").innerHTML = data;
-    document.getElementById("horaAtual").innerHTML = hora;
-    document.getElementById("dataHojeMenu").innerHTML = data;
-    document.getElementById("horaAtualMenu").innerHTML = hora;
+    document.getElementById("dataHoje").innerHTML =
+        "▣ " + agora.toLocaleDateString("pt-BR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+    document.getElementById("horaAtual").innerHTML =
+        "◷ " + agora.toLocaleTimeString("pt-BR");
 }
 
-setInterval(atualizarHora, 1000);
+setInterval(atualizarHora,1000);
 atualizarHora();
 
 function toggleMenu(){
     document.getElementById("sidebar").classList.toggle("mobile-open");
 }
 
-function abrirListaBase(id){
-    const lista = document.getElementById(id);
+function abrirListaBase(){
+    const lista = document.getElementById("listaBase");
     lista.style.display = lista.style.display === "block" ? "none" : "block";
+}
+
+function esconderTelas(){
+    document.getElementById("telaInicio").style.display = "none";
+    document.getElementById("telaCI").style.display = "none";
+    document.getElementById("telaBusca").style.display = "none";
+    document.getElementById("telaFicha").style.display = "none";
+}
+
+function voltarInicio(){
+    esconderTelas();
+    document.getElementById("telaInicio").style.display = "block";
+    document.getElementById("sidebar").classList.remove("mobile-open");
+}
+
+function abrirTelaCI(){
+    esconderTelas();
+    document.getElementById("telaCI").style.display = "block";
+    document.getElementById("sidebar").classList.remove("mobile-open");
+}
+
+function abrirCI(nome){
+    if(linksCIEdit[nome]){
+        window.location.href = linksCIEdit[nome];
+    }
 }
 
 async function trocarBase(base){
     baseAtual = base;
-
     document.getElementById("textoBase").innerHTML = baseAtual;
-    document.getElementById("textoBaseMenu").innerHTML = baseAtual;
     document.getElementById("baseBusca").innerHTML = baseAtual;
-
-    document.getElementById("listaBaseTop").style.display = "none";
-    document.getElementById("listaBaseMenu").style.display = "none";
+    document.getElementById("listaBase").style.display = "none";
 
     cacheCSV = "";
     linhasPlanilha = [];
@@ -779,29 +311,19 @@ async function trocarBase(base){
     document.getElementById("msgBusca").innerHTML = "Carregando base " + baseAtual + "...";
 
     await baixarCSV();
-
-    document.getElementById("msgBusca").innerHTML =
-        "Base " + baseAtual + " carregada. Digite para pesquisar.";
+    document.getElementById("msgBusca").innerHTML = "Base " + baseAtual + " carregada. Digite para pesquisar.";
 }
 
 async function baixarCSV(){
     const url = baseAtual === "IMP" ? urlIMP : urlILR;
-
     const resp = await fetch(url);
-
-    if(!resp.ok){
-        throw new Error("Erro ao baixar CSV.");
-    }
-
+    if(!resp.ok){throw new Error("Erro ao baixar CSV.");}
     cacheCSV = await resp.text();
     prepararLinhas();
 }
 
 async function garantirCSV(){
-    if(cacheCSV !== ""){
-        return cacheCSV;
-    }
-
+    if(cacheCSV !== "") return cacheCSV;
     await baixarCSV();
     return cacheCSV;
 }
@@ -811,9 +333,7 @@ async function atualizarDados(){
         cacheCSV = "";
         linhasPlanilha = [];
         cabecalhoPlanilha = [];
-
         await baixarCSV();
-
         alert("Dados atualizados com sucesso.");
     }catch(e){
         alert("Erro: " + e.message);
@@ -825,24 +345,17 @@ function parseCSVLine(line){
     let current = "";
     let insideQuotes = false;
 
-    for(let i = 0; i < line.length; i++){
+    for(let i=0;i<line.length;i++){
         const char = line[i];
-
         if(char === '"'){
-            if(line[i + 1] === '"'){
-                current += '"';
-                i++;
-            }else{
-                insideQuotes = !insideQuotes;
-            }
+            if(line[i+1] === '"'){current += '"'; i++;}
+            else{insideQuotes = !insideQuotes;}
         }else if(char === "," && !insideQuotes){
-            result.push(current);
-            current = "";
+            result.push(current); current = "";
         }else{
             current += char;
         }
     }
-
     result.push(current);
     return result;
 }
@@ -850,21 +363,16 @@ function parseCSVLine(line){
 function prepararLinhas(){
     linhasPlanilha = [];
     cabecalhoPlanilha = [];
-
     const linhas = cacheCSV.split(/\r?\n/);
 
     if(linhas.length > 0){
         cabecalhoPlanilha = parseCSVLine(linhas[0]);
     }
 
-    for(let i = 1; i < linhas.length; i++){
+    for(let i=1;i<linhas.length;i++){
         if(!linhas[i].trim()) continue;
-
         const colunas = parseCSVLine(linhas[i]);
-
-        if(colunas.length > 1){
-            linhasPlanilha.push(colunas);
-        }
+        if(colunas.length > 1) linhasPlanilha.push(colunas);
     }
 }
 
@@ -872,49 +380,37 @@ function normalizarTexto(texto){
     return String(texto || "")
         .toLowerCase()
         .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[.\-/]/g, " ")
-        .replace(/\s+/g, " ")
+        .replace(/[\u0300-\u036f]/g,"")
+        .replace(/[.\-/]/g," ")
+        .replace(/\s+/g," ")
         .trim();
 }
 
 function somenteNumeros(texto){
-    return String(texto || "").replace(/\D/g, "");
+    return String(texto || "").replace(/\D/g,"");
 }
 
-function valor(c, i){
+function valor(c,i){
     return c[i] || "";
 }
 
 function pegarPorColuna(linha, nomesPossiveis){
-    for(let i = 0; i < cabecalhoPlanilha.length; i++){
+    for(let i=0;i<cabecalhoPlanilha.length;i++){
         const nomeAtual = normalizarTexto(cabecalhoPlanilha[i]);
-
-        for(let j = 0; j < nomesPossiveis.length; j++){
+        for(let j=0;j<nomesPossiveis.length;j++){
             if(nomeAtual === normalizarTexto(nomesPossiveis[j])){
                 return linha[i] || "";
             }
         }
     }
-
     return "";
 }
 
-function voltarInicio(){
-    document.getElementById("telaInicio").style.display = "block";
-    document.getElementById("telaBusca").style.display = "none";
-    document.getElementById("telaFicha").style.display = "none";
-    document.getElementById("sidebar").classList.remove("mobile-open");
-}
-
 async function abrirBusca(){
-    document.getElementById("telaInicio").style.display = "none";
+    esconderTelas();
     document.getElementById("telaBusca").style.display = "block";
-    document.getElementById("telaFicha").style.display = "none";
     document.getElementById("sidebar").classList.remove("mobile-open");
-
     document.getElementById("baseBusca").innerHTML = baseAtual;
-
     await garantirCSV();
 }
 
@@ -933,35 +429,17 @@ function abrirFichaPorLinha(index){
     document.getElementById("fStatus").innerHTML = valor(c,13);
 
     document.getElementById("fAnaliseDefeito").innerHTML =
-        pegarPorColuna(c, ["ANALISE DO DEFEITO", "ANÁLISE DO DEFEITO"]);
-
+        pegarPorColuna(c, ["ANALISE DO DEFEITO","ANÁLISE DO DEFEITO"]);
     document.getElementById("fObsStatus").innerHTML =
-        pegarPorColuna(c, ["OBS. STATUS", "OBS STATUS"]);
-
+        pegarPorColuna(c, ["OBS. STATUS","OBS STATUS"]);
     document.getElementById("fObsOS").innerHTML =
-        pegarPorColuna(c, [
-            "OBS. ORDEM DE SERVICO",
-            "OBS. ORDEM DE SERVIÇO",
-            "OBS ORDEM DE SERVICO",
-            "OBS ORDEM DE SERVIÇO"
-        ]);
-
+        pegarPorColuna(c, ["OBS. ORDEM DE SERVICO","OBS. ORDEM DE SERVIÇO","OBS ORDEM DE SERVICO","OBS ORDEM DE SERVIÇO"]);
     document.getElementById("fStatusOS").innerHTML =
-        pegarPorColuna(c, [
-            "STATUS DA OS",
-            "STATUS DA O.S",
-            "STATUS OS"
-        ]);
-
+        pegarPorColuna(c, ["STATUS DA OS","STATUS DA O.S","STATUS OS"]);
     document.getElementById("fDtRecbAT").innerHTML =
-        pegarPorColuna(c, [
-            "DT.RECB/AT",
-            "DT RECB/AT",
-            "DT. RECB/AT",
-            "DT RECEB AT"
-        ]);
+        pegarPorColuna(c, ["DT.RECB/AT","DT RECB/AT","DT. RECB/AT","DT RECEB AT"]);
 
-    document.getElementById("telaBusca").style.display = "none";
+    esconderTelas();
     document.getElementById("telaFicha").style.display = "block";
 }
 
@@ -971,7 +449,6 @@ async function buscarAutomatico(){
     const termoOriginal = document.getElementById("campoBusca").value;
     const termo = normalizarTexto(termoOriginal);
     const termoNum = somenteNumeros(termoOriginal);
-
     const area = document.getElementById("resultadosBusca");
     const msg = document.getElementById("msgBusca");
 
@@ -984,17 +461,13 @@ async function buscarAutomatico(){
 
     const resultados = [];
 
-    for(let i = 0; i < linhasPlanilha.length; i++){
+    for(let i=0;i<linhasPlanilha.length;i++){
         const c = linhasPlanilha[i];
-
         const linhaCompleta = c.join(" ");
         const textoBusca = normalizarTexto(linhaCompleta);
         const numerosBusca = somenteNumeros(linhaCompleta);
 
-        if(
-            textoBusca.includes(termo) ||
-            numerosBusca.includes(termoNum)
-        ){
+        if(textoBusca.includes(termo) || numerosBusca.includes(termoNum)){
             resultados.push({
                 index:i,
                 os:valor(c,0),
@@ -1005,9 +478,7 @@ async function buscarAutomatico(){
             });
         }
 
-        if(resultados.length >= 50){
-            break;
-        }
+        if(resultados.length >= 50) break;
     }
 
     if(resultados.length === 0){
@@ -1020,11 +491,7 @@ async function buscarAutomatico(){
     resultados.forEach(function(item){
         const div = document.createElement("div");
         div.className = "item-resultado";
-
-        div.onclick = function(){
-            abrirFichaPorLinha(item.index);
-        };
-
+        div.onclick = function(){ abrirFichaPorLinha(item.index); };
         div.innerHTML =
             "<b>O.S:</b> " + item.os +
             "<br><b>Cliente:</b> " + item.cliente +
