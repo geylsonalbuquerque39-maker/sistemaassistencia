@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Assistência Técnica</title>
 
 <style>
-
 *{
     margin:0;
     padding:0;
@@ -20,10 +18,6 @@ body{
     overflow-x:hidden;
 }
 
-/* =========================
-SIDEBAR
-========================= */
-
 .sidebar{
     position:fixed;
     left:0;
@@ -35,6 +29,13 @@ SIDEBAR
     padding:35px 25px;
     z-index:1000;
     transition:.3s;
+}
+
+.mobile-close{
+    display:none;
+    font-size:34px;
+    cursor:pointer;
+    margin-bottom:25px;
 }
 
 .logo{
@@ -75,9 +76,10 @@ SIDEBAR
     background:#006cff;
 }
 
-/* =========================
-MAIN
-========================= */
+.base-menu-mobile{
+    display:none;
+    margin-bottom:20px;
+}
 
 .main{
     margin-left:300px;
@@ -111,10 +113,6 @@ MAIN
 .datetime div{
     margin-bottom:10px;
 }
-
-/* =========================
-BOTÃO BASE
-========================= */
 
 .base-box{
     position:absolute;
@@ -159,10 +157,6 @@ BOTÃO BASE
     background:#eef3f8;
 }
 
-/* =========================
-TÍTULO
-========================= */
-
 .title{
     text-align:center;
     margin-top:50px;
@@ -185,10 +179,6 @@ TÍTULO
     background:#0074ff;
     margin:18px auto;
 }
-
-/* =========================
-CARDS
-========================= */
 
 .cards{
     width:1150px;
@@ -266,10 +256,6 @@ CARDS
     color:white;
 }
 
-/* =========================
-TELAS
-========================= */
-
 #telaBusca,
 #telaFicha{
     display:none;
@@ -336,11 +322,6 @@ TELAS
     margin-top:15px;
 }
 
-.btn-buscar:hover,
-.btn-voltar:hover{
-    background:#006cff;
-}
-
 .resultado{
     margin-top:20px;
 }
@@ -355,13 +336,11 @@ TELAS
     font-size:18px;
 }
 
-.item-resultado:hover{
-    background:#dce9f8;
+.status-msg{
+    margin-top:18px;
+    font-size:18px;
+    font-weight:bold;
 }
-
-/* =========================
-FOOTER
-========================= */
 
 .footer{
     height:60px;
@@ -372,10 +351,6 @@ FOOTER
     margin-top:40px;
     font-size:18px;
 }
-
-/* =========================
-BOTÃO MOBILE
-========================= */
 
 .mobile-menu-btn{
     display:none;
@@ -388,19 +363,25 @@ BOTÃO MOBILE
     z-index:1001;
 }
 
-/* =========================
-RESPONSIVO
-========================= */
-
 @media(max-width:950px){
 
     .sidebar{
         left:-100%;
-        width:320px;
+        width:100%;
+        height:100%;
+        overflow:auto;
     }
 
     .sidebar.mobile-open{
         left:0;
+    }
+
+    .mobile-close{
+        display:block;
+    }
+
+    .base-menu-mobile{
+        display:block;
     }
 
     .main{
@@ -412,20 +393,15 @@ RESPONSIVO
     }
 
     .topbar{
-        padding:85px 20px 20px;
+        min-height:80px;
+        padding:20px;
+        background:#eef3f8;
+        box-shadow:none;
     }
 
-    .company{
-        font-size:18px;
-        margin-top:10px;
-    }
-
+    .topbar-info,
     .datetime{
-        position:relative;
-        right:auto;
-        top:auto;
-        margin-top:15px;
-        font-size:16px;
+        display:none;
     }
 
     .base-box{
@@ -436,6 +412,7 @@ RESPONSIVO
 
     .title{
         padding:0 20px;
+        margin-top:45px;
     }
 
     .title h1{
@@ -453,36 +430,49 @@ RESPONSIVO
         width:100%;
         padding:0 18px;
         gap:20px;
+        margin:45px auto;
     }
 
     .card{
         min-height:145px;
+        background:transparent;
+        box-shadow:none;
+        overflow:visible;
     }
 
     .card-bar{
-        width:75px;
+        width:55px;
+        height:140px;
+        border-radius:12px;
+        background:#0046b8;
+        box-shadow:0 8px 18px rgba(0,0,0,.20);
     }
 
     .icon{
-        width:78px;
-        height:78px;
-        line-height:78px;
-        font-size:38px;
+        width:76px;
+        height:76px;
+        line-height:76px;
+        font-size:36px;
         left:36px;
+        background:white;
+        box-shadow:0 8px 20px rgba(0,0,0,.08);
     }
 
     .card-content{
-        padding:25px 25px 25px 130px;
+        padding:18px 20px 18px 125px;
+        color:#001b3d;
     }
 
     .card-content h2{
-        font-size:22px;
-        line-height:28px;
+        font-size:24px;
+        line-height:30px;
     }
 
     .card-content p{
-        font-size:15px;
-        margin-top:8px;
+        color:#4e5b6d;
+        font-size:16px;
+        line-height:24px;
+        margin-top:10px;
     }
 
     .arrow{
@@ -505,6 +495,7 @@ RESPONSIVO
 
     .ficha-label{
         width:100%;
+        display:block;
         margin-bottom:5px;
     }
 
@@ -513,18 +504,19 @@ RESPONSIVO
         font-size:18px;
     }
 
-    .btn-buscar{
+    .btn-buscar,
+    .btn-voltar{
         width:100%;
         margin-left:0;
     }
 
     .footer{
         font-size:14px;
-        padding:0 15px;
+        padding:10px 15px;
+        height:auto;
+        line-height:22px;
     }
-
 }
-
 </style>
 </head>
 
@@ -532,23 +524,45 @@ RESPONSIVO
 
 <div class="sidebar" id="sidebar">
 
+    <div class="mobile-close" onclick="toggleMenu()">×</div>
+
     <div class="logo">
         ASSISTÊNCIA<br>
         <span>TÉCNICA</span>
     </div>
 
-    <div class="sublogo">
-        LOGÍSTICA REVERSA
-    </div>
+    <div class="sublogo">LOGÍSTICA REVERSA</div>
 
     <div class="line"></div>
 
-    <div class="menu active">⌂ Página Inicial</div>
+    <div class="base-menu-mobile">
+        <button class="btn-base" onclick="abrirListaBase('listaBaseMenu')">
+            BASE: <span id="textoBaseMenu">ILR</span> ▼
+        </button>
+
+        <div class="lista-base" id="listaBaseMenu">
+            <div onclick="trocarBase('ILR')">ILR</div>
+            <div onclick="trocarBase('IMP')">IMP</div>
+        </div>
+    </div>
+
+    <div class="menu active" onclick="voltarInicio()">⌂ Página Inicial</div>
     <div class="menu">▣ Coleta de O.S</div>
     <div class="menu">↩ C.I Devoluções</div>
     <div class="menu" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu">▥ Relatórios</div>
-    <div class="menu">⟳ Atualizar Dados</div>
+    <div class="menu" onclick="atualizarDados()">⟳ Atualizar Dados</div>
+
+    <div class="line"></div>
+
+    <div class="topbar-info-mobile">
+        <div>Bem-vindo,</div>
+        <div style="font-size:22px;font-weight:bold;margin:8px 0;">
+            Claudino SA Lojas de Departamentos
+        </div>
+        <div id="dataHojeMenu"></div>
+        <div id="horaAtualMenu"></div>
+    </div>
 
 </div>
 
@@ -556,14 +570,11 @@ RESPONSIVO
 
     <div class="topbar">
 
-        <div class="mobile-menu-btn" onclick="toggleMenu()">
-            ☰
-        </div>
+        <div class="mobile-menu-btn" onclick="toggleMenu()">☰</div>
 
-        <div>Bem-vindo,</div>
-
-        <div class="company">
-            Claudino SA Lojas de Departamentos
+        <div class="topbar-info">
+            <div>Bem-vindo,</div>
+            <div class="company">Claudino SA Lojas de Departamentos</div>
         </div>
 
         <div class="datetime">
@@ -572,16 +583,14 @@ RESPONSIVO
         </div>
 
         <div class="base-box">
-
-            <button class="btn-base" onclick="abrirListaBase()">
+            <button class="btn-base" onclick="abrirListaBase('listaBaseTop')">
                 BASE: <span id="textoBase">ILR</span> ▼
             </button>
 
-            <div class="lista-base" id="listaBase">
-                <div>ILR</div>
-                <div>IMP</div>
+            <div class="lista-base" id="listaBaseTop">
+                <div onclick="trocarBase('ILR')">ILR</div>
+                <div onclick="trocarBase('IMP')">IMP</div>
             </div>
-
         </div>
 
     </div>
@@ -590,89 +599,111 @@ RESPONSIVO
 
         <div class="title">
             <h1>ASSISTÊNCIA TÉCNICA</h1>
-
-            <p>
-                LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO
-            </p>
-
+            <p>LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO</p>
             <div class="underline"></div>
         </div>
 
         <div class="cards">
 
             <div class="card">
-
                 <div class="card-bar"></div>
-
                 <div class="icon">▣</div>
-
                 <div class="card-content">
                     <h2>COLETA DE<br>ORDENS DE SERVIÇO</h2>
-
-                    <p>
-                        Registrar novas ordens de serviço
-                    </p>
+                    <p>Registrar novas ordens de serviço</p>
                 </div>
-
                 <div class="arrow">›</div>
-
             </div>
 
             <div class="card">
-
                 <div class="card-bar"></div>
-
                 <div class="icon">↩</div>
-
                 <div class="card-content">
                     <h2>C.I<br>DEVOLUÇÕES</h2>
-
-                    <p>
-                        Registrar e controlar devoluções
-                    </p>
+                    <p>Registrar e controlar devoluções</p>
                 </div>
-
                 <div class="arrow">›</div>
-
             </div>
 
             <div class="card" onclick="abrirBusca()">
-
                 <div class="card-bar"></div>
-
                 <div class="icon">⌕</div>
-
                 <div class="card-content">
                     <h2>CONSULTAR O.S</h2>
-
-                    <p>
-                        Pesquisar por O.S, série, cliente ou produto
-                    </p>
+                    <p>Pesquisar por O.S, série, cliente ou produto</p>
                 </div>
-
                 <div class="arrow">›</div>
-
             </div>
 
             <div class="card">
-
                 <div class="card-bar"></div>
-
                 <div class="icon">▥</div>
-
                 <div class="card-content">
                     <h2>RELATÓRIOS</h2>
-
-                    <p>
-                        Visualizar relatórios e indicadores
-                    </p>
+                    <p>Visualizar relatórios e indicadores</p>
                 </div>
-
                 <div class="arrow">›</div>
-
             </div>
 
         </div>
+
+    </div>
+
+    <div id="telaBusca">
+
+        <div class="ficha-topo">
+            <h2>CONSULTAR ORDEM DE SERVIÇO</h2>
+            <div>Base atual: <b id="baseBusca">ILR</b></div>
+        </div>
+
+        <input
+            id="campoBusca"
+            class="busca-input"
+            type="text"
+            placeholder="Digite O.S, série, cliente ou produto..."
+            onkeyup="buscarAutomatico()"
+        >
+
+        <button class="btn-buscar" onclick="buscarAutomatico()">Buscar</button>
+
+        <div id="msgBusca" class="status-msg"></div>
+        <div id="resultadosBusca" class="resultado"></div>
+
+        <button class="btn-voltar" onclick="voltarInicio()">Voltar</button>
+
+    </div>
+
+    <div id="telaFicha">
+
+        <div class="ficha-topo">
+            <h2>ORDEM DE SERVIÇO</h2>
+            <div>Assistência Técnica / Logística Reversa</div>
+        </div>
+
+        <div class="ficha-linha"><span class="ficha-label">O.S:</span><span id="fOS"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Data:</span><span id="fData"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">PDV:</span><span id="fPDV"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Cliente:</span><span id="fCliente"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Produto:</span><span id="fProduto"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Cor:</span><span id="fCor"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Nº Série:</span><span id="fSerie"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Técnico:</span><span id="fTecnico"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Rack:</span><span id="fRack"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Status:</span><span id="fStatus"></span></div>
+
+        <div class="ficha-linha"><span class="ficha-label">Análise do Defeito:</span><span id="fAnaliseDefeito"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Obs. Status:</span><span id="fObsStatus"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Obs. Ordem Serviço:</span><span id="fObsOS"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Status da OS:</span><span id="fStatusOS"></span></div>
+        <div class="ficha-linha"><span class="ficha-label">Dt. Recb/AT:</span><span id="fDtRecbAT"></span></div>
+
+        <div class="ficha-box">
+            <b>Observações:</b><br>
+            Dados importados automaticamente da planilha online.
+        </div>
+
+        <button class="btn-voltar" onclick="abrirBusca()">Voltar para busca</button>
+        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
 
     </div>
 
@@ -683,63 +714,329 @@ RESPONSIVO
 </div>
 
 <script>
+let baseAtual = "ILR";
+
+const urlILR =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTIeFcwq3BjMqk_93QTashFFBor9bueaWFVzbLdU8utIzm4aShhwjgskdOv_LG4wgLlpRDq_VvQwEXw/pub?gid=868143536&single=true&output=csv";
+
+const urlIMP =
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vTgCtE4QozXivh1D1NiJa5ogr9kimTwlgJ_E2kaexyj1CZFazTs5ep6BYVI3zQ1sdkHK9FQcFRyAqCD/pub?gid=885845663&single=true&output=csv";
+
+let cacheCSV = "";
+let linhasPlanilha = [];
+let cabecalhoPlanilha = [];
 
 function atualizarHora(){
-
     const agora = new Date();
 
-    document.getElementById("dataHoje").innerHTML =
+    const data =
         "▣ " +
-        agora.toLocaleDateString(
-            "pt-BR",
-            {
-                weekday:"long",
-                day:"2-digit",
-                month:"long",
-                year:"numeric"
-            }
-        );
+        agora.toLocaleDateString("pt-BR", {
+            weekday:"long",
+            day:"2-digit",
+            month:"long",
+            year:"numeric"
+        });
 
-    document.getElementById("horaAtual").innerHTML =
+    const hora =
         "◷ " +
         agora.toLocaleTimeString("pt-BR");
+
+    document.getElementById("dataHoje").innerHTML = data;
+    document.getElementById("horaAtual").innerHTML = hora;
+    document.getElementById("dataHojeMenu").innerHTML = data;
+    document.getElementById("horaAtualMenu").innerHTML = hora;
 }
 
-setInterval(atualizarHora,1000);
-
+setInterval(atualizarHora, 1000);
 atualizarHora();
 
 function toggleMenu(){
-
-    document
-        .getElementById("sidebar")
-        .classList
-        .toggle("mobile-open");
+    document.getElementById("sidebar").classList.toggle("mobile-open");
 }
 
-function abrirListaBase(){
-
-    const lista =
-        document.getElementById("listaBase");
-
-    lista.style.display =
-        lista.style.display === "block"
-        ? "none"
-        : "block";
+function abrirListaBase(id){
+    const lista = document.getElementById(id);
+    lista.style.display = lista.style.display === "block" ? "none" : "block";
 }
 
-function abrirBusca(){
+async function trocarBase(base){
+    baseAtual = base;
 
+    document.getElementById("textoBase").innerHTML = baseAtual;
+    document.getElementById("textoBaseMenu").innerHTML = baseAtual;
+    document.getElementById("baseBusca").innerHTML = baseAtual;
+
+    document.getElementById("listaBaseTop").style.display = "none";
+    document.getElementById("listaBaseMenu").style.display = "none";
+
+    cacheCSV = "";
+    linhasPlanilha = [];
+    cabecalhoPlanilha = [];
+
+    document.getElementById("campoBusca").value = "";
+    document.getElementById("resultadosBusca").innerHTML = "";
+    document.getElementById("msgBusca").innerHTML = "Carregando base " + baseAtual + "...";
+
+    await baixarCSV();
+
+    document.getElementById("msgBusca").innerHTML =
+        "Base " + baseAtual + " carregada. Digite para pesquisar.";
+}
+
+async function baixarCSV(){
+    const url = baseAtual === "IMP" ? urlIMP : urlILR;
+
+    const resp = await fetch(url);
+
+    if(!resp.ok){
+        throw new Error("Erro ao baixar CSV.");
+    }
+
+    cacheCSV = await resp.text();
+    prepararLinhas();
+}
+
+async function garantirCSV(){
+    if(cacheCSV !== ""){
+        return cacheCSV;
+    }
+
+    await baixarCSV();
+    return cacheCSV;
+}
+
+async function atualizarDados(){
+    try{
+        cacheCSV = "";
+        linhasPlanilha = [];
+        cabecalhoPlanilha = [];
+
+        await baixarCSV();
+
+        alert("Dados atualizados com sucesso.");
+    }catch(e){
+        alert("Erro: " + e.message);
+    }
+}
+
+function parseCSVLine(line){
+    const result = [];
+    let current = "";
+    let insideQuotes = false;
+
+    for(let i = 0; i < line.length; i++){
+        const char = line[i];
+
+        if(char === '"'){
+            if(line[i + 1] === '"'){
+                current += '"';
+                i++;
+            }else{
+                insideQuotes = !insideQuotes;
+            }
+        }else if(char === "," && !insideQuotes){
+            result.push(current);
+            current = "";
+        }else{
+            current += char;
+        }
+    }
+
+    result.push(current);
+    return result;
+}
+
+function prepararLinhas(){
+    linhasPlanilha = [];
+    cabecalhoPlanilha = [];
+
+    const linhas = cacheCSV.split(/\r?\n/);
+
+    if(linhas.length > 0){
+        cabecalhoPlanilha = parseCSVLine(linhas[0]);
+    }
+
+    for(let i = 1; i < linhas.length; i++){
+        if(!linhas[i].trim()) continue;
+
+        const colunas = parseCSVLine(linhas[i]);
+
+        if(colunas.length > 1){
+            linhasPlanilha.push(colunas);
+        }
+    }
+}
+
+function normalizarTexto(texto){
+    return String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[.\-/]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
+function somenteNumeros(texto){
+    return String(texto || "").replace(/\D/g, "");
+}
+
+function valor(c, i){
+    return c[i] || "";
+}
+
+function pegarPorColuna(linha, nomesPossiveis){
+    for(let i = 0; i < cabecalhoPlanilha.length; i++){
+        const nomeAtual = normalizarTexto(cabecalhoPlanilha[i]);
+
+        for(let j = 0; j < nomesPossiveis.length; j++){
+            if(nomeAtual === normalizarTexto(nomesPossiveis[j])){
+                return linha[i] || "";
+            }
+        }
+    }
+
+    return "";
+}
+
+function voltarInicio(){
+    document.getElementById("telaInicio").style.display = "block";
+    document.getElementById("telaBusca").style.display = "none";
+    document.getElementById("telaFicha").style.display = "none";
+    document.getElementById("sidebar").classList.remove("mobile-open");
+}
+
+async function abrirBusca(){
     document.getElementById("telaInicio").style.display = "none";
     document.getElementById("telaBusca").style.display = "block";
     document.getElementById("telaFicha").style.display = "none";
+    document.getElementById("sidebar").classList.remove("mobile-open");
 
     document.getElementById("baseBusca").innerHTML = baseAtual;
 
-    garantirCSV();
-}
+    await garantirCSV();
 }
 
+function abrirFichaPorLinha(index){
+    const c = linhasPlanilha[index];
+
+    document.getElementById("fOS").innerHTML = valor(c,0);
+    document.getElementById("fData").innerHTML = valor(c,1);
+    document.getElementById("fPDV").innerHTML = valor(c,2);
+    document.getElementById("fCliente").innerHTML = valor(c,3);
+    document.getElementById("fProduto").innerHTML = valor(c,7);
+    document.getElementById("fCor").innerHTML = valor(c,8);
+    document.getElementById("fSerie").innerHTML = valor(c,9);
+    document.getElementById("fTecnico").innerHTML = valor(c,11);
+    document.getElementById("fRack").innerHTML = valor(c,12);
+    document.getElementById("fStatus").innerHTML = valor(c,13);
+
+    document.getElementById("fAnaliseDefeito").innerHTML =
+        pegarPorColuna(c, ["ANALISE DO DEFEITO", "ANÁLISE DO DEFEITO"]);
+
+    document.getElementById("fObsStatus").innerHTML =
+        pegarPorColuna(c, ["OBS. STATUS", "OBS STATUS"]);
+
+    document.getElementById("fObsOS").innerHTML =
+        pegarPorColuna(c, [
+            "OBS. ORDEM DE SERVICO",
+            "OBS. ORDEM DE SERVIÇO",
+            "OBS ORDEM DE SERVICO",
+            "OBS ORDEM DE SERVIÇO"
+        ]);
+
+    document.getElementById("fStatusOS").innerHTML =
+        pegarPorColuna(c, [
+            "STATUS DA OS",
+            "STATUS DA O.S",
+            "STATUS OS"
+        ]);
+
+    document.getElementById("fDtRecbAT").innerHTML =
+        pegarPorColuna(c, [
+            "DT.RECB/AT",
+            "DT RECB/AT",
+            "DT. RECB/AT",
+            "DT RECEB AT"
+        ]);
+
+    document.getElementById("telaBusca").style.display = "none";
+    document.getElementById("telaFicha").style.display = "block";
+}
+
+async function buscarAutomatico(){
+    await garantirCSV();
+
+    const termoOriginal = document.getElementById("campoBusca").value;
+    const termo = normalizarTexto(termoOriginal);
+    const termoNum = somenteNumeros(termoOriginal);
+
+    const area = document.getElementById("resultadosBusca");
+    const msg = document.getElementById("msgBusca");
+
+    area.innerHTML = "";
+
+    if(termo.length < 2 && termoNum.length < 2){
+        msg.innerHTML = "Digite pelo menos 2 caracteres.";
+        return;
+    }
+
+    const resultados = [];
+
+    for(let i = 0; i < linhasPlanilha.length; i++){
+        const c = linhasPlanilha[i];
+
+        const linhaCompleta = c.join(" ");
+        const textoBusca = normalizarTexto(linhaCompleta);
+        const numerosBusca = somenteNumeros(linhaCompleta);
+
+        if(
+            textoBusca.includes(termo) ||
+            numerosBusca.includes(termoNum)
+        ){
+            resultados.push({
+                index:i,
+                os:valor(c,0),
+                cliente:valor(c,3),
+                produto:valor(c,7),
+                serie:valor(c,9),
+                status:valor(c,13)
+            });
+        }
+
+        if(resultados.length >= 50){
+            break;
+        }
+    }
+
+    if(resultados.length === 0){
+        msg.innerHTML = "Nenhum resultado encontrado.";
+        return;
+    }
+
+    msg.innerHTML = resultados.length + " resultado(s) encontrado(s).";
+
+    resultados.forEach(function(item){
+        const div = document.createElement("div");
+        div.className = "item-resultado";
+
+        div.onclick = function(){
+            abrirFichaPorLinha(item.index);
+        };
+
+        div.innerHTML =
+            "<b>O.S:</b> " + item.os +
+            "<br><b>Cliente:</b> " + item.cliente +
+            "<br><b>Produto:</b> " + item.produto +
+            "<br><b>Série:</b> " + item.serie +
+            "<br><b>Status:</b> " + item.status;
+
+        area.appendChild(div);
+    });
+}
+
+baixarCSV();
 </script>
 
 </body>
