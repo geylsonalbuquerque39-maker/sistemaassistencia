@@ -8,7 +8,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
 body{background:#eef3f8;overflow-x:hidden}
-
 .sidebar{position:fixed;left:0;top:0;width:300px;height:100%;background:#001b3d;color:white;padding:35px 25px;z-index:1000;transition:.3s}
 .logo{font-size:30px;font-weight:bold;line-height:34px}
 .logo span{color:#1ea5ff}
@@ -16,23 +15,19 @@ body{background:#eef3f8;overflow-x:hidden}
 .line{height:1px;background:#244466;margin:32px 0}
 .menu{height:58px;line-height:58px;padding-left:20px;margin-bottom:15px;font-size:20px;cursor:pointer;border-radius:10px;transition:.2s}
 .menu:hover,.menu.active{background:#006cff}
-
 .main{margin-left:300px;min-height:100vh}
 .topbar{background:white;min-height:110px;padding:25px 45px;position:relative;box-shadow:0 2px 8px rgba(0,0,0,.08)}
 .company{font-size:30px;font-weight:bold;color:#001b3d}
 .datetime{position:absolute;right:45px;top:20px;color:#001b3d;font-size:18px;font-weight:bold}
 .datetime div{margin-bottom:10px}
-
 .base-box{position:absolute;right:45px;top:70px;z-index:50}
 .btn-base{background:#ff9800;color:white;border:none;border-radius:12px;padding:10px 22px;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.25)}
 .lista-base{display:none;background:white;margin-top:8px;border-radius:10px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,.2)}
 .lista-base div{padding:12px 20px;cursor:pointer;color:#001b3d;font-weight:bold}
-
 .title{text-align:center;margin-top:50px;color:#001b3d}
 .title h1{font-size:64px;font-weight:900}
 .title p{margin-top:15px;font-size:24px}
 .underline{width:170px;height:5px;background:#0074ff;margin:18px auto}
-
 .cards{width:1150px;max-width:95%;margin:50px auto;display:grid;grid-template-columns:1fr 1fr;gap:30px}
 .card{background:#0046b8;border-radius:18px;min-height:180px;position:relative;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:0 8px 18px rgba(0,0,0,.18)}
 .card:hover{transform:scale(1.02);background:#0062ff}
@@ -42,24 +37,340 @@ body{background:#eef3f8;overflow-x:hidden}
 .card-content h2{font-size:36px;line-height:40px}
 .card-content p{margin-top:15px;font-size:20px}
 .arrow{position:absolute;right:30px;top:50%;transform:translateY(-50%);font-size:75px;color:white}
-
-#telaBusca,#telaFicha,#telaCI{display:none}
+#telaBusca,#telaFicha,#telaCI,#telaAbrirCI,#telaGerarCI,#telaPlanilhaCI{display:none}
 #telaBusca,#telaFicha{width:1100px;max-width:95%;margin:35px auto;background:white;border:2px solid #001b3d;border-radius:12px;padding:25px}
-
 .ficha-topo{text-align:center;border-bottom:2px solid #001b3d;padding-bottom:15px;margin-bottom:20px}
 .ficha-topo h2{font-size:40px;color:#001b3d}
 .ficha-linha{padding:14px 0;border-bottom:1px dashed #001b3d;font-size:20px}
 .ficha-label{width:250px;display:inline-block;font-weight:bold;color:#001b3d}
 .ficha-box{margin-top:25px;border:1px solid #001b3d;padding:20px;border-radius:10px;font-size:18px}
-
 .busca-input{width:75%;height:52px;border:2px solid #001b3d;border-radius:10px;padding:0 18px;font-size:22px}
 .btn-buscar,.btn-voltar{background:#0046b8;color:white;border:none;border-radius:10px;padding:14px 28px;cursor:pointer;font-size:18px;margin-top:15px;margin-right:10px}
 .resultado{margin-top:20px}
 .item-resultado{background:#eef3f8;border-left:6px solid #0046b8;padding:18px;border-radius:8px;margin-bottom:12px;cursor:pointer;font-size:18px}
 .status-msg{margin-top:18px;font-size:18px;font-weight:bold}
-
 .footer{height:60px;background:#001b3d;color:white;text-align:center;line-height:60px;margin-top:40px;font-size:18px}
 .mobile-menu-btn{display:none;position:absolute;left:20px;top:22px;font-size:34px;color:#001b3d;cursor:pointer;z-index:1001}
+
+
+.ci-painel{
+    width:95%;
+    max-width:980px;
+    margin:25px auto;
+    background:white;
+    border:2px solid #001b3d;
+    border-radius:14px;
+    padding:25px;
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+.ci-campo{
+    margin-bottom:16px;
+}
+.ci-campo label{
+    display:block;
+    color:#001b3d;
+    font-weight:bold;
+    margin-bottom:8px;
+    font-size:18px;
+}
+.ci-input{
+    width:100%;
+    min-height:48px;
+    border:2px solid #001b3d;
+    border-radius:10px;
+    padding:12px;
+    font-size:18px;
+    resize:vertical;
+}
+.ci-msg{
+    margin-top:15px;
+    font-weight:bold;
+    color:#001b3d;
+    font-size:18px;
+}
+.ci-preview{
+    width:95%;
+    margin:25px auto;
+    background:white;
+    border:2px solid #001b3d;
+    border-radius:14px;
+    padding:18px;
+    overflow:auto;
+}
+.ci-table{
+    border-collapse:collapse;
+    background:white;
+    font-size:12px;
+    color:#000;
+    min-width:900px;
+}
+.ci-table td{
+    border:1px solid #ddd;
+    padding:4px 6px;
+    min-width:55px;
+    height:20px;
+    white-space:pre-wrap;
+}
+.ci-table .empty{
+    border-color:#f5f5f5;
+}
+
+.ci-documento{
+    width:1000px;
+    max-width:100%;
+    background:white;
+    color:#000;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    padding:10px 16px 18px;
+}
+.ci-doc-topo{
+    display:grid;
+    grid-template-columns:1fr 90px 130px;
+    gap:10px;
+    font-weight:bold;
+    margin-bottom:8px;
+}
+.ci-doc-centro{
+    text-align:center;
+    font-weight:bold;
+    font-size:16px;
+    margin:8px 0;
+}
+.ci-doc-linha{
+    border-top:1px solid #ddd;
+    padding:3px 0;
+}
+.ci-doc-info{
+    font-weight:bold;
+    text-align:center;
+    margin:10px 0 4px;
+}
+.ci-doc-msg{
+    background:#eef3f8;
+    border-radius:8px;
+    padding:3px 6px;
+    display:inline-block;
+    margin:2px 0;
+}
+.ci-doc-table{
+    border-collapse:collapse;
+    width:760px;
+    max-width:100%;
+    margin-top:14px;
+    font-size:11px;
+}
+.ci-doc-table th,
+.ci-doc-table td{
+    border:1px solid #000;
+    padding:3px 4px;
+    text-align:center;
+}
+.ci-doc-table th{
+    font-weight:bold;
+}
+.ci-doc-table .desc{
+    text-align:left;
+    width:290px;
+}
+.ci-doc-obs{
+    margin-top:0;
+    font-size:13px;
+}
+.ci-doc-assinatura{
+    display:grid;
+    grid-template-columns:260px 220px 1fr;
+    gap:30px;
+    margin-top:18px;
+    align-items:end;
+    font-size:12px;
+}
+.ci-doc-logo{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#ffd400;
+    border:2px solid #000;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    font-size:8px;
+    margin-right:8px;
+}
+.ci-doc-small{
+    font-size:11px;
+    line-height:16px;
+}
+.ci-doc-nome{
+    text-align:center;
+    font-weight:bold;
+    font-size:14px;
+    padding-top:25px;
+}
+.ci-doc-acoes{
+    margin:10px 0 16px;
+}
+
+/* =========================
+C.I EDITÁVEL NO APP
+========================= */
+.ci-edit-wrap{
+    width:95%;
+    max-width:1100px;
+    margin:25px auto;
+    background:white;
+    border:2px solid #001b3d;
+    border-radius:14px;
+    padding:18px;
+    overflow:auto;
+    box-shadow:0 8px 18px rgba(0,0,0,.12);
+}
+.ci-edit-doc{
+    width:880px;
+    min-height:620px;
+    background:white;
+    color:#000;
+    font-family:Arial, sans-serif;
+    font-size:12px;
+    padding:8px 14px 18px;
+}
+.ci-edit-top{
+    display:grid;
+    grid-template-columns:1fr 90px 120px;
+    gap:10px;
+    font-weight:bold;
+    margin-bottom:14px;
+}
+.ci-edit-center{
+    text-align:center;
+    font-weight:bold;
+    font-size:16px;
+    margin:8px 0;
+}
+.ci-edit-ac{
+    text-align:center;
+    font-weight:bold;
+    font-size:14px;
+    margin:16px 0 8px;
+}
+.ci-edit-msg{
+    background:#eef3f8;
+    border-radius:8px;
+    padding:3px 8px;
+    display:inline-block;
+    margin:2px 0;
+}
+.ci-edit-table{
+    border-collapse:collapse;
+    width:760px;
+    margin-top:14px;
+    font-size:11px;
+}
+.ci-edit-table th,
+.ci-edit-table td{
+    border:1px solid #000;
+    padding:3px 4px;
+    text-align:center;
+    height:22px;
+}
+.ci-edit-table th{
+    font-weight:bold;
+}
+.ci-edit-table .desc{
+    width:300px;
+    text-align:left;
+}
+.ci-edit-cell{
+    min-height:16px;
+    outline:none;
+    background:#fffbe6;
+}
+.ci-edit-cell:focus{
+    background:#fff3a0;
+    box-shadow:inset 0 0 0 2px #ff9800;
+}
+.ci-auto{
+    background:#fff;
+}
+.ci-edit-obs{
+    margin-top:0;
+    font-size:13px;
+}
+.ci-edit-assinatura{
+    display:grid;
+    grid-template-columns:260px 220px 1fr;
+    gap:30px;
+    margin-top:18px;
+    align-items:end;
+    font-size:12px;
+}
+.ci-edit-logo{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    background:#ffd400;
+    border:2px solid #000;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    font-size:8px;
+    margin-right:8px;
+}
+.ci-edit-small{
+    font-size:11px;
+    line-height:16px;
+}
+.ci-edit-nome{
+    text-align:center;
+    font-weight:bold;
+    font-size:14px;
+    padding-top:25px;
+}
+.ci-edit-actions{
+    width:95%;
+    max-width:1100px;
+    margin:25px auto 0;
+    text-align:center;
+}
+@media print{
+    .sidebar,.topbar,.footer,.title,.ci-edit-actions{display:none!important;}
+    .main{margin-left:0!important;}
+    body{background:white!important;}
+    body *{visibility:hidden;}
+    #ciEditDocumento, #ciEditDocumento *{visibility:visible;}
+    #ciEditDocumento{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        padding:0;
+        margin:0;
+    }
+}
+
+@media print{
+    .ci-doc-acoes{display:none!important;}
+    #ciPreview{border:0!important;}
+    .ci-documento{width:100%!important;padding:0!important;}
+}
+
+@media print{
+    body *{visibility:hidden;}
+    #ciPreview, #ciPreview *{visibility:visible;}
+    #ciPreview{
+        position:absolute;
+        left:0;
+        top:0;
+        width:100%;
+        border:0;
+        margin:0;
+        padding:0;
+        overflow:visible;
+    }
+    .ci-table{font-size:10px;min-width:auto;width:100%;}
+}
 
 @media(max-width:950px){
     .sidebar{left:-100%;width:320px}
@@ -81,7 +392,7 @@ body{background:#eef3f8;overflow-x:hidden}
     .card-content h2{font-size:24px;line-height:30px}
     .card-content p{color:#4e5b6d;font-size:16px;line-height:24px}
     .arrow{display:none}
-    #telaBusca,#telaFicha{width:95%;padding:18px}
+    #telaBusca,#telaFicha,#telaGerarCI{width:95%;padding:18px}
     .ficha-topo h2{font-size:28px}
     .ficha-linha{font-size:16px}
     .ficha-label{width:100%;display:block;margin-bottom:5px}
@@ -89,7 +400,325 @@ body{background:#eef3f8;overflow-x:hidden}
     .btn-buscar,.btn-voltar{width:100%;margin-left:0;margin-right:0}
     .footer{font-size:14px;padding:10px 15px;height:auto;line-height:22px}
 }
+
+/* =========================
+JSPREADSHEET C.I
+========================= */
+#planilhaCI{margin-top:14px;}
+#planilhaCI .jexcel{font-size:11px;}
+#planilhaCI .jexcel > thead > tr > td{
+    background:#f4f4f4;color:#000;font-weight:bold;text-align:center;border:1px solid #000;
+}
+#planilhaCI .jexcel > tbody > tr > td{
+    border:1px solid #000;height:22px;
+}
+#planilhaCI .jexcel_content{box-shadow:none!important;}
+.ci-jspreadsheet-area{width:760px;max-width:100%;overflow:auto;}
+@media print{
+    #planilhaCI .jexcel_toolbar,#planilhaCI .jexcel_contextmenu{display:none!important;}
+}
+
+
+/* AJUSTES C.I - SEM BARRA / LETRA PRETA / DROPDOWN */
+.ci-edit-doc{
+    width:980px!important;
+}
+.ci-jspreadsheet-area{
+    width:100%!important;
+    max-width:100%!important;
+    overflow:visible!important;
+}
+#planilhaCI{
+    width:100%!important;
+    overflow:visible!important;
+}
+#planilhaCI .jexcel_content{
+    overflow:visible!important;
+    width:auto!important;
+}
+#planilhaCI table,
+#planilhaCI .jexcel{
+    width:auto!important;
+}
+#planilhaCI .jexcel td,
+#planilhaCI .jexcel td *,
+#planilhaCI .jexcel thead td{
+    color:#000!important;
+}
+#planilhaCI .jexcel td.readonly,
+#planilhaCI .jexcel td.readonly *{
+    color:#000!important;
+}
+.ci-msg-select{
+    border:1px solid #999;
+    background:#eef3f8;
+    border-radius:8px;
+    padding:3px 25px 3px 6px;
+    font-size:12px;
+    font-weight:bold;
+    color:#000;
+    max-width:760px;
+}
+.ci-msg-select:focus{
+    outline:2px solid #ff9800;
+}
+@media print{
+    .ci-msg-select{
+        border:0!important;
+        appearance:none!important;
+        -webkit-appearance:none!important;
+        background:#eef3f8!important;
+    }
+}
+
+
+
+/* =========================
+C.I PIXEL PLANILHA GOOGLE SHEETS
+Baseada no print 100% tela cheia
+========================= */
+.ci-edit-wrap{
+    max-width: 1120px!important;
+    width: 95%!important;
+    padding: 0!important;
+    border: 0!important;
+    box-shadow: none!important;
+    background: #fff!important;
+    overflow: visible!important;
+}
+.ci-edit-doc{
+    width: 780px!important;
+    min-height: 560px!important;
+    padding: 0 0 0 22px!important;
+    margin: 0 auto!important;
+    font-family: Tahoma, Arial, sans-serif!important;
+    font-size: 12px!important;
+    line-height: 1.1!important;
+    background: #fff!important;
+}
+.ci-edit-top{
+    display:grid!important;
+    grid-template-columns: 1fr 55px 105px!important;
+    gap: 0!important;
+    width: 720px!important;
+    margin: 0 0 18px 0!important;
+    font-weight: 700!important;
+    font-size: 18px!important;
+    align-items:center!important;
+}
+.ci-edit-top div:first-child{ text-align:center!important; padding-left:150px!important; }
+#ciHoraAtual{font-size:14px!important;text-align:center!important;}
+#ciDataAtual{font-size:14px!important;text-align:center!important;}
+.ci-edit-center{
+    width:720px!important;
+    text-align:center!important;
+    font-size:16px!important;
+    font-weight:700!important;
+    margin: 0 0 22px 0!important;
+}
+.ci-edit-ac{
+    width:720px!important;
+    text-align:center!important;
+    font-size:13px!important;
+    font-weight:700!important;
+    margin: 0 0 4px 0!important;
+}
+.ci-msg-select{
+    margin-left: 13px!important;
+    width: 697px!important;
+    max-width: 697px!important;
+    height: 18px!important;
+    min-height: 18px!important;
+    border: 0!important;
+    background: #eef3f8!important;
+    border-radius: 9px!important;
+    padding: 0 22px 0 3px!important;
+    font-family: Arial, sans-serif!important;
+    font-size: 12px!important;
+    font-weight: 400!important;
+    color:#000!important;
+}
+.ci-edit-msg{
+    margin-left:45px!important;
+    background:transparent!important;
+    border-radius:0!important;
+    padding:0!important;
+    display:inline-block!important;
+    font-family:Arial, sans-serif!important;
+    font-size:13px!important;
+    font-weight:400!important;
+}
+.ci-jspreadsheet-area{
+    width:720px!important;
+    overflow:visible!important;
+    margin-top:10px!important;
+}
+#planilhaCI{ margin-top:0!important; width:720px!important; overflow:visible!important; }
+#planilhaCI .jexcel_content{ overflow:visible!important; box-shadow:none!important; border:0!important; }
+#planilhaCI .jexcel{
+    border-collapse:collapse!important;
+    font-family:Arial, sans-serif!important;
+    font-size:11px!important;
+    color:#000!important;
+}
+#planilhaCI .jexcel > thead > tr > td{
+    background:#fff!important;
+    color:#000!important;
+    font-weight:700!important;
+    text-align:center!important;
+    vertical-align:middle!important;
+    border:1px solid #000!important;
+    padding:0 2px!important;
+    height:25px!important;
+    line-height:11px!important;
+}
+#planilhaCI .jexcel > tbody > tr > td{
+    color:#000!important;
+    border:1px solid #000!important;
+    height:16px!important;
+    line-height:14px!important;
+    padding:0 2px!important;
+    vertical-align:middle!important;
+    text-align:center!important;
+    white-space:nowrap!important;
+}
+#planilhaCI .jexcel > tbody > tr > td[data-x="3"]{text-align:left!important;}
+#planilhaCI .jexcel_corner, #planilhaCI .jexcel_selectall{display:none!important;}
+.ci-edit-obs{
+    width:720px!important;
+    margin-top:5px!important;
+    font-family:Arial, sans-serif!important;
+    font-size:13px!important;
+    line-height:20px!important;
+}
+.ci-edit-obs > div:first-child{
+    margin-left:0!important;
+    width:157px!important;
+    height:18px!important;
+    line-height:14px!important;
+    padding:2px 4px!important;
+    background:#222!important;
+    color:#fff!important;
+    font-size:13px!important;
+}
+.ci-edit-obs > div:nth-child(2){ margin-left:4px!important; }
+.ci-edit-assinatura{
+    width:720px!important;
+    display:grid!important;
+    grid-template-columns: 315px 245px 1fr!important;
+    gap:0!important;
+    margin-top:9px!important;
+    align-items:start!important;
+    font-family:Arial, sans-serif!important;
+    font-size:12px!important;
+}
+.ci-edit-logo{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+    border-radius:50%!important;
+    margin-right:3px!important;
+    font-size:7px!important;
+}
+.ci-edit-small{font-size:11px!important;line-height:18px!important;}
+.ci-edit-nome{
+    font-size:16px!important;
+    font-weight:700!important;
+    padding-top:75px!important;
+    text-align:center!important;
+}
+@media print{
+    #ciEditDocumento{width:720px!important;padding:0!important;margin:0!important;}
+    .ci-edit-wrap{margin:0!important;}
+}
+
+
+
+/* =========================
+IMPRESSÃO IGUAL GOOGLE SHEETS
+A4 retrato | escala visual 95% | margens: topo 0,5cm / esquerda 1,075cm / direita 0,2cm
+========================= */
+@page{
+    size:A4 portrait;
+    margin:0!important;
+}
+@media print{
+    html,body{
+        width:21cm!important;
+        height:29.7cm!important;
+        margin:0!important;
+        padding:0!important;
+        background:white!important;
+        overflow:hidden!important;
+    }
+    .sidebar,.topbar,.footer,.title,.ci-edit-actions,.ci-msg,.ci-edit-wrap::before{
+        display:none!important;
+    }
+    .main{
+        margin-left:0!important;
+        padding:0!important;
+        width:21cm!important;
+        min-height:29.7cm!important;
+        background:white!important;
+    }
+    body *{visibility:hidden!important;}
+    #ciEditDocumento, #ciEditDocumento *{visibility:visible!important;}
+    .ci-edit-wrap{
+        display:block!important;
+        position:static!important;
+        width:21cm!important;
+        height:29.7cm!important;
+        margin:0!important;
+        padding:0!important;
+        border:0!important;
+        box-shadow:none!important;
+        overflow:visible!important;
+        background:white!important;
+    }
+    #ciEditDocumento{
+        position:absolute!important;
+        left:1.075cm!important;
+        top:0.5cm!important;
+        width:18.2cm!important;
+        min-height:auto!important;
+        margin:0!important;
+        padding:0!important;
+        transform:scale(0.95)!important;
+        transform-origin:top left!important;
+        background:white!important;
+    }
+    .ci-msg-select{
+        border:0!important;
+        appearance:none!important;
+        -webkit-appearance:none!important;
+        background:#eef3f8!important;
+        color:#000!important;
+    }
+    #planilhaCI .jexcel_content,
+    #planilhaCI,
+    #planilhaCI table{
+        overflow:visible!important;
+    }
+}
+
+
+/* REMOVE COLUNA EXTRA DO JSPREADSHEET (NÚMERO DA LINHA / CANTO VAZIO) */
+#planilhaCI .jexcel_selectall,
+#planilhaCI .jexcel_row{
+    display:none!important;
+}
+#planilhaCI .jexcel > thead > tr > td:first-child,
+#planilhaCI .jexcel > tbody > tr > td:first-child{
+    display:none!important;
+}
+
 </style>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
+<link rel="stylesheet" href="https://jsuites.net/v4/jsuites.css">
+<script src="https://jsuites.net/v4/jsuites.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/index.min.js"></script>
+
 </head>
 
 <body>
@@ -170,14 +799,137 @@ body{background:#eef3f8;overflow-x:hidden}
     </div>
 
     <div class="cards">
-        <div class="card" onclick="abrirCI('regiao')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I REGIÃO</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
-        <div class="card" onclick="abrirCI('teresina')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I TEREZINA</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
-        <div class="card" onclick="abrirCI('pmr')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I PMR</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
-        <div class="card" onclick="abrirCI('geit')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I GEIT</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
-        <div class="card" onclick="abrirCI('assurant')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I ASSURANT</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
-        <div class="card" onclick="abrirCI('outros')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I OUTROS</h2><p>Abrir planilha editável</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('regiao')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I REGIÃO</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('teresina')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I TEREZINA</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('pmr')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I PMR</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('geit')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I GEIT</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('assurant')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I ASSURANT</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
+        <div class="card" onclick="abrirCI('outros')"><div class="card-bar"></div><div class="icon">▣</div><div class="card-content"><h2>C.I OUTROS</h2><p>Gerar dentro do app</p></div><div class="arrow">›</div></div>
     </div>
 </div>
+
+
+
+<div id="telaGerarCI">
+    <div class="title">
+        <h1 id="tituloCISelecionada">C.I DEVOLUÇÕES</h1>
+        <p>Digite as O.S para montar a C.I dentro do aplicativo</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="ci-painel">
+        <div class="ci-campo">
+            <label>O.S</label>
+            <textarea id="ciOS" class="ci-input" rows="4" placeholder="Digite uma O.S por linha ou separadas por vírgula"></textarea>
+        </div>
+
+        <div class="ci-campo" id="grupoOSTTR">
+            <label>O.S TTR</label>
+            <textarea id="ciOSTTR" class="ci-input" rows="4" placeholder="Somente C.I Terezina: digite uma O.S TTR por linha ou separadas por vírgula"></textarea>
+        </div>
+
+        <button class="btn-voltar" onclick="gerarCIApp()">Gerar C.I no aplicativo</button>
+        <button class="btn-voltar" onclick="imprimirCI()">Imprimir C.I</button>
+        <button class="btn-voltar" onclick="abrirTelaCI()">Voltar para C.I</button>
+        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+
+        <div id="ciMensagem" class="ci-msg"></div>
+    </div>
+
+    <div id="ciPreview" class="ci-preview" style="display:none;"></div>
+</div>
+
+
+<div id="telaPlanilhaCI">
+    <div class="title">
+        <h1 id="tituloCIEditavel">C.I DEVOLUÇÕES</h1>
+        <p>Edite a C.I direto no aplicativo</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="ci-edit-actions">
+        <button class="btn-voltar" onclick="imprimirCIEditavel()">Imprimir C.I</button>
+        <button class="btn-voltar" onclick="limparCIEditavel()">Limpar O.S</button>
+        <button class="btn-voltar" onclick="abrirTelaCI()">Voltar para C.I</button>
+        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+        <div id="ciEditMensagem" class="ci-msg"></div>
+    </div>
+
+    <div class="ci-edit-wrap">
+        <div class="ci-edit-doc" id="ciEditDocumento">
+
+            <div class="ci-edit-top">
+                <div>IDB - Logística Reversa</div>
+                <div id="ciHoraAtual">--:--</div>
+                <div id="ciDataAtual">-- -- --</div>
+            </div>
+
+            <div class="ci-edit-center" id="ciDestinoTitulo">RDP</div>
+
+            <div class="ci-edit-ac" contenteditable="true">A/C.: GERÊNCIA</div>
+
+            <div>
+                <select id="ciTextoMensagem" class="ci-msg-select" onchange="atualizarTextoMensagemCI()">
+                    <option>Estamos enviando mercadorias abaixo com Defeito e Não Autorizados reparo por nossa Unidade, Regional RM1</option>
+                    <option>Estamos enviando mercadorias abaixo com LCD Quebrado, em Anexo tratativas via Email com Lojas de Origem,</option>
+                    <option>Estamos enviando mercadorias abaixo com Defeito e Não Autorizados reparo por nossa Unidade, Regional RM1</option>
+                    <option>Estamos enviando mercadorias de Devolução Comercial, tratam-se de produtos impossibilitados de</option>
+                    <option>Estamos enviando mercadorias abaixo Fora de Garantia e sem Condições de Conserto</option>
+                    <option>Estamos enviando mercadorias de troca da seguradora Assurant para Descarte e/ou Reaproveitamento</option>
+                    <option>Estamos enviando mercadorias abaixo de USO e Sem Condições de Conserto</option>
+                    <option>Estamos enviando mercadorias abaixo, solicitado pelo SCO, Tratam-se de produtos DC2</option>
+                    <option>Estamos enviando mercadorias do fornecedor ARNO conforme solicitadas pelo Sr. Mendes</option>
+                    <option>Estamos enviando produtos Trocados pelo Fabricante, seguem todas acobertadas pelo DANFE:_____</option>
+                </select>
+            </div>
+
+            <div>
+                <select id="ciTextoDanfe" class="ci-msg-select ci-msg-select-2" onchange="atualizarTextoMensagemCI()">
+                    <option>seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____________________</option>
+                    <option>de Origem, Regional RM4, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+                    <option>de Origem, Regional RM1, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+                    <option>interno e Fora de Garantia, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+                    <option>em TDC, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+                    <option>devolver por nosso Posto, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+                    <option>.</option>
+                </select>
+            </div>
+
+            <div class="ci-jspreadsheet-area"><div id="planilhaCI"></div></div>
+
+            <div class="ci-edit-obs">
+                <div style="background:#222;color:white;display:inline-block;padding:2px 6px;font-weight:bold;">Observações:</div>
+                <div contenteditable="true">1. Favor confirmar o recebimento, devolvendo a 2ª via devidamente assinada.</div>
+            </div>
+
+            <div class="ci-edit-assinatura">
+                <div>
+                    <div style="display:flex;align-items:center;margin-bottom:4px;">
+                        <div class="ci-edit-logo">AP</div>
+                        <b><i>Confirmo Embarque - IDC</i></b>
+                    </div>
+
+                    <div class="ci-edit-small">
+                        <b><i>VOL:</i></b>_______<b><i>Em</i></b>_______/_______/_______<br>
+                        <b><i>Visto:</i></b>_____________________________<br>
+                        <b>TOTAL DE VOLUMES:</b> &nbsp;&nbsp; <span id="ciTotalVolumes">0</span>
+                    </div>
+                </div>
+
+                <div class="ci-edit-small">
+                    <b>PESO TOTAL:</b> ______ <span contenteditable="true">32,500</span> ______ kg<br>
+                    <b>CUBAGEM TOTAL:</b> ____ <span contenteditable="true">0,195</span> ____ m3
+                </div>
+
+                <div class="ci-edit-nome" contenteditable="true">
+                    Allan Kevin
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
 
 <div id="telaBusca">
     <div class="ficha-topo">
@@ -236,20 +988,42 @@ const urlILR =
 const urlIMP =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgCtE4QozXivh1D1NiJa5ogr9kimTwlgJ_E2kaexyj1CZFazTs5ep6BYVI3zQ1sdkHK9FQcFRyAqCD/pub?gid=885845663&single=true&output=csv";
 
-const idPlanilhaCI = "1f_PHzolTB018EQi6Ho5Xh0pI23NU7STVmDuF-7fpXYE";
+/* ID CORRETO DA PLANILHA C.I */
+const idPlanilhaCI = "1f_PHzoITB018EQi6Ho5Xh0pI23NU7STVmDuF-7fpXYE";
 
+/* URL BASE CORRIGIDA */
 const linksCIEdit = {
-    regiao:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=546284772#gid=546284772",
-    teresina:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=2077587325#gid=2077587325",
-    pmr:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=324543846#gid=324543846",
-    geit:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=2126848667#gid=2126848667",
-    assurant:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=1058368228#gid=1058368228",
-    outros:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit?gid=1457022937#gid=1457022937"
+    regiao:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=546284772",
+    teresina:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=2077587325",
+    pmr:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=324543846",
+    geit:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=2126848667",
+    assurant:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=1058368228",
+    outros:"https://docs.google.com/spreadsheets/d/" + idPlanilhaCI + "/edit#gid=1457022937"
 };
+
+/* ABA REXPEDLR COMO BANCO DE DADOS */
+const urlBancoREXPEDLR =
+"https://docs.google.com/spreadsheets/d/1f_PHzoITB018EQi6Ho5Xh0pI23NU7STVmDuF-7fpXYE/gviz/tq?tqx=out:csv&gid=885845663";
+
+let bancoREXPEDLR = [];
+let bancoCarregado = false;
+let planilhaCI = null;
+let preenchendoCI = false;
 
 let cacheCSV = "";
 let linhasPlanilha = [];
 let cabecalhoPlanilha = [];
+
+let ciAtual = "";
+
+const nomesCI = {
+    regiao: "C.I REGIÃO",
+    teresina: "C.I TEREZINA",
+    pmr: "C.I PMR",
+    geit: "C.I GEIT",
+    assurant: "C.I ASSURANT",
+    outros: "C.I OUTROS"
+};
 
 function atualizarHora(){
     const agora = new Date();
@@ -276,6 +1050,8 @@ function esconderTelas(){
     document.getElementById("telaCI").style.display = "none";
     document.getElementById("telaBusca").style.display = "none";
     document.getElementById("telaFicha").style.display = "none";
+    document.getElementById("telaGerarCI").style.display = "none";
+    document.getElementById("telaPlanilhaCI").style.display = "none";
 }
 
 function voltarInicio(){
@@ -291,8 +1067,545 @@ function abrirTelaCI(){
 }
 
 function abrirCI(nome){
-    if(linksCIEdit[nome]){
-        window.location.href = linksCIEdit[nome];
+    if(!linksCIEdit[nome]) return;
+
+    ciAtual = nome;
+
+    esconderTelas();
+
+    document.getElementById("tituloCIEditavel").innerHTML =
+        nomesCI[nome] || "C.I DEVOLUÇÕES";
+
+    document.getElementById("ciEditMensagem").innerHTML =
+        "Digite a O.S na coluna O.S. Os dados serão puxados da aba REXPEDLR.";
+
+    montarGradeCIEditavel();
+
+    document.getElementById("telaPlanilhaCI").style.display = "block";
+    document.getElementById("sidebar").classList.remove("mobile-open");
+
+    carregarBancoREXPEDLR().then(function(){
+        document.getElementById("ciEditMensagem").innerHTML =
+            "Banco REXPEDLR carregado. Pode digitar as O.S.";
+    }).catch(function(e){
+        document.getElementById("ciEditMensagem").innerHTML =
+            "Erro ao carregar REXPEDLR: " + e.message;
+    });
+}
+
+async function carregarBancoREXPEDLR(){
+    if(bancoCarregado) return;
+
+    const resp = await fetch(urlBancoREXPEDLR);
+
+    if(!resp.ok){
+        throw new Error("Não foi possível carregar a aba REXPEDLR. Verifique se a planilha está publicada/compartilhada.");
+    }
+
+    const csv = await resp.text();
+    const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
+
+    bancoREXPEDLR = linhas.map(linha => parseCSVLine(linha));
+    bancoCarregado = true;
+}
+
+function separarLista(texto){
+    return String(texto || "")
+        .split(/[\n,;]+/)
+        .map(x => x.trim())
+        .filter(x => x !== "");
+}
+
+function buscarOSBanco(os){
+    const osLimpa = somenteNumeros(os);
+
+    for(let i = 1; i < bancoREXPEDLR.length; i++){
+        const linha = bancoREXPEDLR[i];
+        const osBanco = somenteNumeros(linha[0] || "");
+
+        if(osBanco === osLimpa){
+            return {
+                os: linha[0] || os,
+                data: linha[1] || "",
+                loja: linha[2] || "",
+                gr: linha[5] || "",
+                nce: linha[6] || "",
+                descricao: linha[7] || "",
+                cor: linha[8] || "",
+                serie: linha[9] || "",
+                valorTrans: linha[10] || "",
+                tecnico: linha[11] || "",
+                rack: linha[12] || "",
+                status: linha[13] || "",
+                usuario: linha[14] || ""
+            };
+        }
+    }
+
+    return null;
+}
+
+
+
+function atualizarTextoMensagemCI(){
+    ["ciTextoMensagem", "ciTextoDanfe"].forEach(function(id){
+        const select = document.getElementById(id);
+        if(select){
+            select.setAttribute("data-print-text", select.value);
+        }
+    });
+}
+
+
+function configCIAtual(){
+    if(ciAtual === "teresina"){
+        return {
+            osCol:5,
+            rowLength:8,
+            columns:[
+                { title:"AL", width:23, readOnly:true },
+                { title:"GR", width:22, readOnly:true },
+                { title:"NCE", width:42, readOnly:true },
+                { title:"DESCRIÇÃO", width:244, readOnly:true, wordWrap:false },
+                { title:"COR", width:56, readOnly:true },
+                { title:"O.S", width:47 },
+                { title:"OS TTR", width:63 },
+                { title:"LOJA DE\nORIGEM", width:85, readOnly:true }
+            ]
+        };
+    }
+
+    return {
+        osCol:7,
+        rowLength:10,
+        columns:[
+            { title:"AL", width:23, readOnly:true },
+            { title:"GR", width:22, readOnly:true },
+            { title:"NCE", width:42, readOnly:true },
+            { title:"DESCRIÇÃO", width:244, readOnly:true, wordWrap:false },
+            { title:"COR", width:56, readOnly:true },
+            { title:"NF.\nORIGEM", width:66, readOnly:false },
+            { title:"CI.\nORIGE", width:49, readOnly:false },
+            { title:"O.S", width:47 },
+            { title:"LOJA DE\nORIGEM", width:85, readOnly:true },
+            { title:"LOJA DE\nDESTINO", width:85, readOnly:true }
+        ]
+    };
+}
+
+function osColCI(){ return configCIAtual().osCol; }
+
+function montarGradeCIEditavel(){
+    document.getElementById("ciHoraAtual").innerHTML = horaAtualCI();
+    document.getElementById("ciDataAtual").innerHTML = dataAtualCI();
+
+    const cfg = configCIAtual();
+    const dadosIniciais = [];
+    for(let i = 0; i < 10; i++){
+        const linha = Array(cfg.rowLength).fill("");
+        linha[0] = "1";
+        dadosIniciais.push(linha);
+    }
+
+    const container = document.getElementById("planilhaCI");
+    container.innerHTML = "";
+
+    planilhaCI = jspreadsheet(container, {
+        data: dadosIniciais,
+        columns: cfg.columns,
+        minDimensions:[cfg.rowLength,10],
+        tableOverflow:false,
+        allowInsertColumn:false,
+        allowDeleteColumn:false,
+        allowRenameColumn:false,
+        allowInsertRow:false,
+        allowDeleteRow:false,
+        columnDrag:false,
+        rowDrag:false,
+        contextMenu:false,
+        onchange:function(instance, cell, x, y, value){
+            if(preenchendoCI) return;
+            x = Number(x);
+            y = Number(y);
+
+            if(x === osColCI()){
+                preencherLinhaCIEditavel(y, value);
+            }
+        },
+        onload:function(){
+            configurarEnterJSpreadsheet();
+            configurarTTRPorCI();
+            atualizarTotalVolumesCI();
+        }
+    });
+
+    setTimeout(function(){
+        configurarEnterJSpreadsheet();
+        configurarTTRPorCI();
+        atualizarTotalVolumesCI();
+    }, 300);
+}
+
+function configurarTTRPorCI(){
+    return;
+}
+
+function configurarEnterJSpreadsheet(){
+    const area = document.getElementById("planilhaCI");
+
+    area.onkeydown = function(e){
+        if(e.key === "Enter"){
+            e.preventDefault();
+
+            const selected = document.querySelector("#planilhaCI .highlight");
+            let x = osColCI();
+            let y = 0;
+
+            if(selected){
+                x = Number(selected.getAttribute("data-x") || osColCI());
+                y = Number(selected.getAttribute("data-y") || 0);
+            }
+
+            if(planilhaCI){
+                const valor = planilhaCI.getValueFromCoords(x, y);
+                if(x === osColCI()){
+                    preencherLinhaCIEditavel(y, valor);
+                }
+
+                const proximaLinha = Math.min(y + 1, 9);
+                planilhaCI.updateSelectionFromCoords(osColCI(), proximaLinha, osColCI(), proximaLinha);
+            }
+
+            return false;
+        }
+    };
+}
+
+async function preencherLinhaCIEditavel(indice, os){
+    try{
+        await carregarBancoREXPEDLR();
+    }catch(e){
+        document.getElementById("ciEditMensagem").innerHTML =
+            "Erro ao carregar REXPEDLR: " + e.message;
+        return;
+    }
+
+    if(!planilhaCI) return;
+    if(preenchendoCI) return;
+
+    preenchendoCI = true;
+
+    try{
+        if(!String(os || "").trim()){
+            limparLinhaCI(indice);
+            atualizarTotalVolumesCI();
+            return;
+        }
+
+        const item = buscarOSBanco(os);
+        const cfg = configCIAtual();
+
+        if(!item){
+            limparLinhaCISemEventos(indice);
+            planilhaCI.setValueFromCoords(0, indice, "1", true);
+            planilhaCI.setValueFromCoords(3, indice, "O.S não encontrada", true);
+            planilhaCI.setValueFromCoords(cfg.osCol, indice, os, true);
+            atualizarTotalVolumesCI();
+            return;
+        }
+
+        planilhaCI.setValueFromCoords(0, indice, "1", true);
+        planilhaCI.setValueFromCoords(1, indice, item.gr, true);
+        planilhaCI.setValueFromCoords(2, indice, item.nce, true);
+        planilhaCI.setValueFromCoords(3, indice, item.descricao, true);
+        planilhaCI.setValueFromCoords(4, indice, item.cor, true);
+        planilhaCI.setValueFromCoords(cfg.osCol, indice, item.os || os, true);
+
+        if(ciAtual === "teresina"){
+            planilhaCI.setValueFromCoords(7, indice, item.loja, true);
+        }else{
+            planilhaCI.setValueFromCoords(8, indice, item.loja, true);
+            planilhaCI.setValueFromCoords(9, indice, item.loja, true);
+        }
+
+        atualizarTotalVolumesCI();
+    }finally{
+        preenchendoCI = false;
+    }
+}
+
+function limparLinhaCISemEventos(indice){
+    if(!planilhaCI) return;
+    const cfg = configCIAtual();
+    for(let x = 0; x < cfg.rowLength; x++){
+        planilhaCI.setValueFromCoords(x, indice, x === 0 ? "1" : "", true);
+    }
+}
+
+function limparLinhaCI(indice){
+    if(!planilhaCI) return;
+    const estavaPreenchendo = preenchendoCI;
+    preenchendoCI = true;
+    try{
+        limparLinhaCISemEventos(indice);
+    }finally{
+        preenchendoCI = estavaPreenchendo;
+    }
+}
+
+function atualizarTotalVolumesCI(){
+    let total = 0;
+    const osCol = osColCI();
+
+    if(planilhaCI){
+        for(let i = 0; i < 10; i++){
+            const os = planilhaCI.getValueFromCoords(osCol, i);
+            if(String(os || "").trim() !== ""){
+                total++;
+            }
+        }
+    }
+
+    document.getElementById("ciTotalVolumes").innerHTML = total;
+}
+
+function limparCIEditavel(){
+    if(planilhaCI){
+        for(let i = 0; i < 10; i++){
+            limparLinhaCI(i);
+        }
+    }
+
+    atualizarTotalVolumesCI();
+    document.getElementById("ciEditMensagem").innerHTML = "C.I limpa.";
+}
+
+function imprimirCIEditavel(){
+    window.print();
+}
+
+
+async function gerarCIApp(){
+    if(!ciAtual){
+        alert("Selecione uma C.I primeiro.");
+        return;
+    }
+
+    const listaOS = separarLista(document.getElementById("ciOS").value);
+    const listaTTR = separarLista(document.getElementById("ciOSTTR").value);
+
+    if(listaOS.length === 0){
+        alert("Digite pelo menos uma O.S.");
+        return;
+    }
+
+    if(listaOS.length > 8){
+        alert("A C.I aceita no máximo 8 O.S por vez.");
+        return;
+    }
+
+    const msg = document.getElementById("ciMensagem");
+    msg.innerHTML = "Carregando dados da aba REXPEDLR...";
+
+    try{
+        await carregarBancoREXPEDLR();
+
+        const itens = [];
+        const naoEncontradas = [];
+
+        listaOS.forEach(function(os, idx){
+            const item = buscarOSBanco(os);
+
+            if(item){
+                item.osTTR = ciAtual === "teresina" ? (listaTTR[idx] || "") : "";
+                itens.push(item);
+            }else{
+                naoEncontradas.push(os);
+            }
+        });
+
+        if(itens.length === 0){
+            msg.innerHTML = "Nenhuma O.S encontrada na aba REXPEDLR.";
+            document.getElementById("ciPreview").style.display = "none";
+            return;
+        }
+
+        renderizarCIDocumento(itens, naoEncontradas);
+
+        msg.innerHTML =
+            "C.I gerada com sucesso." +
+            (naoEncontradas.length ? " Não encontrada(s): " + naoEncontradas.join(", ") : "");
+
+    }catch(e){
+        msg.innerHTML = "Erro: " + e.message;
+    }
+}
+
+function nomeCIAtual(){
+    return nomesCI[ciAtual] || "C.I DEVOLUÇÕES";
+}
+
+function dataAtualCI(){
+    const hoje = new Date();
+    return hoje.toLocaleDateString("pt-BR").replace(/\//g, " ");
+}
+
+function horaAtualCI(){
+    return new Date().toLocaleTimeString("pt-BR", {hour:"2-digit", minute:"2-digit"});
+}
+
+function renderizarCIDocumento(itens, naoEncontradas){
+    const preview = document.getElementById("ciPreview");
+
+    let linhasTabela = "";
+
+    for(let i = 0; i < 8; i++){
+        const item = itens[i];
+
+        if(item){
+            linhasTabela += `
+                <tr>
+                    <td>1</td>
+                    <td>${escaparHTML(item.gr)}</td>
+                    <td>${escaparHTML(item.nce)}</td>
+                    <td class="desc">${escaparHTML(item.descricao)}</td>
+                    <td>${escaparHTML(item.cor)}</td>
+                    <td>${escaparHTML(item.os)}</td>
+                    <td>${escaparHTML(item.osTTR || "")}</td>
+                    <td>${escaparHTML(item.loja)}</td>
+                </tr>
+            `;
+        }else{
+            linhasTabela += `
+                <tr>
+                    <td>&nbsp;</td>
+                    <td></td>
+                    <td></td>
+                    <td class="desc"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            `;
+        }
+    }
+
+    const totalVolumes = itens.length;
+    const pesoTotal = itens.length ? "32,500" : "";
+    const cubagemTotal = itens.length ? "0,195" : "";
+
+    const html = `
+        <div class="ci-doc-acoes">
+            <button class="btn-voltar" onclick="imprimirCI()">Imprimir C.I</button>
+            <button class="btn-voltar" onclick="abrirTelaCI()">Voltar para C.I</button>
+        </div>
+
+        <div class="ci-documento" id="ciDocumentoImpressao">
+
+            <div class="ci-doc-topo">
+                <div>IDB - Logística Reversa</div>
+                <div>${horaAtualCI()}</div>
+                <div>${dataAtualCI()}</div>
+            </div>
+
+            <div class="ci-doc-centro">ATT</div>
+
+            <div class="ci-doc-centro" style="font-size:14px;">
+                A/C.: MENDES / EDIVAN
+            </div>
+
+            <div class="ci-doc-linha">
+                <span class="ci-doc-msg">
+                    Estamos enviando mercadorias abaixo com Defeito e Não Autorizados reparo por nossa Unidade, Regional RM1
+                </span>
+            </div>
+
+            <div class="ci-doc-linha">
+                <span class="ci-doc-msg">
+                    seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____________________
+                </span>
+            </div>
+
+            <table class="ci-doc-table">
+                <thead>
+                    <tr>
+                        <th>AL</th>
+                        <th>GR</th>
+                        <th>NCE</th>
+                        <th>DESCRIÇÃO</th>
+                        <th>COR</th>
+                        <th>O.S</th>
+                        <th>OS TTR</th>
+                        <th>LOJA DE<br>ORIGEM</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${linhasTabela}
+                </tbody>
+            </table>
+
+            <div class="ci-doc-obs">
+                <div style="background:#222;color:white;display:inline-block;padding:2px 6px;font-weight:bold;">Observações:</div>
+                <div>1. Favor confirmar o recebimento, devolvendo a 2ª via devidamente assinada.</div>
+            </div>
+
+            <div class="ci-doc-assinatura">
+                <div>
+                    <div style="display:flex;align-items:center;margin-bottom:4px;">
+                        <div class="ci-doc-logo">AP</div>
+                        <b><i>Confirmo Embarque - IDC</i></b>
+                    </div>
+
+                    <div class="ci-doc-small">
+                        <b><i>VOL:</i></b>_______<b><i>Em</i></b>_______/_______/_______<br>
+                        <b><i>Visto:</i></b>_____________________________<br>
+                        <b>TOTAL DE VOLUMES:</b> &nbsp;&nbsp; ${totalVolumes}
+                    </div>
+                </div>
+
+                <div class="ci-doc-small">
+                    <b>PESO TOTAL:</b> ______ ${pesoTotal} ______ kg<br>
+                    <b>CUBAGEM TOTAL:</b> ____ ${cubagemTotal} ____ m3
+                </div>
+
+                <div class="ci-doc-nome">
+                    Allan Kevin
+                </div>
+            </div>
+
+            ${naoEncontradas.length ? `<div style="margin-top:15px;color:#b00000;font-weight:bold;">Não encontrada(s): ${escaparHTML(naoEncontradas.join(", "))}</div>` : ""}
+
+        </div>
+    `;
+
+    preview.innerHTML = html;
+    preview.style.display = "block";
+}
+
+function escaparHTML(texto){
+    return String(texto || "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function imprimirCI(){
+    const preview = document.getElementById("ciPreview");
+
+    if(preview.style.display === "none" || preview.innerHTML.trim() === ""){
+        alert("Gere a C.I primeiro.");
+        return;
+    }
+
+    window.print();
+}
+
+function abrirCIEditar(){
+    if(ciAtual && linksCIEdit[ciAtual]){
+        window.open(linksCIEdit[ciAtual], "_blank");
     }
 }
 
