@@ -1116,9 +1116,9 @@ A4 retrato | escala visual 95% | margens: topo 0,5cm / esquerda 1,075cm / direit
                 <div id="ciDataAtual">-- -- --</div>
             </div>
 
-            <div class="ci-edit-center" id="ciDestinoTitulo">RDP</div>
+            <div class="ci-edit-center" id="ciDestinoTitulo">ATT</div>
 
-            <div class="ci-edit-ac" contenteditable="true">A/C.: GERÊNCIA</div>
+            <div class="ci-edit-ac" contenteditable="true">A/C.: Srs. Mendes/Edivan</div>
 
             <div>
                 <select id="ciTextoMensagem" class="ci-msg-select" onchange="atualizarTextoMensagemCI()">
@@ -1259,6 +1259,17 @@ const urlBancoREXPEDLR =
 
 let bancoREXPEDLR = [];
 let bancoCarregado = false;
+
+/* Bancos opcionais para a C.I REGIÃO.
+   Se depois você publicar as abas CADASTRO e LOJAS em CSV, basta colocar os links abaixo.
+   Sem esses links, o app mantém os campos editáveis e usa a própria sigla da loja como destino. */
+const urlBancoCadastroCI = "";
+const urlBancoLojasCI = "";
+let bancoCadastroCI = [];
+let bancoLojasCI = [];
+let bancoCadastroCarregado = false;
+let bancoLojasCarregado = false;
+
 let planilhaCI = null;
 let preenchendoCI = false;
 
@@ -1328,6 +1339,8 @@ function abrirCI(nome){
     document.getElementById("tituloCIEditavel").innerHTML =
         nomesCI[nome] || "C.I DEVOLUÇÕES";
 
+    aplicarModeloCIVisual();
+
     document.getElementById("ciEditMensagem").innerHTML =
         "Digite a O.S na coluna O.S. Os dados serão puxados da aba REXPEDLR.";
 
@@ -1345,6 +1358,56 @@ function abrirCI(nome){
     });
 }
 
+function aplicarModeloCIVisual(){
+    const destino = document.getElementById("ciDestinoTitulo");
+    const ac = document.querySelector(".ci-edit-ac");
+    const msg = document.getElementById("ciTextoMensagem");
+    const danfe = document.getElementById("ciTextoDanfe");
+
+    if(!destino || !ac || !msg || !danfe) return;
+
+    if(ciAtual === "regiao"){
+        destino.innerHTML = "RDP";
+        ac.innerHTML = "A/C.: GERÊNCIA";
+        msg.innerHTML = `
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) DEVIDAMENTE CONSERTADA(S) ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) PARA DEVOLUÇÃO AO DESTINO INFORMADO</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) CONFORME RELAÇÃO ABAIXO</option>
+        `;
+        danfe.innerHTML = `
+            <option>PELO(S) DANFE(S) :_________</option>
+            <option>PELO(S) DANFE(S):____________________</option>
+            <option>.</option>
+        `;
+    }else if(ciAtual === "teresina"){
+        destino.innerHTML = "ATT";
+        ac.innerHTML = "A/C.: Srs. Mendes/Edivan";
+        msg.innerHTML = `
+            <option>Estamos enviando mercadorias abaixo com Defeito e Não Autorizados reparo por nossa Unidade, Regional RM1</option>
+            <option>Estamos enviando mercadorias abaixo com LCD Quebrado, em Anexo tratativas via Email com Lojas de Origem,</option>
+            <option>Estamos enviando mercadorias de Devolução Comercial, tratam-se de produtos impossibilitados de</option>
+            <option>Estamos enviando mercadorias abaixo Fora de Garantia e sem Condições de Conserto</option>
+            <option>Estamos enviando mercadorias de troca da seguradora Assurant para Descarte e/ou Reaproveitamento</option>
+            <option>Estamos enviando mercadorias abaixo de USO e Sem Condições de Conserto</option>
+            <option>Estamos enviando mercadorias abaixo, solicitado pelo SCO, Tratam-se de produtos DC2</option>
+            <option>Estamos enviando mercadorias do fornecedor ARNO conforme solicitadas pelo Sr. Mendes</option>
+            <option>Estamos enviando produtos Trocados pelo Fabricante, seguem todas acobertadas pelo DANFE:_____</option>
+        `;
+        danfe.innerHTML = `
+            <option>seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____________________</option>
+            <option>de Origem, Regional RM4, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+            <option>de Origem, Regional RM1, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+            <option>interno e Fora de Garantia, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+            <option>em TDC, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+            <option>devolver por nosso Posto, seguem todas com O.S TTR geradas e acobertadas pelo(S) DANFE(S):____</option>
+            <option>.</option>
+        `;
+    }else{
+        destino.innerHTML = "RDP";
+        ac.innerHTML = "A/C.: GERÊNCIA";
+    }
+}
+
 async function carregarBancoREXPEDLR(){
     if(bancoCarregado) return;
 
@@ -1359,6 +1422,62 @@ async function carregarBancoREXPEDLR(){
 
     bancoREXPEDLR = linhas.map(linha => parseCSVLine(linha));
     bancoCarregado = true;
+}
+
+async function carregarBancoCadastroCI(){
+    if(bancoCadastroCarregado) return;
+    bancoCadastroCarregado = true;
+    if(!urlBancoCadastroCI) return;
+
+    const resp = await fetch(urlBancoCadastroCI);
+    if(!resp.ok) return;
+    const csv = await resp.text();
+    bancoCadastroCI = csv.split(/\r?\n/).filter(l => l.trim() !== "").map(linha => parseCSVLine(linha));
+}
+
+async function carregarBancoLojasCI(){
+    if(bancoLojasCarregado) return;
+    bancoLojasCarregado = true;
+    if(!urlBancoLojasCI) return;
+
+    const resp = await fetch(urlBancoLojasCI);
+    if(!resp.ok) return;
+    const csv = await resp.text();
+    bancoLojasCI = csv.split(/\r?\n/).filter(l => l.trim() !== "").map(linha => parseCSVLine(linha));
+}
+
+function buscarCadastroCI(os){
+    const chave = somenteNumeros(os);
+    for(let i = 1; i < bancoCadastroCI.length; i++){
+        const linha = bancoCadastroCI[i];
+        if(somenteNumeros(linha[0] || "") === chave){
+            return linha[1] || "";
+        }
+    }
+    return "";
+}
+
+function buscarLojaDestinoCI(lojaOrigem){
+    const chave = normalizarTexto(lojaOrigem);
+    for(let i = 1; i < bancoLojasCI.length; i++){
+        const linha = bancoLojasCI[i];
+        if(normalizarTexto(linha[0] || "") === chave){
+            return linha[1] || "";
+        }
+    }
+    return lojaOrigem || "";
+}
+
+function atualizarDestinoTopoRegiao(){
+    if(ciAtual !== "regiao" || !planilhaCI) return;
+
+    let destino = "";
+    for(let i = 0; i < configCIAtual().rows; i++){
+        destino = planilhaCI.getValueFromCoords(9, i);
+        if(String(destino || "").trim() !== "") break;
+    }
+
+    document.getElementById("ciDestinoTitulo").innerHTML = destino || "RDP";
 }
 
 function separarLista(texto){
@@ -1414,6 +1533,7 @@ function configCIAtual(){
         return {
             osCol:5,
             rowLength:8,
+            rows:10,
             columns:[
                 { title:"AL", width:20, readOnly:true },
                 { title:"GR", width:19, readOnly:true },
@@ -1427,20 +1547,41 @@ function configCIAtual(){
         };
     }
 
+    if(ciAtual === "regiao"){
+        return {
+            osCol:7,
+            rowLength:10,
+            rows:8,
+            columns:[
+                { title:"AL", width:20, readOnly:true },
+                { title:"GR", width:19, readOnly:true },
+                { title:"NCE", width:42, readOnly:true },
+                { title:"DESCRIÇÃO", width:239, readOnly:true, wordWrap:false },
+                { title:"COR", width:55, readOnly:true },
+                { title:"NF.\nORIGEM", width:66, readOnly:false },
+                { title:"CI.\nORIGEM", width:49, readOnly:false },
+                { title:"O.S", width:47 },
+                { title:"LOJA DE\nORIGEM", width:83, readOnly:true },
+                { title:"LOJA DE\nDESTINO", width:83, readOnly:true }
+            ]
+        };
+    }
+
     return {
         osCol:7,
         rowLength:10,
+        rows:8,
         columns:[
-            { title:"AL", width:23, readOnly:true },
-            { title:"GR", width:22, readOnly:true },
+            { title:"AL", width:20, readOnly:true },
+            { title:"GR", width:19, readOnly:true },
             { title:"NCE", width:42, readOnly:true },
-            { title:"DESCRIÇÃO", width:244, readOnly:true, wordWrap:false },
-            { title:"COR", width:56, readOnly:true },
+            { title:"DESCRIÇÃO", width:239, readOnly:true, wordWrap:false },
+            { title:"COR", width:55, readOnly:true },
             { title:"NF.\nORIGEM", width:66, readOnly:false },
-            { title:"CI.\nORIGE", width:49, readOnly:false },
+            { title:"CI.\nORIGEM", width:49, readOnly:false },
             { title:"O.S", width:47 },
-            { title:"LOJA DE\nORIGEM", width:85, readOnly:true },
-            { title:"LOJA DE\nDESTINO", width:85, readOnly:true }
+            { title:"LOJA DE\nORIGEM", width:83, readOnly:true },
+            { title:"LOJA DE\nDESTINO", width:83, readOnly:true }
         ]
     };
 }
@@ -1453,7 +1594,7 @@ function montarGradeCIEditavel(){
 
     const cfg = configCIAtual();
     const dadosIniciais = [];
-    for(let i = 0; i < 10; i++){
+    for(let i = 0; i < cfg.rows; i++){
         const linha = Array(cfg.rowLength).fill("");
         linha[0] = "1";
         dadosIniciais.push(linha);
@@ -1465,7 +1606,7 @@ function montarGradeCIEditavel(){
     planilhaCI = jspreadsheet(container, {
         data: dadosIniciais,
         columns: cfg.columns,
-        minDimensions:[cfg.rowLength,10],
+        minDimensions:[cfg.rowLength,cfg.rows],
         tableOverflow:false,
         allowInsertColumn:false,
         allowDeleteColumn:false,
@@ -1482,6 +1623,10 @@ function montarGradeCIEditavel(){
 
             if(x === osColCI()){
                 preencherLinhaCIEditavel(y, value);
+            }else if(ciAtual === "regiao" && x === 8){
+                const destino = buscarLojaDestinoCI(value) || value;
+                planilhaCI.setValueFromCoords(9, y, destino, true);
+                atualizarDestinoTopoRegiao();
             }
         },
         onload:function(){
@@ -1524,7 +1669,7 @@ function configurarEnterJSpreadsheet(){
                     preencherLinhaCIEditavel(y, valor);
                 }
 
-                const proximaLinha = Math.min(y + 1, 9);
+                const proximaLinha = Math.min(y + 1, configCIAtual().rows - 1);
                 planilhaCI.updateSelectionFromCoords(osColCI(), proximaLinha, osColCI(), proximaLinha);
             }
 
@@ -1536,9 +1681,12 @@ function configurarEnterJSpreadsheet(){
 async function preencherLinhaCIEditavel(indice, os){
     try{
         await carregarBancoREXPEDLR();
+        if(ciAtual === "regiao"){
+            await Promise.all([carregarBancoCadastroCI(), carregarBancoLojasCI()]);
+        }
     }catch(e){
         document.getElementById("ciEditMensagem").innerHTML =
-            "Erro ao carregar REXPEDLR: " + e.message;
+            "Erro ao carregar banco: " + e.message;
         return;
     }
 
@@ -1549,8 +1697,9 @@ async function preencherLinhaCIEditavel(indice, os){
 
     try{
         if(!String(os || "").trim()){
-            limparLinhaCI(indice);
+            limparLinhaCISemEventos(indice);
             atualizarTotalVolumesCI();
+            atualizarDestinoTopoRegiao();
             return;
         }
 
@@ -1563,6 +1712,7 @@ async function preencherLinhaCIEditavel(indice, os){
             planilhaCI.setValueFromCoords(3, indice, "O.S não encontrada", true);
             planilhaCI.setValueFromCoords(cfg.osCol, indice, os, true);
             atualizarTotalVolumesCI();
+            atualizarDestinoTopoRegiao();
             return;
         }
 
@@ -1575,12 +1725,26 @@ async function preencherLinhaCIEditavel(indice, os){
 
         if(ciAtual === "teresina"){
             planilhaCI.setValueFromCoords(7, indice, item.loja, true);
+        }else if(ciAtual === "regiao"){
+            const ciOrigemAtual = planilhaCI.getValueFromCoords(6, indice);
+            const ciOrigem = buscarCadastroCI(item.os || os) || ciOrigemAtual || "";
+            const lojaOrigem = item.loja || "";
+            const lojaDestino = buscarLojaDestinoCI(lojaOrigem) || lojaOrigem;
+
+            /* Fórmulas da planilha REGIÃO:
+               GR = REXPEDLR coluna 6 | COR = REXPEDLR coluna 9
+               CI ORIGEM = CADASTRO coluna 2 | LOJA ORIGEM = REXPEDLR coluna 3
+               DESTINO = LOJAS coluna 2 por LOJA ORIGEM | topo = Q9 */
+            planilhaCI.setValueFromCoords(6, indice, ciOrigem, true);
+            planilhaCI.setValueFromCoords(8, indice, lojaOrigem, true);
+            planilhaCI.setValueFromCoords(9, indice, lojaDestino, true);
         }else{
             planilhaCI.setValueFromCoords(8, indice, item.loja, true);
             planilhaCI.setValueFromCoords(9, indice, item.loja, true);
         }
 
         atualizarTotalVolumesCI();
+        atualizarDestinoTopoRegiao();
     }finally{
         preenchendoCI = false;
     }
@@ -1610,7 +1774,7 @@ function atualizarTotalVolumesCI(){
     const osCol = osColCI();
 
     if(planilhaCI){
-        for(let i = 0; i < 10; i++){
+        for(let i = 0; i < configCIAtual().rows; i++){
             const os = planilhaCI.getValueFromCoords(osCol, i);
             if(String(os || "").trim() !== ""){
                 total++;
@@ -1623,7 +1787,7 @@ function atualizarTotalVolumesCI(){
 
 function limparCIEditavel(){
     if(planilhaCI){
-        for(let i = 0; i < 10; i++){
+        for(let i = 0; i < configCIAtual().rows; i++){
             limparLinhaCI(i);
         }
     }
