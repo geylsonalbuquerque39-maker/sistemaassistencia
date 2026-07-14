@@ -1569,6 +1569,7 @@ body.dark-mode .notif-panel,body.dark-mode .notif-item,body.dark-mode .notif-emp
 .erp-import-overlay.aberto{display:flex}
 .erp-import-modal{
     width:760px;max-width:97%;max-height:94vh;overflow:auto;
+    position:relative;
     background:#fff;border:2px solid #1ea5ff;border-radius:24px;
     padding:26px;box-shadow:0 28px 90px rgba(0,0,0,.48);color:#001b3d
 }
@@ -1625,6 +1626,24 @@ body.dark-mode .notif-panel,body.dark-mode .notif-item,body.dark-mode .notif-emp
     border:0;border-radius:11px;padding:12px 18px;background:#0046b8;
     color:#fff;font-weight:900;cursor:pointer;display:none
 }
+.erp-import-ver-comparacoes{
+    border:0;border-radius:11px;padding:12px 18px;background:#0b8f3f;
+    color:#fff;font-weight:900;cursor:pointer;display:none
+}
+.erp-import-x{
+    position:sticky;float:right;top:0;right:0;z-index:5;
+    width:40px;height:40px;margin:-10px -10px 4px 10px;
+    border:0;border-radius:50%;background:#b00020;color:#fff;
+    font-size:24px;font-weight:900;line-height:40px;text-align:center;
+    cursor:pointer;box-shadow:0 5px 14px rgba(176,0,32,.30)
+}
+.erp-import-x:hover{background:#d00026;transform:scale(1.06)}
+.erp-import-acoes{
+    position:sticky;bottom:-26px;z-index:4;background:#fff;
+    padding:14px 0 4px;margin-top:18px;border-top:1px solid #d7dfe8
+}
+body.dark-mode .erp-import-acoes{background:#0d223a}
+
 .erp-import-log{
     max-height:110px;overflow:auto;background:#07192c;color:#d9edff;
     border-radius:12px;padding:11px 13px;font:12px/18px Consolas,monospace
@@ -2194,11 +2213,11 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
     <div class="admin-painel">
         <h2>👤 Gerenciamento de Usuários</h2>
         <div class="admin-info">
-            Esta tela gerencia os perfis da tabela <b>usuarios</b>. Para criar um acesso novo, primeiro crie o usuário em <b>Supabase → Authentication → Users</b>, copie o UID e depois cadastre o perfil aqui.
+            Crie o acesso completo diretamente pelo ERP. O sistema cadastra a conta no <b>Supabase Authentication</b> e depois grava o perfil na tabela <b>usuarios</b>.
         </div>
         <div class="usuarios-toolbar">
             <input id="usuariosBusca" class="usuarios-busca" placeholder="Pesquisar por nome, cargo, perfil ou e-mail..." onkeyup="filtrarUsuariosAdmin()">
-            <button class="btn-voltar" onclick="abrirModalUsuario()">+ Novo Perfil</button>
+            <button class="btn-voltar" onclick="abrirModalUsuario()">+ Novo Usuário</button>
             <button class="btn-voltar" onclick="carregarUsuariosAdmin()">Atualizar</button>
             <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao painel</button>
         </div>
@@ -2207,36 +2226,45 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
     </div>
 </div>
 
-<div id="modalUsuario" class="usuario-modal-backdrop">
-    <div class="usuario-modal">
-        <h2 id="modalUsuarioTitulo">Novo Perfil</h2>
-        <div class="admin-info">
-            O campo <b>UID</b> precisa ser o ID do usuário criado no Supabase Authentication.
+<div id="modalUsuario" class="usuario-modal-backdrop" onclick="if(event.target===this)fecharModalUsuario()">
+    <div class="usuario-modal" role="dialog" aria-modal="true" aria-labelledby="modalUsuarioTitulo">
+        <h2 id="modalUsuarioTitulo">Novo Usuário</h2>
+        <div id="usuarioModalInfo" class="admin-info">
+            Informe os dados do novo acesso. A conta será criada no Supabase Authentication e vinculada automaticamente ao perfil do ERP.
         </div>
         <input type="hidden" id="usuarioEditandoIdOriginal">
+        <input type="hidden" id="usuarioFormId">
         <div class="usuario-modal-grid">
             <div class="ci-campo">
-                <label>UID do Auth</label>
-                <input class="ci-input" id="usuarioFormId" placeholder="UUID do usuário">
+                <label>Nome completo</label>
+                <input class="ci-input" id="usuarioFormNome" placeholder="Nome do usuário" autocomplete="off">
             </div>
             <div class="ci-campo">
-                <label>Nome</label>
-                <input class="ci-input" id="usuarioFormNome" placeholder="Nome do usuário">
+                <label>E-mail de acesso</label>
+                <input class="ci-input" id="usuarioFormEmail" type="email" placeholder="usuario@empresa.com" autocomplete="off">
+            </div>
+            <div class="ci-campo usuario-senha-novo">
+                <label>Senha</label>
+                <input class="ci-input" id="usuarioFormSenha" type="password" placeholder="Mínimo de 6 caracteres" autocomplete="new-password">
+            </div>
+            <div class="ci-campo usuario-senha-novo">
+                <label>Confirmar senha</label>
+                <input class="ci-input" id="usuarioFormConfirmarSenha" type="password" placeholder="Digite a senha novamente" autocomplete="new-password">
             </div>
             <div class="ci-campo">
                 <label>Cargo</label>
-                <input class="ci-input" id="usuarioFormCargo" placeholder="Ex.: Administrador">
+                <input class="ci-input" id="usuarioFormCargo" placeholder="Ex.: Auxiliar, Supervisor">
             </div>
             <div class="ci-campo">
                 <label>Perfil</label>
                 <select class="ci-input" id="usuarioFormPerfil">
-                    <option value="administrador">Administrador</option>
-                    <option value="supervisor">Supervisor</option>
                     <option value="consulta">Consulta</option>
+                    <option value="supervisor">Supervisor</option>
+                    <option value="administrador">Administrador</option>
                 </select>
             </div>
             <div class="ci-campo">
-                <label>Status</label>
+                <label>Situação</label>
                 <select class="ci-input" id="usuarioFormAtivo">
                     <option value="true">Ativo</option>
                     <option value="false">Inativo</option>
@@ -2245,7 +2273,7 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
         </div>
         <div class="usuario-modal-acoes">
             <button class="btn-voltar" onclick="fecharModalUsuario()">Cancelar</button>
-            <button class="btn-voltar" onclick="salvarUsuarioAdmin()">Salvar usuário</button>
+            <button id="btnSalvarUsuarioAdmin" class="btn-voltar" onclick="salvarUsuarioAdmin()">Criar usuário</button>
         </div>
         <div id="modalUsuarioMensagem" class="ci-msg"></div>
     </div>
@@ -4554,7 +4582,7 @@ async function carregarUsuariosAdmin(){
         const supabase = obterSupabaseClient();
         const { data, error } = await supabase
             .from("usuarios")
-            .select("id,nome,cargo,perfil,ativo,criado_em")
+            .select("*")
             .order("nome", { ascending:true });
 
         if(error) throw error;
@@ -4573,7 +4601,7 @@ function filtrarUsuariosAdmin(){
         return;
     }
     const filtrados = usuariosAdminLista.filter(function(u){
-        return [u.id,u.nome,u.cargo,u.perfil,(u.ativo ? "ativo" : "inativo")]
+        return [u.id,u.nome,u.email,u.cargo,u.perfil,(u.ativo ? "ativo" : "inativo")]
             .join(" ").toLowerCase().includes(termo);
     });
     renderizarUsuariosAdmin(filtrados);
@@ -4590,13 +4618,14 @@ function renderizarUsuariosAdmin(lista){
     }
 
     let html = "<table class='usuarios-tabela'><thead><tr>" +
-        "<th>Nome</th><th>Cargo</th><th>Perfil</th><th>Status</th><th>Criado em</th><th>UID</th><th>Ações</th>" +
+        "<th>Nome</th><th>E-mail</th><th>Cargo</th><th>Perfil</th><th>Status</th><th>Criado em</th><th>UID</th><th>Ações</th>" +
         "</tr></thead><tbody>";
 
     lista.forEach(function(u){
         const ativo = u.ativo !== false;
         html += "<tr>" +
             "<td><b>" + escaparHTML(u.nome || "-") + "</b></td>" +
+            "<td>" + escaparHTML(u.email || "-") + "</td>" +
             "<td>" + escaparHTML(u.cargo || "-") + "</td>" +
             "<td>" + escaparHTML(nomePerfilUsuario(u.perfil)) + "</td>" +
             "<td>" + (ativo ? "<span class='usuario-status-ativo'>🟢 Ativo</span>" : "<span class='usuario-status-inativo'>🔴 Inativo</span>") + "</td>" +
@@ -4617,14 +4646,23 @@ function renderizarUsuariosAdmin(lista){
 
 function abrirModalUsuario(usuario){
     if(!exigirPermissao(["administrador"], "Usuários")) return;
-    document.getElementById("modalUsuarioTitulo").innerHTML = usuario ? "Editar Perfil" : "Novo Perfil";
+    const editando = !!usuario;
+    document.getElementById("modalUsuarioTitulo").innerHTML = editando ? "Editar Usuário" : "Novo Usuário";
+    document.getElementById("usuarioModalInfo").innerHTML = editando
+        ? "Edite o nome, cargo, perfil e situação. O e-mail e a senha do Supabase Authentication não são alterados por esta tela."
+        : "Informe os dados do novo acesso. A conta será criada no Supabase Authentication e vinculada automaticamente ao perfil do ERP.";
     document.getElementById("usuarioEditandoIdOriginal").value = usuario?.id || "";
     document.getElementById("usuarioFormId").value = usuario?.id || "";
-    document.getElementById("usuarioFormId").disabled = !!usuario;
     document.getElementById("usuarioFormNome").value = usuario?.nome || "";
+    document.getElementById("usuarioFormEmail").value = usuario?.email || "";
+    document.getElementById("usuarioFormEmail").disabled = editando;
+    document.getElementById("usuarioFormSenha").value = "";
+    document.getElementById("usuarioFormConfirmarSenha").value = "";
+    document.querySelectorAll(".usuario-senha-novo").forEach(el => el.style.display = editando ? "none" : "");
     document.getElementById("usuarioFormCargo").value = usuario?.cargo || "";
     document.getElementById("usuarioFormPerfil").value = usuario?.perfil || "consulta";
     document.getElementById("usuarioFormAtivo").value = (usuario?.ativo === false) ? "false" : "true";
+    document.getElementById("btnSalvarUsuarioAdmin").textContent = editando ? "Salvar alterações" : "Criar usuário";
     document.getElementById("modalUsuarioMensagem").innerHTML = "";
     document.getElementById("modalUsuario").style.display = "flex";
 }
@@ -4645,42 +4683,147 @@ function editarUsuarioAdmin(id){
 
 async function salvarUsuarioAdmin(){
     if(!exigirPermissao(["administrador"], "Usuários")) return;
+
     const msg = document.getElementById("modalUsuarioMensagem");
+    const botao = document.getElementById("btnSalvarUsuarioAdmin");
     const idOriginal = document.getElementById("usuarioEditandoIdOriginal").value;
-    const id = document.getElementById("usuarioFormId").value.trim();
+    const editando = !!idOriginal;
     const nome = document.getElementById("usuarioFormNome").value.trim();
+    const email = document.getElementById("usuarioFormEmail").value.trim().toLowerCase();
+    const senha = document.getElementById("usuarioFormSenha").value;
+    const confirmarSenha = document.getElementById("usuarioFormConfirmarSenha").value;
     const cargo = document.getElementById("usuarioFormCargo").value.trim();
     const perfil = document.getElementById("usuarioFormPerfil").value;
     const ativo = document.getElementById("usuarioFormAtivo").value === "true";
 
-    if(!id || !nome || !perfil){
-        msg.innerHTML = "Preencha UID, nome e perfil.";
+    if(!nome || !perfil){
+        msg.innerHTML = "<span class='admin-status-erro'>Preencha nome e perfil.</span>";
         return;
     }
 
-    try{
-        msg.innerHTML = "Salvando...";
-        const supabase = obterSupabaseClient();
-        const payload = { id, nome, cargo, perfil, ativo };
-        let error;
+    if(!editando){
+        if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+            msg.innerHTML = "<span class='admin-status-erro'>Informe um e-mail válido.</span>";
+            return;
+        }
+        if(senha.length < 6){
+            msg.innerHTML = "<span class='admin-status-erro'>A senha precisa ter pelo menos 6 caracteres.</span>";
+            return;
+        }
+        if(senha !== confirmarSenha){
+            msg.innerHTML = "<span class='admin-status-erro'>As senhas não conferem.</span>";
+            return;
+        }
+    }
 
-        if(idOriginal){
-            const res = await supabase.from("usuarios").update({ nome, cargo, perfil, ativo }).eq("id", idOriginal);
-            error = res.error;
+    try{
+        botao.disabled = true;
+        msg.innerHTML = editando ? "Salvando alterações..." : "Criando conta no Supabase Authentication...";
+
+        const supabasePrincipal = obterSupabaseClient();
+
+        if(editando){
+            const { error } = await supabasePrincipal
+                .from("usuarios")
+                .update({ nome, cargo, perfil, ativo })
+                .eq("id", idOriginal);
+
+            if(error) throw error;
+
+            await registrarAuditoria("usuario", "Perfil de usuário atualizado.", {
+                id:idOriginal, nome, cargo, perfil, ativo
+            });
+            if(typeof criarNotificacaoV39 === "function"){
+                await criarNotificacaoV39(
+                    "Usuário atualizado",
+                    nome + " teve o perfil atualizado com sucesso.",
+                    "usuario",
+                    { id:idOriginal, nome, perfil, ativo }
+                );
+            }
+
+            msg.innerHTML = "<span class='admin-status-ok'>Alterações salvas com sucesso.</span>";
         }else{
-            const res = await supabase.from("usuarios").insert(payload);
-            error = res.error;
+            const url = localStorage.getItem("SUPABASE_URL") || SUPABASE_URL_PADRAO;
+            const key = localStorage.getItem("SUPABASE_ANON_KEY") || SUPABASE_ANON_KEY_PADRAO;
+
+            // Cliente separado para criar a conta sem substituir/desconectar a sessão do administrador.
+            const clienteCadastro = window.supabase.createClient(url, key, {
+                auth:{
+                    persistSession:false,
+                    autoRefreshToken:false,
+                    detectSessionInUrl:false
+                }
+            });
+
+            const { data:authData, error:authError } = await clienteCadastro.auth.signUp({
+                email,
+                password:senha,
+                options:{
+                    data:{ nome, cargo, perfil }
+                }
+            });
+
+            if(authError) throw authError;
+            const novoId = authData?.user?.id;
+            if(!novoId) throw new Error("O Supabase não retornou o UID do novo usuário.");
+
+            msg.innerHTML = "Conta criada. Gravando perfil no ERP...";
+
+            const payloadBase = { id:novoId, nome, cargo, perfil, ativo };
+            let perfilError = null;
+
+            // Tenta salvar também o e-mail caso a tabela possua essa coluna.
+            let resposta = await supabasePrincipal
+                .from("usuarios")
+                .insert({ ...payloadBase, email });
+
+            if(resposta.error && /email|column/i.test(resposta.error.message || "")){
+                resposta = await supabasePrincipal.from("usuarios").insert(payloadBase);
+            }
+            perfilError = resposta.error;
+
+            if(perfilError){
+                throw new Error(
+                    "A conta foi criada no Authentication, mas o perfil não pôde ser salvo na tabela usuarios: " +
+                    (perfilError.message || perfilError)
+                );
+            }
+
+            await registrarAuditoria("usuario", "Novo usuário criado pelo ERP.", {
+                id:novoId, nome, email, cargo, perfil, ativo
+            });
+            if(typeof criarNotificacaoV39 === "function"){
+                await criarNotificacaoV39(
+                    "Novo usuário criado",
+                    nome + " foi cadastrado com o perfil " + nomePerfilUsuario(perfil) + ".",
+                    "usuario",
+                    { id:novoId, nome, email, perfil, ativo }
+                );
+            }
+
+            const confirmacao = authData?.session
+                ? "O usuário já pode entrar com o e-mail e a senha cadastrados."
+                : "A conta foi criada. Caso a confirmação de e-mail esteja ativa no Supabase, o usuário deverá confirmar o e-mail antes do primeiro acesso.";
+
+            msg.innerHTML = "<span class='admin-status-ok'>Usuário criado com sucesso.</span><br>" + escaparHTML(confirmacao);
         }
 
-        if(error) throw error;
-        registrarAuditoria("usuario", idOriginal ? "Perfil de usuário atualizado." : "Perfil de usuário criado.", { id: id, nome: nome, cargo: cargo, perfil: perfil, ativo: ativo });
-        msg.innerHTML = "<span class='admin-status-ok'>Usuário salvo com sucesso.</span>";
         await carregarUsuariosAdmin();
-        setTimeout(fecharModalUsuario, 600);
+        setTimeout(fecharModalUsuario, editando ? 700 : 1800);
     }catch(e){
-        msg.innerHTML = "<span class='admin-status-erro'>Erro ao salvar:</span> " + (e.message || e);
+        msg.innerHTML = "<span class='admin-status-erro'>Erro ao salvar:</span> " + escaparHTML(e.message || String(e));
+    }finally{
+        botao.disabled = false;
     }
 }
+
+document.addEventListener("keydown",function(event){
+    if(event.key==="Escape"){
+        const modal=document.getElementById("modalUsuario");
+        if(modal&&getComputedStyle(modal).display!=="none")fecharModalUsuario();
+    }
+});
 
 async function alternarStatusUsuarioAdmin(id){
     if(!exigirPermissao(["administrador"], "Usuários")) return;
@@ -5831,8 +5974,9 @@ window.addEventListener('load',()=>setTimeout(carregarNotificacoesV39,1200));
 
 </script>
 
-<div id="erpImportOverlay" class="erp-import-overlay" aria-live="polite">
-  <div class="erp-import-modal">
+<div id="erpImportOverlay" class="erp-import-overlay" aria-live="polite" onclick="if(event.target===this)fecharImportacaoV40()">
+  <div class="erp-import-modal" role="dialog" aria-modal="true" aria-labelledby="erpImportTitulo">
+    <button id="erpImportX" class="erp-import-x" type="button" aria-label="Fechar importação" title="Fechar" onclick="fecharImportacaoV40()">×</button>
     <div class="erp-import-cabecalho">
       <div class="erp-import-icone">⇧</div>
       <div>
@@ -5867,6 +6011,7 @@ window.addEventListener('load',()=>setTimeout(carregarNotificacoesV39,1200));
 
     <div class="erp-import-acoes">
       <button id="erpImportCancelar" class="erp-import-cancelar" onclick="cancelarImportacaoV40()">Cancelar importação</button>
+      <button id="erpImportVerComparacoes" class="erp-import-ver-comparacoes" onclick="verComparacoesImportacaoV40()">Ver comparações</button>
       <button id="erpImportFechar" class="erp-import-fechar" onclick="fecharImportacaoV40()">Fechar</button>
     </div>
   </div>
@@ -5880,13 +6025,36 @@ function erpImportElV40(id){return document.getElementById(id)}
 function erpImportTempoTextoV40(seg){seg=Math.max(0,Math.floor(seg||0));return String(Math.floor(seg/60)).padStart(2,"0")+":"+String(seg%60).padStart(2,"0")}
 function erpYieldV40(ms=20){return new Promise(r=>setTimeout(r,ms))}
 function erpImportLogV40(texto){const el=erpImportElV40("erpImportLog");if(!el)return;const hora=new Date().toLocaleTimeString("pt-BR");el.innerHTML+=(el.textContent==="Aguardando início..."?"":"<br>")+"["+hora+"] "+escaparHTML(texto);if(el.textContent.includes("Aguardando início..."))el.innerHTML="["+hora+"] "+escaparHTML(texto);el.scrollTop=el.scrollHeight}
-function abrirImportacaoV40(nome,total){erpImportCanceladaV40=false;erpImportInicioV40=Date.now();erpImportUltimosBytesV40=0;erpImportUltimoTempoV40=performance.now();erpImportElV40("erpImportOverlay")?.classList.add("aberto");erpImportElV40("erpImportArquivo").textContent=nome||"Arquivo REXPEDLR";erpImportElV40("erpImportRegistros").textContent=Number(total||0).toLocaleString("pt-BR");erpImportElV40("erpImportEnviados").textContent="0";erpImportElV40("erpImportVelocidade").textContent="--";erpImportElV40("erpImportLog").textContent="Aguardando início...";erpImportElV40("erpImportCancelar").style.display="";erpImportElV40("erpImportFechar").style.display="none";["Leitura","BaseAntes","Envio","Resposta","Comparacao","Atualizacao"].forEach(x=>{const p=erpImportElV40("erpPasso"+x);if(p)p.className="erp-import-passo"});atualizarImportacaoV40(0,"Preparando importação...");clearInterval(erpImportTimerV40);erpImportTimerV40=setInterval(()=>{const t=(Date.now()-erpImportInicioV40)/1000;const el=erpImportElV40("erpImportTempo");if(el)el.textContent=erpImportTempoTextoV40(t)},500)}
+function abrirImportacaoV40(nome,total){erpImportCanceladaV40=false;erpImportInicioV40=Date.now();erpImportUltimosBytesV40=0;erpImportUltimoTempoV40=performance.now();erpImportElV40("erpImportOverlay")?.classList.add("aberto");erpImportElV40("erpImportArquivo").textContent=nome||"Arquivo REXPEDLR";erpImportElV40("erpImportRegistros").textContent=Number(total||0).toLocaleString("pt-BR");erpImportElV40("erpImportEnviados").textContent="0";erpImportElV40("erpImportVelocidade").textContent="--";erpImportElV40("erpImportLog").textContent="Aguardando início...";erpImportElV40("erpImportCancelar").style.display="";erpImportElV40("erpImportFechar").style.display="none";erpImportElV40("erpImportVerComparacoes").style.display="none";["Leitura","BaseAntes","Envio","Resposta","Comparacao","Atualizacao"].forEach(x=>{const p=erpImportElV40("erpPasso"+x);if(p)p.className="erp-import-passo"});atualizarImportacaoV40(0,"Preparando importação...");clearInterval(erpImportTimerV40);erpImportTimerV40=setInterval(()=>{const t=(Date.now()-erpImportInicioV40)/1000;const el=erpImportElV40("erpImportTempo");if(el)el.textContent=erpImportTempoTextoV40(t)},500)}
 function atualizarImportacaoV40(percentual,etapa,passo,status){percentual=Math.max(0,Math.min(100,Math.round(percentual||0)));const b=erpImportElV40("erpImportBarra"),p=erpImportElV40("erpImportPercentual"),e=erpImportElV40("erpImportEtapa");if(b)b.style.width=percentual+"%";if(p)p.textContent=percentual+"%";if(e&&etapa)e.textContent=etapa;if(passo){const el=erpImportElV40("erpPasso"+passo);if(el)el.className="erp-import-passo "+(status||"ativo")}}
 function concluirPassoV40(p){const e=erpImportElV40("erpPasso"+p);if(e)e.className="erp-import-passo ok"}
 function falharPassoV40(p){const e=erpImportElV40("erpPasso"+p);if(e)e.className="erp-import-passo erro"}
 function cancelarImportacaoV40(){erpImportCanceladaV40=true;if(erpImportXhrV40){try{erpImportXhrV40.abort()}catch(_){}}atualizarImportacaoV40(Number((erpImportElV40("erpImportPercentual")||{}).textContent?.replace("%","")||0),"Cancelamento solicitado...");erpImportLogV40("Cancelamento solicitado pelo usuário.");const b=erpImportElV40("erpImportCancelar");if(b)b.disabled=true}
-function fecharImportacaoV40(){erpImportElV40("erpImportOverlay")?.classList.remove("aberto")}
-function finalizarModalImportacaoV40(sucesso,mensagem){clearInterval(erpImportTimerV40);erpImportElV40("erpImportCancelar").style.display="none";erpImportElV40("erpImportFechar").style.display="";erpImportElV40("erpImportTitulo").textContent=sucesso?"Importação concluída":"Importação interrompida";erpImportElV40("erpImportEtapa").textContent=mensagem||""}
+function fecharImportacaoV40(){
+    const overlay=erpImportElV40("erpImportOverlay");
+    if(overlay)overlay.classList.remove("aberto");
+}
+function verComparacoesImportacaoV40(){
+    fecharImportacaoV40();
+    const comparador=document.getElementById("comparadorModal");
+    if(comparador)comparador.style.display="flex";
+}
+function finalizarModalImportacaoV40(sucesso,mensagem){
+    clearInterval(erpImportTimerV40);
+    erpImportElV40("erpImportCancelar").style.display="none";
+    erpImportElV40("erpImportFechar").style.display="";
+    erpImportElV40("erpImportVerComparacoes").style.display=sucesso?"":"none";
+    erpImportElV40("erpImportTitulo").textContent=sucesso?"Importação concluída":"Importação interrompida";
+    erpImportElV40("erpImportEtapa").textContent=mensagem||"";
+}
+document.addEventListener("keydown",function(event){
+    if(event.key==="Escape"){
+        const overlay=erpImportElV40("erpImportOverlay");
+        if(overlay&&overlay.classList.contains("aberto")){
+            fecharImportacaoV40();
+        }
+    }
+});
 function enviarRexpedlrXhrV40(endpoint,key,payload){return new Promise((resolve,reject)=>{const xhr=new XMLHttpRequest();erpImportXhrV40=xhr;xhr.open("POST",endpoint,true);xhr.setRequestHeader("Content-Type","application/json");xhr.setRequestHeader("Authorization","Bearer "+key);xhr.setRequestHeader("apikey",key);xhr.upload.onprogress=function(ev){if(!ev.lengthComputable)return;const frac=ev.loaded/ev.total,pct=40+Math.round(frac*35),enviados=Math.round((payload.registros.length||0)*frac);erpImportElV40("erpImportEnviados").textContent=enviados.toLocaleString("pt-BR");const agora=performance.now(),dt=(agora-erpImportUltimoTempoV40)/1000;if(dt>.35){const bytesSeg=(ev.loaded-erpImportUltimosBytesV40)/dt;erpImportElV40("erpImportVelocidade").textContent=bytesSeg>1048576?(bytesSeg/1048576).toFixed(1)+" MB/s":Math.max(0,bytesSeg/1024).toFixed(0)+" KB/s";erpImportUltimosBytesV40=ev.loaded;erpImportUltimoTempoV40=agora}atualizarImportacaoV40(pct,"Enviando registros ao Supabase...","Envio","ativo")};xhr.onload=function(){erpImportXhrV40=null;let retorno=null;try{retorno=JSON.parse(xhr.responseText||"{}")}catch(_){retorno={mensagem:xhr.responseText||""}}if(xhr.status>=200&&xhr.status<300)resolve(retorno);else reject(new Error(retorno?.mensagem||("Falha HTTP "+xhr.status+" na importação.")))};xhr.onerror=function(){erpImportXhrV40=null;reject(new Error("Falha de rede durante o envio ao Supabase."))};xhr.onabort=function(){erpImportXhrV40=null;reject(new Error("Importação cancelada pelo usuário."))};xhr.send(JSON.stringify(payload))})}
 
 window.importarNettermParaSupabase=async function(){
