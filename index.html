@@ -6931,13 +6931,44 @@ async function excluirObservacaoOS(id,botao){
 
             observacaoRemovida=registro;
 
-            const {error}=await sb
-                .from(ERP_V38_TABELAS.observacoes)
-                .delete()
-                .eq('id',id)
-                .eq('os',os);
+            // Exclusão segura pelo Supabase. A função valida o perfil do usuário
+            // e confirma que exatamente uma observação foi removida.
+            const {data:rpcResultado,error:rpcErro}=await sb.rpc(
+                'excluir_observacao_os',
+                {p_id:Number(id),p_os:os}
+            );
 
-            if(error)throw error;
+            if(rpcErro){
+                const mensagem=String(rpcErro.message||rpcErro);
+                if(/function|excluir_observacao_os|schema cache|does not exist/i.test(mensagem)){
+                    throw new Error(
+                        "A função de exclusão ainda não foi instalada no Supabase. "+
+                        "Execute o SQL fornecido junto com esta versão."
+                    );
+                }
+                throw rpcErro;
+            }
+
+            if(rpcResultado!==true){
+                throw new Error(
+                    "O Supabase não removeu a observação. Ela pode já ter sido apagada "+
+                    "ou seu usuário não possui permissão."
+                );
+            }
+
+            // Confirma no banco para impedir falso sucesso.
+            const {data:confirmacao,error:erroConfirmacao}=await sb
+                .from(ERP_V38_TABELAS.observacoes)
+                .select('id')
+                .eq('id',id)
+                .eq('os',os)
+                .maybeSingle();
+
+            if(erroConfirmacao)throw erroConfirmacao;
+            if(confirmacao){
+                throw new Error("A exclusão foi solicitada, mas a observação ainda existe no banco.");
+            }
+
             sincronizada=true;
         }else{
             const notas=carregarNotasOS(os);
@@ -6950,6 +6981,13 @@ async function excluirObservacaoOS(id,botao){
         }
 
         await renderNotasOS();
+
+        const origem=document.getElementById('osNotasOrigem');
+        if(origem){
+            origem.textContent=sincronizada
+                ?'• observação apagada e sincronizada'
+                :'• observação local apagada';
+        }
 
         await registrarAuditoria(
             'os',
