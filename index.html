@@ -2011,6 +2011,94 @@ body.dark-mode .copiloto-painel{background:#061426}
 @media(max-width:600px){.copiloto-fab{right:18px;bottom:18px}.copiloto-painel{width:100%;max-width:100vw}}
 @media print{.copiloto-fab,.copiloto-painel,.copiloto-overlay{display:none!important}}
 
+
+/* =========================================================
+   V5.3.1 - MEMÓRIA DE CONTEXTO DO COPILOTO
+   ========================================================= */
+.copiloto-contexto{
+    display:none;align-items:flex-start;gap:8px;flex-wrap:wrap;
+    background:rgba(255,255,255,.07);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:13px;padding:9px 10px
+}
+.copiloto-contexto.visivel{display:flex}
+.copiloto-contexto-titulo{
+    width:100%;font-size:10px;text-transform:uppercase;
+    letter-spacing:.7px;color:#8da4bf;font-weight:900
+}
+.copiloto-contexto-chip{
+    display:inline-flex;align-items:center;gap:5px;
+    background:#006cff;color:#fff;border-radius:999px;
+    padding:6px 9px;font-size:11px;font-weight:800
+}
+.copiloto-contexto-limpar{
+    border:1px solid rgba(255,255,255,.25);border-radius:999px;
+    background:transparent;color:#fff;padding:6px 9px;
+    font-size:11px;font-weight:900;cursor:pointer
+}
+.copiloto-contexto-limpar:hover{background:#b00020}
+.copiloto-comandos{
+    color:#8da4bf;font-size:10px;line-height:15px;
+    padding:0 2px
+}
+
+
+/* =========================================================
+   V5.3.2 - AÇÕES REAIS DO COPILOTO
+   ========================================================= */
+.copiloto-acao-card{
+    margin-top:10px;padding:11px;border-radius:12px;
+    background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.14)
+}
+.copiloto-acao-card b{display:block;margin-bottom:5px}
+.copiloto-acao-card small{display:block;color:#b8cae0;line-height:16px}
+.copiloto-acao-botoes{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.copiloto-acao-confirmar,.copiloto-acao-secundaria{
+    border:0;border-radius:9px;padding:8px 11px;
+    color:#fff;font-weight:900;cursor:pointer
+}
+.copiloto-acao-confirmar{background:#0b8f3f}
+.copiloto-acao-secundaria{background:#006cff}
+.copiloto-acao-confirmar:hover,.copiloto-acao-secundaria:hover{filter:brightness(1.12)}
+
+
+/* =========================================================
+   V5.3.3 - EXCLUSÃO DE OBSERVAÇÕES INTERNAS DA O.S.
+   ========================================================= */
+.os-nota{
+    position:relative;
+    padding-right:105px!important;
+}
+.os-nota-apagar{
+    position:absolute;
+    right:10px;
+    top:10px;
+    border:0;
+    border-radius:8px;
+    padding:7px 10px;
+    background:#b00020;
+    color:#fff;
+    font-size:11px;
+    font-weight:900;
+    cursor:pointer;
+}
+.os-nota-apagar:hover{
+    background:#d00026;
+    transform:scale(1.04);
+}
+.os-nota-apagar:disabled{
+    opacity:.55;
+    cursor:not-allowed;
+    transform:none;
+}
+body.dark-mode .os-nota-apagar{
+    color:#fff!important;
+}
+@media(max-width:600px){
+    .os-nota{padding-right:12px!important;padding-top:50px!important}
+    .os-nota-apagar{left:10px;right:auto;top:9px}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -5889,6 +5977,7 @@ async function carregarInteligencia(forcar){
         renderIntel();
         if(typeof renderHomeIntegradaV502==="function") renderHomeIntegradaV502();
         if(typeof atualizarBadgeCopilotoERP==="function") atualizarBadgeCopilotoERP();
+        if(typeof restaurarContextoCopiloto==="function") restaurarContextoCopiloto();
         m.className="dashboard-ok";
         m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
     }
@@ -5974,6 +6063,140 @@ function carregarTimelineOS(){
 }
 let intelAssistenteUltimoResultado=[];
 let intelAssistenteUltimoTitulo="Resultado da análise";
+let copilotoContexto={
+    ativo:false,
+    criterios:[],
+    lista:[],
+    titulo:""
+};
+
+function salvarContextoCopiloto(lista,criterios,titulo){
+    copilotoContexto={
+        ativo:true,
+        criterios:[...new Set((criterios||[]).filter(Boolean))],
+        lista:Array.isArray(lista)?lista:[],
+        titulo:titulo||"Consulta atual"
+    };
+    try{
+        sessionStorage.setItem("ERP_COPILOTO_CONTEXTO",JSON.stringify({
+            criterios:copilotoContexto.criterios,
+            os:copilotoContexto.lista.map(r=>String(r.os||"")).filter(Boolean),
+            titulo:copilotoContexto.titulo
+        }));
+    }catch(_){}
+    renderContextoCopiloto();
+}
+function renderContextoCopiloto(){
+    const box=document.getElementById("copilotoContexto");
+    const chips=document.getElementById("copilotoContextoChips");
+    if(!box||!chips)return;
+    const criterios=copilotoContexto.criterios||[];
+    box.classList.toggle("visivel",copilotoContexto.ativo&&criterios.length>0);
+    chips.innerHTML=criterios.map(c=>"<span class='copiloto-contexto-chip'>"+escaparHTML(c)+"</span>").join("");
+}
+function limparContextoCopiloto(mostrarMensagem){
+    copilotoContexto={ativo:false,criterios:[],lista:[],titulo:""};
+    intelAssistenteUltimoResultado=[];
+    intelAssistenteUltimoTitulo="Resultado da análise";
+    try{sessionStorage.removeItem("ERP_COPILOTO_CONTEXTO")}catch(_){}
+    renderContextoCopiloto();
+    if(mostrarMensagem)addChatIntelHTML("Contexto limpo. A próxima pergunta começará usando toda a base.");
+}
+function restaurarContextoCopiloto(){
+    if(typeof intelRegistros==="undefined"||!Array.isArray(intelRegistros)||!intelRegistros.length)return;
+    try{
+        const salvo=JSON.parse(sessionStorage.getItem("ERP_COPILOTO_CONTEXTO")||"null");
+        if(!salvo||!Array.isArray(salvo.os)||!salvo.os.length)return;
+        const ids=new Set(salvo.os.map(String));
+        const lista=intelRegistros.filter(r=>ids.has(String(r.os||"")));
+        if(!lista.length)return;
+        copilotoContexto={
+            ativo:true,
+            criterios:Array.isArray(salvo.criterios)?salvo.criterios:[],
+            lista,
+            titulo:salvo.titulo||"Consulta restaurada"
+        };
+        intelAssistenteUltimoResultado=lista;
+        intelAssistenteUltimoTitulo=copilotoContexto.titulo;
+        renderContextoCopiloto();
+    }catch(_){}
+}
+function perguntaContinuaContextoIntel(u){
+    return /^(AGORA|SOMENTE|SO\b|APENAS|DESTES|DESTAS|DESSES|DESSAS|TAMBEM|AINDA|E\b|COM\b|NO\b|NA\b|DO\b|DA\b)/.test(u);
+}
+function executarComandoCopiloto(q){
+    const bruto=String(q||"").trim();
+    if(!bruto.startsWith("/"))return false;
+    const partes=bruto.slice(1).trim().split(/\s+/);
+    const cmd=(partes.shift()||"").toLowerCase();
+    const arg=partes.join(" ").trim();
+
+    if(cmd==="limpar"){
+        limparContextoCopiloto(true);
+        return true;
+    }
+    if(cmd==="ajuda"){
+        addChatIntelHTML("<b>Comandos disponíveis</b><br>/limpar — limpa os filtros<br>/os 33061 — abre a O.S.<br>/rack 500 — consulta o rack<br>/ci 1542 — procura a C.I. no histórico<br>/importar — abre a importação<br>/usuarios — abre usuários<br>/historico — abre o histórico de importações<br>/relatorios — abre relatórios<br>/ci-teresina — carrega a relação atual na C.I. Teresina");
+        return true;
+    }
+    if(cmd==="os"){
+        const os=arg.replace(/\D/g,"");
+        if(!os){addChatIntelHTML("Use o comando assim: <b>/os 33061</b>.");return true}
+        const r=intelRegistros.find(x=>String(x.os||"").replace(/\D/g,"")===os);
+        if(!r){addChatIntelHTML("Não encontrei a O.S. <b>"+escaparHTML(os)+"</b> na base atual.");return true}
+        abrirOSIntel(r.os);
+        return true;
+    }
+    if(cmd==="rack"){
+        if(!arg){addChatIntelHTML("Use o comando assim: <b>/rack 500</b>.");return true}
+        const inp=document.getElementById("intelPergunta");
+        inp.value="mostre as O.S. do rack "+arg;
+        responderAssistenteIntel();
+        return true;
+    }
+    if(cmd==="ci"){
+        if(!arg){addChatIntelHTML("Use o comando assim: <b>/ci 1542</b>.");return true}
+        fecharCopilotoERP();
+        abrirAdminSecao("historico_ci");
+        setTimeout(()=>{
+            const busca=document.getElementById("cihBusca");
+            if(busca){busca.value=arg;if(typeof filtrarHistoricoCI==="function")filtrarHistoricoCI()}
+        },350);
+        return true;
+    }
+    if(cmd==="importar"){
+        fecharCopilotoERP();
+        abrirAdminSecao("atualizar");
+        return true;
+    }
+    if(cmd==="usuarios"){
+        fecharCopilotoERP();
+        abrirAdminSecao("usuarios");
+        return true;
+    }
+    if(cmd==="historico"){
+        fecharCopilotoERP();
+        abrirAdminSecao("historico");
+        return true;
+    }
+    if(cmd==="relatorios"){
+        fecharCopilotoERP();
+        abrirRelatorios();
+        return true;
+    }
+    if(cmd==="inteligencia"){
+        fecharCopilotoERP();
+        abrirInteligencia();
+        return true;
+    }
+    if(["ci-teresina","ci-regiao","ci-pmr","ci-geit","ci-assurant","ci-outros"].includes(cmd)){
+        const tipo=cmd.replace("ci-","");
+        solicitarGeracaoCICopiloto(tipo);
+        return true;
+    }
+    addChatIntelHTML("Comando desconhecido. Use <b>/ajuda</b> para ver os comandos disponíveis.");
+    return true;
+}
 
 function addChatIntel(tipo,texto){
     const c=document.getElementById("intelChat");
@@ -6056,6 +6279,7 @@ function acoesChatIntel(temResultado=true){
     return "<div class='intel-chat-actions'>"+
       "<button class='intel-chat-action' onclick='abrirUltimoResultadoIntel()'>📄 Abrir relação</button>"+
       "<button class='intel-chat-action' onclick='exportarUltimoResultadoIntel()'>⇩ Exportar CSV</button>"+
+      "<button class='intel-chat-action' onclick="solicitarGeracaoCICopiloto('teresina')">↩ Gerar C.I.</button>"+
       "</div>";
 }
 function abrirResultadoAssistenteIntel(titulo,lista){
@@ -6085,19 +6309,157 @@ function exportarUltimoResultadoIntel(){
     a.download=normalizarPerguntaIntel(intelAssistenteUltimoTitulo).toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"")+"_"+new Date().toISOString().slice(0,10)+".csv";
     document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
+
+function nomeCICopiloto(tipo){
+    const mapa={teresina:"C.I. Teresina",regiao:"C.I. Região",pmr:"C.I. PMR",geit:"C.I. GEIT",assurant:"C.I. Assurant",outros:"C.I. Outros"};
+    return mapa[tipo]||tipo;
+}
+function htmlAcaoCICopiloto(tipo,lista){
+    const total=Array.isArray(lista)?lista.length:0;
+    const usados=Math.min(total,8);
+    const aviso=total>8
+        ? "A C.I. aceita até 8 O.S. por vez. Serão carregadas as primeiras 8 da relação."
+        : "Todas as O.S. da relação serão carregadas.";
+    return "<div class='copiloto-acao-card'><b>"+escaparHTML(nomeCICopiloto(tipo))+"</b>"+
+        "<small>"+total+" O.S. selecionadas. "+escaparHTML(aviso)+"</small>"+
+        "<div class='copiloto-acao-botoes'>"+
+        "<button class='copiloto-acao-confirmar' onclick=\"executarGeracaoCICopiloto('"+tipo+"')\">Carregar "+usados+" O.S.</button>"+
+        "<button class='copiloto-acao-secundaria' onclick='abrirUltimoResultadoIntel()'>Revisar relação</button>"+
+        "</div></div>";
+}
+function solicitarGeracaoCICopiloto(tipo){
+    const permitidos=["teresina","regiao","pmr","geit","assurant","outros"];
+    if(!permitidos.includes(tipo)){
+        addChatIntelHTML("Não reconheci esse modelo de C.I.");
+        return;
+    }
+    const lista=(copilotoContexto.ativo&&copilotoContexto.lista.length)
+        ?copilotoContexto.lista
+        :intelAssistenteUltimoResultado;
+    if(!Array.isArray(lista)||!lista.length){
+        addChatIntelHTML("Primeiro faça uma consulta que gere uma relação de O.S.; depois peça para gerar a C.I.");
+        return;
+    }
+    addChatIntelHTML("Posso carregar a relação atual em uma C.I."+htmlAcaoCICopiloto(tipo,lista));
+}
+async function aguardarPlanilhaCICopiloto(limiteMs=8000){
+    const inicio=Date.now();
+    while(Date.now()-inicio<limiteMs){
+        if(planilhaCI&&typeof planilhaCI.setValueFromCoords==="function")return true;
+        await new Promise(r=>setTimeout(r,100));
+    }
+    return false;
+}
+async function executarGeracaoCICopiloto(tipo){
+    const lista=(copilotoContexto.ativo&&copilotoContexto.lista.length)
+        ?copilotoContexto.lista
+        :intelAssistenteUltimoResultado;
+    if(!Array.isArray(lista)||!lista.length){
+        addChatIntelHTML("A relação não está mais disponível.");
+        return;
+    }
+    if(tipo==="outros"){
+        fecharCopilotoERP();
+        abrirCI("outros");
+        return;
+    }
+    const selecionadas=lista.slice(0,8);
+    const numeros=selecionadas.map(r=>String(r.os||"").trim()).filter(Boolean);
+    if(!numeros.length){
+        addChatIntelHTML("A relação não possui números de O.S. válidos.");
+        return;
+    }
+    const confirmar=confirm(
+        "Carregar "+numeros.length+" O.S. em "+nomeCICopiloto(tipo)+"?"+
+        (lista.length>8?"\n\nA relação possui "+lista.length+" O.S.; serão usadas somente as primeiras 8.":"")
+    );
+    if(!confirmar)return;
+
+    fecharCopilotoERP();
+    abrirCI(tipo);
+    const pronta=await aguardarPlanilhaCICopiloto();
+    if(!pronta){
+        alert("A grade da C.I. não ficou pronta dentro do tempo esperado.");
+        return;
+    }
+
+    const cfg=configCIAtual();
+    for(let i=0;i<cfg.rows;i++){
+        limparLinhaCISemEventos(i);
+    }
+
+    for(let i=0;i<numeros.length&&i<cfg.rows;i++){
+        planilhaCI.setValueFromCoords(cfg.osCol,i,numeros[i],true);
+        if(tipo!=="geit"){
+            await preencherLinhaCIEditavel(i,numeros[i]);
+        }
+    }
+    atualizarTotalVolumesCI();
+    atualizarDestinoTopoRegiao();
+    const msg=document.getElementById("ciEditMensagem");
+    if(msg){
+        msg.innerHTML="<span class='admin-status-ok'>"+numeros.length+" O.S. carregadas pelo Copiloto.</span>"+
+            (lista.length>8?" As demais não foram incluídas porque este modelo aceita até 8 O.S. por vez.":"");
+    }
+}
+function detectarPedidoCINaturalCopiloto(u){
+    if(!/(GERAR|CRIAR|MONTAR|CARREGAR|FAZER)\s+(UMA\s+)?C\.?\s*I\.?/.test(u))return "";
+    if(/TERESINA|TEREZINA/.test(u))return "teresina";
+    if(/REGIAO/.test(u))return "regiao";
+    if(/\bPMR\b/.test(u))return "pmr";
+    if(/\bGEIT\b/.test(u))return "geit";
+    if(/ASSURANT/.test(u))return "assurant";
+    if(/OUTROS?/.test(u))return "outros";
+    return "teresina";
+}
+function detectarNavegacaoNaturalCopiloto(u){
+    if(/ABRIR|IR PARA|MOSTRAR TELA|ACESSAR/.test(u)){
+        if(/IMPORTA/.test(u)){fecharCopilotoERP();abrirAdminSecao("atualizar");return true}
+        if(/USUARIOS?/.test(u)){fecharCopilotoERP();abrirAdminSecao("usuarios");return true}
+        if(/HISTORICO DE C\.?I|HISTORICO CI/.test(u)){fecharCopilotoERP();abrirAdminSecao("historico_ci");return true}
+        if(/HISTORICO/.test(u)){fecharCopilotoERP();abrirAdminSecao("historico");return true}
+        if(/RELATORIOS?/.test(u)){fecharCopilotoERP();abrirRelatorios();return true}
+        if(/INTELIGENCIA/.test(u)){fecharCopilotoERP();abrirInteligencia();return true}
+        if(/CONSULTA|CONSULTAR O\.?S/.test(u)){fecharCopilotoERP();abrirBusca();return true}
+    }
+    return false;
+}
+
 function responderAssistenteIntel(){
     const inp=document.getElementById("intelPergunta");
     const q=textoIntel(inp.value);
     if(!q)return;
-    if(!intelAnalise||!Array.isArray(intelRegistros)||!intelRegistros.length){
-        addChatIntel("user",q);
-        addChatIntelHTML("A análise ainda não está carregada. Clique em <b>Reanalisar</b> e tente novamente.");
+    addChatIntel("user",q);
+    inp.value="";
+
+    if(executarComandoCopiloto(q))return;
+
+    if(/^(LIMPAR|ZERAR|REINICIAR)\s+(O\s+)?CONTEXTO/i.test(q)){
+        limparContextoCopiloto(true);
         return;
     }
-    addChatIntel("user",q);inp.value="";
+
+    if(!intelAnalise||!Array.isArray(intelRegistros)||!intelRegistros.length){
+        addChatIntelHTML("A análise ainda não está carregada. Aguarde a base terminar de carregar e tente novamente.");
+        return;
+    }
+
     const u=normalizarPerguntaIntel(q);
-    let lista=[...intelRegistros];
-    const criterios=[];
+
+    if(detectarNavegacaoNaturalCopiloto(u))return;
+
+    const tipoCIPedido=detectarPedidoCINaturalCopiloto(u);
+    if(tipoCIPedido){
+        solicitarGeracaoCICopiloto(tipoCIPedido);
+        return;
+    }
+
+    const continuar=copilotoContexto.ativo&&copilotoContexto.lista.length&&perguntaContinuaContextoIntel(u);
+    let lista=continuar?[...copilotoContexto.lista]:[...intelRegistros];
+    const criterios=continuar?[...copilotoContexto.criterios]:[];
+    if(continuar){
+        addChatIntelHTML("Mantendo o contexto anterior: <b>"+escaparHTML(criterios.join(", "))+"</b>.");
+    }
     const querLista=/MOSTR|LIST|QUAIS|RELACAO|ABRIR|TUDO|TODAS|TODOS/.test(u);
     const querRanking=/RANKING|MAIOR|MAIS CHEIO|MAIS CARREGADO|TEM MAIS|MAIS O\.?S/.test(u);
     const querMedia=/MEDIA|TEMPO MEDIO|DEMORA/.test(u);
@@ -6189,7 +6551,10 @@ function responderAssistenteIntel(){
         else {titulo="Ranking de técnicos";ranking=contarListaIntel(lista,r=>r.tecnico)}
         ranking=ranking.filter(x=>x[0]!=="(vazio)");
         const html="<b>"+escaparHTML(titulo)+"</b>"+(criterios.length?" para "+escaparHTML(criterios.join(", ")):"")+"."+rankingChatIntel(ranking,limite||10);
-        addChatIntelHTML(html);
+        salvarContextoCopiloto(lista,criterios,titulo);
+        intelAssistenteUltimoResultado=lista;
+        intelAssistenteUltimoTitulo=titulo;
+        addChatIntelHTML(html+acoesChatIntel(lista.length>0));
         return;
     }
 
@@ -6200,7 +6565,10 @@ function responderAssistenteIntel(){
         else if(/EXPEDI/.test(u)){pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio entre geração e expedição"}
         else {pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio até a expedição"}
         const media=mediaDiasV36(pares);
-        addChatIntelHTML(media===null?"Não há datas suficientes para calcular "+escaparHTML(rotulo)+".":"O "+escaparHTML(rotulo)+" é de <b>"+media+" dias</b>, considerando "+lista.length+" registros após os filtros.");
+        salvarContextoCopiloto(lista,criterios,rotulo);
+        intelAssistenteUltimoResultado=lista;
+        intelAssistenteUltimoTitulo=rotulo;
+        addChatIntelHTML((media===null?"Não há datas suficientes para calcular "+escaparHTML(rotulo)+".":"O "+escaparHTML(rotulo)+" é de <b>"+media+" dias</b>, considerando "+lista.length+" registros após os filtros.")+acoesChatIntel(lista.length>0));
         return;
     }
 
@@ -6217,6 +6585,7 @@ function responderAssistenteIntel(){
       ?"Encontrei <b>"+lista.length.toLocaleString("pt-BR")+" O.S.</b> com "+escaparHTML(criterios.join(", "))+"."
       :"A base atual possui <b>"+lista.length.toLocaleString("pt-BR")+" O.S.</b>.";
 
+    salvarContextoCopiloto(lista,criterios,intelAssistenteUltimoTitulo);
     addChatIntelHTML(resumo+acoesChatIntel(true));
     if(querLista&&lista.length)abrirUltimoResultadoIntel();
 }
@@ -6514,6 +6883,100 @@ salvarObservacaoOS=async function(){
         alert('Não foi possível salvar a observação: '+(error.message||error));
     }finally{e.disabled=false;e.focus();}
 };
+function podeExcluirObservacaoOS(){
+    if(!usuarioLogado)return false;
+    return ['administrador','supervisor'].includes(String(usuarioLogado.perfil||'').toLowerCase());
+}
+function htmlObservacaoOS(x){
+    const idSeguro=JSON.stringify(String(x.id??''));
+    const botao=podeExcluirObservacaoOS()
+        ?`<button class="os-nota-apagar" type="button" onclick='excluirObservacaoOS(${idSeguro},this)'>Apagar</button>`
+        :'';
+    return `<div class="os-nota" data-nota-id="${escaparHTML(String(x.id??''))}">
+        ${botao}
+        <b>${escaparHTML(x.autor)}</b>
+        <small>${new Date(x.data).toLocaleString('pt-BR')}</small>
+        <p>${escaparHTML(x.texto)}</p>
+    </div>`;
+}
+async function excluirObservacaoOS(id,botao){
+    if(!osAtualCentral)return;
+    if(!exigirPermissao(["administrador","supervisor"],"Excluir observação interna"))return;
+
+    const os=String(osAtualCentral.os);
+    const idTexto=String(id??'');
+    const confirmou=confirm(
+        "Apagar esta observação interna da O.S. "+os+"?\n\n"+
+        "Esta ação não poderá ser desfeita."
+    );
+    if(!confirmou)return;
+
+    if(botao)botao.disabled=true;
+    try{
+        let sincronizada=false;
+        let observacaoRemovida=null;
+
+        if(await supabaseOperacionalDisponivelV38()){
+            const sb=obterSupabaseClient();
+
+            const {data:registro,error:erroBusca}=await sb
+                .from(ERP_V38_TABELAS.observacoes)
+                .select('id,os,texto,autor_nome,autor_email,created_at')
+                .eq('id',id)
+                .eq('os',os)
+                .maybeSingle();
+
+            if(erroBusca)throw erroBusca;
+            if(!registro)throw new Error("A observação não foi encontrada ou já foi apagada.");
+
+            observacaoRemovida=registro;
+
+            const {error}=await sb
+                .from(ERP_V38_TABELAS.observacoes)
+                .delete()
+                .eq('id',id)
+                .eq('os',os);
+
+            if(error)throw error;
+            sincronizada=true;
+        }else{
+            const notas=carregarNotasOS(os);
+            const indice=notas.findIndex(x=>String(x.id)===idTexto);
+            if(indice<0)throw new Error("A observação local não foi encontrada.");
+
+            observacaoRemovida=notas[indice];
+            notas.splice(indice,1);
+            localStorage.setItem(chaveNotasOS(os),JSON.stringify(notas.slice(0,200)));
+        }
+
+        await renderNotasOS();
+
+        await registrarAuditoria(
+            'os',
+            'Observação interna apagada da O.S. '+os,
+            {
+                os,
+                observacao_id:idTexto,
+                texto:observacaoRemovida?.texto||null,
+                autor_original:observacaoRemovida?.autor_nome||observacaoRemovida?.autor||observacaoRemovida?.autor_email||null,
+                sincronizada
+            }
+        );
+
+        if(typeof criarNotificacaoV39==='function'){
+            await criarNotificacaoV39(
+                'Observação apagada',
+                'Uma observação interna da O.S. '+os+' foi apagada.',
+                'os',
+                {os,observacao_id:idTexto,sincronizada}
+            );
+        }
+    }catch(error){
+        alert('Não foi possível apagar a observação: '+(error.message||error));
+        if(botao)botao.disabled=false;
+    }
+}
+
 renderNotasOS=async function(){
     const e=document.getElementById('osNotas');if(!e||!osAtualCentral)return;
     e.innerHTML='<div class="admin-info">Carregando observações...</div>';
@@ -6521,11 +6984,11 @@ renderNotasOS=async function(){
         const remotas=await carregarNotasOSSupabaseV38(osAtualCentral.os);
         const n=remotas===null?carregarNotasOS(osAtualCentral.os):remotas;
         definirOrigemNotasV38(remotas===null?'• salvas neste computador':'• compartilhadas pela equipe',remotas!==null);
-        e.innerHTML=n.length?n.map(x=>`<div class="os-nota"><b>${escaparHTML(x.autor)}</b><small>${new Date(x.data).toLocaleString('pt-BR')}</small><p>${escaparHTML(x.texto)}</p></div>`).join(''):'<div class="admin-info">Nenhuma observação interna.</div>';
+        e.innerHTML=n.length?n.map(htmlObservacaoOS).join(''):'<div class="admin-info">Nenhuma observação interna.</div>';
     }catch(error){
         definirOrigemNotasV38('• falha de sincronização',false);
         const n=carregarNotasOS(osAtualCentral.os);
-        e.innerHTML=(n.length?n.map(x=>`<div class="os-nota"><b>${escaparHTML(x.autor)}</b><small>${new Date(x.data).toLocaleString('pt-BR')}</small><p>${escaparHTML(x.texto)}</p></div>`).join(''):'<div class="admin-info">Nenhuma observação local.</div>')+`<div class="admin-info">Supabase indisponível: ${escaparHTML(error.message||String(error))}</div>`;
+        e.innerHTML=(n.length?n.map(htmlObservacaoOS).join(''):'<div class="admin-info">Nenhuma observação local.</div>')+`<div class="admin-info">Supabase indisponível: ${escaparHTML(error.message||String(error))}</div>`;
     }
 };
 
@@ -6930,6 +7393,11 @@ document.addEventListener("DOMContentLoaded",function(){
         <button class="copiloto-fechar" type="button" title="Fechar" aria-label="Fechar Copiloto" onclick="fecharCopilotoERP()">×</button>
     </div>
     <div class="copiloto-corpo">
+        <div id="copilotoContexto" class="copiloto-contexto">
+            <div class="copiloto-contexto-titulo">Filtros ativos</div>
+            <div id="copilotoContextoChips"></div>
+            <button class="copiloto-contexto-limpar" onclick="limparContextoCopiloto(true)">Limpar contexto</button>
+        </div>
         <div class="copiloto-sugestoes">
             <button onclick="perguntarIntelExemplo('mostre as O.S. abertas no rack 500')">Rack 500</button>
             <button onclick="perguntarIntelExemplo('mostre as O.S. prontas e abertas')">Prontas</button>
@@ -6938,7 +7406,8 @@ document.addEventListener("DOMContentLoaded",function(){
             <button onclick="perguntarIntelExemplo('mostre as O.S. que chegaram peça')">Chegou peça</button>
         </div>
         <div class="copiloto-chat" id="intelChat"><div class="intel-msg bot intel-resposta">Estou disponível em qualquer tela. Posso analisar a base, combinar filtros, montar rankings e abrir relações de O.S.</div></div>
-        <div class="copiloto-entrada"><input id="intelPergunta" placeholder="Pergunte sobre a operação..." onkeydown="if(event.key==='Enter') responderAssistenteIntel()"><button type="button" title="Enviar" onclick="responderAssistenteIntel()">➤</button></div>
+        <div class="copiloto-entrada"><input id="intelPergunta" placeholder="Pergunte ou use /os, /rack, /ci..." onkeydown="if(event.key==='Enter') responderAssistenteIntel()"><button type="button" title="Enviar" onclick="responderAssistenteIntel()">➤</button></div>
+        <div class="copiloto-comandos">Comandos: /limpar • /os 33061 • /rack 500 • /ci 1542 • /importar • /usuarios • /relatorios</div>
     </div>
     <div class="copiloto-rodape">As respostas usam os dados carregados no ERP.</div>
 </aside>
@@ -6949,6 +7418,7 @@ function abrirCopilotoERP(){
     const painel=document.getElementById("copilotoPainel"),overlay=document.getElementById("copilotoOverlay");
     if(painel)painel.classList.add("aberto");
     if(overlay)overlay.classList.add("aberto");
+    if(typeof renderContextoCopiloto==="function")renderContextoCopiloto();
     setTimeout(()=>document.getElementById("intelPergunta")?.focus(),220);
     if((typeof intelRegistros==="undefined"||!Array.isArray(intelRegistros)||!intelRegistros.length)&&typeof carregarInteligencia==="function")carregarInteligencia(false);
 }
