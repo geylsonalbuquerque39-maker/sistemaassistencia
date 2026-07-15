@@ -2099,6 +2099,218 @@ body.dark-mode .os-nota-apagar{
     .os-nota-apagar{left:10px;right:auto;top:9px}
 }
 
+
+/* =========================================================
+   V5.4.0 - PESQUISA GLOBAL INTELIGENTE
+   ========================================================= */
+.pesquisa-global-wrap{
+    position:absolute;
+    left:50%;
+    top:24px;
+    transform:translateX(-50%);
+    width:430px;
+    max-width:38vw;
+    z-index:80;
+}
+.pesquisa-global-atalho{
+    width:100%;
+    height:46px;
+    border:1px solid #c8d2df;
+    border-radius:14px;
+    background:#f7f9fc;
+    color:#667085;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:0 14px;
+    cursor:pointer;
+    box-shadow:0 4px 13px rgba(0,0,0,.07);
+}
+.pesquisa-global-atalho:hover{
+    border-color:#006cff;
+    background:#fff;
+}
+.pesquisa-global-atalho span{
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.pesquisa-global-atalho kbd{
+    border:1px solid #c8d2df;
+    border-bottom-width:2px;
+    border-radius:7px;
+    background:#fff;
+    color:#001b3d;
+    padding:3px 7px;
+    font:700 11px Segoe UI,Arial;
+}
+.pesquisa-global-overlay{
+    position:fixed;
+    inset:0;
+    z-index:14750;
+    background:rgba(0,0,0,.46);
+    backdrop-filter:blur(3px);
+    display:none;
+    align-items:flex-start;
+    justify-content:center;
+    padding:9vh 18px 24px;
+}
+.pesquisa-global-overlay.aberto{display:flex}
+.pesquisa-global-modal{
+    width:820px;
+    max-width:98vw;
+    max-height:82vh;
+    background:#fff;
+    border:2px solid #1ea5ff;
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:0 28px 90px rgba(0,0,0,.42);
+    display:flex;
+    flex-direction:column;
+}
+.pesquisa-global-cabecalho{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    padding:16px;
+    border-bottom:1px solid #d7dfe8;
+    background:#f8fafc;
+}
+.pesquisa-global-cabecalho .icone{position:static;transform:none;width:auto;height:auto;line-height:normal;background:none;font-size:24px;color:#001b3d}
+.pesquisa-global-input{
+    flex:1;
+    height:48px;
+    border:0;
+    outline:0;
+    background:transparent;
+    font-size:20px;
+    color:#001b3d;
+}
+.pesquisa-global-fechar{
+    width:38px;height:38px;border:0;border-radius:50%;
+    background:#b00020;color:#fff;font-size:22px;font-weight:900;cursor:pointer
+}
+.pesquisa-global-meta{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:10px 16px;
+    border-bottom:1px solid #e6ebf1;
+    background:#fff;
+}
+.pesquisa-global-chip{
+    border:1px solid #c8d2df;
+    border-radius:999px;
+    background:#eef3f8;
+    color:#001b3d;
+    padding:6px 10px;
+    font-size:11px;
+    font-weight:900;
+}
+.pesquisa-global-resultados{
+    overflow:auto;
+    padding:10px 12px 18px;
+}
+.pesquisa-global-grupo{margin:10px 0 18px}
+.pesquisa-global-grupo h3{
+    font-size:12px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    color:#667085;
+    padding:0 8px 7px;
+}
+.pesquisa-global-item{
+    display:grid;
+    grid-template-columns:44px 1fr auto;
+    gap:12px;
+    align-items:center;
+    border:1px solid transparent;
+    border-radius:13px;
+    padding:11px 12px;
+    cursor:pointer;
+}
+.pesquisa-global-item:hover,
+.pesquisa-global-item.selecionado{
+    background:#edf5ff;
+    border-color:#9bc5ff;
+}
+.pesquisa-global-item-icone{
+    width:40px;height:40px;border-radius:12px;
+    background:#eef3f8;color:#001b3d;
+    display:flex;align-items:center;justify-content:center;
+    font-size:20px;font-weight:900
+}
+.pesquisa-global-item b{display:block;color:#001b3d;font-size:14px}
+.pesquisa-global-item p{color:#4f5d70;font-size:12px;line-height:17px;margin-top:3px}
+.pesquisa-global-item small{color:#7b8798;font-size:11px;text-align:right}
+.pesquisa-global-vazio{
+    padding:35px 20px;
+    text-align:center;
+    color:#667085;
+    font-weight:800;
+}
+.pesquisa-global-carregando{
+    padding:28px;
+    text-align:center;
+    color:#001b3d;
+    font-weight:900;
+}
+.pesquisa-global-rodape{
+    border-top:1px solid #d7dfe8;
+    padding:9px 14px;
+    background:#f8fafc;
+    color:#667085;
+    font-size:11px;
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    flex-wrap:wrap;
+}
+body.dark-mode .pesquisa-global-atalho{
+    background:#102b49;color:#d6e6f7;border-color:#244466
+}
+body.dark-mode .pesquisa-global-atalho kbd{
+    background:#07192c;color:#fff;border-color:#365a80
+}
+body.dark-mode .pesquisa-global-modal,
+body.dark-mode .pesquisa-global-meta,
+body.dark-mode .pesquisa-global-resultados{
+    background:#0d223a;color:#eaf2ff
+}
+body.dark-mode .pesquisa-global-cabecalho,
+body.dark-mode .pesquisa-global-rodape{
+    background:#07192c;border-color:#244466
+}
+body.dark-mode .pesquisa-global-input{color:#fff}
+body.dark-mode .pesquisa-global-chip{
+    background:#102b49;color:#eaf2ff;border-color:#244466
+}
+body.dark-mode .pesquisa-global-grupo h3{color:#9fb5cc}
+body.dark-mode .pesquisa-global-item:hover,
+body.dark-mode .pesquisa-global-item.selecionado{
+    background:#173a5e;border-color:#2c6ca7
+}
+body.dark-mode .pesquisa-global-item-icone{background:#102b49;color:#fff}
+body.dark-mode .pesquisa-global-item b,
+body.dark-mode .pesquisa-global-item p,
+body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
+@media(max-width:1250px){
+    .pesquisa-global-wrap{width:330px;max-width:32vw}
+}
+@media(max-width:950px){
+    .pesquisa-global-wrap{
+        position:relative;
+        left:auto;top:auto;transform:none;
+        width:100%;max-width:none;
+        margin:14px 0 0;
+    }
+    .topbar{padding-bottom:24px}
+}
+@media print{
+    .pesquisa-global-wrap,.pesquisa-global-overlay{display:none!important}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -2158,6 +2370,13 @@ body.dark-mode .os-nota-apagar{
     <div class="usuario-topo" id="usuarioTopo" style="display:none">
         <span id="usuarioNomeTopo">Usuário</span> • <span id="usuarioPerfilTopo">Perfil</span>
         <button class="btn-sair" onclick="sairSistema()">Sair</button>
+    </div>
+
+    <div class="pesquisa-global-wrap">
+        <button class="pesquisa-global-atalho" type="button" onclick="abrirPesquisaGlobal()" title="Pesquisa Global">
+            <span>🔎 Pesquisar O.S., C.I., técnico, loja...</span>
+            <kbd>Ctrl K</kbd>
+        </button>
     </div>
 
 
@@ -7479,6 +7698,357 @@ function atualizarBadgeCopilotoERP(){
 document.addEventListener("keydown",function(event){
     if(event.key==="Escape"&&document.getElementById("copilotoPainel")?.classList.contains("aberto"))fecharCopilotoERP();
     if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="j"){event.preventDefault();alternarCopilotoERP()}
+});
+</script>
+
+
+<div id="pesquisaGlobalOverlay" class="pesquisa-global-overlay" onclick="if(event.target===this)fecharPesquisaGlobal()">
+  <div class="pesquisa-global-modal" role="dialog" aria-modal="true" aria-labelledby="pesquisaGlobalTitulo">
+    <div class="pesquisa-global-cabecalho">
+      <span class="icone">🔎</span>
+      <input id="pesquisaGlobalInput" class="pesquisa-global-input"
+             placeholder="Pesquise O.S., produto, técnico, rack, C.I., usuário ou observação..."
+             autocomplete="off"
+             oninput="agendarPesquisaGlobal()"
+             onkeydown="navegarPesquisaGlobal(event)">
+      <button class="pesquisa-global-fechar" type="button" onclick="fecharPesquisaGlobal()" aria-label="Fechar">×</button>
+    </div>
+    <div class="pesquisa-global-meta">
+      <span class="pesquisa-global-chip">O.S.</span>
+      <span class="pesquisa-global-chip">C.I.</span>
+      <span class="pesquisa-global-chip">Observações</span>
+      <span class="pesquisa-global-chip">Notificações</span>
+      <span class="pesquisa-global-chip">Usuários</span>
+    </div>
+    <div id="pesquisaGlobalResultados" class="pesquisa-global-resultados">
+      <div class="pesquisa-global-vazio">Digite pelo menos 2 caracteres para pesquisar.</div>
+    </div>
+    <div class="pesquisa-global-rodape">
+      <span>↑ ↓ para navegar • Enter para abrir • Esc para fechar</span>
+      <span id="pesquisaGlobalStatus">Pesquisa local e Supabase</span>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* =========================================================
+   V5.4.0 - PESQUISA GLOBAL INTELIGENTE
+   ========================================================= */
+let pesquisaGlobalTimer=null;
+let pesquisaGlobalToken=0;
+let pesquisaGlobalItens=[];
+let pesquisaGlobalIndice=-1;
+let pesquisaGlobalOsCache=[];
+let pesquisaGlobalCiCache=[];
+let pesquisaGlobalObsCache=[];
+let pesquisaGlobalUsuariosCache=[];
+let pesquisaGlobalCarregadoEm=0;
+
+function normalizarPesquisaGlobal(v){
+    return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ").trim();
+}
+function escaparAttrPesquisaGlobal(v){
+    return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function abrirPesquisaGlobal(termo=""){
+    if(!usuarioLogado)return;
+    const overlay=document.getElementById("pesquisaGlobalOverlay");
+    const input=document.getElementById("pesquisaGlobalInput");
+    overlay.classList.add("aberto");
+    input.value=termo||"";
+    pesquisaGlobalIndice=-1;
+    setTimeout(()=>input.focus(),80);
+    if(termo)executarPesquisaGlobal();
+}
+function fecharPesquisaGlobal(){
+    document.getElementById("pesquisaGlobalOverlay")?.classList.remove("aberto");
+}
+function agendarPesquisaGlobal(){
+    clearTimeout(pesquisaGlobalTimer);
+    pesquisaGlobalTimer=setTimeout(executarPesquisaGlobal,220);
+}
+async function carregarIndicePesquisaGlobal(forcar=false){
+    const agora=Date.now();
+    if(!forcar&&pesquisaGlobalCarregadoEm&&agora-pesquisaGlobalCarregadoEm<120000&&pesquisaGlobalOsCache.length)return;
+
+    const tarefas=[];
+
+    tarefas.push((async()=>{
+        if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros)&&intelRegistros.length){
+            pesquisaGlobalOsCache=intelRegistros;
+        }else if(typeof buscarTodaRexpedlr==="function"){
+            pesquisaGlobalOsCache=await buscarTodaRexpedlr();
+            if(typeof intelRegistros!=="undefined"&&(!Array.isArray(intelRegistros)||!intelRegistros.length)){
+                intelRegistros=pesquisaGlobalOsCache;
+                if(typeof analisarIntel==="function")intelAnalise=analisarIntel(intelRegistros);
+            }
+        }
+    })());
+
+    tarefas.push((async()=>{
+        try{
+            const {data,error}=await obterSupabaseClient()
+                .from("ci_historico")
+                .select("id,numero_ci,tipo_ci,data_emissao,usuario_nome,quantidade_os,status,lista_os")
+                .order("data_emissao",{ascending:false})
+                .limit(500);
+            if(error)throw error;
+            pesquisaGlobalCiCache=data||[];
+        }catch(e){
+            pesquisaGlobalCiCache=Array.isArray(historicoCILista)?historicoCILista:[];
+        }
+    })());
+
+    tarefas.push((async()=>{
+        try{
+            const {data,error}=await obterSupabaseClient()
+                .from(ERP_V38_TABELAS.observacoes)
+                .select("id,os,texto,autor_nome,autor_email,created_at")
+                .order("created_at",{ascending:false})
+                .limit(500);
+            if(error)throw error;
+            pesquisaGlobalObsCache=data||[];
+        }catch(e){
+            pesquisaGlobalObsCache=[];
+        }
+    })());
+
+    tarefas.push((async()=>{
+        const perfil=String(usuarioLogado?.perfil||"").toLowerCase();
+        if(perfil!=="administrador"){
+            pesquisaGlobalUsuariosCache=[];
+            return;
+        }
+        try{
+            if(Array.isArray(usuariosAdminLista)&&usuariosAdminLista.length){
+                pesquisaGlobalUsuariosCache=usuariosAdminLista;
+                return;
+            }
+            const {data,error}=await obterSupabaseClient()
+                .from("usuarios")
+                .select("id,nome,email,cargo,perfil,ativo")
+                .order("nome",{ascending:true});
+            if(error)throw error;
+            pesquisaGlobalUsuariosCache=data||[];
+        }catch(e){
+            pesquisaGlobalUsuariosCache=[];
+        }
+    })());
+
+    await Promise.allSettled(tarefas);
+    pesquisaGlobalCarregadoEm=Date.now();
+}
+function pontuarPesquisaGlobal(texto,termo){
+    const t=normalizarPesquisaGlobal(texto);
+    const q=normalizarPesquisaGlobal(termo);
+    if(!t||!q)return 0;
+    if(t===q)return 100;
+    if(t.startsWith(q))return 80;
+    if(t.includes(" "+q))return 60;
+    if(t.includes(q))return 40;
+    const palavras=q.split(" ").filter(Boolean);
+    return palavras.every(p=>t.includes(p))?25:0;
+}
+function montarResultadosPesquisaGlobal(termo){
+    const itens=[];
+
+    pesquisaGlobalOsCache.forEach(r=>{
+        const campos=[
+            r.os,r.desc_produto,r.descricao,r.tecnico,r.pdv,r.rack,r.status,r.status_da_os,
+            r.nf,r.nce,r.nr_serie,r.cor,r.marca,r.fabricante,r.imei,r.tipo_garantia
+        ];
+        const score=Math.max(...campos.map(v=>pontuarPesquisaGlobal(v,termo)));
+        if(score>0){
+            itens.push({
+                tipo:"os",grupo:"Ordens de serviço",icone:"🔧",score,
+                titulo:"O.S. "+(r.os||"-"),
+                subtitulo:[r.desc_produto,r.status||r.status_da_os,r.tecnico&&("Técnico: "+r.tecnico),r.rack&&("Rack: "+r.rack),r.pdv&&("PDV: "+r.pdv)].filter(Boolean).join(" • "),
+                detalhe:r.dt_geracao||"",
+                dado:r
+            });
+        }
+    });
+
+    pesquisaGlobalCiCache.forEach(x=>{
+        const texto=[x.numero_ci,x.id,x.tipo_ci,x.usuario_nome,x.lista_os,x.status].join(" ");
+        const score=pontuarPesquisaGlobal(texto,termo);
+        if(score>0){
+            itens.push({
+                tipo:"ci",grupo:"C.I.",icone:"📄",score,
+                titulo:"C.I. "+(x.numero_ci||x.id),
+                subtitulo:[nomeTipoCI(x.tipo_ci),x.quantidade_os+" O.S.",x.usuario_nome].filter(Boolean).join(" • "),
+                detalhe:x.data_emissao?formatarDataHora(x.data_emissao):"",
+                dado:x
+            });
+        }
+    });
+
+    pesquisaGlobalObsCache.forEach(x=>{
+        const score=Math.max(pontuarPesquisaGlobal(x.os,termo),pontuarPesquisaGlobal(x.texto,termo),pontuarPesquisaGlobal(x.autor_nome||x.autor_email,termo));
+        if(score>0){
+            itens.push({
+                tipo:"observacao",grupo:"Observações internas",icone:"💬",score,
+                titulo:"Observação da O.S. "+x.os,
+                subtitulo:String(x.texto||"").slice(0,180),
+                detalhe:[x.autor_nome||x.autor_email,x.created_at?formatarDataHora(x.created_at):""].filter(Boolean).join(" • "),
+                dado:x
+            });
+        }
+    });
+
+    (erpNotificacoes||[]).forEach(x=>{
+        const score=pontuarPesquisaGlobal([x.titulo,x.mensagem,x.tipo].join(" "),termo);
+        if(score>0){
+            itens.push({
+                tipo:"notificacao",grupo:"Notificações",icone:"🔔",score,
+                titulo:x.titulo||"Notificação",
+                subtitulo:x.mensagem||"",
+                detalhe:x.created_at?formatarDataHora(x.created_at):"",
+                dado:x
+            });
+        }
+    });
+
+    pesquisaGlobalUsuariosCache.forEach(u=>{
+        const score=pontuarPesquisaGlobal([u.nome,u.email,u.cargo,u.perfil,u.ativo?"ativo":"inativo"].join(" "),termo);
+        if(score>0){
+            itens.push({
+                tipo:"usuario",grupo:"Usuários",icone:"👤",score,
+                titulo:u.nome||u.email||"Usuário",
+                subtitulo:[u.email,u.cargo,nomePerfilUsuario(u.perfil),u.ativo===false?"Inativo":"Ativo"].filter(Boolean).join(" • "),
+                detalhe:"",
+                dado:u
+            });
+        }
+    });
+
+    return itens.sort((a,b)=>b.score-a.score||String(a.titulo).localeCompare(String(b.titulo),"pt-BR")).slice(0,80);
+}
+function renderPesquisaGlobal(itens){
+    pesquisaGlobalItens=itens;
+    pesquisaGlobalIndice=-1;
+    const area=document.getElementById("pesquisaGlobalResultados");
+    const status=document.getElementById("pesquisaGlobalStatus");
+
+    if(!itens.length){
+        area.innerHTML="<div class='pesquisa-global-vazio'>Nenhum resultado encontrado.</div>";
+        status.textContent="0 resultados";
+        return;
+    }
+
+    const grupos=new Map();
+    itens.forEach((item,indice)=>{
+        item._indice=indice;
+        if(!grupos.has(item.grupo))grupos.set(item.grupo,[]);
+        grupos.get(item.grupo).push(item);
+    });
+
+    area.innerHTML=[...grupos.entries()].map(([grupo,lista])=>
+        "<section class='pesquisa-global-grupo'><h3>"+escaparHTML(grupo)+" • "+lista.length+"</h3>"+
+        lista.map(item=>
+            "<div class='pesquisa-global-item' data-pg-indice='"+item._indice+"' onclick='abrirResultadoPesquisaGlobal("+item._indice+")'>"+
+                "<div class='pesquisa-global-item-icone'>"+item.icone+"</div>"+
+                "<div><b>"+escaparHTML(item.titulo)+"</b><p>"+escaparHTML(item.subtitulo||"")+"</p></div>"+
+                "<small>"+escaparHTML(item.detalhe||"")+"</small>"+
+            "</div>"
+        ).join("")+"</section>"
+    ).join("");
+
+    status.textContent=itens.length+" resultado(s)";
+}
+async function executarPesquisaGlobal(){
+    const input=document.getElementById("pesquisaGlobalInput");
+    const area=document.getElementById("pesquisaGlobalResultados");
+    const termo=String(input?.value||"").trim();
+    const token=++pesquisaGlobalToken;
+
+    if(termo.length<2){
+        pesquisaGlobalItens=[];
+        pesquisaGlobalIndice=-1;
+        area.innerHTML="<div class='pesquisa-global-vazio'>Digite pelo menos 2 caracteres para pesquisar.</div>";
+        document.getElementById("pesquisaGlobalStatus").textContent="Pesquisa local e Supabase";
+        return;
+    }
+
+    area.innerHTML="<div class='pesquisa-global-carregando'>Pesquisando em todo o ERP...</div>";
+    document.getElementById("pesquisaGlobalStatus").textContent="Atualizando índice...";
+    await carregarIndicePesquisaGlobal(false);
+    if(token!==pesquisaGlobalToken)return;
+    renderPesquisaGlobal(montarResultadosPesquisaGlobal(termo));
+}
+function navegarPesquisaGlobal(event){
+    if(event.key==="Escape"){
+        event.preventDefault();
+        fecharPesquisaGlobal();
+        return;
+    }
+    if(event.key==="ArrowDown"||event.key==="ArrowUp"){
+        event.preventDefault();
+        if(!pesquisaGlobalItens.length)return;
+        const delta=event.key==="ArrowDown"?1:-1;
+        pesquisaGlobalIndice=(pesquisaGlobalIndice+delta+pesquisaGlobalItens.length)%pesquisaGlobalItens.length;
+        document.querySelectorAll(".pesquisa-global-item").forEach(el=>el.classList.remove("selecionado"));
+        const alvo=document.querySelector(".pesquisa-global-item[data-pg-indice='"+pesquisaGlobalIndice+"']");
+        alvo?.classList.add("selecionado");
+        alvo?.scrollIntoView({block:"nearest"});
+        return;
+    }
+    if(event.key==="Enter"&&pesquisaGlobalIndice>=0){
+        event.preventDefault();
+        abrirResultadoPesquisaGlobal(pesquisaGlobalIndice);
+    }
+}
+async function abrirResultadoPesquisaGlobal(indice){
+    const item=pesquisaGlobalItens[indice];
+    if(!item)return;
+    fecharPesquisaGlobal();
+
+    if(item.tipo==="os"){
+        abrirFichaRegistro(item.dado);
+        return;
+    }
+
+    if(item.tipo==="observacao"){
+        const r=pesquisaGlobalOsCache.find(x=>String(x.os)===String(item.dado.os));
+        if(r)abrirFichaRegistro(r);
+        else abrirBusca();
+        return;
+    }
+
+    if(item.tipo==="ci"){
+        abrirAdminSecao("historico_ci");
+        if(!Array.isArray(historicoCILista)||!historicoCILista.some(x=>Number(x.id)===Number(item.dado.id))){
+            await carregarHistoricoCI();
+        }
+        setTimeout(()=>visualizarHistoricoCI(item.dado.id),120);
+        return;
+    }
+
+    if(item.tipo==="usuario"){
+        abrirAdminSecao("usuarios");
+        setTimeout(()=>{
+            const campo=document.getElementById("usuariosBusca");
+            if(campo){
+                campo.value=item.dado.nome||item.dado.email||"";
+                filtrarUsuariosAdmin();
+            }
+        },250);
+        return;
+    }
+
+    if(item.tipo==="notificacao"){
+        item.dado.lida=true;
+        renderCentralNotificacoesV39();
+        alternarCentralNotificacoes({stopPropagation(){}});
+        return;
+    }
+}
+document.addEventListener("keydown",function(event){
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="k"){
+        event.preventDefault();
+        abrirPesquisaGlobal();
+    }
 });
 </script>
 
