@@ -1852,6 +1852,128 @@ body.dark-mode .intel-modal-box .admin-info{
 }
 .intel-chat-hint button:hover{background:#006cff}
 
+
+/* =========================================================
+   V5.1.1 - REFINAMENTO FINAL DA INTERFACE
+   ========================================================= */
+
+/* Sino mais à esquerda, sem tocar no relógio/data */
+.notif-wrap{
+    right:455px!important;
+    top:55px!important;
+}
+@media(max-width:1280px) and (min-width:1101px){
+    .notif-wrap{right:410px!important}
+}
+@media(max-width:1100px) and (min-width:951px){
+    .notif-wrap{right:365px!important;top:58px!important}
+}
+@media(max-width:950px){
+    .notif-wrap{right:82px!important;top:18px!important}
+}
+
+/* Data, hora e textos da barra superior no modo escuro */
+body.dark-mode .topbar{
+    background:#0d223a!important;
+}
+body.dark-mode .datetime,
+body.dark-mode .datetime div,
+body.dark-mode #dataAtual,
+body.dark-mode #horaAtual{
+    color:#f4f8ff!important;
+    text-shadow:0 1px 2px rgba(0,0,0,.4);
+}
+body.dark-mode .topbar > div:first-of-type,
+body.dark-mode .company{
+    color:#f4f8ff!important;
+}
+body.dark-mode .btn-base{
+    color:#fff!important;
+}
+body.dark-mode .lista-base{
+    background:#102b49!important;
+    border:1px solid #244466!important;
+}
+body.dark-mode .lista-base div{
+    color:#eaf2ff!important;
+}
+body.dark-mode .lista-base div:hover{
+    background:#1a4168!important;
+    color:#fff!important;
+}
+
+/* Datas e horas dentro das relações e modais */
+body.dark-mode .intel-modal-box,
+body.dark-mode .intel-modal-box td,
+body.dark-mode .intel-modal-box th,
+body.dark-mode .intel-modal-box small,
+body.dark-mode .intel-modal-box span,
+body.dark-mode .intel-row small,
+body.dark-mode .intel-row span{
+    color:#eaf2ff!important;
+}
+body.dark-mode .intel-modal-box table,
+body.dark-mode .intel-modal-box tbody,
+body.dark-mode .intel-modal-box tr{
+    background:#0d223a!important;
+}
+body.dark-mode .intel-modal-box tr:nth-child(even){
+    background:#102b49!important;
+}
+body.dark-mode .intel-modal-box tr:hover{
+    background:#1a4168!important;
+}
+body.dark-mode .intel-modal-box tr:hover td,
+body.dark-mode .intel-modal-box tr:hover span,
+body.dark-mode .intel-modal-box tr:hover small{
+    color:#fff!important;
+}
+
+/* Apenas a tela realmente aberta fica azul */
+.menu.active{
+    background:#006cff!important;
+    color:#fff!important;
+    box-shadow:0 5px 15px rgba(0,108,255,.28);
+}
+.menu:not(.active){
+    background:transparent;
+}
+body.dark-mode .menu:not(.active):hover{
+    background:#173a5e!important;
+}
+
+
+/* =========================================================
+   V5.2 - NUMERAÇÃO INTERNA EDITÁVEL DA C.I.
+   ========================================================= */
+.ci-numero-interno-box{
+    display:inline-flex;align-items:center;gap:9px;vertical-align:middle;
+    background:#eef3f8;border:1px solid #c8d2df;border-radius:12px;
+    padding:8px 11px;margin:8px 10px 0 0;color:#001b3d
+}
+.ci-numero-interno-box label{font-weight:900;font-size:13px;white-space:nowrap}
+.ci-numero-interno-input{
+    width:190px;height:38px;border:2px solid #001b3d;border-radius:9px;
+    padding:0 10px;font-size:15px;font-weight:800;background:#fff;color:#001b3d
+}
+.cih-numero-edicao{
+    display:flex;align-items:end;gap:10px;flex-wrap:wrap;
+    background:#eef3f8;border-left:6px solid #006cff;border-radius:12px;
+    padding:13px 14px;margin:12px 0
+}
+.cih-numero-edicao .ci-campo{margin:0;flex:1;min-width:250px}
+.cih-numero-edicao .btn-voltar{margin-top:0}
+body.dark-mode .ci-numero-interno-box,
+body.dark-mode .cih-numero-edicao{background:#102b49;color:#eaf2ff;border-color:#244466}
+body.dark-mode .ci-numero-interno-input{background:#07192c;color:#fff;border-color:#1ea5ff}
+@media(max-width:700px){
+    .ci-numero-interno-box{display:flex;width:100%;flex-wrap:wrap}
+    .ci-numero-interno-input{width:100%}
+}
+@media print{
+    .ci-numero-interno-box,.cih-numero-edicao{display:none!important}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -1893,13 +2015,13 @@ body.dark-mode .intel-modal-box .admin-info{
     <div class="sublogo">LOGÍSTICA REVERSA</div>
     <div class="line"></div>
 
-    <div class="menu active" onclick="voltarInicio()">⌂ Página Inicial</div>
-    <div class="menu">▣ Coleta de O.S</div>
-    <div class="menu" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
-    <div class="menu" onclick="abrirBusca()">⌕ Consultar O.S</div>
-    <div class="menu" onclick="abrirRelatorios()">▥ Relatórios</div>
-    <div class="menu" onclick="abrirInteligencia()">✦ Inteligência</div>
-    <div class="menu" onclick="abrirAdmin()">⚙ Administração</div>
+    <div class="menu active" data-menu="inicio" onclick="voltarInicio()">⌂ Página Inicial</div>
+    <div class="menu" data-menu="coleta">▣ Coleta de O.S</div>
+    <div class="menu" data-menu="ci" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
+    <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
+    <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
+    <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
+    <div class="menu" data-menu="admin" onclick="abrirAdmin()">⚙ Administração</div>
 </div>
 
 <div class="main">
@@ -2075,6 +2197,10 @@ body.dark-mode .intel-modal-box .admin-info{
             <textarea id="ciOSTTR" class="ci-input" rows="4" placeholder="Somente C.I Terezina: digite uma O.S TTR por linha ou separadas por vírgula"></textarea>
         </div>
 
+        <div class="ci-numero-interno-box">
+            <label for="ciNumeroInterno">Número interno da C.I.</label>
+            <input id="ciNumeroInterno" class="ci-numero-interno-input" placeholder="Opcional — ex.: 1542/2026" autocomplete="off">
+        </div>
         <button class="btn-voltar" onclick="gerarCIApp()">Gerar C.I no aplicativo</button>
         <button class="btn-voltar" onclick="imprimirCI()">Imprimir C.I</button>
         <button class="btn-voltar" onclick="abrirTelaCI()">Voltar para C.I</button>
@@ -2095,6 +2221,10 @@ body.dark-mode .intel-modal-box .admin-info{
     </div>
 
     <div class="ci-edit-actions">
+        <div class="ci-numero-interno-box">
+            <label for="ciNumeroInternoEdit">Número interno da C.I.</label>
+            <input id="ciNumeroInternoEdit" class="ci-numero-interno-input" placeholder="Opcional — ex.: 1542/2026" autocomplete="off">
+        </div>
         <button class="btn-voltar" onclick="imprimirCIEditavel()">Imprimir C.I</button>
         <button class="btn-voltar" onclick="limparCIEditavel()">Limpar O.S</button>
         <button class="btn-voltar" onclick="abrirTelaCI()">Voltar para C.I</button>
@@ -2594,6 +2724,14 @@ body.dark-mode .intel-modal-box .admin-info{
 <div id="cihModal" class="cih-modal-backdrop" onclick="if(event.target===this) fecharModalHistoricoCI()">
   <div class="cih-modal">
     <div class="cih-modal-top"><div><h2 id="cihModalTitulo">C.I.</h2><div id="cihModalInfo"></div></div><div><button class="btn-voltar" onclick="imprimirHistoricoCIAtual()">Imprimir segunda via</button><button class="btn-voltar" onclick="fecharModalHistoricoCI()">Fechar</button></div></div>
+    <div class="cih-numero-edicao">
+        <div class="ci-campo">
+            <label>Número interno da C.I.</label>
+            <input id="cihNumeroInterno" class="ci-input" placeholder="Digite a numeração do documento interno">
+        </div>
+        <button class="btn-voltar" onclick="atualizarNumeroHistoricoCI()">Salvar número</button>
+    </div>
+    <div id="cihNumeroMensagem" class="ci-msg"></div>
     <div id="cihModalConteudo" class="cih-modal-conteudo"></div>
   </div>
 </div>
@@ -2946,8 +3084,15 @@ function esconderTelas(){
     });
 }
 
+function definirMenuAtivo(chave){
+    document.querySelectorAll("#sidebar .menu").forEach(function(item){
+        item.classList.toggle("active", item.dataset.menu === chave);
+    });
+}
+
 function voltarInicio(){
     esconderTelas();
+    definirMenuAtivo("inicio");
     document.getElementById("telaInicio").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
     setTimeout(function(){
@@ -2958,6 +3103,7 @@ function voltarInicio(){
 function abrirTelaCI(){
     if(!exigirPermissao(["administrador","supervisor"], "C.I Devoluções")) return;
     esconderTelas();
+    definirMenuAtivo("ci");
     document.getElementById("telaCI").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
 }
@@ -2968,6 +3114,7 @@ function abrirCI(nome){
     ciAtual = nome;
 
     esconderTelas();
+    definirMenuAtivo("ci");
 
     document.getElementById("tituloCIEditavel").innerHTML =
         nomesCI[nome] || "C.I DEVOLUÇÕES";
@@ -3641,6 +3788,7 @@ async function imprimirCIEditavel(){
 
 
 async function gerarCIApp(){
+    sincronizarNumeroCIInterno((document.getElementById("ciNumeroInterno")||{}).value);
     if(!ciAtual){
         alert("Selecione uma C.I primeiro.");
         return;
@@ -3921,6 +4069,7 @@ async function garantirCSV(){
 function abrirAdmin(){
     if(!exigirPermissao(["administrador"], "Administração")) return;
     esconderTelas();
+    definirMenuAtivo("admin");
     document.getElementById("telaAdmin").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
     carregarDashboardAdmin();
@@ -3930,6 +4079,7 @@ function abrirAdminSecao(secao){
     if(secao === "atualizar" && !exigirPermissao(["administrador","supervisor"], "Atualizar Banco")) return;
     if(secao !== "atualizar" && !exigirPermissao(["administrador"], "Administração")) return;
     esconderTelas();
+    definirMenuAtivo("admin");
     const mapa = {
         atualizar:"telaAdminAtualizar",
         usuarios:"telaAdminUsuarios",
@@ -4575,6 +4725,7 @@ function pegarPorColuna(linha, nomesPossiveis){
 async function abrirBusca(){
     if(!exigirPermissao(["administrador","supervisor","consulta"], "Consultar O.S")) return;
     esconderTelas();
+    definirMenuAtivo("consulta");
     document.getElementById("telaBusca").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
     document.getElementById("baseBusca").innerHTML = "SUPABASE";
@@ -4719,6 +4870,7 @@ function alternarModoEscuro(){
 function abrirRelatorios(){
     if(!exigirPermissao(["administrador","supervisor"], "Relatórios")) return;
     esconderTelas();
+    definirMenuAtivo("relatorios");
     document.getElementById("telaRelatorios").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
 }
@@ -5323,6 +5475,30 @@ let historicoCIAtual = null;
 let ultimoHistoricoCIHash = "";
 let ultimoHistoricoCITempo = 0;
 
+function limparNumeroCIInterno(valor){
+    return String(valor||"").trim().replace(/\s+/g," ");
+}
+function obterNumeroCIInformado(){
+    const editavel=document.getElementById("ciNumeroInternoEdit");
+    const preview=document.getElementById("ciNumeroInterno");
+    const telaEditavel=document.getElementById("telaPlanilhaCI");
+    const usaEditavel=telaEditavel&&getComputedStyle(telaEditavel).display!=="none";
+    return limparNumeroCIInterno(usaEditavel?(editavel?.value||""):(preview?.value||""));
+}
+function sincronizarNumeroCIInterno(valor){
+    const numero=limparNumeroCIInterno(valor);
+    const a=document.getElementById("ciNumeroInterno");
+    const b=document.getElementById("ciNumeroInternoEdit");
+    if(a)a.value=numero;
+    if(b)b.value=numero;
+}
+function validarNumeroCIInterno(numero){
+    if(!numero)return true;
+    if(numero.length>80)throw new Error("O número interno da C.I. deve ter no máximo 80 caracteres.");
+    if(/[<>]/.test(numero))throw new Error("O número interno contém caracteres inválidos.");
+    return true;
+}
+
 function numeroCINovo(){
     const d = new Date();
     const p = n => String(n).padStart(2,"0");
@@ -5401,10 +5577,14 @@ async function salvarHistoricoCI(origem, opcoes = {}){
         historicoCIAtual = existente;
         const msg = document.getElementById("ciEditMensagem") || document.getElementById("ciMensagem");
         if(msg) msg.innerHTML = "Esta C.I. já estava salva recentemente como <b>" + escaparHTML(existente.numero_ci) + "</b>. Nenhuma cópia duplicada foi criada.";
+        sincronizarNumeroCIInterno(existente.numero_ci);
         return existente.numero_ci;
     }
 
-    const numero = numeroCINovo();
+    const numeroInformado = obterNumeroCIInformado();
+    validarNumeroCIInterno(numeroInformado);
+    const numero = numeroInformado || numeroCINovo();
+    sincronizarNumeroCIInterno(numero);
     const obs = (document.querySelector(".ci-edit-obs [contenteditable='true']") || {}).innerText || "";
     const payload = {
         numero_ci: numero,
@@ -5475,7 +5655,7 @@ function renderizarHistoricoCI(lista){
     const el=document.getElementById("cihTabela"); if(!el)return;
     if(!lista.length){el.innerHTML="<div class='admin-info'>Nenhuma C.I. encontrada.</div>";return;}
     let h="<table class='cih-tabela'><thead><tr><th>Número</th><th>Tipo</th><th>Data</th><th>Usuário</th><th>O.S.</th><th>Status</th><th>Ações</th></tr></thead><tbody>";
-    lista.forEach(x=>{h+="<tr><td><b>"+escaparHTML(x.numero_ci||String(x.id))+"</b></td><td>"+escaparHTML(nomeTipoCI(x.tipo_ci))+"</td><td>"+escaparHTML(formatarDataHora(x.data_emissao))+"</td><td>"+escaparHTML(x.usuario_nome||"-")+"</td><td>"+(Number(x.quantidade_os)||0)+"</td><td>"+escaparHTML(x.status||"-")+"</td><td><button class='cih-acao' onclick='visualizarHistoricoCI("+Number(x.id)+")'>Visualizar</button><button class='cih-acao sec' onclick='imprimirHistoricoCIDireto("+Number(x.id)+")'>Reimprimir</button><button class='cih-acao warn' onclick='duplicarHistoricoCI("+Number(x.id)+")'>Duplicar</button></td></tr>"});
+    lista.forEach(x=>{h+="<tr><td><b>"+escaparHTML(x.numero_ci||String(x.id))+"</b></td><td>"+escaparHTML(nomeTipoCI(x.tipo_ci))+"</td><td>"+escaparHTML(formatarDataHora(x.data_emissao))+"</td><td>"+escaparHTML(x.usuario_nome||"-")+"</td><td>"+(Number(x.quantidade_os)||0)+"</td><td>"+escaparHTML(x.status||"-")+"</td><td><button class='cih-acao' onclick='visualizarHistoricoCI("+Number(x.id)+")'>Visualizar / número</button><button class='cih-acao sec' onclick='imprimirHistoricoCIDireto("+Number(x.id)+")'>Reimprimir</button><button class='cih-acao warn' onclick='duplicarHistoricoCI("+Number(x.id)+")'>Duplicar</button></td></tr>"});
     el.innerHTML=h+"</tbody></table>";
 }
 function obterHistoricoCI(id){return historicoCILista.find(x=>Number(x.id)===Number(id))}
@@ -5483,8 +5663,62 @@ function visualizarHistoricoCI(id){
     const x=obterHistoricoCI(id);if(!x)return; historicoCIAtual=x;
     document.getElementById("cihModalTitulo").textContent=(x.numero_ci||("CI "+x.id))+" • "+nomeTipoCI(x.tipo_ci);
     document.getElementById("cihModalInfo").textContent=formatarDataHora(x.data_emissao)+" • "+(x.usuario_nome||"-")+" • "+(x.quantidade_os||0)+" O.S.";
+    document.getElementById("cihNumeroInterno").value=x.numero_ci||"";
+    document.getElementById("cihNumeroMensagem").innerHTML="";
     document.getElementById("cihModalConteudo").innerHTML=x.html_ci||"<div class='admin-info'>Documento sem cópia visual.</div>";
     document.getElementById("cihModal").style.display="flex";
+}
+async function atualizarNumeroHistoricoCI(){
+    if(!historicoCIAtual)return;
+    if(!exigirPermissao(["administrador","supervisor"],"Alterar número da C.I."))return;
+
+    const msg=document.getElementById("cihNumeroMensagem");
+    const novo=limparNumeroCIInterno((document.getElementById("cihNumeroInterno")||{}).value);
+    try{
+        validarNumeroCIInterno(novo);
+        if(!novo)throw new Error("Informe o número interno da C.I.");
+
+        const antigo=historicoCIAtual.numero_ci||"";
+        if(novo===antigo){
+            msg.innerHTML="<span class='admin-status-alerta'>O número informado já é o atual.</span>";
+            return;
+        }
+
+        msg.innerHTML="Salvando numeração interna...";
+        const {data,error}=await obterSupabaseClient()
+            .from("ci_historico")
+            .update({numero_ci:novo})
+            .eq("id",historicoCIAtual.id)
+            .select()
+            .single();
+
+        if(error)throw error;
+
+        historicoCIAtual=data||{...historicoCIAtual,numero_ci:novo};
+        const idx=historicoCILista.findIndex(x=>Number(x.id)===Number(historicoCIAtual.id));
+        if(idx>=0)historicoCILista[idx]=historicoCIAtual;
+
+        document.getElementById("cihModalTitulo").textContent=novo+" • "+nomeTipoCI(historicoCIAtual.tipo_ci);
+        msg.innerHTML="<span class='admin-status-ok'>Número interno atualizado com sucesso.</span>";
+        renderizarHistoricoCI(historicoCILista);
+
+        await registrarAuditoria("ci","Número interno da C.I. alterado.",{
+            id:historicoCIAtual.id,
+            numero_anterior:antigo||null,
+            numero_novo:novo,
+            tipo:historicoCIAtual.tipo_ci
+        });
+        if(typeof criarNotificacaoV39==="function"){
+            await criarNotificacaoV39(
+                "Número da C.I. atualizado",
+                "A C.I. "+(antigo||historicoCIAtual.id)+" passou a usar o número interno "+novo+".",
+                "ci",
+                {id:historicoCIAtual.id,numero_anterior:antigo||null,numero_ci:novo}
+            );
+        }
+    }catch(e){
+        msg.innerHTML="<span class='admin-status-erro'>Erro ao atualizar:</span> "+escaparHTML(e.message||String(e));
+    }
 }
 function fecharModalHistoricoCI(){document.getElementById("cihModal").style.display="none";historicoCIAtual=null}
 function documentoImpressaoHistoricoCI(x){
@@ -5558,6 +5792,7 @@ let intelCarregando = false;
 function abrirInteligencia(){
     if(!usuarioLogado){ mostrarBloqueioPermissao("Faça login para acessar a Central de Inteligência."); return; }
     esconderTelas();
+    definirMenuAtivo("inteligencia");
     document.getElementById("telaInteligencia").style.display="block";
     document.getElementById("sidebar").classList.remove("mobile-open");
     carregarInteligencia(false);
@@ -5685,7 +5920,29 @@ function abrirListaIntel(tipo){
     document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
 function fecharIntelModal(){document.getElementById("intelModal").style.display="none"}
 function abrirOSIntel(os){const r=intelRegistros.find(x=>String(x.os)===String(os));if(!r)return;document.getElementById("intelModalTitulo").textContent="O.S. "+os;document.getElementById("intelModalConteudo").innerHTML=Object.entries(r).filter(x=>!x[0].startsWith("_")).map(x=>"<div class='ficha-linha'><span class='ficha-label'>"+escaparHTML(x[0].replaceAll("_"," "))+":</span>"+escaparHTML(x[1]??"-")+"</div>").join("");document.getElementById("intelModal").style.display="flex"}
-function carregarTimelineOS(){const os=textoIntel(document.getElementById("intelOsTimeline").value);const r=intelRegistros.find(x=>String(x.os)===os);const el=document.getElementById("intelTimeline");if(!r){el.innerHTML="<div class='dashboard-erro'>O.S. não encontrada na análise atual.</div>";return}const etapas=[["Gerada",r.dt_geracao],["Entrada",r.dt_ult_entrada||r.dt_recb_at],["Conserto",r.dt_conserto],["Saída oficina",r.dt_saida_oficina],["Expedição",r.dt_expedicao]];let html="";etapas.forEach((e,i)=>{const done=!!e[1];html+="<div class='intel-step "+(done?'done':'')+"'><div class='intel-dot'>"+(done?'✓':i+1)+"</div><b>"+e[0]+"</b><small>"+(e[1]?escaparHTML(String(e[1])):'Pendente')+"</small></div>";if(i<etapas.length-1)html+="<div class='intel-line "+(done?'done':'')+"'></div>"});el.innerHTML=html}
+function carregarTimelineOS(){
+    const os=textoIntel(document.getElementById("intelOsTimeline").value);
+    const r=intelRegistros.find(x=>String(x.os)===os);
+    const el=document.getElementById("intelTimeline");
+    if(!r){
+        el.innerHTML="<div class='dashboard-erro'>O.S. não encontrada na análise atual.</div>";
+        return;
+    }
+    const etapas=[
+        ["O.S. gerada",r.dt_geracao],
+        ["Recebido na A.T.",r.dt_recb_at],
+        ["Conserto",r.dt_conserto],
+        ["Saída da oficina",r.dt_saida_oficina],
+        ["Expedição",r.dt_expedicao]
+    ];
+    let html="";
+    etapas.forEach((e,i)=>{
+        const done=!!e[1];
+        html+="<div class='intel-step "+(done?'done':'')+"'><div class='intel-dot'>"+(done?'✓':i+1)+"</div><b>"+e[0]+"</b><small>"+(e[1]?escaparHTML(String(e[1])):'Pendente')+"</small></div>";
+        if(i<etapas.length-1)html+="<div class='intel-line "+(done?'done':'')+"'></div>";
+    });
+    el.innerHTML=html;
+}
 let intelAssistenteUltimoResultado=[];
 let intelAssistenteUltimoTitulo="Resultado da análise";
 
@@ -6100,7 +6357,17 @@ function chaveNotasOS(os){return'erp_notas_os_'+String(os||'').trim()}
 function carregarNotasOS(os){try{return JSON.parse(localStorage.getItem(chaveNotasOS(os))||'[]')}catch(e){return[]}}
 function salvarObservacaoOS(){if(!osAtualCentral)return;const e=document.getElementById('osNotaTexto'),texto=e.value.trim();if(!texto){alert('Digite uma observação.');return}const notas=carregarNotasOS(osAtualCentral.os);notas.unshift({id:Date.now(),texto,data:new Date().toISOString(),autor:(usuarioLogado&&(usuarioLogado.nome||usuarioLogado.email))||'Usuário'});localStorage.setItem(chaveNotasOS(osAtualCentral.os),JSON.stringify(notas.slice(0,200)));e.value='';renderNotasOS();registrarAuditoria('os','Observação interna adicionada à O.S. '+osAtualCentral.os,{os:osAtualCentral.os})}
 function renderNotasOS(){const e=document.getElementById('osNotas');if(!e||!osAtualCentral)return;const n=carregarNotasOS(osAtualCentral.os);e.innerHTML=n.length?n.map(x=>`<div class="os-nota"><b>${escaparHTML(x.autor)}</b><small>${new Date(x.data).toLocaleString('pt-BR')}</small><p>${escaparHTML(x.texto)}</p></div>`).join(''):'<div class="admin-info">Nenhuma observação interna.</div>'}
-function eventosInferidosOS(r){const ev=[];const add=(data,titulo,detalhe)=>{if(data)ev.push({data,titulo,detalhe})};add(r.dt_geracao,'O.S. gerada','Registro inicial da ordem de serviço.');add(r.dt_recb_at,'Recebida na assistência técnica','Entrada registrada na assistência.');add(r.dt_ult_entrada,'Última entrada registrada','Movimentação de entrada da O.S.');add(r.data_cpp,'CPP registrado',r.nr_cpp?('CPP '+r.nr_cpp):'Solicitação de CPP.');add(r.dt_conserto,'Conserto registrado',r.status||'Conserto concluído.');add(r.dt_saida_oficina,'Saída da oficina','Equipamento saiu da oficina.');add(r.dt_expedicao,'Expedição registrada',r.pdv_expedicao?('Destino: '+r.pdv_expedicao):'Produto expedido.');return ev}
+function eventosInferidosOS(r){
+    const ev=[];
+    const add=(data,titulo,detalhe)=>{if(data)ev.push({data,titulo,detalhe})};
+    add(r.dt_geracao,'O.S. gerada','Registro inicial da ordem de serviço.');
+    add(r.dt_recb_at,'Recebido na A.T.','Recebimento registrado na Assistência Técnica.');
+    add(r.data_cpp,'CPP registrado',r.nr_cpp?('CPP '+r.nr_cpp):'Solicitação de CPP.');
+    add(r.dt_conserto,'Conserto registrado',r.status||'Conserto concluído.');
+    add(r.dt_saida_oficina,'Saída da oficina','Equipamento saiu da oficina.');
+    add(r.dt_expedicao,'Expedição registrada',r.pdv_expedicao?('Destino: '+r.pdv_expedicao):'Produto expedido.');
+    return ev;
+}
 async function eventosComparacoesOS(os){try{const cs=await listarComparacoesImportacao();const ev=[];cs.forEach(c=>(c.todas||[]).filter(x=>String(x.os)===String(os)).forEach(x=>ev.push({data:c.data,titulo:x.tipo==='nova'?'Importada como nova O.S.':x.campo+' alterado',detalhe:x.tipo==='nova'?'Incluída na base pela importação.':x.antes+' → '+x.depois})));return ev}catch(e){return[]}}
 async function carregarCentralOS(r){osAtualCentral=r;renderNotasOS();const area=document.getElementById('osTimeline');if(!area)return;area.innerHTML='<div class="admin-info">Carregando linha do tempo...</div>';const ev=eventosInferidosOS(r).concat(await eventosComparacoesOS(r.os));ev.sort((a,b)=>{const da=new Date(a.data).getTime()||0,db=new Date(b.data).getTime()||0;return db-da});area.innerHTML=ev.length?ev.map(x=>`<div class="os-evento"><b>${escaparHTML(x.titulo)}</b><small>${formatarDataHora(x.data)}</small><span class="mudanca">${escaparHTML(x.detalhe||'')}</span></div>`).join(''):'<div class="admin-info">Ainda não há eventos registrados para esta O.S.</div>'}
 
