@@ -1974,6 +1974,43 @@ body.dark-mode .ci-numero-interno-input{background:#07192c;color:#fff;border-col
     .ci-numero-interno-box,.cih-numero-edicao{display:none!important}
 }
 
+
+/* =========================================================
+   V5.3.0 - COPILOTO ERP GLOBAL
+   ========================================================= */
+.copiloto-fab{position:fixed;right:28px;bottom:26px;z-index:14500;width:62px;height:62px;border:0;border-radius:50%;background:linear-gradient(135deg,#001b3d,#006cff);color:#fff;font-size:29px;cursor:pointer;box-shadow:0 14px 34px rgba(0,27,61,.40);display:flex;align-items:center;justify-content:center;transition:.22s cubic-bezier(.34,1.56,.64,1)}
+.copiloto-fab:hover{transform:scale(1.08);box-shadow:0 18px 42px rgba(0,108,255,.42)}
+.copiloto-fab:active{transform:scale(.94)}
+.copiloto-badge{position:absolute;right:-3px;top:-4px;min-width:23px;height:23px;border-radius:999px;background:#d70022;color:#fff;border:2px solid #fff;font-size:11px;font-weight:900;display:none;align-items:center;justify-content:center;padding:0 5px}
+.copiloto-badge.visivel{display:flex}
+.copiloto-painel{position:fixed;right:0;top:0;bottom:0;z-index:14600;width:410px;max-width:96vw;background:#081a32;color:#fff;box-shadow:-18px 0 50px rgba(0,0,0,.38);transform:translateX(105%);transition:transform .28s ease;display:flex;flex-direction:column}
+.copiloto-painel.aberto{transform:translateX(0)}
+.copiloto-topo{min-height:74px;padding:16px 18px;background:linear-gradient(135deg,#001b3d,#0e3763);display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.12)}
+.copiloto-identidade{display:flex;align-items:center;gap:11px}
+.copiloto-avatar{width:42px;height:42px;border-radius:14px;background:#006cff;display:flex;align-items:center;justify-content:center;font-size:23px}
+.copiloto-identidade h3{font-size:18px;margin:0}
+.copiloto-identidade small{display:block;color:#b8cae0;margin-top:3px}
+.copiloto-fechar{width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;cursor:pointer}
+.copiloto-fechar:hover{background:#b00020}
+.copiloto-corpo{flex:1;min-height:0;padding:14px;display:flex;flex-direction:column;gap:10px}
+.copiloto-sugestoes{display:flex;gap:7px;flex-wrap:wrap}
+.copiloto-sugestoes button{border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.07);color:#fff;padding:7px 10px;font-size:11px;cursor:pointer}
+.copiloto-sugestoes button:hover{background:#006cff}
+.copiloto-chat{flex:1;min-height:180px;overflow:auto;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.09);border-radius:15px;padding:12px}
+.copiloto-chat .intel-msg{max-width:92%}
+.copiloto-chat .intel-msg.user{margin-left:auto}
+.copiloto-entrada{display:flex;gap:8px;padding-top:2px}
+.copiloto-entrada input{flex:1;height:48px;border:0;border-radius:12px;padding:0 13px;font-size:14px;background:#fff;color:#001b3d}
+.copiloto-entrada button{width:50px;height:48px;border:0;border-radius:12px;background:#16a8ff;color:#fff;font-size:20px;font-weight:900;cursor:pointer}
+.copiloto-entrada button:hover{background:#006cff}
+.copiloto-rodape{text-align:center;color:#8da4bf;font-size:10px;padding:0 10px 11px}
+.copiloto-overlay{position:fixed;inset:0;z-index:14550;background:rgba(0,0,0,.32);display:none}
+.copiloto-overlay.aberto{display:block}
+body.sem-login .copiloto-fab,body.sem-login .copiloto-painel,body.sem-login .copiloto-overlay{display:none!important}
+body.dark-mode .copiloto-painel{background:#061426}
+@media(max-width:600px){.copiloto-fab{right:18px;bottom:18px}.copiloto-painel{width:100%;max-width:100vw}}
+@media print{.copiloto-fab,.copiloto-painel,.copiloto-overlay{display:none!important}}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -2418,21 +2455,12 @@ body.dark-mode .ci-numero-interno-input{background:#07192c;color:#fff;border-col
     </div>
     <div class="intel-main-grid">
       <div class="intel-card"><h2>🔥 Fila de prioridades</h2><div id="intelAlertas"></div><div class="intel-list" id="intelPrioridades"></div></div>
-      <div class="intel-card intel-assistente">
-        <h2>🧠 Analista Operacional <span class="intel-assistente-badge">BASE REAL</span></h2>
-        <div class="intel-chat" id="intelChat">
-          <div class="intel-msg bot intel-resposta">Posso analisar a base atual, combinar filtros, montar rankings e abrir a relação encontrada. Pergunte em linguagem normal.</div>
+      <div class="intel-card">
+        <h2>🧠 Copiloto ERP</h2>
+        <div class="admin-info">
+            O Analista Operacional agora está disponível pelo botão flutuante no canto inferior direito e pode ser aberto em qualquer tela do ERP.
         </div>
-        <div class="intel-chat-hint">
-          <button onclick="perguntarIntelExemplo('qual técnico tem mais O.S. abertas?')">Técnico mais carregado</button>
-          <button onclick="perguntarIntelExemplo('mostre as O.S. prontas da loja 101')">Prontas por loja</button>
-          <button onclick="perguntarIntelExemplo('ranking dos racks com mais O.S. abertas')">Ranking de racks</button>
-          <button onclick="perguntarIntelExemplo('mostre as 20 O.S. mais antigas sem técnico')">Mais antigas sem técnico</button>
-        </div>
-        <div class="intel-chat-line">
-          <input id="intelPergunta" placeholder="Ex.: mostre as O.S. Samsung abertas no rack 500" onkeydown="if(event.key==='Enter') responderAssistenteIntel()">
-          <button onclick="responderAssistenteIntel()">Analisar</button>
-        </div>
+        <button class="v2-btn" onclick="abrirCopilotoERP()">Abrir Copiloto</button>
       </div>
     </div>
     <div class="intel-main-grid">
@@ -5860,6 +5888,7 @@ async function carregarInteligencia(forcar){
         intelAnalise=analisarIntel(intelRegistros);
         renderIntel();
         if(typeof renderHomeIntegradaV502==="function") renderHomeIntegradaV502();
+        if(typeof atualizarBadgeCopilotoERP==="function") atualizarBadgeCopilotoERP();
         m.className="dashboard-ok";
         m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
     }
@@ -5957,7 +5986,9 @@ function addChatIntelHTML(html){
     c.scrollTop=c.scrollHeight;
 }
 function perguntarIntelExemplo(pergunta){
+    if(typeof abrirCopilotoERP==="function")abrirCopilotoERP();
     const inp=document.getElementById("intelPergunta");
+    if(!inp)return;
     inp.value=pergunta;
     responderAssistenteIntel();
 }
@@ -6884,6 +6915,62 @@ document.addEventListener("DOMContentLoaded",function(){
     setTimeout(function(){
         if(window.usuarioLogado)carregarHomeIntegradaV502(false);
     },500);
+});
+</script>
+
+
+<div id="copilotoOverlay" class="copiloto-overlay" onclick="fecharCopilotoERP()"></div>
+<button id="copilotoFab" class="copiloto-fab" type="button" title="Abrir Copiloto ERP" aria-label="Abrir Copiloto ERP" onclick="alternarCopilotoERP()">🧠<span id="copilotoBadge" class="copiloto-badge">0</span></button>
+<aside id="copilotoPainel" class="copiloto-painel" aria-label="Copiloto ERP">
+    <div class="copiloto-topo">
+        <div class="copiloto-identidade">
+            <div class="copiloto-avatar">🧠</div>
+            <div><h3>Copiloto ERP</h3><small id="copilotoStatus">Analista da base operacional</small></div>
+        </div>
+        <button class="copiloto-fechar" type="button" title="Fechar" aria-label="Fechar Copiloto" onclick="fecharCopilotoERP()">×</button>
+    </div>
+    <div class="copiloto-corpo">
+        <div class="copiloto-sugestoes">
+            <button onclick="perguntarIntelExemplo('mostre as O.S. abertas no rack 500')">Rack 500</button>
+            <button onclick="perguntarIntelExemplo('mostre as O.S. prontas e abertas')">Prontas</button>
+            <button onclick="perguntarIntelExemplo('mostre as O.S. sem técnico')">Sem técnico</button>
+            <button onclick="perguntarIntelExemplo('ranking dos técnicos com mais O.S. abertas')">Técnicos</button>
+            <button onclick="perguntarIntelExemplo('mostre as O.S. que chegaram peça')">Chegou peça</button>
+        </div>
+        <div class="copiloto-chat" id="intelChat"><div class="intel-msg bot intel-resposta">Estou disponível em qualquer tela. Posso analisar a base, combinar filtros, montar rankings e abrir relações de O.S.</div></div>
+        <div class="copiloto-entrada"><input id="intelPergunta" placeholder="Pergunte sobre a operação..." onkeydown="if(event.key==='Enter') responderAssistenteIntel()"><button type="button" title="Enviar" onclick="responderAssistenteIntel()">➤</button></div>
+    </div>
+    <div class="copiloto-rodape">As respostas usam os dados carregados no ERP.</div>
+</aside>
+
+
+<script>
+function abrirCopilotoERP(){
+    const painel=document.getElementById("copilotoPainel"),overlay=document.getElementById("copilotoOverlay");
+    if(painel)painel.classList.add("aberto");
+    if(overlay)overlay.classList.add("aberto");
+    setTimeout(()=>document.getElementById("intelPergunta")?.focus(),220);
+    if((typeof intelRegistros==="undefined"||!Array.isArray(intelRegistros)||!intelRegistros.length)&&typeof carregarInteligencia==="function")carregarInteligencia(false);
+}
+function fecharCopilotoERP(){
+    document.getElementById("copilotoPainel")?.classList.remove("aberto");
+    document.getElementById("copilotoOverlay")?.classList.remove("aberto");
+}
+function alternarCopilotoERP(){
+    const painel=document.getElementById("copilotoPainel");
+    if(painel&&painel.classList.contains("aberto"))fecharCopilotoERP();else abrirCopilotoERP();
+}
+function atualizarBadgeCopilotoERP(){
+    const badge=document.getElementById("copilotoBadge");if(!badge)return;
+    if(typeof intelAnalise==="undefined"||!intelAnalise){badge.classList.remove("visivel");return}
+    let alertas=0;
+    ["rack500Abertas","prontasAbertas","semTecnico","semRack","cpp","oficina20"].forEach(chave=>{const lista=intelAnalise[chave];if(Array.isArray(lista)&&lista.length>0)alertas++});
+    badge.textContent=String(alertas);
+    badge.classList.toggle("visivel",alertas>0);
+}
+document.addEventListener("keydown",function(event){
+    if(event.key==="Escape"&&document.getElementById("copilotoPainel")?.classList.contains("aberto"))fecharCopilotoERP();
+    if((event.ctrlKey||event.metaKey)&&event.key.toLowerCase()==="j"){event.preventDefault();alternarCopilotoERP()}
 });
 </script>
 
