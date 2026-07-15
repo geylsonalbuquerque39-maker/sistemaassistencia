@@ -1658,6 +1658,200 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
 }
 @media print{.erp-import-overlay{display:none!important}}
 
+
+/* =========================================================
+   V5.0.2 - HOME INTEGRADA E ESTÁVEL
+   Reutiliza a análise existente sem substituir a Home.
+   ========================================================= */
+.home-integrada{
+    width:1180px;max-width:95%;margin:28px auto 10px;color:#001b3d
+}
+.home-integrada-topo{
+    background:linear-gradient(135deg,#001b3d,#005ce6);
+    color:#fff;border-radius:22px;padding:23px 25px;
+    box-shadow:0 13px 30px rgba(0,27,61,.25);
+    display:flex;justify-content:space-between;align-items:center;
+    gap:18px;flex-wrap:wrap
+}
+.home-integrada-topo h2{font-size:28px;margin-bottom:5px}
+.home-integrada-topo p{opacity:.88;font-size:15px}
+.home-integrada-chips{display:flex;gap:9px;flex-wrap:wrap}
+.home-integrada-chip{
+    background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.24);
+    border-radius:999px;padding:8px 12px;font-size:13px;font-weight:900
+}
+.home-integrada-chip.online:before{
+    content:"";display:inline-block;width:9px;height:9px;border-radius:50%;
+    background:#3dec81;margin-right:7px;box-shadow:0 0 10px #3dec81
+}
+.home-integrada-acoes{display:flex;gap:9px;flex-wrap:wrap;margin:15px 0}
+.home-integrada-btn{
+    border:0;border-radius:11px;padding:10px 14px;background:#001b3d;
+    color:#fff;font-weight:900;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.14)
+}
+.home-integrada-btn.azul{background:#006cff}
+.home-integrada-btn.verde{background:#0b8f3f}
+.home-integrada-btn:hover{transform:translateY(-2px)}
+.home-integrada-status{
+    background:#fffbe6;border-left:6px solid #ff9800;border-radius:12px;
+    padding:13px 15px;margin:12px 0;color:#001b3d;font-weight:800
+}
+.home-integrada-status.ok{background:#ecfff0;border-color:#0b8f3f;color:#087535}
+.home-integrada-status.erro{background:#ffecec;border-color:#b00020;color:#b00020}
+.home-integrada-kpis{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:14px
+}
+.home-integrada-kpi{
+    background:#fff;border:1px solid #d9e2ec;border-radius:16px;
+    padding:15px;box-shadow:0 6px 16px rgba(0,0,0,.07);
+    position:relative;overflow:hidden;cursor:pointer;min-height:108px
+}
+.home-integrada-kpi:hover{transform:translateY(-3px);box-shadow:0 11px 23px rgba(0,0,0,.11)}
+.home-integrada-kpi:before{content:"";position:absolute;left:0;top:0;width:6px;height:100%;background:#006cff}
+.home-integrada-kpi.red:before{background:#d70022}
+.home-integrada-kpi.orange:before{background:#ff9800}
+.home-integrada-kpi.green:before{background:#0b8f3f}
+.home-integrada-kpi.purple:before{background:#7c3aed}
+.home-integrada-kpi small{display:block;color:#667085;font-weight:800}
+.home-integrada-kpi strong{display:block;font-size:31px;margin:7px 0 2px}
+.home-integrada-kpi span{font-size:12px;color:#667085}
+.home-integrada-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:15px}
+.home-integrada-card{
+    background:#fff;border:1px solid #d9e2ec;border-radius:17px;
+    padding:18px;box-shadow:0 6px 16px rgba(0,0,0,.07)
+}
+.home-integrada-card h3{font-size:19px;margin-bottom:12px}
+.home-integrada-alerta{
+    display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;
+    background:#f7f9fc;border:1px solid #e0e6ee;border-radius:12px;
+    padding:11px 12px;margin:8px 0;cursor:pointer
+}
+.home-integrada-alerta:hover{border-color:#006cff}
+.home-integrada-alerta b{display:block}.home-integrada-alerta small{color:#667085}
+.home-integrada-alerta strong{font-size:22px}
+.home-integrada-import{
+    display:grid;grid-template-columns:1fr 1fr;gap:9px
+}
+.home-integrada-import div{background:#f7f9fc;border-radius:11px;padding:11px}
+.home-integrada-import small{display:block;color:#667085;font-weight:800}
+.home-integrada-import b{display:block;margin-top:4px;word-break:break-word}
+body.dark-mode .home-integrada-kpi,
+body.dark-mode .home-integrada-card{background:#0d223a;color:#eaf2ff;border-color:#244466}
+body.dark-mode .home-integrada-alerta,
+body.dark-mode .home-integrada-import div{background:#102b49;border-color:#244466;color:#eaf2ff}
+body.dark-mode .home-integrada-kpi small,
+body.dark-mode .home-integrada-kpi span,
+body.dark-mode .home-integrada-alerta small,
+body.dark-mode .home-integrada-import small{color:#b8cae0}
+@media(max-width:1100px){.home-integrada-kpis{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:760px){.home-integrada-grid{grid-template-columns:1fr}.home-integrada-kpis{grid-template-columns:1fr 1fr}}
+@media(max-width:470px){.home-integrada-kpis,.home-integrada-import{grid-template-columns:1fr}}
+@media print{.home-integrada{display:none!important}}
+
+
+/* =========================================================
+   V5.1 - AJUSTES DE INTERFACE E ANALISTA OPERACIONAL
+   ========================================================= */
+
+/* Sino separado do relógio e do seletor de base */
+.notif-wrap{
+    right:330px!important;
+    top:56px!important;
+}
+@media(max-width:1180px) and (min-width:951px){
+    .notif-wrap{right:285px!important}
+}
+@media(max-width:950px){
+    .notif-wrap{right:78px!important;top:18px!important}
+}
+
+/* Relações de O.S. legíveis no modo escuro */
+body.dark-mode .intel-row{
+    background:#0d223a!important;
+    color:#eaf2ff!important;
+    border-color:#244466!important;
+}
+body.dark-mode .intel-row:hover{
+    background:#173a5e!important;
+    color:#fff!important;
+}
+body.dark-mode .intel-row:hover b,
+body.dark-mode .intel-row:hover span,
+body.dark-mode .intel-row:hover small{
+    color:#fff!important;
+}
+body.dark-mode .intel-list{
+    background:#0d223a!important;
+}
+body.dark-mode .intel-pend-tabela tbody tr{
+    background:#0d223a!important;
+}
+body.dark-mode .intel-pend-tabela tbody tr:nth-child(even){
+    background:#102b49!important;
+}
+body.dark-mode .intel-pend-tabela tbody tr:hover{
+    background:#1a4168!important;
+}
+body.dark-mode .intel-pend-tabela tbody tr:hover td{
+    color:#fff!important;
+}
+body.dark-mode .intel-consulta-tabela tbody tr:hover,
+body.dark-mode .relatorio-tabela tbody tr:hover,
+body.dark-mode .usuarios-tabela tbody tr:hover,
+body.dark-mode .auditoria-tabela tbody tr:hover{
+    background:#1a4168!important;
+}
+body.dark-mode .intel-consulta-tabela tbody tr:hover td,
+body.dark-mode .relatorio-tabela tbody tr:hover td,
+body.dark-mode .usuarios-tabela tbody tr:hover td,
+body.dark-mode .auditoria-tabela tbody tr:hover td{
+    color:#fff!important;
+}
+body.dark-mode .intel-modal-box .admin-info{
+    background:#102b49!important;
+    color:#eaf2ff!important;
+}
+
+/* Analista operacional */
+.intel-assistente{position:relative}
+.intel-assistente-badge{
+    display:inline-block;margin-left:8px;padding:4px 8px;border-radius:999px;
+    background:#16a8ff;color:#fff;font-size:10px;vertical-align:middle
+}
+.intel-msg.bot.intel-resposta{
+    background:rgba(255,255,255,.15);
+    border-left:4px solid #38d98b;
+}
+.intel-chat-actions{
+    display:flex;gap:8px;flex-wrap:wrap;margin-top:10px
+}
+.intel-chat-action{
+    border:1px solid rgba(255,255,255,.38);border-radius:9px;
+    background:rgba(255,255,255,.12);color:#fff;
+    padding:8px 10px;font-weight:900;cursor:pointer
+}
+.intel-chat-action:hover{background:#16a8ff}
+.intel-chat-ranking{
+    margin-top:9px;border-radius:10px;overflow:hidden;
+    background:rgba(0,0,0,.16)
+}
+.intel-chat-ranking div{
+    display:grid;grid-template-columns:34px 1fr auto;gap:8px;
+    padding:7px 9px;border-bottom:1px solid rgba(255,255,255,.12);
+    align-items:center
+}
+.intel-chat-ranking div:last-child{border-bottom:0}
+.intel-chat-ranking strong{color:#fff}
+.intel-chat-hint{
+    display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 11px
+}
+.intel-chat-hint button{
+    border:1px solid rgba(255,255,255,.28);border-radius:999px;
+    background:rgba(255,255,255,.08);color:#fff;padding:6px 9px;
+    font-size:11px;cursor:pointer
+}
+.intel-chat-hint button:hover{background:#006cff}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -1745,6 +1939,59 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
 </div>
 
 <div id="telaInicio">
+
+    <div class="home-integrada" id="homeIntegradaV502">
+        <div class="home-integrada-topo">
+            <div>
+                <h2 id="homeIntegradaSaudacao">Central Operacional</h2>
+                <p>Resumo da operação usando os mesmos cálculos da Central de Inteligência.</p>
+            </div>
+            <div class="home-integrada-chips">
+                <span class="home-integrada-chip online" id="homeIntegradaSistema">Sistema online</span>
+                <span class="home-integrada-chip" id="homeIntegradaAtualizacao">Aguardando análise</span>
+                <span class="home-integrada-chip" id="homeIntegradaBase">Base: --</span>
+            </div>
+        </div>
+
+        <div class="home-integrada-acoes">
+            <button class="home-integrada-btn azul" onclick="carregarHomeIntegradaV502(true)">↻ Atualizar indicadores</button>
+            <button class="home-integrada-btn verde" onclick="abrirAdminSecao('atualizar')">⇧ Importar REXPEDLR</button>
+            <button class="home-integrada-btn" onclick="abrirBusca()">⌕ Consultar O.S.</button>
+            <button class="home-integrada-btn" onclick="abrirTelaCI()">↩ Gerar C.I.</button>
+            <button class="home-integrada-btn" onclick="abrirInteligencia()">✦ Ver análise completa</button>
+        </div>
+
+        <div id="homeIntegradaStatus" class="home-integrada-status">
+            Preparando indicadores sem bloquear a página...
+        </div>
+
+        <div class="home-integrada-kpis">
+            <div class="home-integrada-kpi" onclick="abrirListaHomeV502('abertas')"><small>O.S. abertas</small><strong id="hiAbertas">--</strong><span>Situação ABE</span></div>
+            <div class="home-integrada-kpi green" onclick="abrirListaHomeV502('prontasAbertas')"><small>Prontas e abertas</small><strong id="hiProntas">--</strong><span>Aguardando próxima ação</span></div>
+            <div class="home-integrada-kpi red" onclick="abrirListaHomeV502('rack500Abertas')"><small>Rack 500</small><strong id="hiRack500">--</strong><span>O.S. abertas no rack</span></div>
+            <div class="home-integrada-kpi orange" onclick="abrirListaHomeV502('semTecnico')"><small>Sem técnico</small><strong id="hiSemTecnico">--</strong><span>Cadastro incompleto</span></div>
+            <div class="home-integrada-kpi orange" onclick="abrirListaHomeV502('semRack')"><small>Sem rack</small><strong id="hiSemRack">--</strong><span>Sem localização</span></div>
+            <div class="home-integrada-kpi purple" onclick="abrirListaHomeV502('expHoje')"><small>Expedidas hoje</small><strong id="hiExpHoje">--</strong><span>Movimento do dia</span></div>
+        </div>
+
+        <div class="home-integrada-grid">
+            <div class="home-integrada-card">
+                <h3>⚠ Atenção operacional</h3>
+                <div id="homeIntegradaAlertas">
+                    <div class="home-integrada-status">Aguardando análise...</div>
+                </div>
+            </div>
+            <div class="home-integrada-card">
+                <h3>⇧ Última importação</h3>
+                <div class="home-integrada-import">
+                    <div><small>Data e hora</small><b id="hiImportData">--</b></div>
+                    <div><small>Quantidade</small><b id="hiImportQtd">--</b></div>
+                    <div><small>Duplicados</small><b id="hiImportDup">--</b></div>
+                    <div><small>Status</small><b id="hiImportStatus">Aguardando</b></div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="title">
         <h1>ASSISTÊNCIA TÉCNICA</h1>
         <p>LOGÍSTICA REVERSA / CONTROLE DE ORDENS DE SERVIÇO</p>
@@ -2041,7 +2288,22 @@ body.dark-mode .erp-import-etapa{background:#102b49;color:#eaf2ff}
     </div>
     <div class="intel-main-grid">
       <div class="intel-card"><h2>🔥 Fila de prioridades</h2><div id="intelAlertas"></div><div class="intel-list" id="intelPrioridades"></div></div>
-      <div class="intel-card intel-assistente"><h2>🤖 Assistente operacional</h2><div class="intel-chat" id="intelChat"><div class="intel-msg bot">Pergunte, por exemplo: “quantas O.S. estão no rack 500 e abertas?”, “quantas estão prontas e abertas?” ou “mostre as O.S. do rack 500 prontas e abertas”.</div></div><div class="intel-chat-line"><input id="intelPergunta" placeholder="Digite uma pergunta sobre a base..." onkeydown="if(event.key==='Enter') responderAssistenteIntel()"><button onclick="responderAssistenteIntel()">Perguntar</button></div></div>
+      <div class="intel-card intel-assistente">
+        <h2>🧠 Analista Operacional <span class="intel-assistente-badge">BASE REAL</span></h2>
+        <div class="intel-chat" id="intelChat">
+          <div class="intel-msg bot intel-resposta">Posso analisar a base atual, combinar filtros, montar rankings e abrir a relação encontrada. Pergunte em linguagem normal.</div>
+        </div>
+        <div class="intel-chat-hint">
+          <button onclick="perguntarIntelExemplo('qual técnico tem mais O.S. abertas?')">Técnico mais carregado</button>
+          <button onclick="perguntarIntelExemplo('mostre as O.S. prontas da loja 101')">Prontas por loja</button>
+          <button onclick="perguntarIntelExemplo('ranking dos racks com mais O.S. abertas')">Ranking de racks</button>
+          <button onclick="perguntarIntelExemplo('mostre as 20 O.S. mais antigas sem técnico')">Mais antigas sem técnico</button>
+        </div>
+        <div class="intel-chat-line">
+          <input id="intelPergunta" placeholder="Ex.: mostre as O.S. Samsung abertas no rack 500" onkeydown="if(event.key==='Enter') responderAssistenteIntel()">
+          <button onclick="responderAssistenteIntel()">Analisar</button>
+        </div>
+      </div>
     </div>
     <div class="intel-main-grid">
       <div class="intel-card"><h2>📊 Painel de pendências</h2><div class="intel-pend-wrap" id="intelPendencias"></div></div>
@@ -2525,6 +2787,10 @@ async function recuperarSessao(){
                 atualizarUsuarioTopo();
                 aplicarPermissoesVisuais();
                 ocultarLogin();
+                voltarInicio();
+                setTimeout(function(){
+                    if(typeof carregarHomeIntegradaV502==="function") carregarHomeIntegradaV502(false);
+                },300);
                 return;
             }
         }
@@ -2684,6 +2950,9 @@ function voltarInicio(){
     esconderTelas();
     document.getElementById("telaInicio").style.display = "block";
     document.getElementById("sidebar").classList.remove("mobile-open");
+    setTimeout(function(){
+        if(typeof carregarHomeIntegradaV502==="function") carregarHomeIntegradaV502(false);
+    },50);
 }
 
 function abrirTelaCI(){
@@ -5351,7 +5620,14 @@ function renderIntel(){
 async function carregarInteligencia(forcar){
     if(intelCarregando)return;if(intelRegistros.length&&!forcar){renderIntel();return}
     intelCarregando=true;const m=document.getElementById("intelMensagem");m.className="dashboard-loading";m.textContent="Analisando toda a base REXPEDLR...";
-    try{intelRegistros=await buscarTodaRexpedlr();intelAnalise=analisarIntel(intelRegistros);renderIntel();m.className="dashboard-ok";m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";}
+    try{
+        intelRegistros=await buscarTodaRexpedlr();
+        intelAnalise=analisarIntel(intelRegistros);
+        renderIntel();
+        if(typeof renderHomeIntegradaV502==="function") renderHomeIntegradaV502();
+        m.className="dashboard-ok";
+        m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
+    }
     catch(e){m.className="dashboard-erro";m.textContent="Erro ao analisar a base: "+(e.message||e)}finally{intelCarregando=false}
 }
 
@@ -5402,121 +5678,261 @@ function exportarPendenciaIntelCSV(chave){
     document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
 
-function abrirListaIntel(tipo){const a=intelAnalise;if(!a)return;const lista=a[tipo]||[];document.getElementById("intelModalTitulo").textContent="Lista: "+tipo;document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
+function abrirListaIntel(tipo){
+    const a=intelAnalise;if(!a)return;
+    const lista=a[tipo]||[];
+    const titulos={rack500Abertas:"Rack 500 — O.S. abertas",prontasAbertas:"Prontas e abertas",prontas:"Prontas aguardando expedição",paradas:"Sem movimentação +30 dias",cpp:"CPP pendente",semTecnico:"Sem técnico",semRack:"Sem rack",oficina20:"Oficina há mais de 20 dias",abertas:"O.S. abertas",fechadas:"O.S. fechadas",expHoje:"Expedidas hoje"};
+    document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
 function fecharIntelModal(){document.getElementById("intelModal").style.display="none"}
 function abrirOSIntel(os){const r=intelRegistros.find(x=>String(x.os)===String(os));if(!r)return;document.getElementById("intelModalTitulo").textContent="O.S. "+os;document.getElementById("intelModalConteudo").innerHTML=Object.entries(r).filter(x=>!x[0].startsWith("_")).map(x=>"<div class='ficha-linha'><span class='ficha-label'>"+escaparHTML(x[0].replaceAll("_"," "))+":</span>"+escaparHTML(x[1]??"-")+"</div>").join("");document.getElementById("intelModal").style.display="flex"}
 function carregarTimelineOS(){const os=textoIntel(document.getElementById("intelOsTimeline").value);const r=intelRegistros.find(x=>String(x.os)===os);const el=document.getElementById("intelTimeline");if(!r){el.innerHTML="<div class='dashboard-erro'>O.S. não encontrada na análise atual.</div>";return}const etapas=[["Gerada",r.dt_geracao],["Entrada",r.dt_ult_entrada||r.dt_recb_at],["Conserto",r.dt_conserto],["Saída oficina",r.dt_saida_oficina],["Expedição",r.dt_expedicao]];let html="";etapas.forEach((e,i)=>{const done=!!e[1];html+="<div class='intel-step "+(done?'done':'')+"'><div class='intel-dot'>"+(done?'✓':i+1)+"</div><b>"+e[0]+"</b><small>"+(e[1]?escaparHTML(String(e[1])):'Pendente')+"</small></div>";if(i<etapas.length-1)html+="<div class='intel-line "+(done?'done':'')+"'></div>"});el.innerHTML=html}
-function addChatIntel(tipo,texto){const c=document.getElementById("intelChat");c.innerHTML+="<div class='intel-msg "+tipo+"'>"+escaparHTML(texto)+"</div>";c.scrollTop=c.scrollHeight}
+let intelAssistenteUltimoResultado=[];
+let intelAssistenteUltimoTitulo="Resultado da análise";
+
+function addChatIntel(tipo,texto){
+    const c=document.getElementById("intelChat");
+    c.innerHTML+="<div class='intel-msg "+tipo+"'>"+escaparHTML(texto)+"</div>";
+    c.scrollTop=c.scrollHeight;
+}
+function addChatIntelHTML(html){
+    const c=document.getElementById("intelChat");
+    c.innerHTML+="<div class='intel-msg bot intel-resposta'>"+html+"</div>";
+    c.scrollTop=c.scrollHeight;
+}
+function perguntarIntelExemplo(pergunta){
+    const inp=document.getElementById("intelPergunta");
+    inp.value=pergunta;
+    responderAssistenteIntel();
+}
 function normalizarPerguntaIntel(v){
-    return String(v||"")
-      .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-      .toUpperCase().trim();
+    return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/\s+/g," ").trim();
 }
 function correspondeIntel(valor,termo){
     return normalizarPerguntaIntel(valor).includes(normalizarPerguntaIntel(termo));
 }
 function normalizarRackIntel(valor){
-    let v=normalizarPerguntaIntel(valor)
-      .replace(/^RACK\s*/,'')
-      .replace(/\s+/g,'')
-      .replace(/,0+$/,'')
-      .replace(/\.0+$/,'');
-    if(/^0+\d+$/.test(v)) v=String(parseInt(v,10));
+    let v=normalizarPerguntaIntel(valor).replace(/^RACK\s*/,'').replace(/\s+/g,'').replace(/,0+$/,'').replace(/\.0+$/,'');
+    if(/^0+\d+$/.test(v))v=String(parseInt(v,10));
     return v;
 }
 function rackCorrespondeIntel(valor,termo){
-    const a=normalizarRackIntel(valor);
-    const b=normalizarRackIntel(termo);
-    if(!a||!b) return false;
-    return a===b || a.split(/[\/\-]/).includes(b);
+    const a=normalizarRackIntel(valor),b=normalizarRackIntel(termo);
+    return !!a&&!!b&&(a===b||a.split(/[\/\-]/).includes(b));
 }
-function situacaoAbertaIntel(registro){
-    // No REXPEDLR, STATUS DA OS usa os códigos ABE, CAN e FEC.
-    // ABE = aberta. Mantemos compatibilidade com textos por segurança.
-    const n=normalizarPerguntaIntel(registro.status_da_os);
-    return n==='ABE' || n==='ABERTA' || n==='ABERTO' || n==='EM ABERTO';
+function situacaoAbertaIntel(r){
+    const n=normalizarPerguntaIntel(r.status_da_os);
+    return n==='ABE'||n==='ABERTA'||n==='ABERTO'||n==='EM ABERTO';
 }
-function situacaoFechadaIntel(registro){
-    // FEC = fechada; CAN = cancelada e não deve entrar como aberta.
-    const n=normalizarPerguntaIntel(registro.status_da_os);
-    return n==='FEC' || n==='FECHADA' || n==='FECHADO' || n==='ENCERRADA' || n==='ENCERRADO' || n==='CONCLUIDA' || n==='CONCLUIDO';
+function situacaoFechadaIntel(r){
+    const n=normalizarPerguntaIntel(r.status_da_os);
+    return ['FEC','FECHADA','FECHADO','ENCERRADA','ENCERRADO','CONCLUIDA','CONCLUIDO'].includes(n);
 }
-function statusProntaIntel(registro){
-    // "Pronta" pertence ao campo STATUS; STATUS DA OS guarda ABE/CAN/FEC.
-    const n=normalizarPerguntaIntel(registro.status);
-    return n==='PRONTA' || n==='PRONTO' || n.startsWith('PRONT');
+function statusProntaIntel(r){
+    const n=normalizarPerguntaIntel(r.status);
+    return n==='PRONTA'||n==='PRONTO'||n.startsWith('PRONT');
+}
+function dataHojeIntel(v){
+    const d=dataValidaIntel(v);
+    if(!d)return false;
+    const h=new Date();
+    return d.getFullYear()===h.getFullYear()&&d.getMonth()===h.getMonth()&&d.getDate()===h.getDate();
+}
+function campoPrimeiroIntel(r,campos){
+    for(const c of campos){if(textoIntel(r[c]))return textoIntel(r[c])}
+    return "";
+}
+function termoConhecidoIntel(pergunta,valores){
+    const u=normalizarPerguntaIntel(pergunta);
+    return [...new Set(valores.map(textoIntel).filter(Boolean))]
+      .sort((a,b)=>b.length-a.length)
+      .find(v=>u.includes(normalizarPerguntaIntel(v)))||"";
+}
+function contarListaIntel(lista,obter){
+    const m=new Map();
+    lista.forEach(r=>{
+        const k=textoIntel(obter(r))||"(vazio)";
+        m.set(k,(m.get(k)||0)+1);
+    });
+    return [...m.entries()].sort((a,b)=>b[1]-a[1]);
+}
+function escaparAtributoIntel(v){
+    return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function rankingChatIntel(ranking,limite=10){
+    return "<div class='intel-chat-ranking'>"+ranking.slice(0,limite).map((x,i)=>
+      "<div><span>"+(i+1)+"º</span><b>"+escaparHTML(x[0])+"</b><strong>"+x[1]+"</strong></div>"
+    ).join("")+"</div>";
+}
+function acoesChatIntel(temResultado=true){
+    if(!temResultado)return "";
+    return "<div class='intel-chat-actions'>"+
+      "<button class='intel-chat-action' onclick='abrirUltimoResultadoIntel()'>📄 Abrir relação</button>"+
+      "<button class='intel-chat-action' onclick='exportarUltimoResultadoIntel()'>⇩ Exportar CSV</button>"+
+      "</div>";
 }
 function abrirResultadoAssistenteIntel(titulo,lista){
-    document.getElementById("intelModalTitulo").textContent=titulo;
+    intelAssistenteUltimoResultado=lista||[];
+    intelAssistenteUltimoTitulo=titulo||"Resultado da análise";
+    abrirUltimoResultadoIntel();
+}
+function abrirUltimoResultadoIntel(){
+    const lista=intelAssistenteUltimoResultado||[];
+    document.getElementById("intelModalTitulo").textContent=intelAssistenteUltimoTitulo+" ("+lista.length+")";
     document.getElementById("intelModalConteudo").innerHTML=lista.length
-      ? "<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>Rack: "+escaparHTML(r.rack||"-")+" • Situação O.S.: "+escaparHTML(r.status_da_os||"-")+" • Status: "+escaparHTML(r.status||"-")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>"
-      : "<div class='admin-info'>Nenhuma O.S. encontrada para esse filtro.</div>";
+      ?"<div class='intel-list'>"+lista.slice(0,2000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>Rack: "+escaparHTML(r.rack||"-")+" • O.S.: "+escaparHTML(r.status_da_os||"-")+" • Status: "+escaparHTML(r.status||"-")+" • PDV: "+escaparHTML(r.pdv||"-")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>"
+      :"<div class='admin-info'>Nenhuma O.S. encontrada para esses critérios.</div>";
     document.getElementById("intelModal").style.display="flex";
+}
+function exportarUltimoResultadoIntel(){
+    const lista=intelAssistenteUltimoResultado||[];
+    if(!lista.length){alert("Não há relação para exportar.");return}
+    const cab=["O.S.","Produto","Rack","Status","Situação da O.S.","Técnico","PDV","NF","NCE","Data geração","Data expedição"];
+    const esc=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+    const linhas=[cab.map(esc).join(";")].concat(lista.map(r=>[
+        r.os,r.desc_produto,r.rack,r.status,r.status_da_os,r.tecnico,r.pdv,r.nf,r.nce,r.dt_geracao,r.dt_expedicao
+    ].map(esc).join(";")));
+    const blob=new Blob(["\uFEFF"+linhas.join("\r\n")],{type:"text/csv;charset=utf-8;"});
+    const url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;
+    a.download=normalizarPerguntaIntel(intelAssistenteUltimoTitulo).toLowerCase().replace(/[^a-z0-9]+/g,"_").replace(/^_|_$/g,"")+"_"+new Date().toISOString().slice(0,10)+".csv";
+    document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
 function responderAssistenteIntel(){
     const inp=document.getElementById("intelPergunta");
     const q=textoIntel(inp.value);
-    if(!q||!intelAnalise)return;
+    if(!q)return;
+    if(!intelAnalise||!Array.isArray(intelRegistros)||!intelRegistros.length){
+        addChatIntel("user",q);
+        addChatIntelHTML("A análise ainda não está carregada. Clique em <b>Reanalisar</b> e tente novamente.");
+        return;
+    }
     addChatIntel("user",q);inp.value="";
     const u=normalizarPerguntaIntel(q);
-    let resp="";
-    let resultado=null;
-    let tituloResultado="Resultado da consulta";
+    let lista=[...intelRegistros];
+    const criterios=[];
+    const querLista=/MOSTR|LIST|QUAIS|RELACAO|ABRIR|TUDO|TODAS|TODOS/.test(u);
+    const querRanking=/RANKING|MAIOR|MAIS CHEIO|MAIS CARREGADO|TEM MAIS|MAIS O\.?S/.test(u);
+    const querMedia=/MEDIA|TEMPO MEDIO|DEMORA/.test(u);
+    const limiteMatch=u.match(/\b(?:TOP|PRIMEIR[AO]S?|ULTIM[AO]S?|MOSTR[EA]?)\s*(\d{1,4})\b/);
+    const limite=limiteMatch?Math.max(1,Math.min(2000,Number(limiteMatch[1]))):null;
 
-    const rackMatch=u.match(/RACK\s*([A-Z0-9.-]+)/);
-    const querAberta=/\bABERT[AO]S?\b/.test(u);
-    const querPronta=/\bPRONT[AO]S?\b/.test(u);
-    const querFechada=/\bFECHAD[AO]S?\b/.test(u);
-    const querMostrar=/MOSTR|LIST|QUAIS|ABRIR/.test(u);
+    // O.S. exata.
+    const osMatch=u.match(/\bO\.?\s*S\.?\s*(?:N[ºO]\s*)?[:#-]?\s*(\d{4,})\b/);
+    if(osMatch){
+        lista=lista.filter(r=>String(r.os||"").replace(/\D/g,"")===osMatch[1]);
+        criterios.push("O.S. "+osMatch[1]);
+    }
 
+    // Situação/status.
+    if(/\bABERT[AO]S?\b|\bABE\b/.test(u)){lista=lista.filter(situacaoAbertaIntel);criterios.push("abertas")}
+    if(/\bFECHAD[AO]S?\b|\bFEC\b/.test(u)){lista=lista.filter(situacaoFechadaIntel);criterios.push("fechadas")}
+    if(/\bPRONT[AO]S?\b/.test(u)){lista=lista.filter(statusProntaIntel);criterios.push("prontas")}
+    if(/CHEGOU\s*PECA|CHEGARAM\s*PECAS?/.test(u)){lista=lista.filter(r=>correspondeIntel(r.status,"CHEGOU PECA"));criterios.push("chegou peça")}
+    if(/\bCPP\b/.test(u)){lista=lista.filter(r=>textoIntel(r.nr_cpp)||textoIntel(r.solicitante_cpp)||correspondeIntel(r.status,"CPP"));criterios.push("CPP")}
+    if(/SEM\s+TECNICO/.test(u)){lista=lista.filter(r=>!textoIntel(r.tecnico));criterios.push("sem técnico")}
+    if(/SEM\s+RACK/.test(u)){lista=lista.filter(r=>!textoIntel(r.rack));criterios.push("sem rack")}
+    if(/OFICINA/.test(u)){lista=lista.filter(r=>!textoIntel(r.dt_saida_oficina)&&(textoIntel(r.dt_recb_at)||textoIntel(r.dt_conserto)||correspondeIntel(r.status,"OFIC")));criterios.push("oficina")}
+    if(/EXPEDID[AO]S?\s+HOJE|EXPEDICAO\s+HOJE/.test(u)){lista=lista.filter(r=>dataHojeIntel(r.dt_expedicao));criterios.push("expedidas hoje")}
+    if(/FINALIZAD[AO]S?|EXPEDID[AO]S?/.test(u)&&!u.includes("HOJE")){lista=lista.filter(r=>textoIntel(r.dt_expedicao));criterios.push("finalizadas/expedidas")}
+
+    // Dias parados.
+    const diasMatch=u.match(/(?:MAIS DE|ACIMA DE|\+)\s*(\d{1,4})\s*DIAS?|PARAD[AO]S?\s*(?:HA|A)?\s*(\d{1,4})?/);
+    if(diasMatch){
+        const dias=Number(diasMatch[1]||diasMatch[2]||30);
+        lista=lista.filter(r=>{const d=diasDesdeIntel(ultimaDataIntel(r));return d!==null&&d>dias&&!textoIntel(r.dt_expedicao)});
+        lista.sort((a,b)=>(diasDesdeIntel(ultimaDataIntel(b))||0)-(diasDesdeIntel(ultimaDataIntel(a))||0));
+        criterios.push("paradas há mais de "+dias+" dias");
+    }
+
+    // Rack explícito.
+    const rackMatch=u.match(/\bRACK\s*[:#-]?\s*([A-Z0-9./-]+)/);
     if(rackMatch){
-        const rack=rackMatch[1];
-        const noRack=intelRegistros.filter(r=>rackCorrespondeIntel(r.rack,rack));
-        resultado=noRack;
-        if(querAberta)resultado=resultado.filter(situacaoAbertaIntel);
-        if(querFechada)resultado=resultado.filter(situacaoFechadaIntel);
-        if(querPronta)resultado=resultado.filter(statusProntaIntel);
-        const partes=["rack "+rack];
-        if(querPronta)partes.push("status pronta");
-        if(querAberta)partes.push("situação da O.S. aberta");
-        if(querFechada)partes.push("situação da O.S. fechada");
-        resp="Encontrei "+noRack.length+" O.S. no rack "+rack+". Dessas, "+resultado.length+" atendem aos demais filtros"+(partes.length>1?" ("+partes.slice(1).join(" e ")+")":"")+".";
-        if(noRack.length===0){
-            const racksProximos=[...new Set(intelRegistros.map(r=>textoIntel(r.rack)).filter(Boolean))].filter(v=>normalizarPerguntaIntel(v).includes(normalizarPerguntaIntel(rack).slice(0,2))).slice(0,12);
-            if(racksProximos.length) resp+=" Valores de rack parecidos encontrados: "+racksProximos.join(", ")+".";
-        }
-        tituloResultado="O.S. filtradas — "+partes.join(" / ");
+        lista=lista.filter(r=>rackCorrespondeIntel(r.rack,rackMatch[1]));
+        criterios.push("rack "+rackMatch[1]);
     }
-    else if(querPronta&&querAberta){
-        resultado=intelRegistros.filter(r=>statusProntaIntel(r)&&situacaoAbertaIntel(r));
-        resp="Existem "+resultado.length+" O.S. com status pronta e situação da O.S. aberta.";
-        tituloResultado="O.S. prontas e abertas";
-    }
-    else if(querAberta){
-        resultado=intelRegistros.filter(situacaoAbertaIntel);
-        resp="Existem "+resultado.length+" O.S. com situação da O.S. aberta.";
-        tituloResultado="O.S. abertas";
-    }
-    else if(querPronta){
-        resultado=intelRegistros.filter(statusProntaIntel);
-        resp="Existem "+resultado.length+" O.S. em situação/status pronta.";
-        tituloResultado="O.S. prontas";
-    }
-    else if(u.includes("CPP"))resp="Existem "+intelAnalise.cpp.length+" O.S. com pendência de CPP.";
-    else if(u.includes("AGUARD")&&u.includes("EXPEDI"))resp="Existem "+intelAnalise.prontas.length+" produtos prontos aguardando expedição.";
-    else if((u.includes("MAIS")&&u.includes("TECN"))||(u.includes("TECNICO")&&u.includes("MAIS"))){const x=intelAnalise.tecnicos.find(v=>v[0]!=="(vazio)");resp=x?x[0]+" possui a maior quantidade na base, com "+x[1]+" O.S.":"Não encontrei técnicos preenchidos."}
-    else if(u.includes("SEM TECN"))resp="Existem "+intelAnalise.semTecnico.length+" O.S. sem técnico preenchido.";
-    else if(u.includes("SEM RACK"))resp="Existem "+intelAnalise.semRack.length+" O.S. sem rack preenchido.";
-    else if(u.includes("30")||u.includes("PARAD"))resp="Existem "+intelAnalise.paradas.length+" O.S. sem movimentação há mais de 30 dias.";
-    else if(u.includes("TV")||u.includes("TELEVIS")){const base=intelRegistros.filter(r=>correspondeIntel(r.desc_produto,"TV")||correspondeIntel(r.desc_produto,"TELEVIS"));const ag=base.filter(r=>(correspondeIntel(r.status,"PRONT")||correspondeIntel(r.status_da_os,"PRONT"))&&!textoIntel(r.dt_expedicao));resp="Encontrei "+base.length+" televisores/TVs na base; "+ag.length+" estão prontos sem expedição."}
-    else if(u.includes("LOJA")||u.includes("PDV")){const x=intelAnalise.pdvs.find(v=>v[0]!=="(vazio)");resp=x?"O PDV com maior volume é "+x[0]+", com "+x[1]+" O.S.":"Não encontrei PDVs preenchidos."}
-    else resp="Você pode combinar filtros. Exemplos: 'quantas O.S. estão no rack 500 e abertas?', 'quantas estão prontas e abertas?' ou 'mostre as O.S. do rack 500 prontas e abertas'.";
 
-    setTimeout(()=>{
-        addChatIntel("bot",resp+(resultado&&resultado.length&&querMostrar?" Abrindo a lista...":""));
-        if(resultado&&resultado.length&&querMostrar)abrirResultadoAssistenteIntel(tituloResultado,resultado);
-    },180);
+    // Entidades conhecidas na pergunta.
+    const tecnico=termoConhecidoIntel(q,intelRegistros.map(r=>r.tecnico));
+    const pdv=termoConhecidoIntel(q,intelRegistros.map(r=>r.pdv));
+    if(tecnico && (u.includes("TECN")||u.includes("TUDO DO")||u.includes("TUDO DA"))){
+        lista=lista.filter(r=>normalizarPerguntaIntel(r.tecnico)===normalizarPerguntaIntel(tecnico));
+        criterios.push("técnico "+tecnico);
+    }
+    if(pdv && (u.includes("LOJA")||u.includes("PDV"))){
+        lista=lista.filter(r=>normalizarPerguntaIntel(r.pdv)===normalizarPerguntaIntel(pdv));
+        criterios.push("loja/PDV "+pdv);
+    }
+
+    // Valores explicitamente escritos após palavras-chave.
+    const tecnicoMatch=u.match(/TECNIC[OA]\s+["']?([^,;.]+?)(?=\s+(?:NO|NA|COM|E|QUE|ABERT|PRONT|RACK|LOJA|PDV)\b|$)/);
+    if(tecnicoMatch&&!tecnico){
+        const termo=tecnicoMatch[1].trim();
+        lista=lista.filter(r=>correspondeIntel(r.tecnico,termo));criterios.push("técnico "+termo);
+    }
+    const lojaMatch=u.match(/(?:LOJA|PDV)\s+["']?([^,;.]+?)(?=\s+(?:COM|E|QUE|ABERT|PRONT|RACK|TECNIC)\b|$)/);
+    if(lojaMatch&&!pdv){
+        const termo=lojaMatch[1].trim();
+        lista=lista.filter(r=>correspondeIntel(r.pdv,termo));criterios.push("loja/PDV "+termo);
+    }
+    const produtoMatch=u.match(/(?:PRODUTO|MARCA|FABRICANTE)\s+["']?([^,;.]+?)(?=\s+(?:COM|E|QUE|ABERT|PRONT|RACK|LOJA|PDV|TECNIC)\b|$)/);
+    if(produtoMatch){
+        const termo=produtoMatch[1].trim();
+        lista=lista.filter(r=>[r.desc_produto,r.marca,r.fabricante,r.descricao].some(v=>correspondeIntel(v,termo)));
+        criterios.push("produto/marca "+termo);
+    }else{
+        // Reconhece marcas/fabricantes já existentes, mesmo sem a palavra "marca".
+        const marca=termoConhecidoIntel(q,intelRegistros.map(r=>campoPrimeiroIntel(r,["marca","fabricante"])));
+        if(marca){
+            lista=lista.filter(r=>[r.marca,r.fabricante,r.desc_produto].some(v=>correspondeIntel(v,marca)));
+            criterios.push(marca);
+        }
+    }
+
+    // Rankings reais.
+    if(querRanking){
+        let titulo="Ranking";
+        let ranking=[];
+        if(/TECN/.test(u)){titulo="Ranking de técnicos";ranking=contarListaIntel(lista,r=>r.tecnico)}
+        else if(/LOJA|PDV/.test(u)){titulo="Ranking de lojas/PDVs";ranking=contarListaIntel(lista,r=>r.pdv)}
+        else if(/RACK/.test(u)){titulo="Ranking de racks";ranking=contarListaIntel(lista,r=>r.rack)}
+        else if(/MARCA|FABRICANTE/.test(u)){titulo="Ranking de marcas/fabricantes";ranking=contarListaIntel(lista,r=>campoPrimeiroIntel(r,["marca","fabricante"])||textoIntel(r.desc_produto).split(/\s+/)[0])}
+        else if(/PRODUTO/.test(u)){titulo="Ranking de produtos";ranking=contarListaIntel(lista,r=>r.desc_produto)}
+        else if(/STATUS|SITUACAO/.test(u)){titulo="Ranking de status";ranking=contarListaIntel(lista,r=>r.status||r.status_da_os)}
+        else {titulo="Ranking de técnicos";ranking=contarListaIntel(lista,r=>r.tecnico)}
+        ranking=ranking.filter(x=>x[0]!=="(vazio)");
+        const html="<b>"+escaparHTML(titulo)+"</b>"+(criterios.length?" para "+escaparHTML(criterios.join(", ")):"")+"."+rankingChatIntel(ranking,limite||10);
+        addChatIntelHTML(html);
+        return;
+    }
+
+    // Médias verdadeiras calculadas da base.
+    if(querMedia){
+        let pares=[],rotulo="";
+        if(/OFICINA/.test(u)){pares=lista.map(r=>[r.dt_recb_at||r.dt_ult_entrada,r.dt_saida_oficina||r.dt_conserto]);rotulo="tempo médio na oficina"}
+        else if(/EXPEDI/.test(u)){pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio entre geração e expedição"}
+        else {pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio até a expedição"}
+        const media=mediaDiasV36(pares);
+        addChatIntelHTML(media===null?"Não há datas suficientes para calcular "+escaparHTML(rotulo)+".":"O "+escaparHTML(rotulo)+" é de <b>"+media+" dias</b>, considerando "+lista.length+" registros após os filtros.");
+        return;
+    }
+
+    if(limite){
+        if(/ANTIG|MAIS TEMPO|PARAD/.test(u)){
+            lista.sort((a,b)=>(diasDesdeIntel(ultimaDataIntel(b))||0)-(diasDesdeIntel(ultimaDataIntel(a))||0));
+        }
+        lista=lista.slice(0,limite);
+    }
+
+    intelAssistenteUltimoResultado=lista;
+    intelAssistenteUltimoTitulo=criterios.length?"O.S. — "+criterios.join(" / "):"Resultado da consulta";
+    const resumo=criterios.length
+      ?"Encontrei <b>"+lista.length.toLocaleString("pt-BR")+" O.S.</b> com "+escaparHTML(criterios.join(", "))+"."
+      :"A base atual possui <b>"+lista.length.toLocaleString("pt-BR")+" O.S.</b>.";
+
+    addChatIntelHTML(resumo+acoesChatIntel(true));
+    if(querLista&&lista.length)abrirUltimoResultadoIntel();
 }
+
 
 
 /* =========================
@@ -6085,5 +6501,124 @@ window.importarNettermParaSupabase=async function(){
  }finally{erpImportXhrV40=null;const b=erpImportElV40("erpImportCancelar");if(b)b.disabled=false}
 };
 </script>
+
+<script>
+/* =========================================================
+   V5.0.2 - HOME INTEGRADA E ESTÁVEL
+   ========================================================= */
+let homeV502Tentativa=0;
+let homeV502Timer=null;
+
+function homeV502Set(id,valor){
+    const el=document.getElementById(id);
+    if(el)el.textContent=valor;
+}
+function homeV502Saudacao(){
+    const hora=new Date().getHours();
+    const periodo=hora<12?"Bom dia":hora<18?"Boa tarde":"Boa noite";
+    const nome=(typeof usuarioLogado!=="undefined"&&usuarioLogado&&(usuarioLogado.nome||usuarioLogado.email))||"";
+    homeV502Set("homeIntegradaSaudacao",periodo+(nome?", "+nome.split(" ")[0]:"")+"!");
+}
+function homeV502Status(texto,tipo){
+    const el=document.getElementById("homeIntegradaStatus");
+    if(!el)return;
+    el.className="home-integrada-status"+(tipo?" "+tipo:"");
+    el.textContent=texto;
+}
+function renderHomeIntegradaV502(){
+    const a=(typeof intelAnalise!=="undefined")?intelAnalise:null;
+    const regs=(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))?intelRegistros:[];
+    if(!a||!Array.isArray(regs)||!regs.length)return false;
+
+    homeV502Set("hiAbertas",(a.abertas||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("hiProntas",(a.prontasAbertas||a.prontas||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("hiRack500",(a.rack500Abertas||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("hiSemTecnico",(a.semTecnico||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("hiSemRack",(a.semRack||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("hiExpHoje",(a.expHoje||[]).length.toLocaleString("pt-BR"));
+    homeV502Set("homeIntegradaBase","Base: "+regs.length.toLocaleString("pt-BR")+" O.S.");
+    homeV502Set("homeIntegradaAtualizacao","Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+    homeV502Set("homeIntegradaSistema","Sistema online");
+
+    const alertas=[
+        ["Rack 500 aberto",a.rack500Abertas||[],"rack500Abertas","O.S. abertas no Rack 500"],
+        ["Prontas aguardando",a.prontasAbertas||a.prontas||[],"prontasAbertas","Prontas sem expedição"],
+        ["CPP pendente",a.cpp||[],"cpp","Pendências de CPP"],
+        ["Oficina +20 dias",a.oficina20||[],"oficina20","Tempo acima do limite"],
+        ["Sem técnico",a.semTecnico||[],"semTecnico","O.S. aberta sem técnico"],
+        ["Sem rack",a.semRack||[],"semRack","O.S. aberta sem localização"]
+    ];
+    const area=document.getElementById("homeIntegradaAlertas");
+    if(area){
+        const relevantes=alertas.filter(x=>x[1].length>0);
+        area.innerHTML=relevantes.length
+            ? relevantes.map(x=>"<div class='home-integrada-alerta' onclick=\"abrirListaHomeV502('"+x[2]+"')\"><div><b>"+escaparHTML(x[0])+"</b><small>"+escaparHTML(x[3])+"</small></div><strong>"+x[1].length+"</strong></div>").join("")
+            : "<div class='home-integrada-status ok'>Nenhuma inconsistência crítica encontrada.</div>";
+    }
+
+    homeV502Set("hiImportData",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR")||"--");
+    homeV502Set("hiImportQtd",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR_QTD")||"--");
+    homeV502Set("hiImportDup",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR_DUP")||"--");
+    homeV502Set("hiImportStatus","Concluída");
+    homeV502Status("Indicadores atualizados usando a análise já existente do ERP.","ok");
+    return true;
+}
+function aguardarAnaliseHomeV502(){
+    clearTimeout(homeV502Timer);
+    if(renderHomeIntegradaV502()){
+        homeV502Tentativa=0;
+        return;
+    }
+    homeV502Tentativa++;
+    if(homeV502Tentativa>=40){
+        homeV502Status("A análise não respondeu dentro de 20 segundos. Clique em “Atualizar indicadores” para tentar novamente.","erro");
+        homeV502Set("homeIntegradaAtualizacao","Análise indisponível");
+        homeV502Tentativa=0;
+        return;
+    }
+    const segundos=Math.ceil((40-homeV502Tentativa)/2);
+    homeV502Status("Analisando a base em segundo plano... limite de espera: "+segundos+" s.");
+    homeV502Timer=setTimeout(aguardarAnaliseHomeV502,500);
+}
+async function carregarHomeIntegradaV502(forcar){
+    homeV502Saudacao();
+    homeV502Tentativa=0;
+    if(renderHomeIntegradaV502()&&!forcar)return;
+
+    homeV502Status(forcar?"Reanalisando a base...":"Preparando indicadores em segundo plano...");
+    try{
+        if(typeof carregarInteligencia!=="function"){
+            throw new Error("Módulo de inteligência não encontrado.");
+        }
+        if(forcar || !(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros)&&intelRegistros.length)){
+            await carregarInteligencia(!!forcar);
+        }
+        if(!renderHomeIntegradaV502()){
+            aguardarAnaliseHomeV502();
+        }
+    }catch(e){
+        homeV502Status("Não foi possível carregar os indicadores: "+(e.message||e),"erro");
+        homeV502Set("homeIntegradaAtualizacao","Falha na análise");
+    }
+}
+function abrirListaHomeV502(chave){
+    const a=(typeof intelAnalise!=="undefined")?intelAnalise:null;
+    if(!a){
+        homeV502Status("A análise ainda não está pronta. Atualize os indicadores.","erro");
+        return;
+    }
+    if(typeof abrirListaIntel==="function"){
+        abrirListaIntel(chave);
+        return;
+    }
+    abrirInteligencia();
+}
+document.addEventListener("DOMContentLoaded",function(){
+    setTimeout(function(){
+        if(window.usuarioLogado)carregarHomeIntegradaV502(false);
+    },500);
+});
+</script>
+
 </body>
 </html>
