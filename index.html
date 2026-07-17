@@ -1237,7 +1237,7 @@ body.ci-outros [contenteditable="true"]:focus{
 /* =========================
 PAINEL ADMINISTRATIVO
 ========================= */
-#telaAdmin,#telaAdminAtualizar,#telaAdminUsuarios,#telaAdminLojas,#telaAdminHistorico,#telaAdminAuditoria,#telaAdminConfig,#telaAdminBackup{display:none}
+#telaAdmin,#telaAdminAtualizar,#telaAdminUsuarios,#telaAdminPresenca,#telaAdminLojas,#telaAdminHistorico,#telaAdminAuditoria,#telaAdminConfig,#telaAdminBackup{display:none}
 .admin-grid{width:1150px;max-width:95%;margin:45px auto;display:grid;grid-template-columns:1fr 1fr;gap:26px}
 .admin-card{background:white;border:2px solid #001b3d;border-radius:18px;padding:24px;box-shadow:0 8px 18px rgba(0,0,0,.12);cursor:pointer;transition:.22s;position:relative;overflow:hidden}
 .admin-card:hover{transform:scale(1.02);box-shadow:0 0 22px rgba(30,165,255,.35)}
@@ -1261,7 +1261,7 @@ PAINEL ADMINISTRATIVO
 .admin-mini-box{background:#eef3f8;border-radius:12px;padding:16px;color:#001b3d;font-weight:bold;text-align:center}
 .admin-mini-box span{display:block;font-size:28px;margin-top:8px;color:#0046b8}
 @media(max-width:950px){.admin-grid,.admin-form-grid,.admin-mini-list{grid-template-columns:1fr}.admin-card h2{font-size:24px}}
-@media print{#telaAdmin,#telaAdminAtualizar,#telaAdminUsuarios,#telaAdminLojas,#telaAdminHistorico,#telaAdminAuditoria,#telaAdminConfig,#telaAdminBackup{display:none!important}}
+@media print{#telaAdmin,#telaAdminAtualizar,#telaAdminUsuarios,#telaAdminPresenca,#telaAdminLojas,#telaAdminHistorico,#telaAdminAuditoria,#telaAdminConfig,#telaAdminBackup{display:none!important}}
 
 
 /* =========================
@@ -2311,6 +2311,119 @@ body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
     .pesquisa-global-wrap,.pesquisa-global-overlay{display:none!important}
 }
 
+
+/* =========================================================
+   V5.5.0 - DASHBOARD OPERACIONAL INTERATIVO
+   ========================================================= */
+.operacao-agora{
+    margin-bottom:24px;
+    background:linear-gradient(135deg,#001b3d,#064f9e);
+    color:#fff;
+    border-radius:22px;
+    padding:22px;
+    box-shadow:0 14px 34px rgba(0,27,61,.25);
+}
+.operacao-agora-topo{
+    display:flex;align-items:center;justify-content:space-between;gap:15px;
+    margin-bottom:17px;flex-wrap:wrap
+}
+.operacao-agora-topo h2{font-size:24px;margin:0;color:#fff}
+.operacao-agora-topo p{font-size:12px;color:#cce3ff;margin-top:4px}
+.operacao-atualizar{
+    border:1px solid rgba(255,255,255,.5);border-radius:10px;
+    background:rgba(255,255,255,.12);color:#fff;padding:9px 13px;
+    font-weight:900;cursor:pointer
+}
+.operacao-atualizar:hover{background:#fff;color:#001b3d}
+.operacao-cards{
+    display:grid;grid-template-columns:repeat(4,1fr);gap:13px
+}
+.operacao-card{
+    position:relative;background:#fff;color:#001b3d;border:0;border-radius:16px;
+    padding:17px;text-align:left;cursor:pointer;min-height:125px;
+    box-shadow:0 7px 18px rgba(0,0,0,.16);transition:.18s ease
+}
+.operacao-card:hover{transform:translateY(-3px);box-shadow:0 13px 24px rgba(0,0,0,.24)}
+.operacao-card .op-icone{font-size:24px}
+.operacao-card .op-valor{display:block;font-size:32px;font-weight:950;margin-top:7px}
+.operacao-card .op-label{display:block;font-size:13px;font-weight:900;margin-top:2px}
+.operacao-card .op-dica{display:block;font-size:10px;color:#667085;margin-top:7px}
+.operacao-card.alerta{border-top:6px solid #c62828}
+.operacao-card.atencao{border-top:6px solid #f59e0b}
+.operacao-card.sucesso{border-top:6px solid #15803d}
+.operacao-card.info{border-top:6px solid #0277bd}
+.central-pendencias-dashboard{
+    margin-bottom:25px;background:#fff;border:2px solid #001b3d;
+    border-radius:20px;padding:20px;box-shadow:0 8px 18px rgba(0,0,0,.12)
+}
+.central-pendencias-topo{
+    display:flex;justify-content:space-between;align-items:center;gap:12px;
+    margin-bottom:13px;flex-wrap:wrap
+}
+.central-pendencias-topo h2{font-size:22px;color:#001b3d;margin:0}
+.central-pendencias-topo small{color:#667085}
+.central-pendencias-lista{display:grid;gap:10px}
+.pendencia-dashboard-item{
+    display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;
+    border:1px solid #d7dfe8;border-left:6px solid #f59e0b;
+    border-radius:13px;padding:12px;background:#f8fafc;cursor:pointer
+}
+.pendencia-dashboard-item:hover{background:#eef6ff;border-color:#79aef0}
+.pendencia-dashboard-item.critica{border-left-color:#c62828}
+.pendencia-dashboard-item.ok{border-left-color:#15803d}
+.pendencia-dashboard-item .icone{position:static;transform:none;width:38px;height:38px;line-height:38px;background:#fff;border-radius:10px;text-align:center;font-size:20px}
+.pendencia-dashboard-item b{display:block;color:#001b3d;font-size:14px}
+.pendencia-dashboard-item span{display:block;color:#667085;font-size:12px;margin-top:3px}
+.pendencia-dashboard-item strong{font-size:22px;color:#001b3d}
+.dashboard-box.interativo{cursor:pointer;transition:.18s ease}
+.dashboard-box.interativo:hover{transform:translateY(-3px);border-color:#006cff;box-shadow:0 13px 24px rgba(0,70,184,.18)}
+.dashboard-box.interativo:after{content:"Clique para abrir";position:absolute;right:11px;bottom:8px;font-size:9px;font-weight:900;color:#7b8798}
+.dashboard-atualizacao-automatica{
+    margin-left:auto;font-size:11px;font-weight:900;color:#d6e8ff;
+    background:rgba(255,255,255,.12);padding:7px 10px;border-radius:999px
+}
+body.dark-mode .central-pendencias-dashboard,
+body.dark-mode .pendencia-dashboard-item{background:#0d223a;color:#eaf2ff;border-color:#244466}
+body.dark-mode .central-pendencias-topo h2,
+body.dark-mode .pendencia-dashboard-item b,
+body.dark-mode .pendencia-dashboard-item strong{color:#eaf2ff}
+body.dark-mode .pendencia-dashboard-item span{color:#b8cae0}
+body.dark-mode .pendencia-dashboard-item .icone{background:#102b49}
+@media(max-width:1000px){.operacao-cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.operacao-cards{grid-template-columns:1fr}.pendencia-dashboard-item{grid-template-columns:38px 1fr}.pendencia-dashboard-item strong{grid-column:2}}
+
+
+/* =========================================================
+   V5.6.0 - PRESENÇA ONLINE EM TEMPO REAL
+   ========================================================= */
+.presenca-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0}
+.presenca-resumo-card{background:#fff;border:1px solid #d7dfe8;border-radius:15px;padding:16px;box-shadow:0 6px 15px rgba(0,0,0,.08)}
+.presenca-resumo-card span{display:block;color:#667085;font-size:11px;font-weight:900;text-transform:uppercase}
+.presenca-resumo-card strong{display:block;color:#001b3d;font-size:30px;margin-top:5px}
+.presenca-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:15px 0}
+.presenca-toolbar input{flex:1;min-width:220px;height:42px;border:1px solid #b8c5d3;border-radius:10px;padding:0 12px;font-size:13px}
+.presenca-toolbar button{height:42px;border:0;border-radius:10px;background:#006cff;color:#fff;font-weight:900;padding:0 15px;cursor:pointer}
+.presenca-lista{display:grid;gap:10px}
+.presenca-item{display:grid;grid-template-columns:48px 1fr auto;align-items:center;gap:13px;border:1px solid #d7dfe8;border-radius:15px;padding:13px;background:#fff}
+.presenca-avatar{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eaf2ff;color:#001b3d;font-weight:950;font-size:17px}
+.presenca-identidade b{display:block;color:#001b3d;font-size:14px}
+.presenca-identidade p{margin:3px 0 0;color:#667085;font-size:12px}
+.presenca-identidade small{display:block;color:#7b8798;margin-top:4px}
+.presenca-status{min-width:116px;text-align:center;border-radius:999px;padding:8px 11px;font-size:11px;font-weight:950}
+.presenca-status.online{background:#dcfce7;color:#166534}
+.presenca-status.ausente{background:#fef3c7;color:#92400e}
+.presenca-status.offline{background:#e5e7eb;color:#374151}
+.presenca-indicador-topo{display:inline-flex;align-items:center;gap:6px;margin-left:7px;padding:4px 8px;border-radius:999px;background:#e8f7ec;color:#176b37;font-size:10px;font-weight:950}
+.presenca-vazio{padding:30px;text-align:center;color:#667085;font-weight:800}
+.presenca-ultima-atualizacao{font-size:11px;color:#667085;margin-left:auto}
+body.dark-mode .presenca-resumo-card,body.dark-mode .presenca-item{background:#0d223a;border-color:#244466}
+body.dark-mode .presenca-resumo-card strong,body.dark-mode .presenca-identidade b{color:#eaf2ff}
+body.dark-mode .presenca-identidade p,body.dark-mode .presenca-identidade small,body.dark-mode .presenca-ultima-atualizacao{color:#b8cae0}
+body.dark-mode .presenca-avatar{background:#173a5e;color:#fff}
+body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-color:#365a80}
+@media(max-width:850px){.presenca-resumo{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.presenca-resumo{grid-template-columns:1fr}.presenca-item{grid-template-columns:44px 1fr}.presenca-status{grid-column:2;justify-self:start}}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -2368,7 +2481,7 @@ body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
     <div>Bem-vindo,</div>
     <div class="company">Claudino SA Lojas de Departamentos</div>
     <div class="usuario-topo" id="usuarioTopo" style="display:none">
-        <span id="usuarioNomeTopo">Usuário</span> • <span id="usuarioPerfilTopo">Perfil</span>
+        <span id="usuarioNomeTopo">Usuário</span> • <span id="usuarioPerfilTopo">Perfil</span> <span id="presencaIndicadorTopo" class="presenca-indicador-topo">● online</span>
         <button class="btn-sair" onclick="sairSistema()">Sair</button>
     </div>
 
@@ -2812,11 +2925,51 @@ body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
 
     <div class="dashboard-area">
         <div id="dashboardMensagem" class="dashboard-loading">Carregando dashboard...</div>
+
+        <section class="operacao-agora">
+            <div class="operacao-agora-topo">
+                <div>
+                    <h2>⚡ Operação agora</h2>
+                    <p>Indicadores operacionais calculados sobre toda a base REXPEDLR.</p>
+                </div>
+                <span id="operacaoAtualizacaoAutomatica" class="dashboard-atualizacao-automatica">Atualização automática ativa</span>
+                <button class="operacao-atualizar" onclick="atualizarDashboardOperacional(true)">⟳ Atualizar agora</button>
+            </div>
+            <div class="operacao-cards">
+                <button class="operacao-card alerta" onclick="abrirListaIntel('rack500Abertas')">
+                    <span class="op-icone">🔴</span><span class="op-valor" id="opRack500">--</span>
+                    <span class="op-label">Rack 500 em aberto</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+                <button class="operacao-card atencao" onclick="abrirListaIntel('prontasAbertas')">
+                    <span class="op-icone">🟡</span><span class="op-valor" id="opProntas">--</span>
+                    <span class="op-label">Prontas aguardando expedição</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+                <button class="operacao-card sucesso" onclick="abrirListaIntel('expHoje')">
+                    <span class="op-icone">🟢</span><span class="op-valor" id="opExpedidasHoje">--</span>
+                    <span class="op-label">Expedidas hoje</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+                <button class="operacao-card info" onclick="abrirListaIntel('semTecnico')">
+                    <span class="op-icone">👨‍🔧</span><span class="op-valor" id="opSemTecnico">--</span>
+                    <span class="op-label">O.S. sem técnico</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="central-pendencias-dashboard">
+            <div class="central-pendencias-topo">
+                <div><h2>⚠ Central de Pendências</h2><small>O sistema destaca automaticamente o que exige atenção.</small></div>
+                <small id="pendenciasDashboardHora">Aguardando análise...</small>
+            </div>
+            <div id="pendenciasDashboardLista" class="central-pendencias-lista">
+                <div class="dashboard-loading">Calculando pendências operacionais...</div>
+            </div>
+        </section>
+
         <div class="dashboard-top">
-            <div class="dashboard-box"><h3>Total de O.S no banco</h3><div class="valor" id="dashTotalOS">--</div><div class="sub">Registros disponíveis no Supabase</div></div>
-            <div class="dashboard-box"><h3>PDVs diferentes</h3><div class="valor" id="dashTotalPDV">--</div><div class="sub">Lojas/PDVs encontrados</div></div>
-            <div class="dashboard-box"><h3>Técnicos diferentes</h3><div class="valor" id="dashTotalTecnicos">--</div><div class="sub">Técnicos encontrados</div></div>
-            <div class="dashboard-box"><h3>Status diferentes</h3><div class="valor" id="dashTotalStatus">--</div><div class="sub">Situações no banco</div></div>
+            <div class="dashboard-box interativo" onclick="abrirListaDashboardV55('todas')"><h3>Total de O.S no banco</h3><div class="valor" id="dashTotalOS">--</div><div class="sub">Registros disponíveis no Supabase</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('pdv')"><h3>PDVs diferentes</h3><div class="valor" id="dashTotalPDV">--</div><div class="sub">Lojas/PDVs encontrados</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('tecnico')"><h3>Técnicos diferentes</h3><div class="valor" id="dashTotalTecnicos">--</div><div class="sub">Técnicos encontrados</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('status')"><h3>Status diferentes</h3><div class="valor" id="dashTotalStatus">--</div><div class="sub">Situações no banco</div></div>
             <div class="dashboard-box"><h3>Última importação</h3><div class="valor" id="dashUltimaImportacao" style="font-size:22px">--</div><div class="sub">Registrada neste computador</div></div>
             <div class="dashboard-box"><h3>O.S importadas</h3><div class="valor" id="dashUltimaQtd">--</div><div class="sub">Última carga realizada</div></div>
             <div class="dashboard-box"><h3>Duplicadas removidas</h3><div class="valor" id="dashDuplicadas">--</div><div class="sub">Removidas na importação</div></div>
@@ -2858,6 +3011,11 @@ body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
             <h2>📥 Atualizar Banco de O.S.</h2>
             <p>Importar o arquivo gerado pelo NetTerm e preparar os dados para o Supabase.</p>
             <span class="admin-badge">Primeira etapa</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('presenca')">
+            <h2>🟢 Usuários Online</h2>
+            <p>Presença, última atividade e tela atual em tempo real.</p>
+            <span class="admin-badge">Novo</span>
         </div>
         <div class="admin-card" onclick="abrirAdminSecao('usuarios')">
             <h2>👤 Usuários</h2>
@@ -2930,6 +3088,29 @@ body.dark-mode .pesquisa-global-item small{color:#eaf2ff}
     </div>
 </div>
 
+
+
+<div id="telaAdminPresenca">
+    <div class="title"><h1>USUÁRIOS ONLINE</h1><p>Presença e atividade em tempo real</p><div class="underline"></div></div>
+    <div class="admin-painel">
+        <h2>🟢 Monitoramento de Presença</h2>
+        <div class="admin-info">Online: atividade recente. Ausente: sem interação por alguns minutos. Offline: sem comunicação recente.</div>
+        <div class="presenca-resumo">
+            <div class="presenca-resumo-card"><span>Online</span><strong id="presencaTotalOnline">0</strong></div>
+            <div class="presenca-resumo-card"><span>Ausentes</span><strong id="presencaTotalAusente">0</strong></div>
+            <div class="presenca-resumo-card"><span>Offline</span><strong id="presencaTotalOffline">0</strong></div>
+            <div class="presenca-resumo-card"><span>Total monitorado</span><strong id="presencaTotalUsuarios">0</strong></div>
+        </div>
+        <div class="presenca-toolbar">
+            <input id="presencaBusca" placeholder="Pesquisar nome, e-mail, perfil ou tela..." oninput="renderizarPresencasV56()">
+            <button type="button" onclick="carregarPresencasV56(true)">⟳ Atualizar</button>
+            <span id="presencaUltimaAtualizacao" class="presenca-ultima-atualizacao">Aguardando...</span>
+        </div>
+        <div id="presencaLista" class="presenca-lista"><div class="presenca-vazio">Carregando usuários...</div></div>
+        <div id="presencaMensagem" class="ci-msg"></div>
+        <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao painel</button>
+    </div>
+</div>
 
 <div id="telaAdminUsuarios">
     <div class="title">
@@ -3237,6 +3418,8 @@ async function fazerLogin(){
 
 async function sairSistema(){
     try{
+        if(typeof marcarOfflinePresencaV56==="function") await marcarOfflinePresencaV56();
+        clearInterval(presencaHeartbeatTimerV56);
         await registrarAuditoria("logout", "Logout realizado.", { perfil: usuarioLogado?.perfil || "" });
         const supabase = obterSupabaseClient();
         await supabase.auth.signOut();
@@ -3311,6 +3494,7 @@ function atualizarUsuarioTopo(){
     box.style.display = "inline-block";
     if(nome) nome.innerHTML = usuarioLogado.nome || usuarioLogado.email;
     if(perfil) perfil.innerHTML = PERFIS_NOME[usuarioLogado.perfil] || usuarioLogado.perfil;
+    if(typeof iniciarPresencaV56==="function") iniciarPresencaV56();
 }
 
 function aplicarPermissoesVisuais(){
@@ -3411,7 +3595,7 @@ function abrirListaBase(){
 function esconderTelas(){
     [
         "telaInicio","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
-        "telaAdmin","telaAdminAtualizar","telaAdminUsuarios","telaAdminLojas",
+        "telaAdmin","telaAdminAtualizar","telaAdminUsuarios","telaAdminPresenca","telaAdminLojas",
         "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia"
     ].forEach(function(id){
         const el = document.getElementById(id);
@@ -4418,6 +4602,7 @@ function abrirAdminSecao(secao){
     const mapa = {
         atualizar:"telaAdminAtualizar",
         usuarios:"telaAdminUsuarios",
+        presenca:"telaAdminPresenca",
         lojas:"telaAdminLojas",
         historico:"telaAdminHistorico",
         historico_ci:"telaAdminHistoricoCI",
@@ -4433,6 +4618,8 @@ function abrirAdminSecao(secao){
     if(secao === "historico_ci") carregarHistoricoCI();
     if(secao === "auditoria") carregarAuditoria();
     if(secao === "usuarios") carregarUsuariosAdmin();
+    if(secao === "presenca") carregarPresencasV56(true);
+    if(typeof atualizarPresencaAgoraV56==="function") atualizarPresencaAgoraV56();
 }
 
 function atualizarDados(){
@@ -4786,6 +4973,7 @@ async function carregarDashboardAdmin(){
         msg.className = "dashboard-ok";
         msg.innerHTML = "Dashboard atualizado com dados do Supabase.";
         carregarHistoricoImportacoes();
+        atualizarDashboardOperacional(false);
     }catch(e){
         setDash("dashBancoStatus", "🔴 Erro");
         msg.className = "dashboard-erro";
@@ -6168,7 +6356,11 @@ function analisarIntel(registros){
     const unicos=new Map();prioridades.sort((a,b)=>(b._nivel-a._nivel)||(b._dias-a._dias)).forEach(r=>{if(!unicos.has(r.os))unicos.set(r.os,r)});
     const rack500Abertas=registros.filter(r=>rackCorrespondeIntel(r.rack,"500")&&situacaoAbertaIntel(r));
     const prontasAbertas=registros.filter(r=>statusProntaIntel(r)&&situacaoAbertaIntel(r));
-    return {prontas,paradas,cpp,semTecnico,semRack,oficina,qualidade,rack500Abertas,prontasAbertas,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,"tecnico"),pdvs:contarIntel(registros,"pdv"),status:contarIntel(registros,"status")};
+    const hojeIntel=new Date();hojeIntel.setHours(0,0,0,0);
+    const expHoje=registros.filter(r=>{const d=parseDataIntel(r.dt_expedicao);return d&&d>=hojeIntel;});
+    const abertas=registros.filter(r=>situacaoAbertaIntel(r));
+    const fechadas=registros.filter(r=>!situacaoAbertaIntel(r));
+    return {prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20:oficina.filter(r=>(diasDesdeIntel(r.dt_recb_at||r.dt_conserto||r.dt_geracao)||0)>20),qualidade,rack500Abertas,prontasAbertas,expHoje,abertas,fechadas,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,"tecnico"),pdvs:contarIntel(registros,"pdv"),status:contarIntel(registros,"status")};
 }
 function setIntel(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function barrasIntel(lista,max=8){if(!lista.length)return "<div class='admin-info'>Sem dados.</div>";const maior=lista[0][1]||1;return lista.slice(0,max).map(x=>"<div class='bar-row'><b>"+escaparHTML(x[0])+"</b><div class='bar-track'><div class='bar-fill' style='width:"+Math.max(3,Math.round(x[1]/maior*100))+"%'></div></div><strong>"+x[1]+"</strong></div>").join("")}
@@ -6186,6 +6378,7 @@ function renderIntel(){
     document.getElementById("intelRankingTecnicos").innerHTML=barrasIntel(a.tecnicos.filter(x=>x[0]!=="(vazio)"),10);
     document.getElementById("intelRankingPDV").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),10);
     document.getElementById("intelMapa").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),12)+"<div class='admin-info' style='font-size:13px'>Distribuição baseada no campo PDV. Quando o cadastro de lojas tiver UF/região, este quadro passará a agrupar geograficamente.</div>";
+    if(typeof renderDashboardOperacionalV55==="function")renderDashboardOperacionalV55();
 }
 async function carregarInteligencia(forcar){
     if(intelCarregando)return;if(intelRegistros.length&&!forcar){renderIntel();return}
@@ -8050,6 +8243,192 @@ document.addEventListener("keydown",function(event){
         abrirPesquisaGlobal();
     }
 });
+</script>
+
+
+<script>
+/* =========================================================
+   V5.5.0 - DASHBOARD OPERACIONAL INTERATIVO
+   ========================================================= */
+let dashboardOperacionalIntervaloV55=null;
+
+function renderDashboardOperacionalV55(){
+    const a=typeof intelAnalise!=="undefined"?intelAnalise:null;
+    if(!a)return;
+
+    setIntel("opRack500",(a.rack500Abertas||[]).length);
+    setIntel("opProntas",(a.prontasAbertas||[]).length);
+    setIntel("opExpedidasHoje",(a.expHoje||[]).length);
+    setIntel("opSemTecnico",(a.semTecnico||[]).length);
+
+    const pendencias=[
+        {tipo:"rack500Abertas",icone:"🔴",classe:"critica",total:(a.rack500Abertas||[]).length,
+         titulo:"O.S. no Rack 500 ainda abertas",texto:"Itens que exigem acompanhamento operacional."},
+        {tipo:"prontasAbertas",icone:"🟡",classe:"",total:(a.prontasAbertas||[]).length,
+         titulo:"O.S. prontas aguardando expedição",texto:"Produtos prontos que ainda permanecem em aberto."},
+        {tipo:"semTecnico",icone:"👨‍🔧",classe:"",total:(a.semTecnico||[]).length,
+         titulo:"O.S. sem técnico responsável",texto:"Registros sem preenchimento no campo técnico."},
+        {tipo:"semRack",icone:"📦",classe:"",total:(a.semRack||[]).length,
+         titulo:"O.S. sem rack definido",texto:"Registros que precisam de localização física."},
+        {tipo:"oficina20",icone:"🛠️",classe:"critica",total:(a.oficina20||[]).length,
+         titulo:"O.S. em oficina há mais de 20 dias",texto:"Itens com permanência elevada em oficina."},
+        {tipo:"cpp",icone:"📋",classe:"",total:(a.cpp||[]).length,
+         titulo:"Pendências de CPP",texto:"CPP sem conclusão ou recebimento registrado."}
+    ].filter(x=>x.total>0);
+
+    const area=document.getElementById("pendenciasDashboardLista");
+    if(area){
+        if(!pendencias.length){
+            area.innerHTML="<div class='pendencia-dashboard-item ok'><div class='icone'>✅</div><div><b>Nenhuma pendência crítica detectada</b><span>As regras operacionais atuais não encontraram itens que exijam ação.</span></div><strong>0</strong></div>";
+        }else{
+            area.innerHTML=pendencias.map(x=>
+                "<div class='pendencia-dashboard-item "+x.classe+"' onclick=\"abrirListaIntel('"+x.tipo+"')\">"+
+                "<div class='icone'>"+x.icone+"</div><div><b>"+escaparHTML(x.titulo)+"</b><span>"+escaparHTML(x.texto)+"</span></div><strong>"+x.total+"</strong></div>"
+            ).join("");
+        }
+    }
+    const hora=document.getElementById("pendenciasDashboardHora");
+    if(hora)hora.textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+
+async function atualizarDashboardOperacional(forcar=false){
+    const badge=document.getElementById("operacaoAtualizacaoAutomatica");
+    try{
+        if(badge)badge.textContent="Atualizando...";
+        if(typeof carregarInteligencia==="function")await carregarInteligencia(!!forcar);
+        renderDashboardOperacionalV55();
+        if(badge)badge.textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+    }catch(e){
+        if(badge)badge.textContent="Falha na atualização";
+        console.error("Dashboard operacional:",e);
+    }
+}
+
+function iniciarAtualizacaoAutomaticaDashboardV55(){
+    clearInterval(dashboardOperacionalIntervaloV55);
+    dashboardOperacionalIntervaloV55=setInterval(()=>{
+        const tela=document.getElementById("telaAdmin");
+        if(tela&&getComputedStyle(tela).display!=="none")atualizarDashboardOperacional(true);
+    },300000);
+}
+
+function abrirListaDashboardV55(tipo){
+    if(!intelAnalise)return alert("A análise operacional ainda está carregando.");
+    if(tipo==="todas"){
+        document.getElementById("intelModalTitulo").textContent="Todas as O.S. ("+intelRegistros.length+")";
+        document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+intelRegistros.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";
+        document.getElementById("intelModal").style.display="flex";
+    }
+}
+
+function abrirRankingDashboardV55(tipo){
+    if(!intelAnalise)return alert("A análise operacional ainda está carregando.");
+    const mapa={pdv:{titulo:"O.S. por PDV",lista:intelAnalise.pdvs},tecnico:{titulo:"O.S. por Técnico",lista:intelAnalise.tecnicos},status:{titulo:"O.S. por Status",lista:intelAnalise.status}};
+    const item=mapa[tipo];if(!item)return;
+    document.getElementById("intelModalTitulo").textContent=item.titulo;
+    document.getElementById("intelModalConteudo").innerHTML="<div class='dashboard-card'>"+renderTabelaResumo(item.lista,1000)+"</div>";
+    document.getElementById("intelModal").style.display="flex";
+}
+
+document.addEventListener("DOMContentLoaded",iniciarAtualizacaoAutomaticaDashboardV55);
+</script>
+
+
+<script>
+/* =========================================================
+   V5.6.0 - PRESENÇA ONLINE EM TEMPO REAL
+   ========================================================= */
+const PRESENCA_V56_TABELA="presenca_usuarios";
+const PRESENCA_V56_HEARTBEAT_MS=45000;
+const PRESENCA_V56_AUSENTE_APOS_MS=3*60*1000;
+const PRESENCA_V56_OFFLINE_APOS_MS=2*60*1000;
+let presencaUltimaInteracaoV56=Date.now(),presencaHeartbeatTimerV56=null,presencaPainelTimerV56=null,presencasListaV56=[],presencaEnviandoV56=false;
+
+function telaAtualPresencaV56(){
+    const telas=[["telaHomeIntegrada","Início"],["telaBusca","Busca de O.S."],["telaCI","Gerando C.I."],["telaAdminAtualizar","Importação REXPEDLR"],["telaAdminUsuarios","Gerenciamento de usuários"],["telaAdminPresenca","Usuários online"],["telaAdminHistoricoCI","Histórico de C.I."],["telaAdminAuditoria","Auditoria"],["telaAdmin","Dashboard administrativo"],["telaInteligencia","Inteligência operacional"],["telaRelatorios","Relatórios"]];
+    for(const [id,nome] of telas){const el=document.getElementById(id);if(el&&getComputedStyle(el).display!=="none")return nome;}
+    return "ERP";
+}
+function contextoAtualPresencaV56(){
+    const titulo=document.querySelector(".intel-ficha h2")?.textContent?.trim();
+    if(titulo&&/O\.?S/i.test(titulo))return titulo;
+    if(typeof ciAtual!=="undefined"&&ciAtual&&telaAtualPresencaV56()==="Gerando C.I."){try{return typeof nomeCIAtual==="function"?nomeCIAtual():String(ciAtual)}catch(e){}}
+    return "";
+}
+function statusLocalPresencaV56(){return document.hidden||Date.now()-presencaUltimaInteracaoV56>PRESENCA_V56_AUSENTE_APOS_MS?"ausente":"online";}
+function marcarInteracaoPresencaV56(){presencaUltimaInteracaoV56=Date.now();}
+async function enviarHeartbeatPresencaV56(){
+    if(!usuarioLogado?.id||presencaEnviandoV56)return false;
+    presencaEnviandoV56=true;
+    try{
+        const agora=new Date().toISOString(),status=statusLocalPresencaV56();
+        const {error}=await obterSupabaseClient().from(PRESENCA_V56_TABELA).upsert({
+            user_id:usuarioLogado.id,nome:usuarioLogado.nome||"",email:usuarioLogado.email||"",perfil:usuarioLogado.perfil||"",
+            status,tela:telaAtualPresencaV56(),contexto:contextoAtualPresencaV56(),last_seen:agora,updated_at:agora
+        },{onConflict:"user_id"});
+        if(error)throw error;
+        const i=document.getElementById("presencaIndicadorTopo");
+        if(i){i.textContent=status==="ausente"?"● ausente":"● online";i.style.background=status==="ausente"?"#fef3c7":"#e8f7ec";i.style.color=status==="ausente"?"#92400e":"#176b37";}
+        return true;
+    }catch(e){console.warn("Presença V5.6:",e?.message||e);return false}
+    finally{presencaEnviandoV56=false}
+}
+async function marcarOfflinePresencaV56(){
+    if(!usuarioLogado?.id)return;
+    try{const agora=new Date().toISOString();await obterSupabaseClient().from(PRESENCA_V56_TABELA).upsert({
+        user_id:usuarioLogado.id,nome:usuarioLogado.nome||"",email:usuarioLogado.email||"",perfil:usuarioLogado.perfil||"",
+        status:"offline",tela:"Sessão encerrada",contexto:"",last_seen:agora,updated_at:agora
+    },{onConflict:"user_id"})}catch(e){}
+}
+function iniciarPresencaV56(){
+    clearInterval(presencaHeartbeatTimerV56);
+    if(!usuarioLogado?.id)return;
+    marcarInteracaoPresencaV56();enviarHeartbeatPresencaV56();
+    presencaHeartbeatTimerV56=setInterval(enviarHeartbeatPresencaV56,PRESENCA_V56_HEARTBEAT_MS);
+}
+function atualizarPresencaAgoraV56(){if(usuarioLogado?.id)enviarHeartbeatPresencaV56()}
+function classificarPresencaV56(item){
+    const idade=Date.now()-new Date(item.last_seen||item.updated_at||0).getTime();
+    if(item.status==="offline"||!Number.isFinite(idade)||idade>PRESENCA_V56_OFFLINE_APOS_MS)return "offline";
+    if(item.status==="ausente"||idade>PRESENCA_V56_AUSENTE_APOS_MS)return "ausente";
+    return "online";
+}
+function tempoRelativoPresencaV56(data){
+    const s=Math.floor(Math.max(0,Date.now()-new Date(data||0).getTime())/1000);
+    if(s<15)return "agora";if(s<60)return "há "+s+" segundos";
+    const m=Math.floor(s/60);if(m<60)return "há "+m+" minuto"+(m===1?"":"s");
+    const h=Math.floor(m/60);if(h<24)return "há "+h+" hora"+(h===1?"":"s");
+    const d=Math.floor(h/24);return "há "+d+" dia"+(d===1?"":"s");
+}
+async function carregarPresencasV56(forcar=false){
+    const area=document.getElementById("presencaLista"),msg=document.getElementById("presencaMensagem");if(!area)return;
+    if(forcar)area.innerHTML="<div class='presenca-vazio'>Atualizando presença dos usuários...</div>";
+    try{
+        const {data,error}=await obterSupabaseClient().from(PRESENCA_V56_TABELA).select("user_id,nome,email,perfil,status,tela,contexto,last_seen,updated_at").order("last_seen",{ascending:false});
+        if(error)throw error;presencasListaV56=data||[];renderizarPresencasV56();if(msg)msg.innerHTML="";
+        const hora=document.getElementById("presencaUltimaAtualizacao");if(hora)hora.textContent="Atualizado às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"});
+    }catch(e){area.innerHTML="<div class='presenca-vazio'>Não foi possível carregar a presença.</div>";if(msg)msg.innerHTML="<span class='admin-status-erro'>"+escaparHTML(e?.message||String(e))+"</span>"}
+}
+function renderizarPresencasV56(){
+    const area=document.getElementById("presencaLista");if(!area)return;
+    const normalizar=typeof normalizarPesquisaGlobal==="function"?normalizarPesquisaGlobal:(v=>String(v||"").toUpperCase());
+    const q=normalizar(document.getElementById("presencaBusca")?.value||"");
+    const lista=presencasListaV56.map(x=>({...x,_status:classificarPresencaV56(x)})).filter(x=>!q||normalizar([x.nome,x.email,x.perfil,x.tela,x.contexto,x._status].join(" ")).includes(q)).sort((a,b)=>({online:0,ausente:1,offline:2}[a._status]-({online:0,ausente:1,offline:2}[b._status])||String(a.nome||a.email).localeCompare(String(b.nome||b.email),"pt-BR")));
+    const todos=presencasListaV56.map(classificarPresencaV56);
+    setIntel("presencaTotalOnline",todos.filter(x=>x==="online").length);setIntel("presencaTotalAusente",todos.filter(x=>x==="ausente").length);setIntel("presencaTotalOffline",todos.filter(x=>x==="offline").length);setIntel("presencaTotalUsuarios",todos.length);
+    if(!lista.length){area.innerHTML="<div class='presenca-vazio'>Nenhum usuário encontrado.</div>";return}
+    area.innerHTML=lista.map(x=>{
+        const nome=x.nome||x.email||"Usuário",iniciais=nome.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]).join("").toUpperCase();
+        const statusNome=x._status==="online"?"🟢 Online":x._status==="ausente"?"🟡 Ausente":"⚫ Offline";
+        return "<div class='presenca-item'><div class='presenca-avatar'>"+escaparHTML(iniciais||"U")+"</div><div class='presenca-identidade'><b>"+escaparHTML(nome)+"</b><p>"+escaparHTML([x.tela,x.contexto].filter(Boolean).join(" • ")||"Sem atividade informada")+"</p><small>"+escaparHTML(x.email||"")+" • "+escaparHTML((typeof nomePerfilUsuario==="function"?nomePerfilUsuario(x.perfil):x.perfil)||"")+" • última comunicação "+escaparHTML(tempoRelativoPresencaV56(x.last_seen))+"</small></div><div class='presenca-status "+x._status+"'>"+statusNome+"</div></div>"
+    }).join("");
+}
+function iniciarPainelPresencaV56(){clearInterval(presencaPainelTimerV56);presencaPainelTimerV56=setInterval(()=>{const tela=document.getElementById("telaAdminPresenca");if(tela&&getComputedStyle(tela).display!=="none")carregarPresencasV56(false)},30000)}
+["mousemove","mousedown","keydown","touchstart","scroll"].forEach(evt=>document.addEventListener(evt,marcarInteracaoPresencaV56,{passive:true}));
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)marcarInteracaoPresencaV56();enviarHeartbeatPresencaV56()});
+window.addEventListener("focus",()=>{marcarInteracaoPresencaV56();enviarHeartbeatPresencaV56()});
+document.addEventListener("click",()=>setTimeout(atualizarPresencaAgoraV56,800),true);
+document.addEventListener("DOMContentLoaded",iniciarPainelPresencaV56);
 </script>
 
 </body>
