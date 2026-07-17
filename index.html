@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V5.7.2 - CHAT FLUTUANTE ARRASTÁVEL
+   V5.7.5 - CHAT COM CONFIRMAÇÕES
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V5.7.2 - CHAT FLUTUANTE ARRASTÁVEL E REDIMENSIONÁVEL
+   V5.7.5 - CHAT COM CONFIRMAÇÕES E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -2630,6 +2630,88 @@ body.dark-mode .chat-arraste-dica{color:#b8cae0}
     .chat-arraste-dica{display:none}
 }
 
+
+/* =========================================================
+   V5.7.4 - ARRASTE E RPC CORRIGIDOS
+   ========================================================= */
+.chat-painel{
+    padding-top:24px;
+    resize:none!important;
+}
+.chat-painel-drag{
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(90deg,#e9f1fb,#f7f9fc);
+    border-bottom:1px solid #d7e0ea;
+    color:#53657a;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:.3px;
+    cursor:grab;
+    user-select:none;
+    touch-action:none;
+    z-index:5;
+}
+.chat-painel-drag:active{cursor:grabbing}
+.chat-resize-handle{
+    position:absolute;
+    right:0;
+    bottom:0;
+    width:24px;
+    height:24px;
+    cursor:nwse-resize;
+    z-index:10;
+    touch-action:none;
+}
+.chat-resize-handle::before{
+    content:"";
+    position:absolute;
+    right:5px;
+    bottom:5px;
+    width:11px;
+    height:11px;
+    border-right:3px solid #6f8094;
+    border-bottom:3px solid #6f8094;
+}
+.chat-botao{
+    touch-action:none!important;
+    user-select:none!important;
+}
+body.dark-mode .chat-painel-drag{
+    background:linear-gradient(90deg,#102b47,#0d223a);
+    color:#c6d7e9;
+    border-color:#244466;
+}
+@media(max-width:760px){
+    .chat-painel{padding-top:0}
+    .chat-painel-drag,.chat-resize-handle{display:none}
+}
+
+
+/* =========================================================
+   V5.7.5 - CONFIRMAÇÕES E ARRASTE DEFINITIVO
+   ========================================================= */
+.chat-confirmacao{
+    display:inline-block;
+    margin-left:4px;
+    font-size:11px;
+    font-weight:950;
+    letter-spacing:-3px;
+    color:#7a8797;
+    min-width:15px;
+}
+.chat-confirmacao.lida{color:#0084ff}
+.chat-wrap.chat-arrastando .chat-botao,
+.chat-painel.chat-arrastando .chat-painel-drag{cursor:grabbing!important}
+.chat-painel-drag{z-index:30!important}
+.chat-resize-handle{z-index:40!important}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -2708,6 +2790,8 @@ body.dark-mode .chat-arraste-dica{color:#b8cae0}
     </div>
 
     <div class="chat-painel" id="chatPainel">
+        <div class="chat-painel-drag" id="chatPainelDrag">⋮⋮ ARRASTE O CHAT POR AQUI ⋮⋮</div>
+        <div class="chat-resize-handle" id="chatResizeHandle" title="Redimensionar"></div>
         <aside class="chat-lateral">
             <div class="chat-lateral-topo">
                 <h3>💬 Conversas</h3>
@@ -2721,7 +2805,7 @@ body.dark-mode .chat-arraste-dica{color:#b8cae0}
 
         <section class="chat-conversa">
             <div class="chat-cabecalho" id="chatCabecalho">
-                <div class="chat-arraste-dica">Arraste por esta barra</div>
+
                 <button class="chat-voltar-mobile" onclick="voltarListaChatV57()">←</button>
                 <div class="chat-avatar" id="chatCabecalhoAvatar">U</div>
                 <div class="chat-cabecalho-info">
@@ -8727,18 +8811,20 @@ async function inicializarChatV57(){
         chatInicializadoV57=true;
         iniciarResumoRealtimeChatV57();
         clearInterval(chatPollingV57);
-        chatPollingV57=setInterval(()=>{
+        chatPollingV57=setInterval(async()=>{
+            await marcarMensagensEntreguesV575();
             carregarResumoChatV57();
             if(chatConversaAtualV57)carregarMensagensChatV57(false);
         },10000);
     }
+    await marcarMensagensEntreguesV575();
     await Promise.all([carregarUsuariosChatV57(),carregarResumoChatV57()]);
 }
 
 async function alternarChatV57(ev){
     ev?.stopPropagation();
-    if(typeof chatBotaoArrastadoV572!=="undefined"&&chatBotaoArrastadoV572){
-        chatBotaoArrastadoV572=false;
+    if(typeof chatBotaoFoiArrastadoV574!=="undefined"&&chatBotaoFoiArrastadoV574){
+        chatBotaoFoiArrastadoV574=false;
         return;
     }
     if(!exigirLogin())return;
@@ -8746,13 +8832,13 @@ async function alternarChatV57(ev){
     const abrir=!painel.classList.contains("aberto");
     if(abrir){
         painel.classList.add("aberto");
-        if(typeof restaurarPainelChatV572==="function")restaurarPainelChatV572();
+        if(typeof chatRestaurarPainelV574==="function")chatRestaurarPainelV574();
         await inicializarChatV57();
     }else fecharChatV57();
 }
 
 function fecharChatV57(){
-    if(typeof salvarPainelChatV572==="function")salvarPainelChatV572();
+    if(typeof chatSalvarPainelV574==="function")chatSalvarPainelV574();
     document.getElementById("chatPainel")?.classList.remove("aberto","conversa-aberta");
 }
 function voltarListaChatV57(){
@@ -8808,23 +8894,28 @@ async function abrirConversaChatV57(event,outroId){
     document.getElementById("chatMensagens").innerHTML="<div class='chat-carregando'>Abrindo conversa...</div>";
     renderizarUsuariosChatV57();
     try{
-        const {data,error}=await chatSbV57().rpc("obter_ou_criar_chat_privado",{p_outro_usuario:outroId});
+        const {data,error}=await chatSbV57().rpc("chat_abrir_privado_v574",{p_destinatario:String(outroId)});
         if(error)throw error;
-        chatConversaAtualV57=Array.isArray(data)?data[0]?.conversa_id:data?.conversa_id||data;
+        chatConversaAtualV57=typeof data==="string"?data:(Array.isArray(data)?data[0]?.chat_abrir_privado_v574:data?.chat_abrir_privado_v574||data?.conversa_id||data);
         if(!chatConversaAtualV57)throw new Error("Conversa não foi criada.");
         await carregarMensagensChatV57(true);
         assinarConversaRealtimeChatV57();
         await marcarConversaLidaV57();
         document.getElementById("chatTexto")?.focus();
     }catch(e){
-        document.getElementById("chatMensagens").innerHTML="<div class='chat-sem-usuarios'>"+chatEscV57(e?.message||e)+"</div>";
+        const detalhe=[e?.code,e?.message,e?.details,e?.hint].filter(Boolean).join(" — ")||JSON.stringify(e)||String(e);
+        console.error("Falha ao abrir conversa:",e);
+        chatConversaAtualV57=null;
+        document.getElementById("chatMensagens").innerHTML=
+            "<div class='chat-sem-usuarios'><b>Não foi possível abrir a conversa.</b><br>"+
+            chatEscV57(detalhe)+"<br><small>Execute o SQL de correção V5.7.3 no Supabase.</small></div>";
     }
 }
 
 async function carregarMensagensChatV57(rolarFim=true){
     if(!chatConversaAtualV57)return;
     try{
-        const {data,error}=await chatSbV57().rpc("listar_mensagens_chat",{
+        const {data,error}=await chatSbV57().rpc("listar_mensagens_chat_v575",{
             p_conversa_id:chatConversaAtualV57,
             p_limite:500
         });
@@ -8844,7 +8935,14 @@ function renderizarMensagensChatV57(rolarFim=true){
         diaAnterior=dia;
         const minha=m.remetente_id===usuarioLogado?.id;
         const texto=m.apagado?"Mensagem apagada":m.mensagem;
-        return separador+"<div class='chat-msg "+(minha?"minha":"outra")+"'><div class='chat-msg-balao'>"+chatEscV57(texto)+"</div><div class='chat-msg-meta'>"+chatDataHoraV57(m.created_at)+(m.editado?" • editada":"")+"</div></div>";
+        const confirmacao=minha
+            ? (m.read_at
+                ? "<span class='chat-confirmacao lida' title='Lida'>✓✓</span>"
+                : m.delivered_at
+                    ? "<span class='chat-confirmacao' title='Entregue'>✓✓</span>"
+                    : "<span class='chat-confirmacao' title='Enviada'>✓</span>")
+            : "";
+        return separador+"<div class='chat-msg "+(minha?"minha":"outra")+"'><div class='chat-msg-balao'>"+chatEscV57(texto)+"</div><div class='chat-msg-meta'>"+chatDataHoraV57(m.created_at)+(m.editado?" • editada":"")+confirmacao+"</div></div>";
     }).join("");
     if(rolarFim)requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight});
 }
@@ -8868,14 +8966,27 @@ async function enviarMensagemChatV57(){
         emitirDigitandoChatV57(false);
     }catch(e){
         campo.value=mensagem;
-        alert("Não foi possível enviar a mensagem: "+(e?.message||e));
+        const detalhe=[e?.code,e?.message,e?.details,e?.hint].filter(Boolean).join(" — ")||JSON.stringify(e)||String(e);
+        console.error("Falha ao enviar mensagem:",e);
+        alert("Não foi possível enviar a mensagem:\n"+detalhe);
     }finally{btn.disabled=false;campo.focus()}
+}
+
+
+async function marcarMensagensEntreguesV575(){
+    if(!usuarioLogado?.id)return;
+    try{
+        const {error}=await chatSbV57().rpc("marcar_mensagens_entregues_v575");
+        if(error)throw error;
+    }catch(e){
+        console.warn("Confirmação de entrega:",e?.message||e);
+    }
 }
 
 async function marcarConversaLidaV57(){
     if(!chatConversaAtualV57||!usuarioLogado?.id)return;
     try{
-        const {error}=await chatSbV57().rpc("marcar_chat_como_lido",{
+        const {error}=await chatSbV57().rpc("marcar_chat_lido_v575",{
             p_conversa_id:chatConversaAtualV57
         });
         if(error)throw error;
@@ -8903,7 +9014,9 @@ function assinarConversaRealtimeChatV57(){
     chatRealtimeV57=chatSbV57().channel("chat-conversa-"+chatConversaAtualV57)
         .on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_mensagens",filter:"conversa_id=eq."+chatConversaAtualV57},async payload=>{
             if(!chatMensagensV57.some(m=>m.id===payload.new.id)){chatMensagensV57.push(payload.new);renderizarMensagensChatV57(true)}
+            await marcarMensagensEntreguesV575();
             await marcarConversaLidaV57();
+            await carregarMensagensChatV57(true);
         })
         .subscribe();
 }
@@ -8942,134 +9055,151 @@ function limparChatAoSairV57(){
 
 <script>
 /* =========================================================
-   V5.7.2 - POSIÇÃO E TAMANHO DO CHAT
+   V5.7.4 - ARRASTE ROBUSTO E REDIMENSIONAMENTO MANUAL
    ========================================================= */
-const CHAT_V572_POS_BOTAO="erp_chat_botao_pos_v572";
-const CHAT_V572_POS_PAINEL="erp_chat_painel_pos_v572";
-const CHAT_V572_TAMANHO="erp_chat_tamanho_v572";
+const CHAT_V574_POS_BOTAO="erp_chat_botao_pos_v574";
+const CHAT_V574_POS_PAINEL="erp_chat_painel_pos_v574";
+const CHAT_V574_TAMANHO="erp_chat_tamanho_v574";
+let chatBotaoFoiArrastadoV574=false;
 
-function limitarV572(v,min,max){return Math.min(Math.max(v,min),max)}
+function chatLimitarV574(v,min,max){return Math.min(Math.max(v,min),Math.max(min,max))}
 
-function salvarPosicaoBotaoChatV572(){
-    const el=document.getElementById("chatWrap");
-    if(!el)return;
+function chatAplicarPosicaoV574(el,left,top){
     const r=el.getBoundingClientRect();
-    localStorage.setItem(CHAT_V572_POS_BOTAO,JSON.stringify({left:Math.round(r.left),top:Math.round(r.top)}));
+    el.style.setProperty("left",chatLimitarV574(left,6,window.innerWidth-r.width-6)+"px","important");
+    el.style.setProperty("top",chatLimitarV574(top,6,window.innerHeight-r.height-6)+"px","important");
+    el.style.setProperty("right","auto","important");
+    el.style.setProperty("bottom","auto","important");
 }
-function restaurarPosicaoBotaoChatV572(){
+
+function chatRestaurarBotaoV574(){
     const el=document.getElementById("chatWrap");
     if(!el||window.innerWidth<=760)return;
     try{
-        const p=JSON.parse(localStorage.getItem(CHAT_V572_POS_BOTAO)||"null");
-        if(!p)return;
-        const r=el.getBoundingClientRect();
-        el.style.left=limitarV572(Number(p.left)||0,8,window.innerWidth-r.width-8)+"px";
-        el.style.top=limitarV572(Number(p.top)||0,8,window.innerHeight-r.height-8)+"px";
-        el.style.right="auto";
-        el.style.bottom="auto";
+        const p=JSON.parse(localStorage.getItem(CHAT_V574_POS_BOTAO)||"null");
+        if(p)chatAplicarPosicaoV574(el,Number(p.left),Number(p.top));
     }catch(e){}
 }
-
-function salvarPainelChatV572(){
-    const el=document.getElementById("chatPainel");
-    if(!el||!el.classList.contains("aberto")||window.innerWidth<=760)return;
+function chatSalvarBotaoV574(){
+    const el=document.getElementById("chatWrap");if(!el)return;
     const r=el.getBoundingClientRect();
-    localStorage.setItem(CHAT_V572_POS_PAINEL,JSON.stringify({left:Math.round(r.left),top:Math.round(r.top)}));
-    localStorage.setItem(CHAT_V572_TAMANHO,JSON.stringify({width:Math.round(r.width),height:Math.round(r.height)}));
+    localStorage.setItem(CHAT_V574_POS_BOTAO,JSON.stringify({left:r.left,top:r.top}));
 }
-function restaurarPainelChatV572(){
+function chatRestaurarPainelV574(){
     const el=document.getElementById("chatPainel");
     if(!el||window.innerWidth<=760)return;
     try{
-        const tam=JSON.parse(localStorage.getItem(CHAT_V572_TAMANHO)||"null");
-        if(tam){
-            el.style.width=limitarV572(Number(tam.width)||760,360,window.innerWidth-20)+"px";
-            el.style.height=limitarV572(Number(tam.height)||650,260,window.innerHeight-20)+"px";
+        const t=JSON.parse(localStorage.getItem(CHAT_V574_TAMANHO)||"null");
+        if(t){
+            el.style.setProperty("width",chatLimitarV574(Number(t.width)||760,380,window.innerWidth-12)+"px","important");
+            el.style.setProperty("height",chatLimitarV574(Number(t.height)||650,300,window.innerHeight-12)+"px","important");
         }
-        const p=JSON.parse(localStorage.getItem(CHAT_V572_POS_PAINEL)||"null");
-        requestAnimationFrame(()=>{
-            const r=el.getBoundingClientRect();
-            if(p){
-                el.style.left=limitarV572(Number(p.left)||0,8,window.innerWidth-r.width-8)+"px";
-                el.style.top=limitarV572(Number(p.top)||0,8,window.innerHeight-r.height-8)+"px";
-                el.style.right="auto";
-                el.style.bottom="auto";
-            }
-        });
+        const p=JSON.parse(localStorage.getItem(CHAT_V574_POS_PAINEL)||"null");
+        if(p)requestAnimationFrame(()=>chatAplicarPosicaoV574(el,Number(p.left),Number(p.top)));
     }catch(e){}
 }
+function chatSalvarPainelV574(){
+    const el=document.getElementById("chatPainel");
+    if(!el||window.innerWidth<=760)return;
+    const r=el.getBoundingClientRect();
+    localStorage.setItem(CHAT_V574_POS_PAINEL,JSON.stringify({left:r.left,top:r.top}));
+    localStorage.setItem(CHAT_V574_TAMANHO,JSON.stringify({width:r.width,height:r.height}));
+}
 
-function tornarArrastavelV572(elemento,alca,aoFinal){
-    if(!elemento||!alca)return;
-    let ativo=false,dx=0,dy=0,movido=false;
-    alca.addEventListener("pointerdown",e=>{
+function chatAtivarArrasteV574(el,alca,aoMoverFim,marcarBotao=false){
+    if(!el||!alca)return;
+    let ativo=false,dx=0,dy=0,x0=0,y0=0;
+
+    const iniciar=(x,y,e)=>{
         if(window.innerWidth<=760)return;
-        if(e.target.closest("button,input,textarea,select,a"))return;
-        ativo=true;movido=false;
-        const r=elemento.getBoundingClientRect();
-        dx=e.clientX-r.left;dy=e.clientY-r.top;
-        elemento.style.left=r.left+"px";elemento.style.top=r.top+"px";
-        elemento.style.right="auto";elemento.style.bottom="auto";
-        alca.setPointerCapture?.(e.pointerId);
-        e.preventDefault();
-    });
-    alca.addEventListener("pointermove",e=>{
+        ativo=true;x0=x;y0=y;
+        const r=el.getBoundingClientRect();
+        dx=x-r.left;dy=y-r.top;
+        el.style.setProperty("left",r.left+"px","important");
+        el.style.setProperty("top",r.top+"px","important");
+        el.style.setProperty("right","auto","important");
+        el.style.setProperty("bottom","auto","important");
+        el.classList.add("chat-arrastando");
+        if(marcarBotao)chatBotaoFoiArrastadoV574=false;
+        e?.preventDefault();
+        e?.stopPropagation();
+    };
+    const mover=(x,y,e)=>{
         if(!ativo)return;
-        movido=true;
-        const r=elemento.getBoundingClientRect();
-        elemento.style.left=limitarV572(e.clientX-dx,8,window.innerWidth-r.width-8)+"px";
-        elemento.style.top=limitarV572(e.clientY-dy,8,window.innerHeight-r.height-8)+"px";
-        e.preventDefault();
-    });
-    const finalizar=e=>{
+        if(marcarBotao&&Math.hypot(x-x0,y-y0)>5)chatBotaoFoiArrastadoV574=true;
+        chatAplicarPosicaoV574(el,x-dx,y-dy);
+        e?.preventDefault();
+    };
+    const finalizar=()=>{
         if(!ativo)return;
         ativo=false;
-        try{alca.releasePointerCapture?.(e.pointerId)}catch(err){}
-        if(movido&&typeof aoFinal==="function")aoFinal();
+        el.classList.remove("chat-arrastando");
+        aoMoverFim?.();
     };
-    alca.addEventListener("pointerup",finalizar);
-    alca.addEventListener("pointercancel",finalizar);
+
+    alca.addEventListener("mousedown",e=>iniciar(e.clientX,e.clientY,e));
+    document.addEventListener("mousemove",e=>mover(e.clientX,e.clientY,e));
+    document.addEventListener("mouseup",finalizar);
+
+    alca.addEventListener("touchstart",e=>{
+        const t=e.touches[0];if(t)iniciar(t.clientX,t.clientY,e);
+    },{passive:false});
+    document.addEventListener("touchmove",e=>{
+        const t=e.touches[0];if(t)mover(t.clientX,t.clientY,e);
+    },{passive:false});
+    document.addEventListener("touchend",finalizar);
+}
+
+function chatAtivarResizeV574(){
+    const painel=document.getElementById("chatPainel");
+    const alca=document.getElementById("chatResizeHandle");
+    if(!painel||!alca)return;
+    let ativo=false,x0=0,y0=0,w0=0,h0=0;
+
+    const iniciar=(x,y,e)=>{
+        if(window.innerWidth<=760)return;
+        ativo=true;x0=x;y0=y;
+        const r=painel.getBoundingClientRect();w0=r.width;h0=r.height;
+        e?.preventDefault();e?.stopPropagation();
+    };
+    const mover=(x,y,e)=>{
+        if(!ativo)return;
+        const r=painel.getBoundingClientRect();
+        painel.style.setProperty("width",chatLimitarV574(w0+(x-x0),380,window.innerWidth-r.left-6)+"px","important");
+        painel.style.setProperty("height",chatLimitarV574(h0+(y-y0),300,window.innerHeight-r.top-6)+"px","important");
+        e?.preventDefault();
+    };
+    const fim=()=>{if(ativo){ativo=false;chatSalvarPainelV574()}};
+
+    alca.addEventListener("mousedown",e=>iniciar(e.clientX,e.clientY,e));
+    document.addEventListener("mousemove",e=>mover(e.clientX,e.clientY,e));
+    document.addEventListener("mouseup",fim);
+    alca.addEventListener("touchstart",e=>{const t=e.touches[0];if(t)iniciar(t.clientX,t.clientY,e)},{passive:false});
+    document.addEventListener("touchmove",e=>{const t=e.touches[0];if(t)mover(t.clientX,t.clientY,e)},{passive:false});
+    document.addEventListener("touchend",fim);
 }
 
 document.addEventListener("DOMContentLoaded",()=>{
     const wrap=document.getElementById("chatWrap");
     const botao=document.getElementById("chatBotao");
     const painel=document.getElementById("chatPainel");
-    const cabecalho=document.getElementById("chatCabecalho");
+    const barra=document.getElementById("chatPainelDrag");
 
-    restaurarPosicaoBotaoChatV572();
-    tornarArrastavelV572(wrap,botao,salvarPosicaoBotaoChatV572);
-    tornarArrastavelV572(painel,cabecalho,salvarPainelChatV572);
-
-    if(typeof ResizeObserver!=="undefined"&&painel){
-        let t=null;
-        new ResizeObserver(()=>{
-            clearTimeout(t);
-            t=setTimeout(salvarPainelChatV572,250);
-        }).observe(painel);
-    }
+    chatRestaurarBotaoV574();
+    chatAtivarArrasteV574(wrap,botao,chatSalvarBotaoV574,true);
+    chatAtivarArrasteV574(painel,barra,chatSalvarPainelV574,false);
+    chatAtivarResizeV574();
 });
 
 window.addEventListener("resize",()=>{
-    restaurarPosicaoBotaoChatV572();
-    const painel=document.getElementById("chatPainel");
-    if(painel?.classList.contains("aberto"))restaurarPainelChatV572();
+    chatRestaurarBotaoV574();
+    const p=document.getElementById("chatPainel");
+    if(p?.classList.contains("aberto"))chatRestaurarPainelV574();
 });
 </script>
 
 
-<script>
-let chatBotaoArrastadoV572=false;
-document.addEventListener("DOMContentLoaded",()=>{
-    const b=document.getElementById("chatBotao");
-    if(!b)return;
-    let x=0,y=0;
-    b.addEventListener("pointerdown",e=>{x=e.clientX;y=e.clientY;chatBotaoArrastadoV572=false});
-    b.addEventListener("pointermove",e=>{
-        if(Math.hypot(e.clientX-x,e.clientY-y)>6)chatBotaoArrastadoV572=true;
-    });
-});
-</script>
+
 
 </body>
 </html>
