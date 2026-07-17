@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V5.7.5 - CHAT COM CONFIRMAÇÕES
+   V5.8.1 - COMPATIBILIDADE COM CONTAS ANTIGAS
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V5.7.5 - CHAT COM CONFIRMAÇÕES E REDIMENSIONÁVEL
+   V5.8.1 - COMPATIBILIDADE COM CONTAS ANTIGAS E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -2712,6 +2712,72 @@ body.dark-mode .chat-painel-drag{
 .chat-painel-drag{z-index:30!important}
 .chat-resize-handle{z-index:40!important}
 
+
+/* =========================================================
+   V5.8.0 - SOLICITAÇÃO DE CONTA E APROVAÇÃO ADMINISTRATIVA
+   ========================================================= */
+.login-btn-secundario{
+    width:100%;height:50px;border:2px solid #0046b8;border-radius:12px;
+    background:#fff;color:#0046b8;font-size:17px;font-weight:900;
+    cursor:pointer;margin-top:10px
+}
+.login-btn-secundario:hover{background:#edf5ff}
+.cadastro-modal{
+    position:fixed;inset:0;z-index:10050;background:rgba(0,14,34,.72);
+    display:none;align-items:center;justify-content:center;padding:18px
+}
+.cadastro-modal.aberto{display:flex}
+.cadastro-card{
+    width:520px;max-width:96%;max-height:94vh;overflow:auto;background:#fff;
+    border-radius:22px;padding:28px;box-shadow:0 22px 70px rgba(0,0,0,.42);
+    border:2px solid #1ea5ff
+}
+.cadastro-topo{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:18px}
+.cadastro-topo h2{color:#001b3d;font-size:28px}
+.cadastro-topo p{color:#526174;font-weight:700;margin-top:5px}
+.cadastro-fechar{
+    border:0;background:#e9eef5;color:#001b3d;border-radius:999px;width:38px;height:38px;
+    cursor:pointer;font-size:22px;font-weight:900;flex:0 0 auto
+}
+.cadastro-acoes{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.cadastro-status{
+    border-radius:12px;padding:12px;margin-top:14px;font-weight:800;line-height:20px;display:none
+}
+.cadastro-status.ok{display:block;background:#e8f8ed;color:#08762b;border-left:5px solid #18a348}
+.cadastro-status.erro{display:block;background:#ffeded;color:#a80020;border-left:5px solid #c90025}
+.cadastro-status.info{display:block;background:#edf5ff;color:#0046b8;border-left:5px solid #1e86ff}
+.solicitacoes-box{
+    background:#f7fbff;border:2px solid #1e86ff;border-radius:16px;padding:20px;margin-bottom:24px
+}
+.solicitacoes-topo{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.solicitacoes-topo h3{color:#001b3d;font-size:23px}
+.solicitacoes-badge{
+    background:#d91032;color:#fff;border-radius:999px;padding:6px 12px;font-weight:900
+}
+.solicitacao-card{
+    background:#fff;border:1px solid #cdd8e5;border-radius:13px;padding:15px;margin-top:12px;
+    display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center
+}
+.solicitacao-dados strong{display:block;color:#001b3d;font-size:17px;margin-bottom:4px}
+.solicitacao-dados span{display:block;color:#526174;font-size:13px;line-height:20px}
+.solicitacao-acoes{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.btn-aprovar,.btn-negar{
+    border:0;border-radius:9px;padding:10px 13px;font-weight:900;cursor:pointer
+}
+.btn-aprovar{background:#138a38;color:#fff}.btn-negar{background:#bd1632;color:#fff}
+.solicitacoes-vazio{padding:18px;text-align:center;color:#607086;font-weight:800}
+body.dark-mode .login-btn-secundario{background:#0d223a;color:#75caff;border-color:#1ea5ff}
+body.dark-mode .cadastro-card,body.dark-mode .solicitacao-card{background:#0d223a;color:#eaf2ff}
+body.dark-mode .cadastro-topo h2,body.dark-mode .solicitacoes-topo h3,
+body.dark-mode .solicitacao-dados strong{color:#eaf2ff}
+body.dark-mode .cadastro-topo p,body.dark-mode .solicitacao-dados span{color:#b8cae0}
+body.dark-mode .solicitacoes-box{background:#102b49}
+@media(max-width:650px){
+    .cadastro-acoes{grid-template-columns:1fr}
+    .solicitacao-card{grid-template-columns:1fr}
+    .solicitacao-acoes{justify-content:flex-start}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -2738,11 +2804,54 @@ body.dark-mode .chat-painel-drag{
             <input id="loginSenha" type="password" autocomplete="current-password" placeholder="Digite sua senha" onkeydown="if(event.key==='Enter') fazerLogin()">
         </div>
         <button class="login-btn" onclick="fazerLogin()">Entrar no sistema</button>
+        <button class="login-btn-secundario" type="button" onclick="abrirCadastroV580()">Criar uma conta</button>
         <div id="loginMensagem" class="login-msg"></div>
         <div class="login-demo">
-            <b>Login real com Supabase Auth</b><br>
-            Use o e-mail e senha criados em <b>Authentication → Users</b>.<br>
-            O perfil é lido automaticamente da tabela <b>usuarios</b>.
+            <b>Acesso controlado pelo administrador</b><br>
+            Novos usuários podem solicitar uma conta. O acesso só será liberado depois da aprovação no painel administrativo.
+        </div>
+    </div>
+</div>
+
+
+
+<div class="cadastro-modal" id="cadastroModalV580" onclick="if(event.target===this)fecharCadastroV580()">
+    <div class="cadastro-card">
+        <div class="cadastro-topo">
+            <div>
+                <h2>Criar conta</h2>
+                <p>Preencha seus dados. O administrador analisará sua solicitação.</p>
+            </div>
+            <button class="cadastro-fechar" type="button" onclick="fecharCadastroV580()">×</button>
+        </div>
+
+        <div class="login-campo">
+            <label>Nome completo</label>
+            <input id="cadastroNomeV580" autocomplete="name" placeholder="Digite seu nome completo">
+        </div>
+        <div class="login-campo">
+            <label>Cargo ou setor</label>
+            <input id="cadastroCargoV580" placeholder="Ex.: Auxiliar de depósito">
+        </div>
+        <div class="login-campo">
+            <label>E-mail</label>
+            <input id="cadastroEmailV580" type="email" autocomplete="email" placeholder="Digite seu e-mail">
+        </div>
+        <div class="login-campo">
+            <label>Senha</label>
+            <input id="cadastroSenhaV580" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres">
+        </div>
+        <div class="login-campo">
+            <label>Confirmar senha</label>
+            <input id="cadastroSenha2V580" type="password" autocomplete="new-password" placeholder="Digite a senha novamente"
+                   onkeydown="if(event.key==='Enter') solicitarCadastroV580()">
+        </div>
+
+        <div id="cadastroMensagemV580" class="cadastro-status"></div>
+
+        <div class="cadastro-acoes">
+            <button class="login-btn-secundario" type="button" onclick="fecharCadastroV580()">Cancelar</button>
+            <button class="login-btn" id="cadastroEnviarV580" type="button" onclick="solicitarCadastroV580()">Enviar solicitação</button>
         </div>
     </div>
 </div>
@@ -3458,7 +3567,17 @@ body.dark-mode .chat-painel-drag{
     <div class="admin-painel">
         <h2>👤 Gerenciamento de Usuários</h2>
         <div class="admin-info">
-            Crie o acesso completo diretamente pelo ERP. O sistema cadastra a conta no <b>Supabase Authentication</b> e depois grava o perfil na tabela <b>usuarios</b>.
+            Gerencie usuários existentes e analise novas solicitações de acesso. Contas solicitadas pela tela de login só entram no sistema depois da aprovação de um administrador.
+        </div>
+
+        <div class="solicitacoes-box">
+            <div class="solicitacoes-topo">
+                <h3>🛡 Solicitações de criação de conta</h3>
+                <span class="solicitacoes-badge" id="solicitacoesBadgeV580">0 pendentes</span>
+            </div>
+            <div id="solicitacoesListaV580">
+                <div class="solicitacoes-vazio">Carregando solicitações...</div>
+            </div>
         </div>
         <div class="usuarios-toolbar">
             <input id="usuariosBusca" class="usuarios-busca" placeholder="Pesquisar por nome, cargo, perfil ou e-mail..." onkeyup="filtrarUsuariosAdmin()">
@@ -3735,6 +3854,15 @@ async function fazerLogin(){
             throw new Error("Perfil não encontrado na tabela usuarios.");
         }
 
+        if(usuarioLogado.status_aprovacao && usuarioLogado.status_aprovacao !== "aprovado"){
+            const situacao = usuarioLogado.status_aprovacao === "negado"
+                ? "Sua solicitação de conta foi negada pelo administrador."
+                : "Sua conta ainda está aguardando aprovação do administrador.";
+            await supabase.auth.signOut();
+            usuarioLogado = null;
+            throw new Error(situacao);
+        }
+
         if(usuarioLogado.ativo === false){
             await supabase.auth.signOut();
             usuarioLogado = null;
@@ -3777,7 +3905,7 @@ async function recuperarSessao(){
         const usuarioAuth = data?.session?.user;
         if(usuarioAuth){
             await carregarPerfilUsuario(usuarioAuth);
-            if(usuarioLogado && usuarioLogado.ativo !== false){
+            if(usuarioLogado && usuarioLogado.ativo !== false && (!usuarioLogado.status_aprovacao || usuarioLogado.status_aprovacao === "aprovado")){
                 atualizarUsuarioTopo();
                 aplicarPermissoesVisuais();
                 ocultarLogin();
@@ -3797,11 +3925,26 @@ async function recuperarSessao(){
 async function carregarPerfilUsuario(usuarioAuth){
     const supabase = obterSupabaseClient();
 
-    const { data, error } = await supabase
+    let data = null;
+    let error = null;
+
+    ({ data, error } = await supabase
         .from("usuarios")
-        .select("id,nome,cargo,perfil,ativo")
+        .select("id,nome,cargo,perfil,ativo,status_aprovacao")
         .eq("id", usuarioAuth.id)
-        .maybeSingle();
+        .maybeSingle());
+
+    // Compatibilidade com bancos antigos onde a coluna ainda não foi criada.
+    if(error && (
+        error.code === "42703" ||
+        String(error.message || "").includes("status_aprovacao")
+    )){
+        ({ data, error } = await supabase
+            .from("usuarios")
+            .select("id,nome,cargo,perfil,ativo")
+            .eq("id", usuarioAuth.id)
+            .maybeSingle());
+    }
 
     if(error) throw error;
 
@@ -3816,7 +3959,8 @@ async function carregarPerfilUsuario(usuarioAuth){
         nome: data.nome || usuarioAuth.email,
         cargo: data.cargo || "",
         perfil: data.perfil || "consulta",
-        ativo: data.ativo !== false
+        ativo: data.ativo !== false,
+        status_aprovacao: data.status_aprovacao || "aprovado"
     };
 }
 
@@ -5871,6 +6015,7 @@ async function carregarUsuariosAdmin(){
         if(error) throw error;
         usuariosAdminLista = data || [];
         renderizarUsuariosAdmin(usuariosAdminLista);
+        await carregarSolicitacoesCadastroV580();
         if(msg) msg.innerHTML = "<span class='admin-status-ok'>" + usuariosAdminLista.length + " usuário(s) carregado(s).</span>";
     }catch(e){
         if(msg) msg.innerHTML = "<span class='admin-status-erro'>Erro ao carregar usuários:</span> " + (e.message || e);
@@ -9200,6 +9345,161 @@ window.addEventListener("resize",()=>{
 
 
 
+
+
+
+<script>
+/* =========================================================
+   V5.8.0 - CADASTRO COM APROVAÇÃO DO ADMINISTRADOR
+   ========================================================= */
+let solicitacoesCadastroV580=[];
+
+function abrirCadastroV580(){
+    const modal=document.getElementById("cadastroModalV580");
+    const msg=document.getElementById("cadastroMensagemV580");
+    if(msg){msg.className="cadastro-status";msg.textContent=""}
+    modal?.classList.add("aberto");
+    setTimeout(()=>document.getElementById("cadastroNomeV580")?.focus(),80);
+}
+
+function fecharCadastroV580(){
+    document.getElementById("cadastroModalV580")?.classList.remove("aberto");
+}
+
+function mensagemCadastroV580(texto,tipo="info"){
+    const el=document.getElementById("cadastroMensagemV580");
+    if(!el)return;
+    el.className="cadastro-status "+tipo;
+    el.textContent=texto;
+}
+
+async function solicitarCadastroV580(){
+    const nome=(document.getElementById("cadastroNomeV580")?.value||"").trim();
+    const cargo=(document.getElementById("cadastroCargoV580")?.value||"").trim();
+    const email=(document.getElementById("cadastroEmailV580")?.value||"").trim().toLowerCase();
+    const senha=document.getElementById("cadastroSenhaV580")?.value||"";
+    const senha2=document.getElementById("cadastroSenha2V580")?.value||"";
+    const btn=document.getElementById("cadastroEnviarV580");
+
+    if(nome.length<3)return mensagemCadastroV580("Informe seu nome completo.","erro");
+    if(!email||!email.includes("@"))return mensagemCadastroV580("Informe um e-mail válido.","erro");
+    if(senha.length<6)return mensagemCadastroV580("A senha precisa ter pelo menos 6 caracteres.","erro");
+    if(senha!==senha2)return mensagemCadastroV580("As senhas não são iguais.","erro");
+
+    btn.disabled=true;
+    mensagemCadastroV580("Criando a solicitação...","info");
+
+    try{
+        const supabase=obterSupabaseClient();
+        const {data,error}=await supabase.auth.signUp({
+            email,
+            password:senha,
+            options:{
+                data:{
+                    nome:nome,
+                    cargo:cargo,
+                    origem_cadastro:"erp_login"
+                }
+            }
+        });
+        if(error)throw error;
+
+        if(data?.session){
+            await supabase.auth.signOut();
+        }
+
+        mensagemCadastroV580(
+            "Solicitação enviada. Aguarde a aprovação do administrador para entrar no sistema.",
+            "ok"
+        );
+
+        ["cadastroNomeV580","cadastroCargoV580","cadastroEmailV580","cadastroSenhaV580","cadastroSenha2V580"]
+            .forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+    }catch(e){
+        const detalhe=[e?.message,e?.details,e?.hint].filter(Boolean).join(" — ")||String(e);
+        mensagemCadastroV580("Não foi possível criar a solicitação: "+detalhe,"erro");
+    }finally{
+        btn.disabled=false;
+    }
+}
+
+function formatarSolicitacaoV580(data){
+    if(!data)return "-";
+    try{return new Date(data).toLocaleString("pt-BR")}catch(e){return String(data)}
+}
+
+async function carregarSolicitacoesCadastroV580(){
+    if(!temPermissao(["administrador"]))return;
+    const lista=document.getElementById("solicitacoesListaV580");
+    const badge=document.getElementById("solicitacoesBadgeV580");
+    if(lista)lista.innerHTML="<div class='solicitacoes-vazio'>Carregando solicitações...</div>";
+
+    try{
+        const {data,error}=await obterSupabaseClient().rpc("listar_solicitacoes_cadastro_v580");
+        if(error)throw error;
+        solicitacoesCadastroV580=Array.isArray(data)?data:[];
+        if(badge)badge.textContent=solicitacoesCadastroV580.length+" pendente"+(solicitacoesCadastroV580.length===1?"":"s");
+        renderizarSolicitacoesCadastroV580();
+    }catch(e){
+        if(lista)lista.innerHTML="<div class='solicitacoes-vazio'>Erro ao carregar: "+escaparHTML(e?.message||String(e))+"</div>";
+    }
+}
+
+function renderizarSolicitacoesCadastroV580(){
+    const lista=document.getElementById("solicitacoesListaV580");
+    if(!lista)return;
+    if(!solicitacoesCadastroV580.length){
+        lista.innerHTML="<div class='solicitacoes-vazio'>Nenhuma solicitação pendente.</div>";
+        return;
+    }
+
+    lista.innerHTML=solicitacoesCadastroV580.map(s=>`
+        <div class="solicitacao-card">
+            <div class="solicitacao-dados">
+                <strong>${escaparHTML(s.nome||"Sem nome")}</strong>
+                <span>📧 ${escaparHTML(s.email||"-")}</span>
+                <span>💼 ${escaparHTML(s.cargo||"Cargo não informado")}</span>
+                <span>🕒 Solicitado em ${escaparHTML(formatarSolicitacaoV580(s.criado_em))}</span>
+            </div>
+            <div class="solicitacao-acoes">
+                <button class="btn-aprovar" onclick="aprovarSolicitacaoV580('${escaparHTML(s.user_id)}')">✓ Aprovar</button>
+                <button class="btn-negar" onclick="negarSolicitacaoV580('${escaparHTML(s.user_id)}')">✕ Negar</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+async function aprovarSolicitacaoV580(userId){
+    if(!confirm("Aprovar esta conta e liberar o acesso ao sistema?"))return;
+    try{
+        const {error}=await obterSupabaseClient().rpc("aprovar_solicitacao_cadastro_v580",{
+            p_user_id:userId,
+            p_perfil:"consulta"
+        });
+        if(error)throw error;
+        alert("Conta aprovada com sucesso.");
+        await carregarUsuariosAdmin();
+    }catch(e){
+        alert("Erro ao aprovar: "+(e?.message||e));
+    }
+}
+
+async function negarSolicitacaoV580(userId){
+    const motivo=prompt("Motivo da negativa (opcional):","")??null;
+    if(motivo===null)return;
+    try{
+        const {error}=await obterSupabaseClient().rpc("negar_solicitacao_cadastro_v580",{
+            p_user_id:userId,
+            p_motivo:motivo
+        });
+        if(error)throw error;
+        alert("Solicitação negada.");
+        await carregarUsuariosAdmin();
+    }catch(e){
+        alert("Erro ao negar: "+(e?.message||e));
+    }
+}
+</script>
 
 </body>
 </html>
