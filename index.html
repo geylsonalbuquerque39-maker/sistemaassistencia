@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.3.9 - ENVIO DE O.S. NO CHAT
+   V6.4.2 - ABERTURA DO CARTÃO DE O.S. CORRIGIDA
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.3.9 - ENVIO DE O.S. NO CHAT E REDIMENSIONÁVEL
+   V6.4.2 - ABERTURA DO CARTÃO DE O.S. CORRIGIDA E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4261,6 +4261,108 @@ body.dark-mode .chat-os-ficha-v639{background:#081a2e}
     .chat-os-busca-v639 button{height:42px}
 }
 
+
+/* =========================================================
+   V6.4.0 - MENU +, O.S. CORRIGIDA E CONTATOS
+   ========================================================= */
+.chat-mais-wrap-v640{position:relative}
+.chat-mais-botao-v640{
+    font-size:28px!important;
+    line-height:30px;
+    font-weight:300;
+    transition:transform .18s ease,background .18s ease;
+}
+.chat-mais-wrap-v640:has(.chat-mais-menu-v640.aberto) .chat-mais-botao-v640{transform:rotate(45deg)}
+.chat-mais-menu-v640{
+    display:none;
+    position:absolute;
+    left:0;
+    bottom:48px;
+    z-index:2147483500;
+    width:190px;
+    padding:7px;
+    border:1px solid #ccd8e5;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 18px 48px rgba(0,0,0,.28);
+}
+.chat-mais-menu-v640.aberto{display:block}
+.chat-mais-menu-v640 button{
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    border:0;
+    border-radius:10px;
+    padding:10px 11px;
+    background:transparent;
+    color:#203247;
+    cursor:pointer;
+    text-align:left;
+}
+.chat-mais-menu-v640 button:hover{background:#edf6ff}
+.chat-mais-menu-v640 button span{
+    width:34px;height:34px;border-radius:10px;background:#e8f3ff;
+    display:flex;align-items:center;justify-content:center;font-size:17px
+}
+.chat-mais-menu-v640 button b{font-size:13px}
+.chat-os-resultado-v639{cursor:default}
+.chat-os-enviar-v640{
+    flex:0 0 auto;
+    border:0;
+    border-radius:9px;
+    padding:9px 12px;
+    background:#087cf0;
+    color:#fff;
+    font-size:12px;
+    font-weight:900;
+    cursor:pointer;
+}
+.chat-os-enviar-v640:hover{background:#0066cb;transform:translateY(-1px)}
+.chat-contato-resultado-v640{
+    display:flex;align-items:center;gap:12px;padding:11px;margin-bottom:8px;
+    border:1px solid #d6e0ec;border-radius:13px;background:#fff
+}
+.chat-contato-avatar-v640{
+    width:44px;height:44px;flex:0 0 44px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;overflow:hidden;
+    background:linear-gradient(135deg,#087cf0,#6e4cff);color:#fff;font-weight:900
+}
+.chat-contato-avatar-v640 img{width:100%;height:100%;object-fit:cover}
+.chat-contato-cartao-v640{
+    width:270px;max-width:100%;display:flex;align-items:center;gap:12px;
+    padding:13px;border-radius:13px;background:#fff;color:#203247;
+    box-shadow:0 2px 10px rgba(0,0,0,.13)
+}
+.chat-contato-cartao-info-v640{min-width:0;flex:1}
+.chat-contato-cartao-info-v640 small,
+.chat-contato-cartao-info-v640 b,
+.chat-contato-cartao-info-v640 em{display:block}
+.chat-contato-cartao-info-v640 small{font-size:9px;color:#087cf0;font-weight:900;letter-spacing:.7px}
+.chat-contato-cartao-info-v640 b{font-size:14px;margin-top:3px}
+.chat-contato-cartao-info-v640 em{font-size:11px;color:#738198;font-style:normal;margin-top:3px}
+body.dark-mode .chat-mais-menu-v640,
+body.dark-mode .chat-contato-resultado-v640,
+body.dark-mode .chat-contato-cartao-v640{
+    background:#102b49;color:#eaf2ff;border-color:#274865
+}
+body.dark-mode .chat-mais-menu-v640 button{color:#eaf2ff}
+body.dark-mode .chat-mais-menu-v640 button:hover{background:#183b5d}
+
+
+/* V6.4.2 - CARTÃO DE O.S. CLICÁVEL */
+.chat-os-cartao-v639{
+    pointer-events:auto!important;
+    cursor:pointer!important;
+    position:relative;
+    z-index:1;
+}
+.chat-os-cartao-v639:hover{
+    transform:translateY(-1px);
+    box-shadow:0 5px 16px rgba(0,0,0,.18);
+}
+.chat-os-cartao-v639:active{transform:scale(.99)}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -4463,9 +4565,17 @@ body.dark-mode .chat-os-ficha-v639{background:#081a2e}
                 <div class="chat-upload-progresso" id="chatUploadProgressoV600"></div>
                 <div class="chat-compositor-linha">
                     <div class="chat-tools">
+                        <div class="chat-mais-wrap-v640">
+                            <button class="chat-ferramenta chat-mais-botao-v640" type="button"
+                                    onclick="alternarMenuMaisChatV640(event)" title="Adicionar">＋</button>
+                            <div class="chat-mais-menu-v640" id="chatMaisMenuV640" onclick="event.stopPropagation()">
+                                <button type="button" onclick="selecionarOpcaoMaisChatV640('arquivo')"><span>📎</span><b>Arquivo</b></button>
+                                <button type="button" onclick="selecionarOpcaoMaisChatV640('foto')"><span>🖼️</span><b>Foto</b></button>
+                                <button type="button" onclick="selecionarOpcaoMaisChatV640('contato')"><span>👤</span><b>Contato</b></button>
+                                <button type="button" onclick="selecionarOpcaoMaisChatV640('os')"><span>📄</span><b>O.S.</b></button>
+                            </div>
+                        </div>
                         <button class="chat-ferramenta" type="button" onclick="alternarEmojiV600(event)" title="Emojis">😀</button>
-                        <button class="chat-ferramenta chat-os-botao-v639" type="button" onclick="abrirSeletorOSChatV639()" title="Enviar Ordem de Serviço">📄</button>
-                        <button class="chat-ferramenta" type="button" onclick="document.getElementById('chatArquivoV600').click()" title="Anexar arquivo">📎</button>
                         <button class="chat-ferramenta" type="button" id="chatAudioBtnV600" onclick="alternarGravacaoAudioV600()" title="Gravar áudio">🎤</button>
                     </div>
                     <textarea id="chatTexto" maxlength="4000" rows="1" placeholder="Digite uma mensagem..."
@@ -4473,6 +4583,7 @@ body.dark-mode .chat-os-ficha-v639{background:#081a2e}
                     <button class="chat-enviar" id="chatEnviar" onclick="enviarMensagemChatV57()" title="Enviar">➤</button>
                 </div>
                 <input type="file" id="chatArquivoV600" hidden multiple onchange="enviarArquivosChatV600(this.files)">
+                <input type="file" id="chatFotoV640" hidden multiple accept="image/*" onchange="enviarArquivosChatV600(this.files)">
                 <div class="chat-emoji-painel" id="chatEmojiPainelV600">
                     <input class="chat-emoji-busca" id="chatEmojiBuscaV600" placeholder="Pesquisar emoji..." oninput="renderizarEmojisV600()">
                     <div class="chat-emoji-grade" id="chatEmojiGradeV600"></div>
@@ -4481,6 +4592,26 @@ body.dark-mode .chat-os-ficha-v639{background:#081a2e}
         </section>
     </div>
 
+
+
+    <!-- V6.4.0 - SELETOR DE CONTATO DO CHAT -->
+    <div class="chat-os-overlay-v639" id="chatContatoOverlayV640" onclick="fecharSeletorContatoChatV640(event)">
+        <div class="chat-os-modal-v639 chat-contato-modal-v640" onclick="event.stopPropagation()">
+            <div class="chat-os-topo-v639">
+                <div>
+                    <h3>👤 Enviar contato</h3>
+                    <p>Escolha um usuário do ERP para compartilhar nesta conversa.</p>
+                </div>
+                <button type="button" onclick="fecharSeletorContatoChatV640()" title="Fechar">✕</button>
+            </div>
+            <div class="chat-os-busca-v639">
+                <input id="chatContatoBuscaV640" placeholder="Pesquisar usuário..."
+                       oninput="renderizarContatosChatV640()"
+                       onkeydown="if(event.key==='Escape')fecharSeletorContatoChatV640()">
+            </div>
+            <div class="chat-os-resultados-v639" id="chatContatoResultadosV640"></div>
+        </div>
+    </div>
 
     <!-- V6.3.9 - SELETOR DE O.S. DO CHAT -->
     <div class="chat-os-overlay-v639" id="chatOSSeletorOverlayV639" onclick="fecharSeletorOSChatV639(event)">
@@ -10613,9 +10744,18 @@ document.addEventListener("pointerdown",e=>{
     const wrap=document.getElementById("chatWrap");
     const chamada=document.getElementById("chamadaOverlayV630");
     const chamadaRecebida=document.getElementById("chamadaRecebidaV630");
+    const seletorOS=document.getElementById("chatOSSeletorOverlayV639");
+    const visualizadorOS=document.getElementById("chatOSVisualizadorOverlayV639");
+    const seletorContato=document.getElementById("chatContatoOverlayV640");
 
-    // Cliques nos controles da ligação não devem fechar o chat que está atrás.
-    if(chamada?.contains(e.target)||chamadaRecebida?.contains(e.target))return;
+    // Sobreposições pertencentes ao chat não podem fechar a conversa que está atrás.
+    if(
+        chamada?.contains(e.target)||
+        chamadaRecebida?.contains(e.target)||
+        seletorOS?.contains(e.target)||
+        visualizadorOS?.contains(e.target)||
+        seletorContato?.contains(e.target)
+    )return;
 
     if(painel?.classList.contains("aberto")&&!painel.contains(e.target)&&!wrap?.contains(e.target)){
         fecharChatV57();
@@ -10775,7 +10915,8 @@ function renderizarMensagensChatV57(rolarFim=true){
         const anexos=renderizarAnexosChatV600(m.anexos);
         const registroChamada=renderizarRegistroChamadaV633(m);
         const registroOS=renderizarRegistroOSChatV639(m);
-        const corpo=m.apagado?"<i>Mensagem apagada</i>":(registroChamada||registroOS||chatEscV57(m.mensagem||"")+anexos);
+        const registroContato=renderizarRegistroContatoChatV640(m);
+        const corpo=m.apagado?"<i>Mensagem apagada</i>":(registroChamada||registroOS||registroContato||chatEscV57(m.mensagem||"")+anexos);
         const reacoes=renderizarReacoesChatV600(m.reacoes,m.id);
         return separador+`<div class="chat-msg ${minha?"minha":"outra"}" data-id="${m.id}" oncontextmenu="abrirMenuMensagemV600(event,'${m.id}')">
           <div class="chat-msg-acoes">
@@ -10820,7 +10961,154 @@ async function enviarMensagemChatV57(){
 
 
 
+
+const CHAT_CONTATO_PREFIXO_V640="[[CONTATO_CHAT_V640]]";
+
+function alternarMenuMaisChatV640(event){
+    event?.preventDefault();
+    event?.stopPropagation();
+    const menu=document.getElementById("chatMaisMenuV640");
+    if(!menu)return;
+    menu.classList.toggle("aberto");
+    document.getElementById("chatEmojiPainelV600")?.classList.remove("aberto");
+}
+
+function fecharMenuMaisChatV640(){
+    document.getElementById("chatMaisMenuV640")?.classList.remove("aberto");
+}
+
+function selecionarOpcaoMaisChatV640(tipo){
+    fecharMenuMaisChatV640();
+
+    if(!chatConversaAtualV57){
+        alert("Selecione uma conversa primeiro.");
+        return;
+    }
+
+    if(tipo==="arquivo"){
+        document.getElementById("chatArquivoV600")?.click();
+    }else if(tipo==="foto"){
+        document.getElementById("chatFotoV640")?.click();
+    }else if(tipo==="contato"){
+        abrirSeletorContatoChatV640();
+    }else if(tipo==="os"){
+        abrirSeletorOSChatV639();
+    }
+}
+
+function abrirSeletorContatoChatV640(){
+    const overlay=document.getElementById("chatContatoOverlayV640");
+    const busca=document.getElementById("chatContatoBuscaV640");
+    overlay?.classList.add("aberto");
+    overlay?.setAttribute("aria-hidden","false");
+    if(busca)busca.value="";
+    renderizarContatosChatV640();
+    setTimeout(()=>busca?.focus(),60);
+}
+
+function fecharSeletorContatoChatV640(event){
+    if(event&&event.target!==event.currentTarget)return;
+    document.getElementById("chatContatoOverlayV640")?.classList.remove("aberto");
+}
+
+function renderizarContatosChatV640(){
+    const area=document.getElementById("chatContatoResultadosV640");
+    if(!area)return;
+
+    const termo=normalizarTextoOSV639(document.getElementById("chatContatoBuscaV640")?.value);
+    const usuarios=(chatUsuariosV57||[]).filter(u=>{
+        const texto=normalizarTextoOSV639([u.nome,u.cargo,u.perfil,u.email].join(" "));
+        return !termo||texto.includes(termo);
+    });
+
+    if(!usuarios.length){
+        area.innerHTML="<div class='chat-os-vazio-v639'>Nenhum contato encontrado.</div>";
+        return;
+    }
+
+    area.innerHTML=usuarios.map((u,indice)=>{
+        const original=(chatUsuariosV57||[]).indexOf(u);
+        const inicial=chatEscV57(String(u.nome||"U").trim().charAt(0).toUpperCase());
+        const avatar=u.avatar_url
+            ?`<img src="${chatEscV57(u.avatar_url)}" alt="">`
+            :inicial;
+        return `<div class="chat-contato-resultado-v640">
+            <span class="chat-contato-avatar-v640">${avatar}</span>
+            <span class="chat-os-resultado-info-v639">
+                <b>${chatEscV57(u.nome||"Usuário")}</b>
+                <small>${chatEscV57(u.cargo||u.perfil||"Usuário do ERP")}</small>
+            </span>
+            <button type="button" class="chat-os-enviar-v640"
+                    onclick="enviarContatoChatV640(${original})">Enviar</button>
+        </div>`;
+    }).join("");
+}
+
+async function enviarContatoChatV640(indice){
+    const usuario=(chatUsuariosV57||[])[Number(indice)];
+    if(!usuario||!chatConversaAtualV57)return;
+
+    const contato={
+        id:usuario.id||null,
+        nome:usuario.nome||"Usuário",
+        cargo:usuario.cargo||"",
+        perfil:usuario.perfil||"",
+        avatar_url:usuario.avatar_url||""
+    };
+
+    const mensagem=CHAT_CONTATO_PREFIXO_V640+JSON.stringify(contato);
+
+    try{
+        const {data,error}=await chatSbV57().rpc("enviar_mensagem_chat_v600",{
+            p_conversa_id:chatConversaAtualV57,
+            p_mensagem:mensagem,
+            p_resposta_id:chatRespostaAtualV600?.id||null,
+            p_anexos:[]
+        });
+        if(error)throw error;
+        if(!data)throw new Error("O servidor não confirmou o envio.");
+        fecharSeletorContatoChatV640();
+        cancelarRespostaChatV600();
+        await carregarMensagensChatV57(true);
+    }catch(e){
+        alert("Não foi possível enviar o contato:\n"+(e?.message||e));
+    }
+}
+
+function renderizarRegistroContatoChatV640(m){
+    const mensagem=String(m?.mensagem||"");
+    if(!mensagem.startsWith(CHAT_CONTATO_PREFIXO_V640))return "";
+
+    try{
+        const contato=JSON.parse(mensagem.slice(CHAT_CONTATO_PREFIXO_V640.length));
+        const inicial=chatEscV57(String(contato.nome||"U").trim().charAt(0).toUpperCase());
+        const avatar=contato.avatar_url
+            ?`<img src="${chatEscV57(contato.avatar_url)}" alt="">`
+            :inicial;
+
+        return `<div class="chat-contato-cartao-v640">
+            <span class="chat-contato-avatar-v640">${avatar}</span>
+            <span class="chat-contato-cartao-info-v640">
+                <small>CONTATO DO ERP</small>
+                <b>${chatEscV57(contato.nome||"Usuário")}</b>
+                <em>${chatEscV57(contato.cargo||contato.perfil||"Usuário")}</em>
+            </span>
+        </div>`;
+    }catch(_){
+        return "";
+    }
+}
+
+document.addEventListener("pointerdown",event=>{
+    const menu=document.getElementById("chatMaisMenuV640");
+    const wrap=event.target.closest?.(".chat-mais-wrap-v640");
+    if(menu?.classList.contains("aberto")&&!wrap){
+        fecharMenuMaisChatV640();
+    }
+});
+
 const CHAT_OS_PREFIXO_V639="[[OS_CHAT_V639]]";
+const chatOSCartoesRenderizadosV642=new Map();
 let chatOSResultadosCacheV639=[];
 
 function normalizarTextoOSV639(valor){
@@ -10934,28 +11222,45 @@ function renderizarResultadosOSChatV639(lista){
         return;
     }
 
-    area.innerHTML=lista.map((item,indice)=>{
-        const dados=encodeURIComponent(JSON.stringify(item));
-        return `<button type="button" class="chat-os-resultado-v639" onclick="enviarOSChatV639('${dados}')">
+    area.innerHTML=lista.map(item=>{
+        const indice=chatOSResultadosCacheV639.indexOf(item);
+        return `<div class="chat-os-resultado-v639">
             <span class="chat-os-resultado-icone-v639">📄</span>
             <span class="chat-os-resultado-info-v639">
                 <b>O.S. ${chatEscV57(item.os||"-")}</b>
                 <small>${chatEscV57(item.produto||"Produto não informado")}</small>
                 <em>${chatEscV57(item.status||"Status não informado")} • ${chatEscV57(item.loja||"Loja não informada")}</em>
             </span>
-            <span class="chat-os-resultado-enviar-v639">Enviar</span>
-        </button>`;
+            <button type="button" class="chat-os-enviar-v640"
+                    onclick="event.stopPropagation();enviarOSChatV640PorIndice(${indice})">Enviar</button>
+        </div>`;
     }).join("");
 }
 
-async function enviarOSChatV639(dadosCodificados){
+function enviarOSChatV640PorIndice(indice){
+    const item=chatOSResultadosCacheV639[Number(indice)];
+    if(!item){
+        alert("A O.S. selecionada não está mais disponível. Faça a pesquisa novamente.");
+        return;
+    }
+    enviarOSChatV639(item);
+}
+
+async function enviarOSChatV639(itemOuDados){
     if(!chatConversaAtualV57||!usuarioLogado?.id)return;
 
-    let item;
-    try{
-        item=JSON.parse(decodeURIComponent(dadosCodificados));
-    }catch(e){
-        alert("Não foi possível ler os dados desta O.S.");
+    let item=itemOuDados;
+    if(typeof itemOuDados==="string"){
+        try{
+            item=JSON.parse(decodeURIComponent(itemOuDados));
+        }catch(e){
+            alert("Não foi possível ler os dados desta O.S.");
+            return;
+        }
+    }
+
+    if(!item?.os){
+        alert("A O.S. selecionada não possui número válido.");
         return;
     }
 
@@ -10979,7 +11284,18 @@ async function enviarOSChatV639(dadosCodificados){
         if(!data)throw new Error("O servidor não confirmou o envio.");
 
         cancelarRespostaChatV600();
+
+        const painelChat=document.getElementById("chatPainel");
+        const conversaContinuavaAberta=!!painelChat?.classList.contains("aberto");
+        const conversaSelecionada=chatConversaAtualV57;
+
         fecharSeletorOSChatV639();
+
+        if(conversaContinuavaAberta&&painelChat){
+            painelChat.classList.add("aberto");
+            if(conversaSelecionada)painelChat.classList.add("conversa-aberta");
+        }
+
         await carregarMensagensChatV57(true);
     }catch(e){
         const detalhe=[e?.code,e?.message,e?.details,e?.hint].filter(Boolean).join(" — ")||String(e);
@@ -11003,8 +11319,12 @@ function renderizarRegistroOSChatV639(m){
     const item=extrairRegistroOSChatV639(m);
     if(!item)return "";
 
-    const dados=encodeURIComponent(JSON.stringify(item));
-    return `<button type="button" class="chat-os-cartao-v639" onclick="event.stopPropagation();abrirVisualizadorOSChatV639('${dados}')">
+    const chave=String(m?.id||("os-"+item.os+"-"+Math.random().toString(36).slice(2)));
+    chatOSCartoesRenderizadosV642.set(chave,item);
+
+    return `<button type="button" class="chat-os-cartao-v639"
+                    data-os-chave-v642="${escaparAtributoOSV639(chave)}"
+                    onclick="event.stopPropagation();abrirVisualizadorOSChatV642PorChave(this.dataset.osChaveV642)">
         <span class="chat-os-cartao-cab-v639">
             <span class="chat-os-cartao-icone-v639">📄</span>
             <span>
@@ -11019,11 +11339,28 @@ function renderizarRegistroOSChatV639(m){
     </button>`;
 }
 
-function abrirVisualizadorOSChatV639(dadosCodificados){
-    let item;
-    try{
-        item=JSON.parse(decodeURIComponent(dadosCodificados));
-    }catch(e){
+function abrirVisualizadorOSChatV642PorChave(chave){
+    const item=chatOSCartoesRenderizadosV642.get(String(chave||""));
+    if(!item){
+        alert("Não foi possível localizar os dados desta O.S. no chat.");
+        return;
+    }
+    abrirVisualizadorOSChatV639(item);
+}
+
+function abrirVisualizadorOSChatV639(itemOuDados){
+    let item=itemOuDados;
+
+    if(typeof itemOuDados==="string"){
+        try{
+            item=JSON.parse(decodeURIComponent(itemOuDados));
+        }catch(e){
+            alert("Os dados desta O.S. não puderam ser abertos.");
+            return;
+        }
+    }
+
+    if(!item||typeof item!=="object"){
         alert("Os dados desta O.S. não puderam ser abertos.");
         return;
     }
@@ -11068,6 +11405,7 @@ function abrirVisualizadorOSChatV639(dadosCodificados){
     if(overlay){
         overlay.classList.add("aberto");
         overlay.setAttribute("aria-hidden","false");
+        overlay.style.display="flex";
     }
 }
 
@@ -11076,6 +11414,7 @@ function fecharVisualizadorOSChatV639(event){
     const overlay=document.getElementById("chatOSVisualizadorOverlayV639");
     overlay?.classList.remove("aberto");
     overlay?.setAttribute("aria-hidden","true");
+    if(overlay)overlay.style.display="none";
 }
 
 document.addEventListener("keydown",event=>{
@@ -11088,7 +11427,13 @@ document.addEventListener("keydown",event=>{
     }
     if(seletor?.classList.contains("aberto")){
         fecharSeletorOSChatV639();
+        return;
     }
+    if(document.getElementById("chatContatoOverlayV640")?.classList.contains("aberto")){
+        fecharSeletorContatoChatV640();
+        return;
+    }
+    fecharMenuMaisChatV640();
 });
 
 
