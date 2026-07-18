@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.3.1 - ENCERRAMENTO DE CHAMADA CORRIGIDO
+   V6.3.8 - HISTÓRICO VISUAL E TOQUE DE CHAMADA
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.3.1 - ENCERRAMENTO DE CHAMADA CORRIGIDO E REDIMENSIONÁVEL
+   V6.3.8 - HISTÓRICO VISUAL E TOQUE DE CHAMADA E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -3956,6 +3956,189 @@ aside{
     pointer-events:none!important;
 }
 
+
+/* =========================================================
+   V6.3.3 - REGISTRO DE CHAMADAS NO CHAT
+   ========================================================= */
+.chat-registro-chamada-v633{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    min-width:230px;
+    padding:6px 2px;
+}
+.chat-registro-icone-v633{
+    width:40px;
+    height:40px;
+    flex:0 0 40px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(8,125,240,.14);
+    font-size:19px;
+}
+.chat-registro-info-v633{
+    min-width:0;
+    flex:1;
+}
+.chat-registro-info-v633 b,
+.chat-registro-info-v633 span{
+    display:block;
+}
+.chat-registro-info-v633 b{
+    font-size:13px;
+}
+.chat-registro-info-v633 span{
+    margin-top:3px;
+    font-size:11px;
+    opacity:.72;
+}
+.chat-registro-chamada-v633>button{
+    width:34px;
+    height:34px;
+    border:0;
+    border-radius:50%;
+    background:rgba(8,125,240,.15);
+    cursor:pointer;
+}
+.chat-registro-chamada-v633>button:hover{
+    background:rgba(8,125,240,.27);
+}
+
+
+/* =========================================================
+   V6.3.5 - REMOÇÃO DO PAINEL FANTASMA
+   ========================================================= */
+#chamadaOverlayV630:not(.aberta),
+#chamadaRecebidaV630:not(.aberta){
+    pointer-events:none!important;
+}
+#chamadaOverlayV630:not(.aberta){
+    display:none!important;
+}
+#chamadaRecebidaV630:not(.aberta){
+    display:none!important;
+}
+
+
+/* =========================================================
+   V6.3.6 - CHAT DO PERFIL SEM TELA TRAVADA
+   ========================================================= */
+#chatWrap{
+    pointer-events:none;
+}
+#chatWrap #chatBotao,
+#chatWrap .chat-botao{
+    pointer-events:auto;
+}
+#chatPainel:not(.aberto){
+    pointer-events:none!important;
+}
+#chatPainel.aberto{
+    pointer-events:auto!important;
+}
+
+
+/* V6.3.7 */
+.chat-topo-titulo-v637{display:flex;align-items:center;justify-content:space-between}
+.chat-fechar-lista-v637{
+border:0;border-radius:8px;padding:6px 10px;cursor:pointer;
+background:rgba(255,255,255,.08);color:#fff;font-weight:700}
+.chat-fechar-lista-v637:hover{background:rgba(255,255,255,.16)}
+
+
+/* =========================================================
+   V6.3.8 - HISTÓRICO VISUAL E TOQUE DE CHAMADA
+   ========================================================= */
+.chat-registro-chamada-v638{
+    display:flex;
+    align-items:center;
+    gap:11px;
+    min-width:250px;
+    padding:7px 2px;
+}
+.chat-registro-icone-v638{
+    width:42px;
+    height:42px;
+    flex:0 0 42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    background:rgba(8,125,240,.14);
+    font-size:19px;
+}
+.chat-registro-info-v638{
+    flex:1;
+    min-width:0;
+}
+.chat-registro-info-v638 b,
+.chat-registro-info-v638 span{
+    display:block;
+}
+.chat-registro-info-v638 b{
+    font-size:13px;
+    line-height:1.25;
+}
+.chat-registro-info-v638 span{
+    margin-top:4px;
+    font-size:11px;
+    opacity:.72;
+}
+.chat-registro-chamada-v638.perdida .chat-registro-icone-v638,
+.chat-registro-chamada-v638.recusada .chat-registro-icone-v638{
+    background:rgba(226,55,75,.14);
+}
+.chat-registro-chamada-v638.perdida b,
+.chat-registro-chamada-v638.recusada b{
+    color:#d52f47;
+}
+.chat-registro-chamada-v638.cancelada .chat-registro-icone-v638{
+    background:rgba(120,130,145,.14);
+}
+.chat-registro-chamada-v638>button{
+    width:35px;
+    height:35px;
+    border:0;
+    border-radius:50%;
+    background:rgba(8,125,240,.15);
+    cursor:pointer;
+    transition:.18s ease;
+}
+.chat-registro-chamada-v638>button:hover{
+    transform:scale(1.06);
+    background:rgba(8,125,240,.28);
+}
+.chamada-recebida-status-v638{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:13px;
+    padding:9px 10px;
+    border-radius:10px;
+    background:#f2f6fb;
+    color:#526378;
+    font-size:12px;
+}
+.chamada-recebida-status-v638 button{
+    border:0;
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    cursor:pointer;
+    background:#e5edf7;
+    font-size:16px;
+}
+.chamada-recebida-v630.aberta{
+    animation:entradaChamadaV630 .25s ease, pulsarChamadaV638 1.7s ease-in-out infinite;
+}
+@keyframes pulsarChamadaV638{
+    0%,100%{box-shadow:0 18px 60px rgba(0,0,0,.35)}
+    50%{box-shadow:0 18px 70px rgba(14,126,232,.42)}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -4103,7 +4286,7 @@ aside{
         <div class="chat-resize-handle" id="chatResizeHandle" title="Redimensionar"></div>
         <aside class="chat-lateral">
             <div class="chat-lateral-topo">
-                <h3>💬 Conversas</h3>
+                <div class="chat-topo-titulo-v637"><h3>💬 Conversas</h3><button class="chat-fechar-lista-v637" onclick="fecharChatV57()" title="Fechar">✕</button></div>
                 <p>Converse diretamente com os usuários do ERP.</p>
                 <input class="chat-busca" id="chatBuscaUsuario" placeholder="Pesquisar usuário..." oninput="renderizarUsuariosChatV57()">
             </div>
@@ -10246,14 +10429,39 @@ function fecharChatV57(){
     descartarAudioPreviaV603();
 
     if(typeof chatSalvarPainelV574==="function")chatSalvarPainelV574();
-    document.getElementById("chatPainel")?.classList.remove("aberto","conversa-aberta");
+
+    const painel=document.getElementById("chatPainel");
+    if(painel){
+        painel.classList.remove("aberto","conversa-aberta");
+        painel.style.removeProperty("display");
+        painel.style.removeProperty("visibility");
+        painel.style.removeProperty("pointer-events");
+        painel.style.removeProperty("opacity");
+    }
+
+    const wrap=document.getElementById("chatWrap");
+    if(wrap){
+        wrap.classList.remove("aberto");
+        wrap.style.removeProperty("display");
+        wrap.style.removeProperty("visibility");
+        wrap.style.removeProperty("pointer-events");
+    }
 }
 function voltarListaChatV57(){
     document.getElementById("chatPainel")?.classList.remove("conversa-aberta");
 }
 document.addEventListener("pointerdown",e=>{
-    const painel=document.getElementById("chatPainel"),wrap=document.getElementById("chatWrap");
-    if(painel?.classList.contains("aberto")&&!painel.contains(e.target)&&!wrap?.contains(e.target))fecharChatV57();
+    const painel=document.getElementById("chatPainel");
+    const wrap=document.getElementById("chatWrap");
+    const chamada=document.getElementById("chamadaOverlayV630");
+    const chamadaRecebida=document.getElementById("chamadaRecebidaV630");
+
+    // Cliques nos controles da ligação não devem fechar o chat que está atrás.
+    if(chamada?.contains(e.target)||chamadaRecebida?.contains(e.target))return;
+
+    if(painel?.classList.contains("aberto")&&!painel.contains(e.target)&&!wrap?.contains(e.target)){
+        fecharChatV57();
+    }
 });
 
 async function carregarUsuariosChatV57(){
@@ -10333,6 +10541,69 @@ async function carregarMensagensChatV57(rolarFim=true){
     }catch(e){console.warn("Chat mensagens:",e)}
 }
 
+function renderizarRegistroChamadaV633(m){
+ const prefixo="[[CHAMADA_V633]]";
+ const mensagem=String(m?.mensagem||"");
+ if(!mensagem.startsWith(prefixo))return "";
+
+ try{
+   const dados=JSON.parse(mensagem.slice(prefixo.length));
+   const video=dados.tipo==="video";
+   const fuiEu=String(dados.remetente_id||"")===String(usuarioLogado?.id||"");
+   const hora=chatDataHoraV57(m.created_at);
+   let titulo="";
+   let detalhe="";
+   let classe="normal";
+   let seta=fuiEu?"↗":"↙";
+   let icone=video?"🎥":"📞";
+
+   if(dados.resultado==="concluida"){
+     titulo=video
+       ?(fuiEu?"Chamada de vídeo efetuada":"Chamada de vídeo recebida")
+       :(fuiEu?"Chamada de áudio efetuada":"Chamada de áudio recebida");
+     detalhe=`${seta} ${hora} • ${formatarDuracaoChamadaV633(Number(dados.duracao_segundos||0))}`;
+     classe="concluida";
+   }else if(dados.resultado==="recusada"){
+     titulo=video?"Chamada de vídeo recusada":"Chamada de áudio recusada";
+     detalhe=fuiEu
+       ?`${seta} ${hora} • A pessoa recusou`
+       :`${seta} ${hora} • Você recusou`;
+     classe="recusada";
+   }else if(dados.resultado==="perdida"){
+     titulo=video?"Chamada de vídeo perdida":"Chamada de áudio perdida";
+     detalhe=fuiEu
+       ?`${seta} ${hora} • Não atendida`
+       :`${seta} ${hora} • Você não atendeu`;
+     classe="perdida";
+   }else{
+     titulo=video?"Chamada de vídeo cancelada":"Chamada de áudio cancelada";
+     detalhe=`${seta} ${hora} • Chamada cancelada`;
+     classe="cancelada";
+   }
+
+   return `<div class="chat-registro-chamada-v638 ${classe}">
+      <div class="chat-registro-icone-v638">${icone}</div>
+      <div class="chat-registro-info-v638">
+        <b>${titulo}</b>
+        <span>${detalhe}</span>
+      </div>
+      <button type="button" onclick="event.stopPropagation();iniciarChamadaV630('${video?"video":"audio"}')" title="Ligar novamente" aria-label="Ligar novamente">${icone}</button>
+   </div>`;
+ }catch(_){
+   return "";
+ }
+}
+
+function formatarDuracaoChamadaV633(segundos){
+ segundos=Math.max(0,Math.floor(segundos||0));
+ const h=Math.floor(segundos/3600);
+ const m=Math.floor((segundos%3600)/60);
+ const s=segundos%60;
+ if(h>0)return `${h}h ${String(m).padStart(2,"0")}min ${String(s).padStart(2,"0")}s`;
+ if(m>0)return `${m}min ${String(s).padStart(2,"0")}s`;
+ return `${s}s`;
+}
+
 function renderizarMensagensChatV57(rolarFim=true){
     const area=document.getElementById("chatMensagens");if(!area)return;
     if(!chatMensagensV57.length){area.innerHTML="<div class='chat-conversa-vazia' style='display:block'>Nenhuma mensagem ainda.<br>Envie a primeira mensagem.</div>";return}
@@ -10344,7 +10615,8 @@ function renderizarMensagensChatV57(rolarFim=true){
         const confirmacao=minha?(m.read_at?"<span class='chat-confirmacao lida'>✓✓</span>":m.delivered_at?"<span class='chat-confirmacao'>✓✓</span>":"<span class='chat-confirmacao'>✓</span>"):"";
         const resposta=m.resposta_mensagem?`<div class="chat-msg-reply"><b>${chatEscV57(m.resposta_nome||"Mensagem")}</b><br>${chatEscV57(m.resposta_mensagem)}</div>`:"";
         const anexos=renderizarAnexosChatV600(m.anexos);
-        const corpo=m.apagado?"<i>Mensagem apagada</i>":chatEscV57(m.mensagem||"")+anexos;
+        const registroChamada=renderizarRegistroChamadaV633(m);
+        const corpo=m.apagado?"<i>Mensagem apagada</i>":(registroChamada||chatEscV57(m.mensagem||"")+anexos);
         const reacoes=renderizarReacoesChatV600(m.reacoes,m.id);
         return separador+`<div class="chat-msg ${minha?"minha":"outra"}" data-id="${m.id}" oncontextmenu="abrirMenuMensagemV600(event,'${m.id}')">
           <div class="chat-msg-acoes">
@@ -11512,7 +11784,7 @@ document.addEventListener("keydown",event=>{
         </div>
 
         <div class="painel-acoes-v620">
-            <button class="painel-acao-v620" onclick="abrirChatPainelV620()" title="Abrir conversas" aria-label="Abrir conversas">💬</button>
+            <button class="painel-acao-v620" onclick="abrirChatPainelV620(event)" title="Abrir conversas" aria-label="Abrir conversas">💬</button>
             <button class="painel-acao-v620" onclick="abrirConfiguracoesPainelV620()" title="Configurações">⚙️</button>
             <button class="painel-acao-v620 painel-logout-v622" onclick="sairSistema()" title="Encerrar sessão" aria-label="Encerrar sessão"><span class="painel-logout-icone-v622" aria-hidden="true"></span></button>
         </div>
@@ -11531,7 +11803,7 @@ document.addEventListener("keydown",event=>{
         <hr>
         <button onclick="alternarMenuStatusV620(event)">🟢 Alterar status</button>
         <button onclick="abrirConfiguracoesPainelV620()">⚙️ Configurações</button>
-        <button onclick="abrirChatPainelV620()">💬 Abrir chat</button>
+        <button onclick="abrirChatPainelV620(event)">💬 Abrir chat</button>
         <hr>
         <button onclick="sairSistema()"><span class="menu-logout-icone-v622" aria-hidden="true"></span> Encerrar sessão</button>
     </div>
@@ -11660,37 +11932,57 @@ async function alterarStatusUsuarioV620(status){
     }
 }
 
-function abrirChatPainelV620(){
+async function abrirChatPainelV620(event){
+    event?.preventDefault();
+    event?.stopPropagation();
+
     document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
     document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+    document.getElementById("painelConfigV620")?.classList.remove("aberto");
 
-    const botoes=[
-        document.querySelector("#chatBotaoFlutuante"),
-        document.querySelector(".chat-botao-flutuante"),
-        document.querySelector(".chat-flutuante"),
-        document.querySelector("[onclick*='abrirChatV57']"),
-        document.querySelector("[onclick*='toggleChat']")
-    ].filter(Boolean);
+    if(typeof exigirLogin==="function"&&!exigirLogin())return;
 
-    for(const botao of botoes){
-        if(botao.closest("#painelUsuarioV620"))continue;
-        botao.click();
-        setTimeout(()=>{if(typeof corrigirEstruturaLayoutV621==="function")corrigirEstruturaLayoutV621()},80);
+    const painel=document.getElementById("chatPainel");
+    const wrap=document.getElementById("chatWrap");
+
+    if(!painel){
+        alert("O painel do chat não foi encontrado.");
         return;
     }
 
-    const painel=document.getElementById("chatPainel")||document.querySelector(".chat-painel");
-    if(painel){
-        painel.classList.add("aberto");
-        painel.style.display="grid";
-        painel.setAttribute("aria-hidden","false");
-        const wrap=document.getElementById("chatWrap")||painel.closest(".chat-wrap");
-        if(wrap){wrap.classList.add("aberto");wrap.style.display="block"}
-        setTimeout(()=>{if(typeof corrigirEstruturaLayoutV621==="function")corrigirEstruturaLayoutV621()},80);
-        return;
+    // Remove estilos artificiais deixados pelas versões anteriores.
+    painel.style.removeProperty("display");
+    painel.style.removeProperty("visibility");
+    painel.style.removeProperty("pointer-events");
+    painel.style.removeProperty("opacity");
+    painel.removeAttribute("aria-hidden");
+
+    if(wrap){
+        wrap.style.removeProperty("display");
+        wrap.style.removeProperty("visibility");
+        wrap.style.removeProperty("pointer-events");
+        wrap.classList.remove("aberto");
     }
 
-    alert("O painel do chat não foi encontrado.");
+    // Usa exatamente o mesmo estado do botão flutuante oficial.
+    painel.classList.add("aberto");
+
+    try{
+        if(typeof chatRestaurarPainelV574==="function"){
+            chatRestaurarPainelV574();
+        }
+        if(typeof inicializarChatV57==="function"){
+            await inicializarChatV57();
+        }
+    }catch(e){
+        console.error("Falha ao abrir o chat pelo perfil:",e);
+    }
+
+    requestAnimationFrame(()=>{
+        if(typeof corrigirEstruturaLayoutV621==="function"){
+            corrigirEstruturaLayoutV621();
+        }
+    });
 }
 
 function abrirConfiguracoesPainelV620(){
@@ -11835,7 +12127,11 @@ window.addEventListener("resize",()=>{
 </div>
 <div class="chamada-recebida-v630" id="chamadaRecebidaV630">
   <div class="chamada-recebida-cab-v630"><div class="chamada-recebida-avatar-v630" id="chamadaRecebidaAvatarV630">U</div><div><h3 id="chamadaRecebidaNomeV630">Usuário</h3><p id="chamadaRecebidaTipoV630">Chamada de áudio</p></div></div>
-  <div class="chamada-recebida-acoes-v630"><button class="chamada-recusar-v630" onclick="recusarChamadaV630()">Recusar</button><button class="chamada-aceitar-v630" onclick="aceitarChamadaV630()">Aceitar</button></div>
+  <div class="chamada-recebida-status-v638">
+  <span id="chamadaRecebidaTempoV638">Chamando...</span>
+  <button type="button" id="chamadaSilenciarToqueV638" onclick="alternarToqueChamadaV638()" title="Silenciar toque">🔔</button>
+</div>
+<div class="chamada-recebida-acoes-v630"><button class="chamada-recusar-v630" onclick="recusarChamadaV630()">Recusar</button><button class="chamada-aceitar-v630" onclick="aceitarChamadaV630()">Aceitar</button></div>
 </div>
 
 
@@ -11847,6 +12143,14 @@ let chamadaAtualV630=null,pcV630=null,streamLocalV630=null,streamRemotoV630=null
 let canalChamadasV630=null,canalSinaisV630=null,chamadaPendenteV630=null;
 let candidatosPendentesV630=[],timerChamadaV630=null,inicioChamadaV630=null;
 let encerrandoChamadaV631=false;
+let contextoAudioToqueV638=null;
+let osciladorToqueV638=null;
+let ganhoToqueV638=null;
+let intervaloToqueV638=null;
+let timeoutChamadaRecebidaV638=null;
+let toqueSilenciadoV638=false;
+let segundosChamadaRecebidaV638=0;
+let contadorChamadaRecebidaV638=null;
 const rtcConfigV630={iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}]};
 
 function sbV630(){return obterSupabaseClient()}
@@ -11856,30 +12160,105 @@ function avatarHTMLV630(u){return u?.avatar_url?`<img src="${chatEscV57(u.avatar
 
 async function iniciarChamadaV630(tipo){
  if(!chatUsuarioAtualV57?.id)return alert("Selecione um usuário antes de iniciar a chamada.");
+
  if(chatUsuarioAtualV57.id===usuarioLogado?.id)return;
  if(chamadaAtualV630)return alert("Já existe uma chamada em andamento.");
+
  try{
-  const {data,error}=await sbV630().rpc("criar_chamada_v630",{p_destinatario_id:chatUsuarioAtualV57.id,p_tipo:tipo});
+  const tipoReal=await prepararMidiaInicialV633(tipo);
+  if(!tipoReal)return;
+
+  await sbV630().rpc("limpar_minhas_chamadas_presas_v633");
+
+  const {data,error}=await sbV630().rpc("criar_chamada_v633",{
+    p_destinatario_id:chatUsuarioAtualV57.id,
+    p_tipo:tipoReal,
+    p_conversa_id:chatConversaAtualV57||null
+  });
   if(error)throw error;
+
   chamadaAtualV630=data;
-  abrirTelaChamadaV630(chatUsuarioAtualV57,tipo,"Chamando...");
-  await prepararMidiaV630(tipo);
+  abrirTelaChamadaV630(chatUsuarioAtualV57,tipoReal,"Chamando...");
+  configurarMidiaNaTelaV633(tipoReal);
+
   await criarPeerV630(true);
   const oferta=await pcV630.createOffer();
   await pcV630.setLocalDescription(oferta);
   await enviarSinalV630("offer",oferta);
   assinarSinaisV630(chamadaAtualV630.id);
- }catch(e){await limparChamadaV630();alert("Não foi possível iniciar a chamada: "+(e?.message||e))}
+ }catch(e){
+  await limparChamadaV630();
+  const msg=e?.name==="NotAllowedError"
+    ?"O navegador não recebeu permissão para usar o microfone ou a câmera."
+    :(e?.message||e);
+  alert("Não foi possível iniciar a chamada: "+msg);
+ }
 }
 
-async function prepararMidiaV630(tipo){
- streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:tipo==="video"});
- document.getElementById("chamadaVideoLocalV630").srcObject=streamLocalV630;
+async function prepararMidiaInicialV633(tipo){
+ if(tipo==="audio"){
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+   return "audio";
+ }
+
+ try{
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+   return "video";
+ }catch(e){
+   const semCamera=["NotFoundError","DevicesNotFoundError","OverconstrainedError"].includes(e?.name)
+     || /Requested device not found|device not found/i.test(e?.message||"");
+
+   if(!semCamera)throw e;
+
+   const continuar=confirm(
+     "Nenhuma câmera foi encontrada neste computador.\n\n"+
+     "Deseja continuar esta ligação somente com áudio?"
+   );
+   if(!continuar)return null;
+
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+   return "audio";
+ }
+}
+
+function configurarMidiaNaTelaV633(tipo){
  const video=tipo==="video";
+ const local=document.getElementById("chamadaVideoLocalV630");
+ if(local)local.srcObject=streamLocalV630;
+
  document.getElementById("chamadaVideoLocalV630").style.display=video?"block":"none";
  document.getElementById("chamadaVideoRemotoV630").style.display=video?"block":"none";
  document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",!video);
  document.getElementById("chamadaCameraV630").style.display=video?"inline-flex":"none";
+}
+
+async function prepararMidiaV630(tipo){
+ if(tipo==="video"){
+   try{
+     streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+   }catch(e){
+     const semCamera=["NotFoundError","DevicesNotFoundError","OverconstrainedError"].includes(e?.name)
+       || /Requested device not found|device not found/i.test(e?.message||"");
+     if(!semCamera)throw e;
+
+     const continuar=confirm(
+       "Você recebeu uma chamada de vídeo, mas nenhuma câmera foi encontrada.\n\n"+
+       "Deseja atender somente com áudio?"
+     );
+     if(!continuar)throw new Error("Chamada não atendida porque não há câmera disponível.");
+
+     streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+   }
+ }else{
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+ }
+
+ const possuiVideo=streamLocalV630.getVideoTracks().length>0;
+ document.getElementById("chamadaVideoLocalV630").srcObject=streamLocalV630;
+ document.getElementById("chamadaVideoLocalV630").style.display=possuiVideo?"block":"none";
+ document.getElementById("chamadaVideoRemotoV630").style.display=tipo==="video"?"block":"none";
+ document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",tipo!=="video");
+ document.getElementById("chamadaCameraV630").style.display=possuiVideo?"inline-flex":"none";
 }
 
 async function criarPeerV630(iniciador){
@@ -11922,10 +12301,14 @@ async function aplicarCandidatosPendentesV630(){for(const c of candidatosPendent
 
 async function aceitarChamadaV630(){
  const c=chamadaPendenteV630;if(!c)return;
- document.getElementById("chamadaRecebidaV630").classList.remove("aberta");
+ clearTimeout(timeoutChamadaRecebidaV638);
+ pararToqueChamadaV638();
+ pararContadorChamadaRecebidaV638();
+
+ (()=>{const el=document.getElementById("chamadaRecebidaV630");if(el){el.classList.remove("aberta");el.style.display="none";el.setAttribute("aria-hidden","true")}})();
  chamadaAtualV630=c;chamadaPendenteV630=null;
  try{
-  const {error}=await sbV630().rpc("responder_chamada_v630",{p_chamada_id:c.id,p_aceitar:true});if(error)throw error;
+  const {error}=await sbV630().rpc("responder_chamada_v633",{p_chamada_id:c.id,p_aceitar:true});if(error)throw error;
   const u={id:c.remetente_id,nome:c.remetente_nome,avatar_url:c.remetente_avatar};
   abrirTelaChamadaV630(u,c.tipo,"Conectando...");
   await prepararMidiaV630(c.tipo);await criarPeerV630(false);assinarSinaisV630(c.id);
@@ -11939,13 +12322,44 @@ async function aceitarChamadaV630(){
   await aplicarCandidatosPendentesV630();
  }catch(e){await limparChamadaV630();alert("Não foi possível aceitar a chamada: "+(e?.message||e))}
 }
-async function recusarChamadaV630(){if(!chamadaPendenteV630)return;await sbV630().rpc("responder_chamada_v630",{p_chamada_id:chamadaPendenteV630.id,p_aceitar:false});chamadaPendenteV630=null;document.getElementById("chamadaRecebidaV630").classList.remove("aberta")}
+async function recusarChamadaV630(){
+ if(!chamadaPendenteV630)return;
+
+ clearTimeout(timeoutChamadaRecebidaV638);
+ pararToqueChamadaV638();
+ pararContadorChamadaRecebidaV638();
+
+ const id=chamadaPendenteV630.id;
+ chamadaPendenteV630=null;
+
+ const recebida=document.getElementById("chamadaRecebidaV630");
+ if(recebida){
+   recebida.classList.remove("aberta");
+   recebida.style.display="none";
+   recebida.setAttribute("aria-hidden","true");
+ }
+
+ await sbV630().rpc("responder_chamada_v633",{
+   p_chamada_id:id,
+   p_aceitar:false
+ });
+
+ if(typeof carregarMensagensChatV57==="function"&&chatConversaAtualV57){
+   setTimeout(()=>carregarMensagensChatV57(false),250);
+ }
+}
 
 function abrirTelaChamadaV630(u,tipo,status){
  const avatar=avatarHTMLV630(u);
  document.getElementById("chamadaAvatarV630").innerHTML=avatar;document.getElementById("chamadaAudioFotoV630").innerHTML=avatar;
  document.getElementById("chamadaNomeV630").textContent=u?.nome||"Usuário";document.getElementById("chamadaAudioNomeV630").textContent=u?.nome||"Usuário";
- atualizarEstadoChamadaV630(status);document.getElementById("chamadaOverlayV630").classList.add("aberta");
+ atualizarEstadoChamadaV630(status);
+ const overlay=document.getElementById("chamadaOverlayV630");
+ if(overlay){
+   overlay.style.display="flex";
+   overlay.setAttribute("aria-hidden","false");
+   overlay.classList.add("aberta");
+ }
 }
 function atualizarEstadoChamadaV630(s){document.getElementById("chamadaStatusV630").textContent=s;document.getElementById("chamadaAudioEstadoV630").textContent=s}
 function iniciarCronometroV630(){if(timerChamadaV630)return;inicioChamadaV630=Date.now();timerChamadaV630=setInterval(()=>{const s=Math.floor((Date.now()-inicioChamadaV630)/1000);document.getElementById("chamadaTempoV630").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")},1000)}
@@ -11967,11 +12381,14 @@ async function encerrarChamadaV630(status="encerrada"){
  // Atualiza o banco depois, sem manter a tela presa esperando rede.
  if(id){
    try{
-     const {error}=await sbV630().rpc("encerrar_chamada_v630",{
+     const {error}=await sbV630().rpc("encerrar_chamada_v633",{
        p_chamada_id:id,
        p_status:status==="cancelada"?"cancelada":"encerrada"
      });
      if(error)console.error("Falha ao registrar encerramento:",error);
+     if(typeof carregarMensagensChatV57==="function"&&chatConversaAtualV57){
+       setTimeout(()=>carregarMensagensChatV57(false),250);
+     }
    }catch(e){
      console.error("Falha ao registrar encerramento:",e);
    }
@@ -11982,6 +12399,10 @@ async function encerrarChamadaV630(status="encerrada"){
 }
 
 async function limparChamadaV630(){
+ clearTimeout(timeoutChamadaRecebidaV638);
+ pararToqueChamadaV638();
+ pararContadorChamadaRecebidaV638();
+
  clearInterval(timerChamadaV630);
  timerChamadaV630=null;
  inicioChamadaV630=null;
@@ -12035,8 +12456,20 @@ async function limparChamadaV630(){
  chamadaAtualV630=null;
  chamadaPendenteV630=null;
 
- document.getElementById("chamadaOverlayV630")?.classList.remove("aberta");
- document.getElementById("chamadaRecebidaV630")?.classList.remove("aberta");
+ const overlayChamada=document.getElementById("chamadaOverlayV630");
+ if(overlayChamada){
+   overlayChamada.classList.remove("aberta");
+   overlayChamada.style.display="none";
+   overlayChamada.setAttribute("aria-hidden","true");
+ }
+
+ const chamadaRecebida=document.getElementById("chamadaRecebidaV630");
+ if(chamadaRecebida){
+   chamadaRecebida.classList.remove("aberta");
+   chamadaRecebida.style.display="none";
+   chamadaRecebida.setAttribute("aria-hidden","true");
+ }
+
  document.getElementById("chamadaAudioAvatarV630")?.classList.remove("ativo");
 
  const tempo=document.getElementById("chamadaTempoV630");
@@ -12046,6 +12479,7 @@ async function limparChamadaV630(){
  const camera=document.getElementById("chamadaCameraV630");
  mic?.classList.remove("desativado");
  camera?.classList.remove("desativado");
+
 }
 
 async function iniciarEscutaChamadasV630(){
@@ -12068,17 +12502,157 @@ async function iniciarEscutaChamadasV630(){
    }
  }).subscribe();
 }
+function iniciarToqueChamadaV638(){
+ pararToqueChamadaV638();
+ toqueSilenciadoV638=false;
+ const botao=document.getElementById("chamadaSilenciarToqueV638");
+ if(botao)botao.textContent="🔔";
+
+ try{
+   const AudioCtx=window.AudioContext||window.webkitAudioContext;
+   if(!AudioCtx)return;
+   contextoAudioToqueV638=new AudioCtx();
+
+   const tocarPulso=()=>{
+     if(toqueSilenciadoV638||!contextoAudioToqueV638)return;
+     try{
+       const agora=contextoAudioToqueV638.currentTime;
+       const osc=contextoAudioToqueV638.createOscillator();
+       const ganho=contextoAudioToqueV638.createGain();
+
+       osc.type="sine";
+       osc.frequency.setValueAtTime(740,agora);
+       osc.frequency.setValueAtTime(880,agora+.22);
+
+       ganho.gain.setValueAtTime(.0001,agora);
+       ganho.gain.exponentialRampToValueAtTime(.18,agora+.03);
+       ganho.gain.exponentialRampToValueAtTime(.0001,agora+.42);
+
+       osc.connect(ganho);
+       ganho.connect(contextoAudioToqueV638.destination);
+       osc.start(agora);
+       osc.stop(agora+.45);
+     }catch(_){}
+   };
+
+   tocarPulso();
+   intervaloToqueV638=setInterval(()=>{
+     tocarPulso();
+     setTimeout(tocarPulso,600);
+   },2600);
+ }catch(e){
+   console.warn("Toque de chamada indisponível:",e);
+ }
+}
+
+function pararToqueChamadaV638(){
+ clearInterval(intervaloToqueV638);
+ intervaloToqueV638=null;
+
+ try{
+   osciladorToqueV638?.stop();
+ }catch(_){}
+ osciladorToqueV638=null;
+
+ try{
+   contextoAudioToqueV638?.close();
+ }catch(_){}
+ contextoAudioToqueV638=null;
+}
+
+function alternarToqueChamadaV638(){
+ toqueSilenciadoV638=!toqueSilenciadoV638;
+ const botao=document.getElementById("chamadaSilenciarToqueV638");
+ if(botao){
+   botao.textContent=toqueSilenciadoV638?"🔕":"🔔";
+   botao.title=toqueSilenciadoV638?"Ativar toque":"Silenciar toque";
+ }
+ if(toqueSilenciadoV638){
+   pararToqueChamadaV638();
+ }else{
+   iniciarToqueChamadaV638();
+ }
+}
+
+function iniciarContadorChamadaRecebidaV638(){
+ clearInterval(contadorChamadaRecebidaV638);
+ segundosChamadaRecebidaV638=0;
+ const label=document.getElementById("chamadaRecebidaTempoV638");
+ if(label)label.textContent="Chamando...";
+
+ contadorChamadaRecebidaV638=setInterval(()=>{
+   segundosChamadaRecebidaV638++;
+   if(label)label.textContent=`Chamando há ${segundosChamadaRecebidaV638}s`;
+ },1000);
+}
+
+function pararContadorChamadaRecebidaV638(){
+ clearInterval(contadorChamadaRecebidaV638);
+ contadorChamadaRecebidaV638=null;
+ segundosChamadaRecebidaV638=0;
+ const label=document.getElementById("chamadaRecebidaTempoV638");
+ if(label)label.textContent="Chamando...";
+}
+
+async function expirarChamadaRecebidaV638(){
+ if(!chamadaPendenteV630)return;
+
+ const id=chamadaPendenteV630.id;
+ chamadaPendenteV630=null;
+ pararToqueChamadaV638();
+ pararContadorChamadaRecebidaV638();
+
+ const caixa=document.getElementById("chamadaRecebidaV630");
+ if(caixa){
+   caixa.classList.remove("aberta");
+   caixa.style.display="none";
+   caixa.setAttribute("aria-hidden","true");
+ }
+
+ try{
+   await sbV630().rpc("encerrar_chamada_v633",{
+     p_chamada_id:id,
+     p_status:"cancelada"
+   });
+ }catch(e){
+   console.warn("Não foi possível marcar chamada como perdida:",e);
+ }
+
+ if(typeof carregarMensagensChatV57==="function"&&chatConversaAtualV57){
+   setTimeout(()=>carregarMensagensChatV57(false),250);
+ }
+}
+
 function mostrarChamadaRecebidaV630(c){
- if(chamadaAtualV630||chamadaPendenteV630){sbV630().rpc("responder_chamada_v630",{p_chamada_id:c.id,p_aceitar:false});return}
+ if(chamadaAtualV630||chamadaPendenteV630){
+   sbV630().rpc("responder_chamada_v633",{p_chamada_id:c.id,p_aceitar:false});
+   return;
+ }
+
  chamadaPendenteV630=c;
  const u={nome:c.remetente_nome,avatar_url:c.remetente_avatar};
+
  document.getElementById("chamadaRecebidaAvatarV630").innerHTML=avatarHTMLV630(u);
  document.getElementById("chamadaRecebidaNomeV630").textContent=u.nome||"Usuário";
  document.getElementById("chamadaRecebidaTipoV630").textContent=c.tipo==="video"?"Chamada de vídeo":"Chamada de áudio";
- document.getElementById("chamadaRecebidaV630").classList.add("aberta");
- try{const a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");a.play().catch(()=>{})}catch(_){}
+
+ const recebida=document.getElementById("chamadaRecebidaV630");
+ if(recebida){
+   recebida.style.display="block";
+   recebida.setAttribute("aria-hidden","false");
+   recebida.classList.add("aberta");
+ }
+
+ iniciarToqueChamadaV638();
+ iniciarContadorChamadaRecebidaV638();
+
+ clearTimeout(timeoutChamadaRecebidaV638);
+ timeoutChamadaRecebidaV638=setTimeout(expirarChamadaRecebidaV638,45000);
 }
-document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciarEscutaChamadasV630,1500));
+document.addEventListener("DOMContentLoaded",()=>setTimeout(async()=>{
+ try{await sbV630().rpc("limpar_minhas_chamadas_presas_v633")}catch(_){}
+ iniciarEscutaChamadasV630();
+},1500));
 
 document.addEventListener("DOMContentLoaded",()=>{
  const botao=document.getElementById("chamadaEncerrarV631");
