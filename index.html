@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.0.3 - CHAT PROFISSIONAL
+   V6.3.1 - ENCERRAMENTO DE CHAMADA CORRIGIDO
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.0.3 - CHAT PROFISSIONAL E REDIMENSIONÁVEL
+   V6.3.1 - ENCERRAMENTO DE CHAMADA CORRIGIDO E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -3003,6 +3003,959 @@ body.dark-mode .chat-audio-previa-v603{
     }
 }
 
+
+/* =========================================================
+   V6.1.0 - PERFIL DO USUÁRIO E AVATARES
+   ========================================================= */
+.usuario-topo-v610{
+    position:absolute!important;
+    right:42px!important;
+    top:18px!important;
+    display:flex;
+    align-items:center;
+    gap:9px;
+    z-index:650;
+}
+.usuario-avatar-botao-v610{
+    position:relative;
+    width:48px;
+    height:48px;
+    padding:0;
+    border:2px solid #fff;
+    border-radius:50%;
+    overflow:visible;
+    background:#dceaff;
+    box-shadow:0 3px 12px rgba(0,27,61,.18);
+    cursor:pointer;
+}
+.usuario-avatar-botao-v610 img,
+.usuario-menu-avatar-v610 img{
+    display:none;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    border-radius:50%;
+}
+.usuario-avatar-fallback-v610{
+    display:flex;
+    width:100%;
+    height:100%;
+    align-items:center;
+    justify-content:center;
+    border-radius:50%;
+    color:#001b3d;
+    font-weight:950;
+    font-size:16px;
+}
+.usuario-avatar-status-v610{
+    position:absolute;
+    right:-1px;
+    bottom:-1px;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    border:2px solid #fff;
+    background:#18a957;
+}
+.usuario-resumo-v610{
+    border:0;
+    background:transparent;
+    color:#001b3d;
+    text-align:left;
+    cursor:pointer;
+    padding:3px 0;
+}
+.usuario-resumo-v610 strong,
+.usuario-resumo-v610 small{
+    display:block;
+}
+.usuario-resumo-v610 strong{
+    max-width:220px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:14px;
+}
+.usuario-resumo-v610 small{
+    margin-top:2px;
+    color:#5f6f82;
+    font-size:10px;
+}
+.usuario-menu-v610{
+    display:none;
+    position:absolute;
+    right:0;
+    top:58px;
+    width:245px;
+    padding:8px;
+    border:1px solid #d3deea;
+    border-radius:14px;
+    background:#fff;
+    box-shadow:0 18px 50px rgba(0,27,61,.25);
+}
+.usuario-menu-v610.aberto{display:block}
+.usuario-menu-cab-v610{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding:10px;
+    border-bottom:1px solid #e4eaf1;
+    margin-bottom:6px;
+}
+.usuario-menu-avatar-v610{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    background:#dceaff;
+    overflow:hidden;
+    flex:0 0 auto;
+}
+.usuario-menu-avatar-v610 span{
+    display:flex;
+    width:100%;
+    height:100%;
+    align-items:center;
+    justify-content:center;
+    font-weight:950;
+}
+.usuario-menu-cab-v610 b,
+.usuario-menu-cab-v610 small{
+    display:block;
+    max-width:155px;
+    overflow:hidden;
+    white-space:nowrap;
+    text-overflow:ellipsis;
+}
+.usuario-menu-cab-v610 small{margin-top:3px;color:#6a7787}
+.usuario-menu-v610>button{
+    width:100%;
+    border:0;
+    background:transparent;
+    text-align:left;
+    padding:10px;
+    border-radius:9px;
+    cursor:pointer;
+    color:#001b3d;
+}
+.usuario-menu-v610>button:hover{background:#edf5ff}
+
+.chat-avatar.com-foto-v610{
+    background-size:cover;
+    background-position:center;
+    color:transparent;
+}
+.chat-avatar.com-foto-v610 .chat-status-dot{color:initial}
+.chat-avatar img.chat-avatar-img-v610{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    object-fit:cover;
+}
+.chat-avatar .chat-avatar-iniciais-v610{
+    position:relative;
+    z-index:1;
+}
+.chat-avatar.com-foto-v610 .chat-avatar-iniciais-v610{display:none}
+
+.perfil-modal-v610{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:15000;
+    padding:22px;
+    background:rgba(0,18,40,.62);
+    align-items:center;
+    justify-content:center;
+}
+.perfil-modal-v610.aberto{display:flex}
+.perfil-modal-card-v610{
+    width:min(900px,96vw);
+    max-height:94vh;
+    overflow:auto;
+    border-radius:20px;
+    background:#fff;
+    box-shadow:0 25px 80px rgba(0,0,0,.38);
+}
+.perfil-modal-cab-v610{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:20px 22px;
+    border-bottom:1px solid #dce4ed;
+}
+.perfil-modal-cab-v610 h2{margin:0;color:#001b3d}
+.perfil-modal-cab-v610 p{margin:4px 0 0;color:#667085;font-size:12px}
+.perfil-modal-cab-v610>button{
+    border:0;
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#eef3f8;
+    cursor:pointer;
+}
+.perfil-modal-corpo-v610{
+    display:grid;
+    grid-template-columns:350px 1fr;
+    gap:24px;
+    padding:22px;
+}
+.perfil-foto-coluna-v610{text-align:center}
+.perfil-canvas-wrap-v610{
+    position:relative;
+    width:320px;
+    max-width:100%;
+    aspect-ratio:1;
+    margin:auto;
+    border-radius:50%;
+    overflow:hidden;
+    background:#e9f0f7;
+    box-shadow:inset 0 0 0 4px #fff,0 0 0 2px #aec3d9;
+    cursor:grab;
+}
+.perfil-canvas-wrap-v610:active{cursor:grabbing}
+.perfil-canvas-wrap-v610 canvas{
+    display:block;
+    width:100%;
+    height:100%;
+}
+.perfil-canvas-vazio-v610{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    color:#49637e;
+    pointer-events:none;
+}
+.perfil-canvas-vazio-v610 span{
+    font-size:74px;
+    font-weight:950;
+}
+.perfil-canvas-vazio-v610 small{font-weight:800}
+.perfil-foto-acoes-v610{
+    display:flex;
+    justify-content:center;
+    gap:7px;
+    margin-top:15px;
+}
+.perfil-foto-acoes-v610 button{
+    border:0;
+    border-radius:10px;
+    background:#eaf3ff;
+    color:#0055ad;
+    padding:10px 12px;
+    font-weight:850;
+    cursor:pointer;
+}
+.perfil-foto-acoes-v610 button.perigo{background:#ffe9ec;color:#b00020}
+.perfil-zoom-v610{
+    display:grid;
+    grid-template-columns:auto 1fr;
+    gap:10px;
+    align-items:center;
+    margin-top:15px;
+    color:#334e68;
+    font-weight:800;
+}
+.perfil-ajuda-v610{display:block;margin-top:7px;color:#778899}
+.perfil-dados-v610{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:14px;
+    align-content:start;
+}
+.perfil-dados-v610 label span{
+    display:block;
+    margin-bottom:5px;
+    color:#253b53;
+    font-size:12px;
+    font-weight:900;
+}
+.perfil-dados-v610 input,
+.perfil-dados-v610 select{
+    width:100%;
+    box-sizing:border-box;
+    border:1px solid #b8c7d7;
+    border-radius:10px;
+    padding:11px;
+    font:inherit;
+    color:#001b3d;
+    background:#fff;
+}
+.perfil-modal-rodape-v610{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:9px;
+    padding:16px 22px;
+    border-top:1px solid #dce4ed;
+}
+.perfil-modal-rodape-v610 span{
+    margin-right:auto;
+    font-size:12px;
+    font-weight:800;
+}
+.perfil-modal-rodape-v610 button{
+    border:0;
+    border-radius:11px;
+    padding:11px 17px;
+    background:#087df0;
+    color:#fff;
+    font-weight:900;
+    cursor:pointer;
+}
+.perfil-modal-rodape-v610 button.secundario{background:#e9eff6;color:#18324c}
+.perfil-modal-rodape-v610 button:disabled{opacity:.55;cursor:not-allowed}
+
+body.dark-mode .usuario-resumo-v610,
+body.dark-mode .usuario-menu-v610>button{color:#eaf2ff}
+body.dark-mode .usuario-menu-v610,
+body.dark-mode .perfil-modal-card-v610{background:#10243a;color:#eaf2ff}
+body.dark-mode .usuario-menu-cab-v610,
+body.dark-mode .perfil-modal-cab-v610,
+body.dark-mode .perfil-modal-rodape-v610{border-color:#294663}
+body.dark-mode .perfil-modal-cab-v610 h2,
+body.dark-mode .perfil-dados-v610 label span{color:#eaf2ff}
+body.dark-mode .perfil-dados-v610 input,
+body.dark-mode .perfil-dados-v610 select{background:#0a1a2b;color:#fff;border-color:#35516d}
+
+@media(max-width:820px){
+    .usuario-resumo-v610{display:none}
+    .usuario-topo-v610{right:70px!important}
+    .perfil-modal-corpo-v610{grid-template-columns:1fr}
+    .perfil-dados-v610{grid-template-columns:1fr}
+    .perfil-canvas-wrap-v610{width:min(280px,80vw)}
+}
+
+
+/* =========================================================
+   V6.1.2 - PERFIL REPOSICIONADO NO CANTO SUPERIOR DIREITO
+   ========================================================= */
+.usuario-topo-v610{
+    position:fixed!important;
+    top:78px!important;
+    right:34px!important;
+    left:auto!important;
+    width:auto!important;
+    max-width:220px!important;
+    min-height:48px!important;
+    padding:5px 8px!important;
+    display:flex!important;
+    align-items:center!important;
+    gap:8px!important;
+    border-radius:16px!important;
+    background:rgba(255,255,255,.94)!important;
+    border:1px solid rgba(165,183,204,.55)!important;
+    box-shadow:0 8px 24px rgba(0,29,66,.16)!important;
+    backdrop-filter:blur(10px)!important;
+    z-index:920!important;
+}
+.usuario-avatar-botao-v610{
+    width:40px!important;
+    height:40px!important;
+    flex:0 0 40px!important;
+    border-width:2px!important;
+    box-shadow:none!important;
+}
+.usuario-avatar-status-v610{
+    width:11px!important;
+    height:11px!important;
+}
+.usuario-resumo-v610{
+    max-width:150px!important;
+}
+.usuario-resumo-v610 strong{
+    max-width:150px!important;
+    font-size:13px!important;
+}
+.usuario-resumo-v610 small{
+    font-size:9px!important;
+}
+.usuario-menu-v610{
+    top:54px!important;
+    right:0!important;
+}
+@media(max-width:1100px){
+    .usuario-topo-v610{
+        top:76px!important;
+        right:20px!important;
+        max-width:52px!important;
+        padding:5px!important;
+        border-radius:50%!important;
+    }
+    .usuario-resumo-v610{
+        display:none!important;
+    }
+}
+@media(max-width:760px){
+    .usuario-topo-v610{
+        top:72px!important;
+        right:14px!important;
+    }
+}
+body.dark-mode .usuario-topo-v610{
+    background:rgba(16,36,58,.94)!important;
+    border-color:#294663!important;
+}
+
+
+/* =========================================================
+   V6.2.0 - PAINEL DO USUÁRIO ESTILO DISCORD
+   ========================================================= */
+
+/* Remove o cartão antigo do topo */
+.usuario-topo-v610{
+    display:none!important;
+}
+
+/* Garante espaço para o painel inferior */
+.sidebar,
+.menu-lateral,
+aside,
+#sidebar{
+    position:relative;
+}
+
+/* Painel inferior */
+.painel-usuario-v620{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:258px;
+    box-sizing:border-box;
+    padding:10px;
+    background:linear-gradient(180deg,#061f3f,#041a35);
+    border-top:1px solid rgba(255,255,255,.12);
+    box-shadow:0 -8px 24px rgba(0,0,0,.22);
+    z-index:980;
+    color:#fff;
+}
+.painel-usuario-linha-v620{
+    display:flex;
+    align-items:center;
+    gap:9px;
+}
+.painel-avatar-v620{
+    position:relative;
+    width:44px;
+    height:44px;
+    flex:0 0 44px;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,.86);
+    overflow:visible;
+    background:#dceaff;
+    cursor:pointer;
+    padding:0;
+}
+.painel-avatar-v620 img{
+    display:none;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    object-fit:cover;
+}
+.painel-avatar-fallback-v620{
+    display:flex;
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    align-items:center;
+    justify-content:center;
+    color:#001b3d;
+    font-weight:950;
+}
+.painel-status-bolinha-v620{
+    position:absolute;
+    right:-1px;
+    bottom:-1px;
+    width:13px;
+    height:13px;
+    border-radius:50%;
+    border:3px solid #041a35;
+    background:#20c66b;
+}
+.painel-status-bolinha-v620.ausente{background:#f2b84b}
+.painel-status-bolinha-v620.ocupado{background:#ef4a5b}
+
+.painel-identidade-v620{
+    min-width:0;
+    flex:1;
+    cursor:pointer;
+}
+.painel-identidade-v620 strong,
+.painel-identidade-v620 small{
+    display:block;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+.painel-identidade-v620 strong{
+    font-size:13px;
+    line-height:1.2;
+}
+.painel-identidade-v620 small{
+    margin-top:2px;
+    color:#aebed1;
+    font-size:10px;
+}
+.painel-acoes-v620{
+    display:flex;
+    gap:4px;
+}
+.painel-acao-v620{
+    width:32px;
+    height:32px;
+    border:0;
+    border-radius:8px;
+    background:transparent;
+    color:#dbe7f5;
+    cursor:pointer;
+    font-size:16px;
+}
+.painel-acao-v620:hover{
+    background:rgba(255,255,255,.1);
+    color:#fff;
+}
+
+.painel-status-botao-v620{
+    margin-top:8px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border:0;
+    border-radius:9px;
+    padding:8px 10px;
+    background:rgba(255,255,255,.07);
+    color:#fff;
+    cursor:pointer;
+    font-size:11px;
+    font-weight:850;
+}
+.painel-status-botao-v620:hover{background:rgba(255,255,255,.12)}
+.painel-status-botao-v620 .seta{margin-left:auto}
+
+.painel-menu-v620{
+    display:none;
+    position:absolute;
+    left:10px;
+    right:10px;
+    bottom:76px;
+    padding:7px;
+    border-radius:12px;
+    background:#fff;
+    color:#001b3d;
+    border:1px solid #cbd7e5;
+    box-shadow:0 16px 45px rgba(0,0,0,.32);
+}
+.painel-menu-v620.aberto{display:block}
+.painel-menu-v620 button{
+    width:100%;
+    border:0;
+    background:transparent;
+    text-align:left;
+    padding:9px;
+    border-radius:8px;
+    cursor:pointer;
+    color:#001b3d;
+    font-weight:750;
+}
+.painel-menu-v620 button:hover{background:#edf5ff}
+.painel-menu-v620 hr{
+    border:0;
+    border-top:1px solid #e0e7ef;
+    margin:5px 0;
+}
+
+.painel-status-menu-v620{
+    display:none;
+    position:absolute;
+    left:10px;
+    right:10px;
+    bottom:126px;
+    padding:7px;
+    border-radius:12px;
+    background:#fff;
+    color:#001b3d;
+    border:1px solid #cbd7e5;
+    box-shadow:0 16px 45px rgba(0,0,0,.32);
+}
+.painel-status-menu-v620.aberto{display:block}
+.painel-status-menu-v620 button{
+    width:100%;
+    display:flex;
+    gap:9px;
+    align-items:center;
+    border:0;
+    background:transparent;
+    padding:10px;
+    border-radius:8px;
+    cursor:pointer;
+    color:#001b3d;
+    font-weight:850;
+}
+.painel-status-menu-v620 button:hover{background:#edf5ff}
+
+.painel-config-v620{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:16000;
+    background:rgba(0,18,40,.62);
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+.painel-config-v620.aberto{display:flex}
+.painel-config-card-v620{
+    width:min(560px,95vw);
+    border-radius:18px;
+    background:#fff;
+    box-shadow:0 24px 70px rgba(0,0,0,.36);
+    overflow:hidden;
+}
+.painel-config-cab-v620{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 20px;
+    border-bottom:1px solid #dce5ee;
+}
+.painel-config-cab-v620 h3{margin:0;color:#001b3d}
+.painel-config-cab-v620 button{
+    width:34px;height:34px;border:0;border-radius:50%;cursor:pointer
+}
+.painel-config-corpo-v620{
+    padding:18px 20px;
+    display:grid;
+    gap:12px;
+}
+.painel-config-opcao-v620{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    padding:12px;
+    border:1px solid #d8e2ec;
+    border-radius:12px;
+}
+.painel-config-opcao-v620 b,
+.painel-config-opcao-v620 small{display:block}
+.painel-config-opcao-v620 small{margin-top:3px;color:#6d7a89}
+.painel-config-rodape-v620{
+    display:flex;
+    justify-content:flex-end;
+    padding:14px 20px;
+    border-top:1px solid #dce5ee;
+}
+.painel-config-rodape-v620 button{
+    border:0;border-radius:10px;padding:10px 15px;background:#087df0;color:#fff;font-weight:900;cursor:pointer
+}
+
+/* Evita que os itens do menu lateral fiquem escondidos atrás do painel */
+.sidebar nav,
+.menu-lateral nav,
+aside nav{
+    padding-bottom:145px!important;
+}
+
+body.dark-mode .painel-menu-v620,
+body.dark-mode .painel-status-menu-v620,
+body.dark-mode .painel-config-card-v620{
+    background:#10243a;
+    color:#eaf2ff;
+}
+body.dark-mode .painel-menu-v620 button,
+body.dark-mode .painel-status-menu-v620 button,
+body.dark-mode .painel-config-cab-v620 h3{
+    color:#eaf2ff;
+}
+body.dark-mode .painel-menu-v620 button:hover,
+body.dark-mode .painel-status-menu-v620 button:hover{
+    background:#17304a;
+}
+body.dark-mode .painel-config-opcao-v620{
+    border-color:#294663;
+}
+@media(max-width:900px){
+    .painel-usuario-v620{
+        width:72px;
+        padding:10px 8px;
+    }
+    .painel-identidade-v620,
+    .painel-status-botao-v620{
+        display:none;
+    }
+    .painel-acoes-v620{
+        flex-direction:column;
+    }
+    .painel-menu-v620,
+    .painel-status-menu-v620{
+        left:74px;
+        right:auto;
+        width:220px;
+        bottom:10px;
+    }
+}
+
+
+/* =========================================================
+   V6.2.1 - CORREÇÃO DA LATERAL, PERFIL E TAMANHO DO CHAT
+   ========================================================= */
+
+/* Restaura a estrutura principal que foi afetada pelo seletor genérico. */
+html,body{
+    width:100%;
+    min-height:100%;
+}
+body{
+    overflow-x:hidden!important;
+}
+.sidebar,
+#sidebar{
+    position:fixed!important;
+    left:0!important;
+    top:0!important;
+    bottom:0!important;
+    width:300px!important;
+    height:100vh!important;
+    padding:35px 25px 152px!important;
+    box-sizing:border-box!important;
+    overflow:hidden!important;
+    z-index:1000!important;
+}
+.main{
+    margin-left:300px!important;
+    width:calc(100% - 300px)!important;
+    min-height:100vh!important;
+}
+
+/* Perfil realmente preso dentro da barra lateral. */
+.painel-usuario-v620{
+    position:absolute!important;
+    left:0!important;
+    right:0!important;
+    bottom:0!important;
+    width:100%!important;
+    max-width:none!important;
+    min-width:0!important;
+    box-sizing:border-box!important;
+    padding:10px 14px!important;
+    border-radius:0!important;
+    z-index:5!important;
+}
+.painel-usuario-linha-v620{
+    width:100%!important;
+}
+.painel-identidade-v620{
+    min-width:0!important;
+}
+.painel-acoes-v620{
+    flex:0 0 auto!important;
+}
+.painel-status-botao-v620{
+    width:100%!important;
+}
+.painel-menu-v620,
+.painel-status-menu-v620{
+    left:10px!important;
+    right:10px!important;
+    width:auto!important;
+}
+
+/* O conteúdo da lateral rola somente quando necessário, acima do perfil. */
+#sidebar{
+    display:flex!important;
+    flex-direction:column!important;
+}
+#sidebar .logo,
+#sidebar .sublogo,
+#sidebar .line{
+    flex:0 0 auto!important;
+}
+#sidebar .menu{
+    flex:0 0 auto!important;
+}
+#sidebar::after{
+    content:"";
+    display:block;
+    height:1px;
+    flex:1 1 auto;
+}
+
+/* Restaura o chat para um tamanho estável. */
+.chat-painel{
+    position:fixed!important;
+    left:auto!important;
+    right:22px!important;
+    top:auto!important;
+    bottom:150px!important;
+    width:min(760px,calc(100vw - 340px))!important;
+    height:min(650px,calc(100vh - 180px))!important;
+    min-width:620px!important;
+    min-height:420px!important;
+    max-width:900px!important;
+    max-height:760px!important;
+    padding-top:0!important;
+    resize:none!important;
+    overflow:hidden!important;
+    transform:none!important;
+}
+.chat-painel.aberto{
+    display:grid!important;
+    grid-template-columns:280px minmax(0,1fr)!important;
+}
+.chat-painel-drag,
+.chat-resize-handle,
+.chat-arraste-dica{
+    display:none!important;
+}
+.chat-cabecalho{
+    cursor:default!important;
+}
+.chat-lateral{
+    position:relative!important;
+    min-width:0!important;
+    width:auto!important;
+}
+.chat-conversa{
+    min-width:0!important;
+    min-height:0!important;
+}
+.chat-mensagens{
+    min-width:0!important;
+    min-height:0!important;
+}
+
+/* Desfaz regras genéricas anteriores que afetavam qualquer aside. */
+aside{
+    position:static;
+}
+.chat-lateral{
+    position:relative!important;
+}
+
+/* Celular e telas estreitas. */
+@media(max-width:1100px){
+    .chat-painel{
+        left:310px!important;
+        right:12px!important;
+        width:auto!important;
+        min-width:0!important;
+        max-width:none!important;
+    }
+}
+@media(max-width:760px){
+    .sidebar,
+    #sidebar{
+        left:-100%!important;
+        width:300px!important;
+        padding-bottom:152px!important;
+    }
+    .sidebar.mobile-open,
+    #sidebar.mobile-open{
+        left:0!important;
+    }
+    .main{
+        margin-left:0!important;
+        width:100%!important;
+    }
+    .painel-usuario-v620{
+        width:100%!important;
+        padding:10px 14px!important;
+    }
+    .painel-identidade-v620,
+    .painel-status-botao-v620{
+        display:block!important;
+    }
+    .painel-acoes-v620{
+        flex-direction:row!important;
+    }
+    .chat-painel{
+        left:8px!important;
+        right:8px!important;
+        top:70px!important;
+        bottom:8px!important;
+        width:auto!important;
+        height:auto!important;
+        min-width:0!important;
+        min-height:0!important;
+        max-width:none!important;
+        max-height:none!important;
+    }
+    .chat-painel.aberto{
+        grid-template-columns:1fr!important;
+    }
+}
+
+
+/* V6.2.2 - chat e logout */
+.painel-logout-icone-v622,.menu-logout-icone-v622{display:inline-block;position:relative;width:16px;height:16px;box-sizing:border-box}
+.painel-logout-icone-v622:before,.menu-logout-icone-v622:before{content:"";position:absolute;left:1px;top:2px;width:8px;height:12px;border:2px solid currentColor;border-right:0;border-radius:3px 0 0 3px;box-sizing:border-box}
+.painel-logout-icone-v622:after,.menu-logout-icone-v622:after{content:"";position:absolute;right:0;top:7px;width:10px;height:2px;background:currentColor;box-shadow:3px -3px 0 -1px currentColor,3px 3px 0 -1px currentColor}
+.menu-logout-icone-v622{margin-right:7px;vertical-align:-3px}
+.painel-logout-v622:hover{background:rgba(239,74,91,.18)!important;color:#ff7b88!important}
+
+
+/* =========================================================
+   V6.3.0 - CHAMADAS DE ÁUDIO E VÍDEO
+   ========================================================= */
+.chamada-overlay-v630{display:none;position:fixed;inset:0;z-index:22000;background:rgba(0,12,28,.82);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+.chamada-overlay-v630.aberta{display:flex}
+.chamada-card-v630{width:min(820px,96vw);min-height:480px;border-radius:24px;overflow:hidden;background:#071a2e;color:#fff;box-shadow:0 28px 100px rgba(0,0,0,.55);display:flex;flex-direction:column}
+.chamada-cab-v630{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(255,255,255,.05)}
+.chamada-identidade-v630{display:flex;align-items:center;gap:12px}
+.chamada-avatar-v630{width:48px;height:48px;border-radius:50%;background:#dceaff;color:#001b3d;display:flex;align-items:center;justify-content:center;font-weight:950;overflow:hidden}
+.chamada-avatar-v630 img{width:100%;height:100%;object-fit:cover}
+.chamada-identidade-v630 b,.chamada-identidade-v630 small{display:block}
+.chamada-identidade-v630 small{margin-top:3px;color:#aec0d5}
+.chamada-tempo-v630{font-variant-numeric:tabular-nums;font-weight:900}
+.chamada-palco-v630{position:relative;flex:1;min-height:340px;background:radial-gradient(circle at center,#173c61,#061426);display:flex;align-items:center;justify-content:center}
+.chamada-video-remoto-v630{width:100%;height:100%;min-height:340px;object-fit:cover;background:#020812}
+.chamada-video-local-v630{position:absolute;right:18px;bottom:18px;width:180px;height:125px;border-radius:14px;object-fit:cover;background:#0d2035;border:2px solid rgba(255,255,255,.45);box-shadow:0 8px 28px rgba(0,0,0,.4)}
+.chamada-audio-avatar-v630{display:none;flex-direction:column;align-items:center;gap:14px}
+.chamada-audio-avatar-v630.ativo{display:flex}
+.chamada-audio-avatar-v630 .foto{width:132px;height:132px;border-radius:50%;background:#dceaff;color:#001b3d;display:flex;align-items:center;justify-content:center;font-size:38px;font-weight:950;overflow:hidden;box-shadow:0 0 0 10px rgba(255,255,255,.06)}
+.chamada-audio-avatar-v630 .foto img{width:100%;height:100%;object-fit:cover}
+.chamada-audio-avatar-v630 span{color:#c5d4e6}
+.chamada-controles-v630{display:flex;justify-content:center;gap:12px;padding:18px;background:#071a2e}
+.chamada-btn-v630{width:50px;height:50px;border:0;border-radius:50%;background:#1b3652;color:#fff;font-size:20px;cursor:pointer}
+.chamada-btn-v630:hover{filter:brightness(1.15)}
+.chamada-btn-v630.desativado{background:#fff;color:#071a2e}
+.chamada-btn-v630.encerrar{background:#e43d4f;transform:rotate(135deg)}
+.chamada-recebida-v630{display:none;position:fixed;right:24px;bottom:24px;z-index:23000;width:330px;padding:18px;border-radius:18px;background:#fff;color:#001b3d;box-shadow:0 18px 60px rgba(0,0,0,.35)}
+.chamada-recebida-v630.aberta{display:block;animation:entradaChamadaV630 .25s ease}
+.chamada-recebida-cab-v630{display:flex;gap:12px;align-items:center}
+.chamada-recebida-avatar-v630{width:56px;height:56px;border-radius:50%;background:#dceaff;display:flex;align-items:center;justify-content:center;font-weight:950;overflow:hidden}
+.chamada-recebida-avatar-v630 img{width:100%;height:100%;object-fit:cover}
+.chamada-recebida-v630 h3{margin:0 0 4px}.chamada-recebida-v630 p{margin:0;color:#657488;font-size:12px}
+.chamada-recebida-acoes-v630{display:flex;gap:9px;margin-top:16px}
+.chamada-recebida-acoes-v630 button{flex:1;border:0;border-radius:11px;padding:11px;font-weight:900;cursor:pointer;color:#fff}
+.chamada-aceitar-v630{background:#19a65b}.chamada-recusar-v630{background:#e13e50}
+@keyframes entradaChamadaV630{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
+@media(max-width:700px){.chamada-card-v630{min-height:90vh}.chamada-video-local-v630{width:120px;height:90px}.chamada-recebida-v630{left:12px;right:12px;bottom:12px;width:auto}}
+
+
+/* =========================================================
+   V6.3.1 - ENCERRAMENTO CONFIÁVEL DA CHAMADA
+   ========================================================= */
+#chamadaEncerrarV631{
+    position:relative;
+    z-index:5;
+    pointer-events:auto!important;
+    touch-action:manipulation;
+}
+#chamadaEncerrarV631:active{
+    transform:rotate(135deg) scale(.9)!important;
+}
+#chamadaEncerrarV631.encerrando{
+    opacity:.6;
+    pointer-events:none!important;
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -3102,9 +4055,31 @@ body.dark-mode .chat-audio-previa-v603{
     <div class="mobile-menu-btn" onclick="toggleMenu()">☰</div>
     <div>Bem-vindo,</div>
     <div class="company">Claudino SA Lojas de Departamentos</div>
-    <div class="usuario-topo" id="usuarioTopo" style="display:none">
-        <span id="usuarioNomeTopo">Usuário</span> • <span id="usuarioPerfilTopo">Perfil</span> <span id="presencaIndicadorTopo" class="presenca-indicador-topo">● online</span>
-        <button class="btn-sair" onclick="sairSistema()">Sair</button>
+    <div class="usuario-topo usuario-topo-v610" id="usuarioTopo" style="display:none">
+        <button type="button" class="usuario-avatar-botao-v610" onclick="alternarMenuPerfilV610(event)" title="Abrir perfil">
+            <span class="usuario-avatar-fallback-v610" id="usuarioAvatarFallbackV610">U</span>
+            <img id="usuarioAvatarTopoV610" alt="Foto do usuário">
+            <span class="usuario-avatar-status-v610"></span>
+        </button>
+        <button type="button" class="usuario-resumo-v610" onclick="alternarMenuPerfilV610(event)">
+            <strong id="usuarioNomeTopo">Usuário</strong>
+            <small><span id="usuarioPerfilTopo">Perfil</span> • <span id="presencaIndicadorTopo" class="presenca-indicador-topo">online</span></small>
+        </button>
+        <div class="usuario-menu-v610" id="usuarioMenuV610">
+            <div class="usuario-menu-cab-v610">
+                <div class="usuario-menu-avatar-v610">
+                    <span id="usuarioMenuFallbackV610">U</span>
+                    <img id="usuarioMenuAvatarV610" alt="">
+                </div>
+                <div>
+                    <b id="usuarioMenuNomeV610">Usuário</b>
+                    <small id="usuarioMenuCargoV610">Cargo</small>
+                </div>
+            </div>
+            <button type="button" onclick="abrirPerfilUsuarioV610()">👤 Meu perfil</button>
+            <button type="button" onclick="abrirPerfilUsuarioV610(true)">📷 Alterar foto</button>
+            <button type="button" onclick="sairSistema()">🚪 Sair</button>
+        </div>
     </div>
 
     <div class="pesquisa-global-wrap">
@@ -3149,8 +4124,8 @@ body.dark-mode .chat-audio-previa-v603{
                 <div class="chat-cabecalho-acoes">
                     <button class="chat-acao-topo" id="chatFavoritoV600" onclick="alternarFavoritoChatV600()" title="Favoritar conversa">☆</button>
                     <button class="chat-acao-topo" onclick="alternarPesquisaChatV600()" title="Pesquisar mensagens">🔎</button>
-                    <button class="chat-acao-topo" onclick="avisoChamadaV600('áudio')" title="Chamada de áudio">📞</button>
-                    <button class="chat-acao-topo" onclick="avisoChamadaV600('vídeo')" title="Chamada de vídeo">🎥</button>
+                    <button class="chat-acao-topo" onclick="iniciarChamadaV630('audio')" title="Chamada de áudio">📞</button>
+                    <button class="chat-acao-topo" onclick="iniciarChamadaV630('video')" title="Chamada de vídeo">🎥</button>
                     <button class="chat-fechar" onclick="fecharChatV57()" title="Fechar">✕</button>
                 </div>
             </div>
@@ -4190,7 +5165,7 @@ async function carregarPerfilUsuario(usuarioAuth){
 
     ({ data, error } = await supabase
         .from("usuarios")
-        .select("id,nome,cargo,perfil,ativo,status_aprovacao")
+        .select("id,nome,cargo,perfil,ativo,status_aprovacao,avatar_url,status_perfil,recado,ramal,aniversario")
         .eq("id", usuarioAuth.id)
         .maybeSingle());
 
@@ -4201,7 +5176,7 @@ async function carregarPerfilUsuario(usuarioAuth){
     )){
         ({ data, error } = await supabase
             .from("usuarios")
-            .select("id,nome,cargo,perfil,ativo")
+            .select("id,nome,cargo,perfil,ativo,avatar_url,status_perfil,recado,ramal,aniversario")
             .eq("id", usuarioAuth.id)
             .maybeSingle());
     }
@@ -4220,24 +5195,45 @@ async function carregarPerfilUsuario(usuarioAuth){
         cargo: data.cargo || "",
         perfil: data.perfil || "consulta",
         ativo: data.ativo !== false,
-        status_aprovacao: data.status_aprovacao || "aprovado"
+        status_aprovacao: data.status_aprovacao || "aprovado",
+        avatar_url: data.avatar_url || "",
+        status_perfil: data.status_perfil || "online",
+        recado: data.recado || "",
+        ramal: data.ramal || "",
+        aniversario: data.aniversario || "",
+        email: usuarioAuth?.email || usuarioLogado?.email || ""
     };
 }
 
 function atualizarUsuarioTopo(){
-    const box = document.getElementById("usuarioTopo");
-    const nome = document.getElementById("usuarioNomeTopo");
-    const perfil = document.getElementById("usuarioPerfilTopo");
-    if(!box) return;
+    const box=document.getElementById("usuarioTopo");
+    const nome=document.getElementById("usuarioNomeTopo");
+    const perfil=document.getElementById("usuarioPerfilTopo");
+    if(!box)return;
+
     if(!usuarioLogado){
-        box.style.display = "none";
+        box.style.display="none";
         return;
     }
-    box.style.display = "inline-block";
-    if(nome) nome.innerHTML = usuarioLogado.nome || usuarioLogado.email;
-    if(perfil) perfil.innerHTML = PERFIS_NOME[usuarioLogado.perfil] || usuarioLogado.perfil;
-    if(typeof iniciarPresencaV56==="function") iniciarPresencaV56();
-    if(typeof inicializarChatV57==="function") setTimeout(inicializarChatV57,500);
+
+    box.style.display="flex";
+    if(nome)nome.textContent=usuarioLogado.nome||usuarioLogado.email;
+    if(perfil)perfil.textContent=PERFIS_NOME[usuarioLogado.perfil]||usuarioLogado.perfil;
+
+    atualizarElementosAvatarV610(
+        usuarioLogado.avatar_url,
+        usuarioLogado.nome||usuarioLogado.email,
+        ["usuarioAvatarTopoV610","usuarioMenuAvatarV610"],
+        ["usuarioAvatarFallbackV610","usuarioMenuFallbackV610"]
+    );
+
+    const menuNome=document.getElementById("usuarioMenuNomeV610");
+    const menuCargo=document.getElementById("usuarioMenuCargoV610");
+    if(menuNome)menuNome.textContent=usuarioLogado.nome||usuarioLogado.email;
+    if(menuCargo)menuCargo.textContent=usuarioLogado.cargo||PERFIS_NOME[usuarioLogado.perfil]||"Usuário";
+
+    if(typeof iniciarPresencaV56==="function")iniciarPresencaV56();
+    if(typeof inicializarChatV57==="function")setTimeout(inicializarChatV57,500);
 }
 
 function aplicarPermissoesVisuais(){
@@ -9263,7 +10259,7 @@ document.addEventListener("pointerdown",e=>{
 async function carregarUsuariosChatV57(){
     const area=document.getElementById("chatUsuarios");
     try{
-        const {data,error}=await chatSbV57().rpc("listar_usuarios_chat");
+        const {data,error}=await chatSbV57().rpc("listar_usuarios_chat_v610");
         if(error)throw error;
         chatUsuariosV57=(data||[]).filter(u=>u.id!==usuarioLogado?.id);
         renderizarUsuariosChatV57();
@@ -9284,7 +10280,7 @@ function renderizarUsuariosChatV57(){
     area.innerHTML=lista.map(u=>{
         const s=chatStatusUsuarioV57(u),nao=Number(chatResumoNaoLidasV57[u.id]||0);
         return "<button class='chat-usuario "+(chatUsuarioAtualV57?.id===u.id?"ativo":"")+"' onclick=\"abrirConversaChatV57(event,'"+u.id+"')\">"+
-            "<div class='chat-avatar'>"+chatEscV57(chatIniciaisV57(u.nome||u.email))+"<span class='chat-status-dot "+s+"'></span></div>"+
+            avatarChatHTMLV610(u,s)+
             "<div class='chat-usuario-info'><b>"+chatEscV57(u.nome||u.email)+"</b><span>"+chatEscV57(chatStatusTextoV57(u))+"</span></div>"+
             (nao?"<span class='chat-nao-lidas'>"+Math.min(nao,99)+"</span>":"<span></span>")+"</button>";
     }).join("");
@@ -9301,7 +10297,7 @@ async function abrirConversaChatV57(event,outroId){
     const vazia=document.getElementById("chatConversaVazia");if(vazia)vazia.style.display="none";
     document.getElementById("chatCabecalhoNome").textContent=usuario.nome||usuario.email;
     document.getElementById("chatCabecalhoStatus").textContent=chatStatusTextoV57(usuario);
-    document.getElementById("chatCabecalhoAvatar").textContent=chatIniciaisV57(usuario.nome||usuario.email);
+    aplicarAvatarChatCabecalhoV610(usuario);
     document.getElementById("chatMensagens").innerHTML="<div class='chat-carregando'>Abrindo conversa...</div>";
     renderizarUsuariosChatV57();
     try{
@@ -10050,6 +11046,1068 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 </script>
 
+
+
+<div class="perfil-modal-v610" id="perfilModalV610" aria-hidden="true">
+    <div class="perfil-modal-card-v610">
+        <div class="perfil-modal-cab-v610">
+            <div>
+                <h2>Meu perfil</h2>
+                <p>Sua foto aparecerá no ERP e nas conversas.</p>
+            </div>
+            <button type="button" onclick="fecharPerfilUsuarioV610()" title="Fechar">✕</button>
+        </div>
+
+        <div class="perfil-modal-corpo-v610">
+            <section class="perfil-foto-coluna-v610">
+                <div class="perfil-canvas-wrap-v610">
+                    <canvas id="perfilCanvasV610" width="320" height="320"></canvas>
+                    <div class="perfil-canvas-vazio-v610" id="perfilCanvasVazioV610">
+                        <span id="perfilCanvasInicialV610">U</span>
+                        <small>Selecione uma foto</small>
+                    </div>
+                </div>
+
+                <input type="file" id="perfilArquivoV610" accept="image/jpeg,image/png,image/webp" hidden onchange="carregarImagemPerfilV610(this.files?.[0])">
+
+                <div class="perfil-foto-acoes-v610">
+                    <button type="button" onclick="document.getElementById('perfilArquivoV610').click()">📷 Selecionar foto</button>
+                    <button type="button" onclick="girarImagemPerfilV610(-90)" title="Girar para esquerda">↶</button>
+                    <button type="button" onclick="girarImagemPerfilV610(90)" title="Girar para direita">↷</button>
+                    <button type="button" class="perigo" onclick="removerFotoPerfilV610()" title="Remover foto">🗑</button>
+                </div>
+
+                <label class="perfil-zoom-v610">
+                    <span>Zoom</span>
+                    <input type="range" id="perfilZoomV610" min="1" max="3" step="0.01" value="1" oninput="atualizarZoomPerfilV610(this.value)">
+                </label>
+                <small class="perfil-ajuda-v610">Arraste a imagem dentro do círculo para reposicionar.</small>
+            </section>
+
+            <section class="perfil-dados-v610">
+                <label>
+                    <span>Nome</span>
+                    <input id="perfilNomeV610" maxlength="120">
+                </label>
+                <label>
+                    <span>Cargo</span>
+                    <input id="perfilCargoV610" maxlength="120">
+                </label>
+                <label>
+                    <span>Status</span>
+                    <select id="perfilStatusV610">
+                        <option value="online">Online</option>
+                        <option value="ocupado">Ocupado</option>
+                        <option value="ausente">Ausente</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </label>
+                <label>
+                    <span>Recado</span>
+                    <input id="perfilRecadoV610" maxlength="180" placeholder="Ex.: Em atendimento">
+                </label>
+                <label>
+                    <span>Ramal</span>
+                    <input id="perfilRamalV610" maxlength="30">
+                </label>
+                <label>
+                    <span>Aniversário</span>
+                    <input id="perfilAniversarioV610" type="date">
+                </label>
+                <label>
+                    <span>E-mail</span>
+                    <input id="perfilEmailV610" readonly>
+                </label>
+            </section>
+        </div>
+
+        <div class="perfil-modal-rodape-v610">
+            <span id="perfilMensagemV610"></span>
+            <button type="button" class="secundario" onclick="fecharPerfilUsuarioV610()">Cancelar</button>
+            <button type="button" id="perfilSalvarV610" onclick="salvarPerfilUsuarioV610()">Salvar perfil</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+/* =========================================================
+   V6.1.0 - PERFIL DO USUÁRIO E AVATARES
+   ========================================================= */
+let perfilImagemV610=null;
+let perfilImagemOriginalV610=null;
+let perfilZoomAtualV610=1;
+let perfilRotacaoV610=0;
+let perfilOffsetXV610=0;
+let perfilOffsetYV610=0;
+let perfilArrastandoV610=false;
+let perfilUltimoXV610=0;
+let perfilUltimoYV610=0;
+let perfilFotoAlteradaV610=false;
+let perfilFotoRemoverV610=false;
+
+function iniciaisPerfilV610(nome){
+    return String(nome||"U").trim().split(/\s+/).slice(0,2).map(p=>p[0]||"").join("").toUpperCase()||"U";
+}
+
+function atualizarElementosAvatarV610(url,nome,idsImagem,idsFallback){
+    const iniciais=iniciaisPerfilV610(nome);
+    idsImagem.forEach((id,i)=>{
+        const img=document.getElementById(id);
+        const fallback=document.getElementById(idsFallback[i]);
+        if(fallback)fallback.textContent=iniciais;
+
+        if(img&&url){
+            img.onload=()=>{
+                img.style.display="block";
+                if(fallback)fallback.style.display="none";
+            };
+            img.onerror=()=>{
+                img.style.display="none";
+                if(fallback)fallback.style.display="flex";
+            };
+            img.src=url+(url.includes("?")?"&":"?")+"v="+Date.now();
+        }else{
+            if(img){
+                img.removeAttribute("src");
+                img.style.display="none";
+            }
+            if(fallback)fallback.style.display="flex";
+        }
+    });
+}
+
+function alternarMenuPerfilV610(event){
+    event?.stopPropagation();
+    document.getElementById("usuarioMenuV610")?.classList.toggle("aberto");
+}
+
+document.addEventListener("click",event=>{
+    if(!event.target.closest("#usuarioTopo")){
+        document.getElementById("usuarioMenuV610")?.classList.remove("aberto");
+    }
+});
+
+function avatarChatHTMLV610(usuario,status){
+    const nome=usuario.nome||usuario.email||"Usuário";
+    const iniciais=chatEscV57(chatIniciaisV57(nome));
+    const url=usuario.avatar_url?chatEscV57(usuario.avatar_url):"";
+
+    return "<div class='chat-avatar "+(url?"com-foto-v610":"")+"'>"+
+        (url?"<img class='chat-avatar-img-v610' src='"+url+"' alt=''>":"")+
+        "<span class='chat-avatar-iniciais-v610'>"+iniciais+"</span>"+
+        "<span class='chat-status-dot "+status+"'></span>"+
+        "</div>";
+}
+
+function aplicarAvatarChatCabecalhoV610(usuario){
+    const avatar=document.getElementById("chatCabecalhoAvatar");
+    if(!avatar)return;
+
+    const nome=usuario.nome||usuario.email||"Usuário";
+    avatar.classList.toggle("com-foto-v610",!!usuario.avatar_url);
+    avatar.innerHTML=
+        (usuario.avatar_url?"<img class='chat-avatar-img-v610' src='"+chatEscV57(usuario.avatar_url)+"' alt=''>":"")+
+        "<span class='chat-avatar-iniciais-v610'>"+chatEscV57(chatIniciaisV57(nome))+"</span>";
+}
+
+function abrirPerfilUsuarioV610(abrirSeletor=false){
+    if(!usuarioLogado)return;
+    document.getElementById("usuarioMenuV610")?.classList.remove("aberto");
+
+    document.getElementById("perfilNomeV610").value=usuarioLogado.nome||"";
+    document.getElementById("perfilCargoV610").value=usuarioLogado.cargo||"";
+    document.getElementById("perfilStatusV610").value=usuarioLogado.status_perfil||"online";
+    document.getElementById("perfilRecadoV610").value=usuarioLogado.recado||"";
+    document.getElementById("perfilRamalV610").value=usuarioLogado.ramal||"";
+    document.getElementById("perfilAniversarioV610").value=usuarioLogado.aniversario||"";
+    document.getElementById("perfilEmailV610").value=usuarioLogado.email||"";
+    document.getElementById("perfilCanvasInicialV610").textContent=iniciaisPerfilV610(usuarioLogado.nome||usuarioLogado.email);
+    document.getElementById("perfilMensagemV610").textContent="";
+
+    resetarEditorFotoV610();
+    document.getElementById("perfilModalV610")?.classList.add("aberto");
+    document.getElementById("perfilModalV610")?.setAttribute("aria-hidden","false");
+
+    if(usuarioLogado.avatar_url){
+        carregarImagemURLPerfilV610(usuarioLogado.avatar_url);
+    }else{
+        desenharPerfilV610();
+    }
+
+    if(abrirSeletor)setTimeout(()=>document.getElementById("perfilArquivoV610")?.click(),180);
+}
+
+function fecharPerfilUsuarioV610(){
+    document.getElementById("perfilModalV610")?.classList.remove("aberto");
+    document.getElementById("perfilModalV610")?.setAttribute("aria-hidden","true");
+}
+
+function resetarEditorFotoV610(){
+    perfilImagemV610=null;
+    perfilImagemOriginalV610=null;
+    perfilZoomAtualV610=1;
+    perfilRotacaoV610=0;
+    perfilOffsetXV610=0;
+    perfilOffsetYV610=0;
+    perfilFotoAlteradaV610=false;
+    perfilFotoRemoverV610=false;
+
+    const zoom=document.getElementById("perfilZoomV610");
+    if(zoom)zoom.value="1";
+}
+
+function validarArquivoFotoV610(arquivo){
+    if(!arquivo)return false;
+    if(!["image/jpeg","image/png","image/webp"].includes(arquivo.type)){
+        alert("Use uma imagem JPG, PNG ou WEBP.");
+        return false;
+    }
+    if(arquivo.size>5*1024*1024){
+        alert("A foto deve ter no máximo 5 MB.");
+        return false;
+    }
+    return true;
+}
+
+function carregarImagemPerfilV610(arquivo){
+    if(!validarArquivoFotoV610(arquivo))return;
+    const leitor=new FileReader();
+    leitor.onload=()=>carregarImagemBase64PerfilV610(leitor.result,true);
+    leitor.readAsDataURL(arquivo);
+}
+
+function carregarImagemURLPerfilV610(url){
+    const img=new Image();
+    img.crossOrigin="anonymous";
+    img.onload=()=>{
+        perfilImagemV610=img;
+        perfilImagemOriginalV610=img;
+        document.getElementById("perfilCanvasVazioV610").style.display="none";
+        desenharPerfilV610();
+    };
+    img.onerror=()=>desenharPerfilV610();
+    img.src=url+(url.includes("?")?"&":"?")+"v="+Date.now();
+}
+
+function carregarImagemBase64PerfilV610(base64,alterada){
+    const img=new Image();
+    img.onload=()=>{
+        perfilImagemV610=img;
+        perfilImagemOriginalV610=img;
+        perfilZoomAtualV610=1;
+        perfilRotacaoV610=0;
+        perfilOffsetXV610=0;
+        perfilOffsetYV610=0;
+        perfilFotoAlteradaV610=alterada;
+        perfilFotoRemoverV610=false;
+        document.getElementById("perfilCanvasVazioV610").style.display="none";
+        document.getElementById("perfilZoomV610").value="1";
+        desenharPerfilV610();
+    };
+    img.src=base64;
+}
+
+function atualizarZoomPerfilV610(valor){
+    perfilZoomAtualV610=Number(valor)||1;
+    perfilFotoAlteradaV610=true;
+    desenharPerfilV610();
+}
+
+function girarImagemPerfilV610(graus){
+    if(!perfilImagemV610)return;
+    perfilRotacaoV610=(perfilRotacaoV610+graus)%360;
+    perfilFotoAlteradaV610=true;
+    desenharPerfilV610();
+}
+
+function removerFotoPerfilV610(){
+    perfilImagemV610=null;
+    perfilFotoRemoverV610=true;
+    perfilFotoAlteradaV610=true;
+    document.getElementById("perfilCanvasVazioV610").style.display="flex";
+    desenharPerfilV610();
+}
+
+function desenharPerfilV610(){
+    const canvas=document.getElementById("perfilCanvasV610");
+    if(!canvas)return;
+    const ctx=canvas.getContext("2d");
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    if(!perfilImagemV610){
+        document.getElementById("perfilCanvasVazioV610").style.display="flex";
+        return;
+    }
+
+    document.getElementById("perfilCanvasVazioV610").style.display="none";
+
+    const w=perfilImagemV610.naturalWidth||perfilImagemV610.width;
+    const h=perfilImagemV610.naturalHeight||perfilImagemV610.height;
+    const base=Math.max(canvas.width/w,canvas.height/h);
+    const escala=base*perfilZoomAtualV610;
+    const dw=w*escala;
+    const dh=h*escala;
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(canvas.width/2,canvas.height/2,canvas.width/2,0,Math.PI*2);
+    ctx.clip();
+    ctx.translate(canvas.width/2+perfilOffsetXV610,canvas.height/2+perfilOffsetYV610);
+    ctx.rotate(perfilRotacaoV610*Math.PI/180);
+    ctx.drawImage(perfilImagemV610,-dw/2,-dh/2,dw,dh);
+    ctx.restore();
+}
+
+(function configurarArrastePerfilV610(){
+    document.addEventListener("DOMContentLoaded",()=>{
+        const canvas=document.getElementById("perfilCanvasV610");
+        if(!canvas)return;
+
+        const inicio=(x,y)=>{
+            if(!perfilImagemV610)return;
+            perfilArrastandoV610=true;
+            perfilUltimoXV610=x;
+            perfilUltimoYV610=y;
+        };
+        const mover=(x,y)=>{
+            if(!perfilArrastandoV610)return;
+            perfilOffsetXV610+=x-perfilUltimoXV610;
+            perfilOffsetYV610+=y-perfilUltimoYV610;
+            perfilUltimoXV610=x;
+            perfilUltimoYV610=y;
+            perfilFotoAlteradaV610=true;
+            desenharPerfilV610();
+        };
+        const fim=()=>perfilArrastandoV610=false;
+
+        canvas.addEventListener("mousedown",e=>inicio(e.clientX,e.clientY));
+        window.addEventListener("mousemove",e=>mover(e.clientX,e.clientY));
+        window.addEventListener("mouseup",fim);
+
+        canvas.addEventListener("touchstart",e=>{
+            const t=e.touches[0];
+            inicio(t.clientX,t.clientY);
+        },{passive:true});
+        canvas.addEventListener("touchmove",e=>{
+            const t=e.touches[0];
+            mover(t.clientX,t.clientY);
+        },{passive:true});
+        canvas.addEventListener("touchend",fim);
+    });
+})();
+
+function canvasBlobPerfilV610(){
+    return new Promise((resolve,reject)=>{
+        const canvas=document.getElementById("perfilCanvasV610");
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error("Não foi possível processar a foto.")),"image/webp",.88);
+    });
+}
+
+async function salvarPerfilUsuarioV610(){
+    if(!usuarioLogado)return;
+
+    const botao=document.getElementById("perfilSalvarV610");
+    const mensagem=document.getElementById("perfilMensagemV610");
+    const nome=document.getElementById("perfilNomeV610").value.trim();
+    const cargo=document.getElementById("perfilCargoV610").value.trim();
+    const status=document.getElementById("perfilStatusV610").value;
+    const recado=document.getElementById("perfilRecadoV610").value.trim();
+    const ramal=document.getElementById("perfilRamalV610").value.trim();
+    const aniversario=document.getElementById("perfilAniversarioV610").value||null;
+
+    if(nome.length<3){
+        mensagem.textContent="Informe um nome válido.";
+        mensagem.style.color="#b00020";
+        return;
+    }
+
+    botao.disabled=true;
+    mensagem.textContent="Salvando perfil...";
+    mensagem.style.color="#0064bd";
+
+    try{
+        const supabase=obterSupabaseClient();
+        let avatarUrl=usuarioLogado.avatar_url||"";
+
+        if(perfilFotoRemoverV610){
+            await supabase.storage.from("avatars").remove([`${usuarioLogado.id}/perfil.webp`]);
+            avatarUrl="";
+        }else if(perfilImagemV610&&perfilFotoAlteradaV610){
+            const blob=await canvasBlobPerfilV610();
+            const caminho=`${usuarioLogado.id}/perfil.webp`;
+            const {error:uploadError}=await supabase.storage.from("avatars").upload(caminho,blob,{
+                contentType:"image/webp",
+                upsert:true,
+                cacheControl:"3600"
+            });
+            if(uploadError)throw uploadError;
+
+            const {data:urlData}=supabase.storage.from("avatars").getPublicUrl(caminho);
+            avatarUrl=urlData.publicUrl;
+        }
+
+        const {data,error}=await supabase.rpc("atualizar_meu_perfil_v610",{
+            p_nome:nome,
+            p_cargo:cargo,
+            p_avatar_url:avatarUrl,
+            p_status_perfil:status,
+            p_recado:recado,
+            p_ramal:ramal,
+            p_aniversario:aniversario
+        });
+        if(error)throw error;
+
+        usuarioLogado={
+            ...usuarioLogado,
+            nome,
+            cargo,
+            avatar_url:avatarUrl,
+            status_perfil:status,
+            recado,
+            ramal,
+            aniversario:aniversario||""
+        };
+
+        atualizarUsuarioTopo();
+        await carregarUsuariosChatV57();
+        if(chatUsuarioAtualV57){
+            const atualizado=chatUsuariosV57.find(u=>u.id===chatUsuarioAtualV57.id);
+            if(atualizado){
+                chatUsuarioAtualV57=atualizado;
+                aplicarAvatarChatCabecalhoV610(atualizado);
+            }
+        }
+
+        mensagem.textContent="Perfil salvo com sucesso.";
+        mensagem.style.color="#14833b";
+        setTimeout(fecharPerfilUsuarioV610,700);
+    }catch(e){
+        mensagem.textContent="Erro ao salvar: "+(e?.message||e);
+        mensagem.style.color="#b00020";
+    }finally{
+        botao.disabled=false;
+    }
+}
+
+document.addEventListener("keydown",event=>{
+    if(event.key==="Escape"&&document.getElementById("perfilModalV610")?.classList.contains("aberto")){
+        fecharPerfilUsuarioV610();
+    }
+});
+</script>
+
+
+<div class="painel-usuario-v620" id="painelUsuarioV620">
+    <div class="painel-usuario-linha-v620">
+        <button type="button" class="painel-avatar-v620" onclick="alternarMenuUsuarioV620(event)" title="Abrir perfil">
+            <span class="painel-avatar-fallback-v620" id="painelAvatarFallbackV620">U</span>
+            <img id="painelAvatarImagemV620" alt="Foto do usuário">
+            <span class="painel-status-bolinha-v620" id="painelStatusBolinhaV620"></span>
+        </button>
+
+        <div class="painel-identidade-v620" onclick="alternarMenuUsuarioV620(event)">
+            <strong id="painelUsuarioNomeV620">Usuário</strong>
+            <small id="painelUsuarioCargoV620">Perfil</small>
+        </div>
+
+        <div class="painel-acoes-v620">
+            <button class="painel-acao-v620" onclick="abrirChatPainelV620()" title="Abrir conversas" aria-label="Abrir conversas">💬</button>
+            <button class="painel-acao-v620" onclick="abrirConfiguracoesPainelV620()" title="Configurações">⚙️</button>
+            <button class="painel-acao-v620 painel-logout-v622" onclick="sairSistema()" title="Encerrar sessão" aria-label="Encerrar sessão"><span class="painel-logout-icone-v622" aria-hidden="true"></span></button>
+        </div>
+    </div>
+
+    <button type="button" class="painel-status-botao-v620" onclick="alternarMenuStatusV620(event)">
+        <span id="painelStatusIconeV620">🟢</span>
+        <span id="painelStatusTextoV620">Online</span>
+        <span class="seta">▴</span>
+    </button>
+
+    <div class="painel-menu-v620" id="painelMenuUsuarioV620">
+        <button onclick="abrirPerfilUsuarioV610()">👤 Meu perfil</button>
+        <button onclick="abrirPerfilUsuarioV610(true)">📷 Alterar foto</button>
+        <button onclick="abrirPerfilUsuarioV610()">✏ Editar perfil</button>
+        <hr>
+        <button onclick="alternarMenuStatusV620(event)">🟢 Alterar status</button>
+        <button onclick="abrirConfiguracoesPainelV620()">⚙️ Configurações</button>
+        <button onclick="abrirChatPainelV620()">💬 Abrir chat</button>
+        <hr>
+        <button onclick="sairSistema()"><span class="menu-logout-icone-v622" aria-hidden="true"></span> Encerrar sessão</button>
+    </div>
+
+    <div class="painel-status-menu-v620" id="painelStatusMenuV620">
+        <button onclick="alterarStatusUsuarioV620('online')">🟢 Online</button>
+        <button onclick="alterarStatusUsuarioV620('ausente')">🟡 Ausente</button>
+        <button onclick="alterarStatusUsuarioV620('ocupado')">🔴 Ocupado</button>
+    </div>
+</div>
+
+<div class="painel-config-v620" id="painelConfigV620">
+    <div class="painel-config-card-v620">
+        <div class="painel-config-cab-v620">
+            <h3>Configurações rápidas</h3>
+            <button onclick="fecharConfiguracoesPainelV620()">✕</button>
+        </div>
+        <div class="painel-config-corpo-v620">
+            <div class="painel-config-opcao-v620">
+                <div><b>Aparência</b><small>Alternar tema claro ou escuro.</small></div>
+                <button onclick="alternarTemaV620()">🌗</button>
+            </div>
+            <div class="painel-config-opcao-v620">
+                <div><b>Notificações</b><small>Ativar notificações do navegador.</small></div>
+                <button onclick="solicitarNotificacoesV620()">🔔</button>
+            </div>
+            <div class="painel-config-opcao-v620">
+                <div><b>Sons do chat</b><small>Ativar ou desativar sons.</small></div>
+                <input type="checkbox" id="painelSomChatV620" checked onchange="salvarPreferenciaSomV620(this.checked)">
+            </div>
+            <div class="painel-config-opcao-v620">
+                <div><b>Meu perfil</b><small>Editar foto, nome, cargo e recado.</small></div>
+                <button onclick="abrirPerfilUsuarioV610()">Abrir</button>
+            </div>
+        </div>
+        <div class="painel-config-rodape-v620">
+            <button onclick="fecharConfiguracoesPainelV620()">Fechar</button>
+        </div>
+    </div>
+</div>
+
+
+<script>
+/* =========================================================
+   V6.2.0 - PAINEL DO USUÁRIO ESTILO DISCORD
+   ========================================================= */
+
+function atualizarPainelUsuarioV620(){
+    if(!usuarioLogado)return;
+
+    const nome=document.getElementById("painelUsuarioNomeV620");
+    const cargo=document.getElementById("painelUsuarioCargoV620");
+    if(nome)nome.textContent=usuarioLogado.nome||usuarioLogado.email||"Usuário";
+    if(cargo)cargo.textContent=usuarioLogado.cargo||PERFIS_NOME?.[usuarioLogado.perfil]||usuarioLogado.perfil||"Usuário";
+
+    atualizarElementosAvatarV610(
+        usuarioLogado.avatar_url,
+        usuarioLogado.nome||usuarioLogado.email,
+        ["painelAvatarImagemV620"],
+        ["painelAvatarFallbackV620"]
+    );
+
+    aplicarStatusPainelV620(usuarioLogado.status_perfil||"online");
+}
+
+function aplicarStatusPainelV620(status){
+    const mapa={
+        online:{icone:"🟢",texto:"Online",classe:""},
+        ausente:{icone:"🟡",texto:"Ausente",classe:"ausente"},
+        ocupado:{icone:"🔴",texto:"Ocupado",classe:"ocupado"}
+    };
+    const info=mapa[status]||mapa.online;
+
+    const icone=document.getElementById("painelStatusIconeV620");
+    const texto=document.getElementById("painelStatusTextoV620");
+    const bolinha=document.getElementById("painelStatusBolinhaV620");
+
+    if(icone)icone.textContent=info.icone;
+    if(texto)texto.textContent=info.texto;
+    if(bolinha){
+        bolinha.classList.remove("ausente","ocupado");
+        if(info.classe)bolinha.classList.add(info.classe);
+    }
+}
+
+function alternarMenuUsuarioV620(event){
+    event?.stopPropagation();
+    document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+    document.getElementById("painelMenuUsuarioV620")?.classList.toggle("aberto");
+}
+
+function alternarMenuStatusV620(event){
+    event?.stopPropagation();
+    document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
+    document.getElementById("painelStatusMenuV620")?.classList.toggle("aberto");
+}
+
+document.addEventListener("click",event=>{
+    if(!event.target.closest("#painelUsuarioV620")){
+        document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
+        document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+    }
+});
+
+async function alterarStatusUsuarioV620(status){
+    if(!["online","ausente","ocupado"].includes(status)||!usuarioLogado)return;
+
+    const antigo=usuarioLogado.status_perfil||"online";
+    usuarioLogado.status_perfil=status;
+    aplicarStatusPainelV620(status);
+    document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+
+    try{
+        const {error}=await obterSupabaseClient().rpc("alterar_meu_status_v620",{
+            p_status:status
+        });
+        if(error)throw error;
+
+        if(typeof carregarUsuariosChatV57==="function"){
+            await carregarUsuariosChatV57();
+        }
+    }catch(e){
+        usuarioLogado.status_perfil=antigo;
+        aplicarStatusPainelV620(antigo);
+        alert("Não foi possível alterar o status: "+(e?.message||e));
+    }
+}
+
+function abrirChatPainelV620(){
+    document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
+    document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+
+    const botoes=[
+        document.querySelector("#chatBotaoFlutuante"),
+        document.querySelector(".chat-botao-flutuante"),
+        document.querySelector(".chat-flutuante"),
+        document.querySelector("[onclick*='abrirChatV57']"),
+        document.querySelector("[onclick*='toggleChat']")
+    ].filter(Boolean);
+
+    for(const botao of botoes){
+        if(botao.closest("#painelUsuarioV620"))continue;
+        botao.click();
+        setTimeout(()=>{if(typeof corrigirEstruturaLayoutV621==="function")corrigirEstruturaLayoutV621()},80);
+        return;
+    }
+
+    const painel=document.getElementById("chatPainel")||document.querySelector(".chat-painel");
+    if(painel){
+        painel.classList.add("aberto");
+        painel.style.display="grid";
+        painel.setAttribute("aria-hidden","false");
+        const wrap=document.getElementById("chatWrap")||painel.closest(".chat-wrap");
+        if(wrap){wrap.classList.add("aberto");wrap.style.display="block"}
+        setTimeout(()=>{if(typeof corrigirEstruturaLayoutV621==="function")corrigirEstruturaLayoutV621()},80);
+        return;
+    }
+
+    alert("O painel do chat não foi encontrado.");
+}
+
+function abrirConfiguracoesPainelV620(){
+    document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
+    document.getElementById("painelConfigV620")?.classList.add("aberto");
+}
+
+function fecharConfiguracoesPainelV620(){
+    document.getElementById("painelConfigV620")?.classList.remove("aberto");
+}
+
+function alternarTemaV620(){
+    document.body.classList.toggle("dark-mode");
+    localStorage.setItem("erp_tema_v620",document.body.classList.contains("dark-mode")?"dark":"light");
+}
+
+async function solicitarNotificacoesV620(){
+    if(!("Notification" in window)){
+        alert("Este navegador não suporta notificações.");
+        return;
+    }
+    const permissao=await Notification.requestPermission();
+    alert(permissao==="granted"?"Notificações ativadas.":"Permissão não concedida.");
+}
+
+function salvarPreferenciaSomV620(valor){
+    localStorage.setItem("erp_som_chat_v620",valor?"1":"0");
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    const tema=localStorage.getItem("erp_tema_v620");
+    if(tema==="dark")document.body.classList.add("dark-mode");
+
+    const som=localStorage.getItem("erp_som_chat_v620");
+    const campo=document.getElementById("painelSomChatV620");
+    if(campo&&som!==null)campo.checked=som==="1";
+
+    setTimeout(atualizarPainelUsuarioV620,800);
+});
+
+// Mantém o painel sincronizado sempre que o topo/perfil for atualizado.
+if(typeof atualizarUsuarioTopo==="function"){
+    const atualizarUsuarioTopoOriginalV620=atualizarUsuarioTopo;
+    atualizarUsuarioTopo=function(){
+        atualizarUsuarioTopoOriginalV620.apply(this,arguments);
+        atualizarPainelUsuarioV620();
+    };
+}
+
+document.addEventListener("keydown",event=>{
+    if(event.key==="Escape"){
+        fecharConfiguracoesPainelV620();
+        document.getElementById("painelMenuUsuarioV620")?.classList.remove("aberto");
+        document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+    }
+});
+</script>
+
+
+<script>
+/* =========================================================
+   V6.2.1 - FIXAÇÃO REAL DO PERFIL E RESET DO CHAT
+   ========================================================= */
+function corrigirEstruturaLayoutV621(){
+    const sidebar=document.getElementById("sidebar");
+    const painel=document.getElementById("painelUsuarioV620");
+
+    // Coloca fisicamente o painel dentro da lateral.
+    if(sidebar&&painel&&painel.parentElement!==sidebar){
+        sidebar.appendChild(painel);
+    }
+
+    // Remove posições e dimensões antigas salvas ou aplicadas pelo arraste.
+    const chat=document.getElementById("chatPainel");
+    if(chat){
+        [
+            "left","top","right","bottom","width","height",
+            "transform","resize"
+        ].forEach(propriedade=>chat.style.removeProperty(propriedade));
+        chat.classList.remove("chat-arrastando");
+    }
+
+    const wrap=document.getElementById("chatWrap");
+    if(wrap){
+        ["left","top","right","bottom","transform"].forEach(
+            propriedade=>wrap.style.removeProperty(propriedade)
+        );
+        wrap.classList.remove("chat-arrastando");
+    }
+
+    // Remove dados antigos de posição caso versões anteriores tenham salvado.
+    [
+        "chat_posicao_v57",
+        "chat_posicao_v574",
+        "chat_posicao_v575",
+        "chat_tamanho_v57",
+        "chat_tamanho_v574",
+        "chat_tamanho_v575",
+        "chatPainelPosicao",
+        "chatPainelTamanho"
+    ].forEach(chave=>localStorage.removeItem(chave));
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+    corrigirEstruturaLayoutV621();
+    setTimeout(corrigirEstruturaLayoutV621,300);
+});
+
+window.addEventListener("resize",()=>{
+    const chat=document.getElementById("chatPainel");
+    if(chat){
+        chat.style.removeProperty("left");
+        chat.style.removeProperty("top");
+        chat.style.removeProperty("width");
+        chat.style.removeProperty("height");
+        chat.style.removeProperty("transform");
+    }
+});
+</script>
+
+
+<div class="chamada-overlay-v630" id="chamadaOverlayV630">
+  <div class="chamada-card-v630">
+    <div class="chamada-cab-v630">
+      <div class="chamada-identidade-v630">
+        <div class="chamada-avatar-v630" id="chamadaAvatarV630">U</div>
+        <div><b id="chamadaNomeV630">Usuário</b><small id="chamadaStatusV630">Chamando...</small></div>
+      </div>
+      <div class="chamada-tempo-v630" id="chamadaTempoV630">00:00</div>
+    </div>
+    <div class="chamada-palco-v630">
+      <video id="chamadaVideoRemotoV630" class="chamada-video-remoto-v630" autoplay playsinline></video>
+      <video id="chamadaVideoLocalV630" class="chamada-video-local-v630" autoplay playsinline muted></video>
+      <div class="chamada-audio-avatar-v630" id="chamadaAudioAvatarV630"><div class="foto" id="chamadaAudioFotoV630">U</div><strong id="chamadaAudioNomeV630">Usuário</strong><span id="chamadaAudioEstadoV630">Chamando...</span></div>
+    </div>
+    <div class="chamada-controles-v630">
+      <button class="chamada-btn-v630" id="chamadaMicV630" onclick="alternarMicrofoneV630()" title="Silenciar microfone">🎙️</button>
+      <button class="chamada-btn-v630" id="chamadaCameraV630" onclick="alternarCameraV630()" title="Desligar câmera">📹</button>
+      <button type="button" class="chamada-btn-v630 encerrar" id="chamadaEncerrarV631" title="Encerrar chamada" aria-label="Encerrar chamada">📞</button>
+    </div>
+  </div>
+</div>
+<div class="chamada-recebida-v630" id="chamadaRecebidaV630">
+  <div class="chamada-recebida-cab-v630"><div class="chamada-recebida-avatar-v630" id="chamadaRecebidaAvatarV630">U</div><div><h3 id="chamadaRecebidaNomeV630">Usuário</h3><p id="chamadaRecebidaTipoV630">Chamada de áudio</p></div></div>
+  <div class="chamada-recebida-acoes-v630"><button class="chamada-recusar-v630" onclick="recusarChamadaV630()">Recusar</button><button class="chamada-aceitar-v630" onclick="aceitarChamadaV630()">Aceitar</button></div>
+</div>
+
+
+<script>
+/* =========================================================
+   V6.3.0 - WEBRTC + SINALIZAÇÃO SUPABASE
+   ========================================================= */
+let chamadaAtualV630=null,pcV630=null,streamLocalV630=null,streamRemotoV630=null;
+let canalChamadasV630=null,canalSinaisV630=null,chamadaPendenteV630=null;
+let candidatosPendentesV630=[],timerChamadaV630=null,inicioChamadaV630=null;
+let encerrandoChamadaV631=false;
+const rtcConfigV630={iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}]};
+
+function sbV630(){return obterSupabaseClient()}
+function iniciaisV630(n){return String(n||"U").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
+function usuarioRemotoV630(){return chamadaAtualV630?.remetente_id===usuarioLogado?.id?{id:chamadaAtualV630.destinatario_id,nome:chamadaAtualV630.destinatario_nome,avatar_url:chamadaAtualV630.destinatario_avatar}:{id:chamadaAtualV630?.remetente_id,nome:chamadaAtualV630?.remetente_nome,avatar_url:chamadaAtualV630?.remetente_avatar}}
+function avatarHTMLV630(u){return u?.avatar_url?`<img src="${chatEscV57(u.avatar_url)}" alt="">`:iniciaisV630(u?.nome)}
+
+async function iniciarChamadaV630(tipo){
+ if(!chatUsuarioAtualV57?.id)return alert("Selecione um usuário antes de iniciar a chamada.");
+ if(chatUsuarioAtualV57.id===usuarioLogado?.id)return;
+ if(chamadaAtualV630)return alert("Já existe uma chamada em andamento.");
+ try{
+  const {data,error}=await sbV630().rpc("criar_chamada_v630",{p_destinatario_id:chatUsuarioAtualV57.id,p_tipo:tipo});
+  if(error)throw error;
+  chamadaAtualV630=data;
+  abrirTelaChamadaV630(chatUsuarioAtualV57,tipo,"Chamando...");
+  await prepararMidiaV630(tipo);
+  await criarPeerV630(true);
+  const oferta=await pcV630.createOffer();
+  await pcV630.setLocalDescription(oferta);
+  await enviarSinalV630("offer",oferta);
+  assinarSinaisV630(chamadaAtualV630.id);
+ }catch(e){await limparChamadaV630();alert("Não foi possível iniciar a chamada: "+(e?.message||e))}
+}
+
+async function prepararMidiaV630(tipo){
+ streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:tipo==="video"});
+ document.getElementById("chamadaVideoLocalV630").srcObject=streamLocalV630;
+ const video=tipo==="video";
+ document.getElementById("chamadaVideoLocalV630").style.display=video?"block":"none";
+ document.getElementById("chamadaVideoRemotoV630").style.display=video?"block":"none";
+ document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",!video);
+ document.getElementById("chamadaCameraV630").style.display=video?"inline-flex":"none";
+}
+
+async function criarPeerV630(iniciador){
+ pcV630=new RTCPeerConnection(rtcConfigV630);
+ streamRemotoV630=new MediaStream();
+ document.getElementById("chamadaVideoRemotoV630").srcObject=streamRemotoV630;
+ streamLocalV630?.getTracks().forEach(t=>pcV630.addTrack(t,streamLocalV630));
+ pcV630.ontrack=e=>e.streams[0].getTracks().forEach(t=>streamRemotoV630.addTrack(t));
+ pcV630.onicecandidate=e=>{if(e.candidate)enviarSinalV630("candidate",e.candidate.toJSON()).catch(console.error)};
+ pcV630.onconnectionstatechange=()=>{
+  const s=pcV630.connectionState;
+  if(s==="connected"){atualizarEstadoChamadaV630("Em chamada");iniciarCronometroV630()}
+  if(["failed","disconnected","closed"].includes(s)&&chamadaAtualV630)encerrarChamadaV630("encerrada");
+ };
+}
+
+async function enviarSinalV630(tipo,payload){
+ const {error}=await sbV630().from("chat_chamada_sinais").insert({chamada_id:chamadaAtualV630.id,remetente_id:usuarioLogado.id,tipo,payload});
+ if(error)throw error;
+}
+
+function assinarSinaisV630(id){
+ if(canalSinaisV630)sbV630().removeChannel(canalSinaisV630);
+ canalSinaisV630=sbV630().channel("sinais-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_chamada_sinais",filter:"chamada_id=eq."+id},async p=>{
+  const s=p.new;if(s.remetente_id===usuarioLogado?.id)return;
+  try{
+   if(s.tipo==="offer"){
+    await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));
+    const resposta=await pcV630.createAnswer();await pcV630.setLocalDescription(resposta);await enviarSinalV630("answer",resposta);
+    await aplicarCandidatosPendentesV630();
+   }else if(s.tipo==="answer"){
+    await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));await aplicarCandidatosPendentesV630();
+   }else if(s.tipo==="candidate"){
+    if(pcV630.remoteDescription)await pcV630.addIceCandidate(new RTCIceCandidate(s.payload));else candidatosPendentesV630.push(s.payload);
+   }
+  }catch(e){console.error("Sinal WebRTC",e)}
+ }).subscribe();
+}
+async function aplicarCandidatosPendentesV630(){for(const c of candidatosPendentesV630.splice(0))await pcV630.addIceCandidate(new RTCIceCandidate(c))}
+
+async function aceitarChamadaV630(){
+ const c=chamadaPendenteV630;if(!c)return;
+ document.getElementById("chamadaRecebidaV630").classList.remove("aberta");
+ chamadaAtualV630=c;chamadaPendenteV630=null;
+ try{
+  const {error}=await sbV630().rpc("responder_chamada_v630",{p_chamada_id:c.id,p_aceitar:true});if(error)throw error;
+  const u={id:c.remetente_id,nome:c.remetente_nome,avatar_url:c.remetente_avatar};
+  abrirTelaChamadaV630(u,c.tipo,"Conectando...");
+  await prepararMidiaV630(c.tipo);await criarPeerV630(false);assinarSinaisV630(c.id);
+  const {data:sinais,error:se}=await sbV630().from("chat_chamada_sinais").select("*").eq("chamada_id",c.id).order("created_at");
+  if(se)throw se;
+  for(const s of sinais||[]){
+   if(s.remetente_id===usuarioLogado.id)continue;
+   if(s.tipo==="offer"){await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));const a=await pcV630.createAnswer();await pcV630.setLocalDescription(a);await enviarSinalV630("answer",a)}
+   else if(s.tipo==="candidate"){if(pcV630.remoteDescription)await pcV630.addIceCandidate(new RTCIceCandidate(s.payload));else candidatosPendentesV630.push(s.payload)}
+  }
+  await aplicarCandidatosPendentesV630();
+ }catch(e){await limparChamadaV630();alert("Não foi possível aceitar a chamada: "+(e?.message||e))}
+}
+async function recusarChamadaV630(){if(!chamadaPendenteV630)return;await sbV630().rpc("responder_chamada_v630",{p_chamada_id:chamadaPendenteV630.id,p_aceitar:false});chamadaPendenteV630=null;document.getElementById("chamadaRecebidaV630").classList.remove("aberta")}
+
+function abrirTelaChamadaV630(u,tipo,status){
+ const avatar=avatarHTMLV630(u);
+ document.getElementById("chamadaAvatarV630").innerHTML=avatar;document.getElementById("chamadaAudioFotoV630").innerHTML=avatar;
+ document.getElementById("chamadaNomeV630").textContent=u?.nome||"Usuário";document.getElementById("chamadaAudioNomeV630").textContent=u?.nome||"Usuário";
+ atualizarEstadoChamadaV630(status);document.getElementById("chamadaOverlayV630").classList.add("aberta");
+}
+function atualizarEstadoChamadaV630(s){document.getElementById("chamadaStatusV630").textContent=s;document.getElementById("chamadaAudioEstadoV630").textContent=s}
+function iniciarCronometroV630(){if(timerChamadaV630)return;inicioChamadaV630=Date.now();timerChamadaV630=setInterval(()=>{const s=Math.floor((Date.now()-inicioChamadaV630)/1000);document.getElementById("chamadaTempoV630").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")},1000)}
+function alternarMicrofoneV630(){const t=streamLocalV630?.getAudioTracks()[0];if(!t)return;t.enabled=!t.enabled;document.getElementById("chamadaMicV630").classList.toggle("desativado",!t.enabled)}
+function alternarCameraV630(){const t=streamLocalV630?.getVideoTracks()[0];if(!t)return;t.enabled=!t.enabled;document.getElementById("chamadaCameraV630").classList.toggle("desativado",!t.enabled)}
+
+async function encerrarChamadaV630(status="encerrada"){
+ if(encerrandoChamadaV631)return;
+ encerrandoChamadaV631=true;
+
+ const botao=document.getElementById("chamadaEncerrarV631");
+ botao?.classList.add("encerrando");
+
+ const id=chamadaAtualV630?.id;
+
+ // Fecha imediatamente no usuário que clicou.
+ await limparChamadaV630();
+
+ // Atualiza o banco depois, sem manter a tela presa esperando rede.
+ if(id){
+   try{
+     const {error}=await sbV630().rpc("encerrar_chamada_v630",{
+       p_chamada_id:id,
+       p_status:status==="cancelada"?"cancelada":"encerrada"
+     });
+     if(error)console.error("Falha ao registrar encerramento:",error);
+   }catch(e){
+     console.error("Falha ao registrar encerramento:",e);
+   }
+ }
+
+ encerrandoChamadaV631=false;
+ botao?.classList.remove("encerrando");
+}
+
+async function limparChamadaV630(){
+ clearInterval(timerChamadaV630);
+ timerChamadaV630=null;
+ inicioChamadaV630=null;
+
+ // Para câmera e microfone de forma garantida.
+ if(streamLocalV630){
+   streamLocalV630.getTracks().forEach(track=>{
+     try{track.stop()}catch(_){}
+   });
+ }
+ if(streamRemotoV630){
+   streamRemotoV630.getTracks().forEach(track=>{
+     try{track.stop()}catch(_){}
+   });
+ }
+
+ // Remove mídias dos elementos para apagar luz da câmera e áudio remoto.
+ const videoLocal=document.getElementById("chamadaVideoLocalV630");
+ const videoRemoto=document.getElementById("chamadaVideoRemotoV630");
+ if(videoLocal){
+   try{videoLocal.pause()}catch(_){}
+   videoLocal.srcObject=null;
+ }
+ if(videoRemoto){
+   try{videoRemoto.pause()}catch(_){}
+   videoRemoto.srcObject=null;
+ }
+
+ if(pcV630){
+   try{
+     pcV630.ontrack=null;
+     pcV630.onicecandidate=null;
+     pcV630.onconnectionstatechange=null;
+     pcV630.getSenders().forEach(sender=>{
+       try{sender.track?.stop()}catch(_){}
+     });
+     pcV630.close();
+   }catch(_){}
+ }
+
+ pcV630=null;
+ streamLocalV630=null;
+ streamRemotoV630=null;
+ candidatosPendentesV630=[];
+
+ if(canalSinaisV630){
+   try{await sbV630().removeChannel(canalSinaisV630)}catch(_){}
+   canalSinaisV630=null;
+ }
+
+ chamadaAtualV630=null;
+ chamadaPendenteV630=null;
+
+ document.getElementById("chamadaOverlayV630")?.classList.remove("aberta");
+ document.getElementById("chamadaRecebidaV630")?.classList.remove("aberta");
+ document.getElementById("chamadaAudioAvatarV630")?.classList.remove("ativo");
+
+ const tempo=document.getElementById("chamadaTempoV630");
+ if(tempo)tempo.textContent="00:00";
+
+ const mic=document.getElementById("chamadaMicV630");
+ const camera=document.getElementById("chamadaCameraV630");
+ mic?.classList.remove("desativado");
+ camera?.classList.remove("desativado");
+}
+
+async function iniciarEscutaChamadasV630(){
+ if(!usuarioLogado?.id)return;
+ if(canalChamadasV630)await sbV630().removeChannel(canalChamadasV630);
+ canalChamadasV630=sbV630().channel("chamadas-"+usuarioLogado.id)
+ .on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_chamadas",filter:"destinatario_id=eq."+usuarioLogado.id},p=>mostrarChamadaRecebidaV630(p.new))
+ .on("postgres_changes",{event:"UPDATE",schema:"public",table:"chat_chamadas",filter:"id=neq.00000000-0000-0000-0000-000000000000"},p=>{
+   if(chamadaAtualV630?.id===p.new.id){
+    chamadaAtualV630={...chamadaAtualV630,...p.new};
+    if(p.new.status==="aceita")atualizarEstadoChamadaV630("Conectando...");
+    if(["recusada","encerrada","cancelada"].includes(p.new.status)){
+      encerrandoChamadaV631=true;
+      limparChamadaV630().finally(()=>{encerrandoChamadaV631=false});
+    }
+   }
+   if(chamadaPendenteV630?.id===p.new.id&&["recusada","encerrada","cancelada"].includes(p.new.status)){
+     chamadaPendenteV630=null;
+     document.getElementById("chamadaRecebidaV630")?.classList.remove("aberta");
+   }
+ }).subscribe();
+}
+function mostrarChamadaRecebidaV630(c){
+ if(chamadaAtualV630||chamadaPendenteV630){sbV630().rpc("responder_chamada_v630",{p_chamada_id:c.id,p_aceitar:false});return}
+ chamadaPendenteV630=c;
+ const u={nome:c.remetente_nome,avatar_url:c.remetente_avatar};
+ document.getElementById("chamadaRecebidaAvatarV630").innerHTML=avatarHTMLV630(u);
+ document.getElementById("chamadaRecebidaNomeV630").textContent=u.nome||"Usuário";
+ document.getElementById("chamadaRecebidaTipoV630").textContent=c.tipo==="video"?"Chamada de vídeo":"Chamada de áudio";
+ document.getElementById("chamadaRecebidaV630").classList.add("aberta");
+ try{const a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");a.play().catch(()=>{})}catch(_){}
+}
+document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciarEscutaChamadasV630,1500));
+
+document.addEventListener("DOMContentLoaded",()=>{
+ const botao=document.getElementById("chamadaEncerrarV631");
+ if(botao){
+   botao.addEventListener("click",event=>{
+     event.preventDefault();
+     event.stopPropagation();
+     encerrarChamadaV630("encerrada");
+   });
+   botao.addEventListener("touchend",event=>{
+     event.preventDefault();
+     event.stopPropagation();
+     encerrarChamadaV630("encerrada");
+   },{passive:false});
+ }
+});
+
+document.addEventListener("keydown",event=>{
+ if(event.key==="Escape"&&document.getElementById("chamadaOverlayV630")?.classList.contains("aberta")){
+   encerrarChamadaV630("encerrada");
+ }
+});
+
+window.addEventListener("beforeunload",()=>{
+ streamLocalV630?.getTracks().forEach(track=>{try{track.stop()}catch(_){}});
+ pcV630?.close();
+});
+
+</script>
 
 </body>
 </html>
