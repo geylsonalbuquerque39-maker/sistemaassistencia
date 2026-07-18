@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.3.8 - HISTÓRICO VISUAL E TOQUE DE CHAMADA
+   V6.3.9 - ENVIO DE O.S. NO CHAT
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.3.8 - HISTÓRICO VISUAL E TOQUE DE CHAMADA E REDIMENSIONÁVEL
+   V6.3.9 - ENVIO DE O.S. NO CHAT E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4139,6 +4139,128 @@ background:rgba(255,255,255,.08);color:#fff;font-weight:700}
     50%{box-shadow:0 18px 70px rgba(14,126,232,.42)}
 }
 
+
+/* =========================================================
+   V6.3.9 - ENVIO E VISUALIZAÇÃO DE O.S. NO CHAT
+   ========================================================= */
+.chat-os-botao-v639{font-size:17px!important}
+.chat-os-overlay-v639{
+    display:none;
+    position:fixed;
+    inset:0;
+    z-index:2147483600;
+    padding:24px;
+    background:rgba(4,15,30,.66);
+    backdrop-filter:blur(4px);
+    align-items:center;
+    justify-content:center;
+}
+.chat-os-overlay-v639.aberto{display:flex}
+.chat-os-modal-v639{
+    width:min(760px,96vw);
+    max-height:88vh;
+    overflow:hidden;
+    border-radius:18px;
+    background:#fff;
+    color:#17263a;
+    box-shadow:0 28px 90px rgba(0,0,0,.45);
+    display:flex;
+    flex-direction:column;
+}
+.chat-os-topo-v639{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:18px;
+    padding:20px 22px;
+    color:#fff;
+    background:linear-gradient(135deg,#063f86,#087cf0);
+}
+.chat-os-topo-v639 h3{margin:0;font-size:21px}
+.chat-os-topo-v639 p{margin:5px 0 0;opacity:.82;font-size:13px}
+.chat-os-topo-v639>button{
+    width:38px;height:38px;flex:0 0 38px;border:0;border-radius:10px;
+    background:rgba(255,255,255,.16);color:#fff;font-size:20px;cursor:pointer
+}
+.chat-os-topo-v639>button:hover{background:rgba(255,255,255,.27)}
+.chat-os-busca-v639{display:flex;gap:9px;padding:16px 18px 8px}
+.chat-os-busca-v639 input{
+    flex:1;min-width:0;padding:12px 14px;border:1px solid #b9c8da;border-radius:11px;font:inherit
+}
+.chat-os-busca-v639 button{
+    border:0;border-radius:11px;padding:0 18px;background:#087cf0;color:#fff;font-weight:800;cursor:pointer
+}
+.chat-os-status-v639{padding:4px 20px 11px;color:#627289;font-size:12px}
+.chat-os-resultados-v639{padding:0 15px 17px;overflow:auto}
+.chat-os-resultado-v639{
+    width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+    border:1px solid #d6e0ec;border-radius:13px;background:#fff;padding:12px;margin-bottom:8px;cursor:pointer
+}
+.chat-os-resultado-v639:hover{border-color:#168cff;background:#f4f9ff;transform:translateY(-1px)}
+.chat-os-resultado-icone-v639{
+    width:43px;height:43px;flex:0 0 43px;border-radius:12px;background:#e7f2ff;
+    display:flex;align-items:center;justify-content:center;font-size:20px
+}
+.chat-os-resultado-info-v639{flex:1;min-width:0}
+.chat-os-resultado-info-v639 b,.chat-os-resultado-info-v639 small,.chat-os-resultado-info-v639 em{display:block}
+.chat-os-resultado-info-v639 b{font-size:14px;color:#063f86}
+.chat-os-resultado-info-v639 small{margin-top:3px;font-size:12px;color:#25364b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-os-resultado-info-v639 em{margin-top:4px;font-size:11px;color:#738198;font-style:normal}
+.chat-os-resultado-enviar-v639{color:#087cf0;font-weight:800;font-size:12px}
+.chat-os-vazio-v639{text-align:center;padding:35px;color:#718096}
+.chat-os-cartao-v639{
+    display:block;width:285px;max-width:100%;padding:0;border:0;border-radius:14px;
+    overflow:hidden;text-align:left;background:#fff;color:#1a2b40;cursor:pointer;
+    box-shadow:0 2px 10px rgba(0,0,0,.13)
+}
+.chat-os-cartao-cab-v639{
+    display:flex;align-items:center;gap:10px;padding:12px 13px;background:linear-gradient(135deg,#0758ad,#0985f4);color:#fff
+}
+.chat-os-cartao-icone-v639{
+    width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;
+    background:rgba(255,255,255,.18);font-size:19px
+}
+.chat-os-cartao-cab-v639 small,.chat-os-cartao-cab-v639 b{display:block}
+.chat-os-cartao-cab-v639 small{font-size:9px;letter-spacing:.8px;opacity:.8}
+.chat-os-cartao-cab-v639 b{font-size:15px;margin-top:2px}
+.chat-os-cartao-linha-v639{display:grid;grid-template-columns:62px 1fr;gap:8px;padding:9px 12px 0}
+.chat-os-cartao-linha-v639 strong{font-size:10px;color:#68788c;text-transform:uppercase}
+.chat-os-cartao-linha-v639 em{font-size:12px;font-style:normal;color:#203247;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chat-os-cartao-rodape-v639{
+    display:flex;justify-content:space-between;align-items:center;margin-top:11px;padding:9px 12px;
+    border-top:1px solid #e2e8f0;color:#0875df;font-size:11px;font-weight:800
+}
+.chat-os-cartao-rodape-v639 b{font-size:19px;line-height:10px}
+.chat-os-visualizador-v639{width:min(860px,96vw)}
+.chat-os-ficha-v639{padding:18px;overflow:auto;background:#f4f7fb}
+.chat-os-ficha-destaque-v639{
+    border-radius:15px;padding:18px 20px;background:linear-gradient(135deg,#073d7e,#087cf0);color:#fff;margin-bottom:14px
+}
+.chat-os-ficha-destaque-v639 span,.chat-os-ficha-destaque-v639 strong,.chat-os-ficha-destaque-v639 small{display:block}
+.chat-os-ficha-destaque-v639 span{font-size:10px;letter-spacing:1px;opacity:.75}
+.chat-os-ficha-destaque-v639 strong{font-size:28px;margin:3px 0}
+.chat-os-ficha-destaque-v639 small{font-size:12px;opacity:.85}
+.chat-os-ficha-grade-v639{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.chat-os-ficha-campo-v639{padding:12px;border:1px solid #d7e1ec;border-radius:11px;background:#fff}
+.chat-os-ficha-campo-v639 span,.chat-os-ficha-campo-v639 b{display:block}
+.chat-os-ficha-campo-v639 span{font-size:10px;color:#728197;text-transform:uppercase;font-weight:800}
+.chat-os-ficha-campo-v639 b{font-size:13px;color:#203247;margin-top:5px;word-break:break-word}
+body.dark-mode .chat-os-modal-v639{background:#0d223a;color:#eaf2ff}
+body.dark-mode .chat-os-busca-v639 input,
+body.dark-mode .chat-os-resultado-v639,
+body.dark-mode .chat-os-ficha-campo-v639{background:#102b49;color:#eaf2ff;border-color:#274865}
+body.dark-mode .chat-os-resultado-info-v639 b,
+body.dark-mode .chat-os-resultado-info-v639 small,
+body.dark-mode .chat-os-ficha-campo-v639 b{color:#eaf2ff}
+body.dark-mode .chat-os-ficha-v639{background:#081a2e}
+@media(max-width:620px){
+    .chat-os-overlay-v639{padding:8px}
+    .chat-os-modal-v639{max-height:94vh}
+    .chat-os-ficha-grade-v639{grid-template-columns:1fr}
+    .chat-os-busca-v639{flex-direction:column}
+    .chat-os-busca-v639 button{height:42px}
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -4342,6 +4464,7 @@ background:rgba(255,255,255,.08);color:#fff;font-weight:700}
                 <div class="chat-compositor-linha">
                     <div class="chat-tools">
                         <button class="chat-ferramenta" type="button" onclick="alternarEmojiV600(event)" title="Emojis">😀</button>
+                        <button class="chat-ferramenta chat-os-botao-v639" type="button" onclick="abrirSeletorOSChatV639()" title="Enviar Ordem de Serviço">📄</button>
                         <button class="chat-ferramenta" type="button" onclick="document.getElementById('chatArquivoV600').click()" title="Anexar arquivo">📎</button>
                         <button class="chat-ferramenta" type="button" id="chatAudioBtnV600" onclick="alternarGravacaoAudioV600()" title="Gravar áudio">🎤</button>
                     </div>
@@ -4356,6 +4479,41 @@ background:rgba(255,255,255,.08);color:#fff;font-weight:700}
                 </div>
             </div>
         </section>
+    </div>
+
+
+    <!-- V6.3.9 - SELETOR DE O.S. DO CHAT -->
+    <div class="chat-os-overlay-v639" id="chatOSSeletorOverlayV639" onclick="fecharSeletorOSChatV639(event)">
+        <div class="chat-os-modal-v639 chat-os-seletor-v639" onclick="event.stopPropagation()">
+            <div class="chat-os-topo-v639">
+                <div>
+                    <h3>📄 Enviar Ordem de Serviço</h3>
+                    <p>Pesquise e selecione uma O.S. para enviar nesta conversa.</p>
+                </div>
+                <button type="button" onclick="fecharSeletorOSChatV639()" title="Fechar">✕</button>
+            </div>
+            <div class="chat-os-busca-v639">
+                <input id="chatOSBuscaV639" placeholder="Digite O.S., produto, série, técnico, loja ou status..."
+                       oninput="pesquisarOSChatV639()" onkeydown="if(event.key==='Escape')fecharSeletorOSChatV639()">
+                <button type="button" onclick="pesquisarOSChatV639()">Buscar</button>
+            </div>
+            <div class="chat-os-status-v639" id="chatOSStatusV639">Carregando base de O.S...</div>
+            <div class="chat-os-resultados-v639" id="chatOSResultadosV639"></div>
+        </div>
+    </div>
+
+    <!-- V6.3.9 - VISUALIZAÇÃO DA O.S. SOBRE O CHAT -->
+    <div class="chat-os-overlay-v639 chat-os-visualizador-overlay-v639" id="chatOSVisualizadorOverlayV639" onclick="fecharVisualizadorOSChatV639(event)">
+        <div class="chat-os-modal-v639 chat-os-visualizador-v639" onclick="event.stopPropagation()">
+            <div class="chat-os-topo-v639">
+                <div>
+                    <h3 id="chatOSVisualizadorTituloV639">📄 Ordem de Serviço</h3>
+                    <p>Detalhes compartilhados nesta conversa.</p>
+                </div>
+                <button type="button" onclick="fecharVisualizadorOSChatV639()" title="Fechar">✕</button>
+            </div>
+            <div class="chat-os-ficha-v639" id="chatOSVisualizadorConteudoV639"></div>
+        </div>
     </div>
 
     <div class="notif-wrap" id="notifWrap">
@@ -10616,7 +10774,8 @@ function renderizarMensagensChatV57(rolarFim=true){
         const resposta=m.resposta_mensagem?`<div class="chat-msg-reply"><b>${chatEscV57(m.resposta_nome||"Mensagem")}</b><br>${chatEscV57(m.resposta_mensagem)}</div>`:"";
         const anexos=renderizarAnexosChatV600(m.anexos);
         const registroChamada=renderizarRegistroChamadaV633(m);
-        const corpo=m.apagado?"<i>Mensagem apagada</i>":(registroChamada||chatEscV57(m.mensagem||"")+anexos);
+        const registroOS=renderizarRegistroOSChatV639(m);
+        const corpo=m.apagado?"<i>Mensagem apagada</i>":(registroChamada||registroOS||chatEscV57(m.mensagem||"")+anexos);
         const reacoes=renderizarReacoesChatV600(m.reacoes,m.id);
         return separador+`<div class="chat-msg ${minha?"minha":"outra"}" data-id="${m.id}" oncontextmenu="abrirMenuMensagemV600(event,'${m.id}')">
           <div class="chat-msg-acoes">
@@ -10658,6 +10817,279 @@ async function enviarMensagemChatV57(){
         alert("Não foi possível enviar a mensagem:\n"+detalhe);
     }finally{btn.disabled=false;campo.focus()}
 }
+
+
+
+const CHAT_OS_PREFIXO_V639="[[OS_CHAT_V639]]";
+let chatOSResultadosCacheV639=[];
+
+function normalizarTextoOSV639(valor){
+    return String(valor??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+}
+
+function escaparAtributoOSV639(valor){
+    return String(valor??"")
+        .replace(/&/g,"&amp;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#39;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;");
+}
+
+function mapearLinhaOSChatV639(linha){
+    return {
+        os:linha?.[0]||"",
+        data:linha?.[1]||"",
+        loja:linha?.[2]||"",
+        gr:linha?.[5]||"",
+        nce:linha?.[6]||"",
+        produto:linha?.[7]||"",
+        cor:linha?.[8]||"",
+        serie:linha?.[9]||"",
+        valor_transporte:linha?.[10]||"",
+        tecnico:linha?.[11]||"",
+        rack:linha?.[12]||"",
+        status:linha?.[13]||"",
+        usuario:linha?.[14]||""
+    };
+}
+
+async function garantirBaseOSChatV639(){
+    if(typeof bancoREXPEDLR!=="undefined"&&Array.isArray(bancoREXPEDLR)&&bancoREXPEDLR.length>1){
+        return bancoREXPEDLR;
+    }
+    if(typeof carregarBancoREXPEDLR==="function"){
+        await carregarBancoREXPEDLR();
+    }
+    return (typeof bancoREXPEDLR!=="undefined"&&Array.isArray(bancoREXPEDLR))?bancoREXPEDLR:[];
+}
+
+async function abrirSeletorOSChatV639(){
+    if(!chatConversaAtualV57){
+        alert("Selecione uma conversa antes de enviar uma O.S.");
+        return;
+    }
+
+    const overlay=document.getElementById("chatOSSeletorOverlayV639");
+    const status=document.getElementById("chatOSStatusV639");
+    const resultados=document.getElementById("chatOSResultadosV639");
+    const busca=document.getElementById("chatOSBuscaV639");
+
+    if(overlay){
+        overlay.classList.add("aberto");
+        overlay.setAttribute("aria-hidden","false");
+    }
+    if(status)status.textContent="Carregando base de O.S...";
+    if(resultados)resultados.innerHTML="";
+    if(busca)busca.value="";
+
+    try{
+        const base=await garantirBaseOSChatV639();
+        chatOSResultadosCacheV639=base.slice(1).filter(Boolean).map(mapearLinhaOSChatV639);
+        if(status){
+            status.textContent=chatOSResultadosCacheV639.length
+                ?`${chatOSResultadosCacheV639.length} O.S. disponíveis. Digite para pesquisar.`
+                :"Nenhuma O.S. foi encontrada na base atual.";
+        }
+        renderizarResultadosOSChatV639(chatOSResultadosCacheV639.slice(0,30));
+        setTimeout(()=>busca?.focus(),60);
+    }catch(e){
+        if(status)status.textContent="Erro ao carregar a base: "+(e?.message||e);
+    }
+}
+
+function fecharSeletorOSChatV639(event){
+    if(event&&event.target!==event.currentTarget)return;
+    const overlay=document.getElementById("chatOSSeletorOverlayV639");
+    overlay?.classList.remove("aberto");
+    overlay?.setAttribute("aria-hidden","true");
+}
+
+function pesquisarOSChatV639(){
+    const termo=normalizarTextoOSV639(document.getElementById("chatOSBuscaV639")?.value);
+    const status=document.getElementById("chatOSStatusV639");
+
+    let lista=chatOSResultadosCacheV639;
+    if(termo){
+        lista=lista.filter(item=>normalizarTextoOSV639([
+            item.os,item.data,item.loja,item.gr,item.nce,item.produto,item.cor,
+            item.serie,item.tecnico,item.rack,item.status,item.usuario
+        ].join(" ")).includes(termo));
+    }
+
+    if(status){
+        status.textContent=termo
+            ?`${lista.length} resultado(s) encontrado(s).`
+            :`${chatOSResultadosCacheV639.length} O.S. disponíveis.`;
+    }
+    renderizarResultadosOSChatV639(lista.slice(0,100));
+}
+
+function renderizarResultadosOSChatV639(lista){
+    const area=document.getElementById("chatOSResultadosV639");
+    if(!area)return;
+
+    if(!lista.length){
+        area.innerHTML="<div class='chat-os-vazio-v639'>Nenhuma O.S. encontrada.</div>";
+        return;
+    }
+
+    area.innerHTML=lista.map((item,indice)=>{
+        const dados=encodeURIComponent(JSON.stringify(item));
+        return `<button type="button" class="chat-os-resultado-v639" onclick="enviarOSChatV639('${dados}')">
+            <span class="chat-os-resultado-icone-v639">📄</span>
+            <span class="chat-os-resultado-info-v639">
+                <b>O.S. ${chatEscV57(item.os||"-")}</b>
+                <small>${chatEscV57(item.produto||"Produto não informado")}</small>
+                <em>${chatEscV57(item.status||"Status não informado")} • ${chatEscV57(item.loja||"Loja não informada")}</em>
+            </span>
+            <span class="chat-os-resultado-enviar-v639">Enviar</span>
+        </button>`;
+    }).join("");
+}
+
+async function enviarOSChatV639(dadosCodificados){
+    if(!chatConversaAtualV57||!usuarioLogado?.id)return;
+
+    let item;
+    try{
+        item=JSON.parse(decodeURIComponent(dadosCodificados));
+    }catch(e){
+        alert("Não foi possível ler os dados desta O.S.");
+        return;
+    }
+
+    const mensagem=CHAT_OS_PREFIXO_V639+JSON.stringify({
+        tipo:"os",
+        enviado_em:new Date().toISOString(),
+        dados:item
+    });
+
+    const status=document.getElementById("chatOSStatusV639");
+    if(status)status.textContent=`Enviando O.S. ${item.os}...`;
+
+    try{
+        const {data,error}=await chatSbV57().rpc("enviar_mensagem_chat_v600",{
+            p_conversa_id:chatConversaAtualV57,
+            p_mensagem:mensagem,
+            p_resposta_id:chatRespostaAtualV600?.id||null,
+            p_anexos:[]
+        });
+        if(error)throw error;
+        if(!data)throw new Error("O servidor não confirmou o envio.");
+
+        cancelarRespostaChatV600();
+        fecharSeletorOSChatV639();
+        await carregarMensagensChatV57(true);
+    }catch(e){
+        const detalhe=[e?.code,e?.message,e?.details,e?.hint].filter(Boolean).join(" — ")||String(e);
+        if(status)status.textContent="Falha no envio: "+detalhe;
+        alert("Não foi possível enviar a O.S.:\n"+detalhe);
+    }
+}
+
+function extrairRegistroOSChatV639(m){
+    const mensagem=String(m?.mensagem||"");
+    if(!mensagem.startsWith(CHAT_OS_PREFIXO_V639))return null;
+    try{
+        const registro=JSON.parse(mensagem.slice(CHAT_OS_PREFIXO_V639.length));
+        return registro?.dados||null;
+    }catch(_){
+        return null;
+    }
+}
+
+function renderizarRegistroOSChatV639(m){
+    const item=extrairRegistroOSChatV639(m);
+    if(!item)return "";
+
+    const dados=encodeURIComponent(JSON.stringify(item));
+    return `<button type="button" class="chat-os-cartao-v639" onclick="event.stopPropagation();abrirVisualizadorOSChatV639('${dados}')">
+        <span class="chat-os-cartao-cab-v639">
+            <span class="chat-os-cartao-icone-v639">📄</span>
+            <span>
+                <small>ORDEM DE SERVIÇO</small>
+                <b>O.S. ${chatEscV57(item.os||"-")}</b>
+            </span>
+        </span>
+        <span class="chat-os-cartao-linha-v639"><strong>Produto</strong><em>${chatEscV57(item.produto||"-")}</em></span>
+        <span class="chat-os-cartao-linha-v639"><strong>Status</strong><em>${chatEscV57(item.status||"-")}</em></span>
+        <span class="chat-os-cartao-linha-v639"><strong>Loja</strong><em>${chatEscV57(item.loja||"-")}</em></span>
+        <span class="chat-os-cartao-rodape-v639">Clique para abrir a O.S. <b>›</b></span>
+    </button>`;
+}
+
+function abrirVisualizadorOSChatV639(dadosCodificados){
+    let item;
+    try{
+        item=JSON.parse(decodeURIComponent(dadosCodificados));
+    }catch(e){
+        alert("Os dados desta O.S. não puderam ser abertos.");
+        return;
+    }
+
+    const titulo=document.getElementById("chatOSVisualizadorTituloV639");
+    const conteudo=document.getElementById("chatOSVisualizadorConteudoV639");
+    const overlay=document.getElementById("chatOSVisualizadorOverlayV639");
+
+    if(titulo)titulo.textContent=`📄 Ordem de Serviço ${item.os||""}`;
+    if(conteudo){
+        const campos=[
+            ["O.S.",item.os],
+            ["Data",item.data],
+            ["Loja / PDV",item.loja],
+            ["Produto",item.produto],
+            ["Cor",item.cor],
+            ["Nº de série",item.serie],
+            ["Status",item.status],
+            ["Técnico",item.tecnico],
+            ["Rack",item.rack],
+            ["GR",item.gr],
+            ["NCE",item.nce],
+            ["Valor transporte",item.valor_transporte],
+            ["Usuário",item.usuario]
+        ];
+
+        conteudo.innerHTML=`
+            <div class="chat-os-ficha-destaque-v639">
+                <span>O.S.</span>
+                <strong>${chatEscV57(item.os||"-")}</strong>
+                <small>${chatEscV57(item.status||"Status não informado")}</small>
+            </div>
+            <div class="chat-os-ficha-grade-v639">
+                ${campos.map(([rotulo,valor])=>`
+                    <div class="chat-os-ficha-campo-v639">
+                        <span>${chatEscV57(rotulo)}</span>
+                        <b>${chatEscV57(valor||"-")}</b>
+                    </div>`).join("")}
+            </div>`;
+    }
+
+    if(overlay){
+        overlay.classList.add("aberto");
+        overlay.setAttribute("aria-hidden","false");
+    }
+}
+
+function fecharVisualizadorOSChatV639(event){
+    if(event&&event.target!==event.currentTarget)return;
+    const overlay=document.getElementById("chatOSVisualizadorOverlayV639");
+    overlay?.classList.remove("aberto");
+    overlay?.setAttribute("aria-hidden","true");
+}
+
+document.addEventListener("keydown",event=>{
+    if(event.key!=="Escape")return;
+    const visualizador=document.getElementById("chatOSVisualizadorOverlayV639");
+    const seletor=document.getElementById("chatOSSeletorOverlayV639");
+    if(visualizador?.classList.contains("aberto")){
+        fecharVisualizadorOSChatV639();
+        return;
+    }
+    if(seletor?.classList.contains("aberto")){
+        fecharSeletorOSChatV639();
+    }
+});
 
 
 async function marcarMensagensEntreguesV575(){
