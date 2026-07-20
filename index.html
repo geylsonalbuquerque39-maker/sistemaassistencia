@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.5.0 - LIGAÇÃO CORRIGIDA E ALTO-FALANTE
+   V6.5.1 - ÁUDIO, CÂMERA E REDE CORPORATIVA
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.5.0 - LIGAÇÃO CORRIGIDA E ALTO-FALANTE E REDIMENSIONÁVEL
+   V6.5.1 - ÁUDIO, CÂMERA E REDE CORPORATIVA E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4389,6 +4389,24 @@ body.dark-mode .chat-mais-menu-v640 button:hover{background:#183b5d}
 }
 .chamada-alto-falante-v650.desativado{
     opacity:.65;
+}
+
+
+/* =========================================================
+   V6.5.1 - ÁUDIO REAL, TROCA DE CÂMERA E REDE CORPORATIVA
+   ========================================================= */
+.chamada-trocar-camera-v651{font-size:20px!important}
+.chamada-trocar-camera-v651.trocando{
+    opacity:.75;
+    animation:girarCameraV651 .8s linear infinite;
+    pointer-events:none;
+}
+@keyframes girarCameraV651{to{transform:rotate(360deg)}}
+.chamada-alto-falante-v650.confirmado-v651{
+    animation:pulsoAltoFalanteV651 .45s ease;
+}
+@keyframes pulsoAltoFalanteV651{
+    50%{transform:scale(1.18);box-shadow:0 0 0 9px rgba(22,140,255,.18)}
 }
 
 </style>
@@ -12926,8 +12944,10 @@ window.addEventListener("resize",()=>{
     <div class="chamada-controles-v630">
       <button class="chamada-btn-v630" id="chamadaMicV630" onclick="alternarMicrofoneV630()" title="Silenciar microfone">🎙️</button>
       <button class="chamada-btn-v630" id="chamadaCameraV630" onclick="alternarCameraV630()" title="Desligar câmera">📹</button>
+      <button class="chamada-btn-v630 chamada-trocar-camera-v651" id="chamadaTrocarCameraV651"
+              onclick="trocarCameraV651()" title="Trocar câmera">🔄</button>
       <button class="chamada-btn-v630 chamada-alto-falante-v650 ativo" id="chamadaAltoFalanteV650"
-              onclick="alternarAltoFalanteV650()" title="Som alto ativado">🔊</button>
+              onclick="alternarAltoFalanteV651()" title="Ativar alto-falante">🔊</button>
       <button type="button" class="chamada-btn-v630 encerrar" id="chamadaEncerrarV631" title="Encerrar chamada" aria-label="Encerrar chamada">📞</button>
     </div>
   </div>
@@ -12966,7 +12986,31 @@ let fonteAudioChamadaV650=null;
 let ganhoAudioChamadaV650=null;
 let altoFalanteAtivoV650=true;
 let processandoSinalV650=Promise.resolve();
-const rtcConfigV630={iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}]};
+let cameraAtualIdV651=null;
+let cameraAtualFacingV651="user";
+let trocandoCameraV651=false;
+let saidaAudioAtualV651="";
+let elementoAudioRemotoV651=null;
+let tentativaRelayV651=false;
+const rtcConfigV630={
+ iceServers:[
+   {urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]},
+   {
+     urls:[
+       "turn:openrelay.metered.ca:80",
+       "turn:openrelay.metered.ca:443",
+       "turn:openrelay.metered.ca:443?transport=tcp",
+       "turns:openrelay.metered.ca:443?transport=tcp"
+     ],
+     username:"openrelayproject",
+     credential:"openrelayproject"
+   }
+ ],
+ iceCandidatePoolSize:10,
+ iceTransportPolicy:"all",
+ bundlePolicy:"max-bundle",
+ rtcpMuxPolicy:"require"
+};
 
 function sbV630(){return obterSupabaseClient()}
 function iniciaisV630(n){return String(n||"U").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase()}
@@ -13014,12 +13058,20 @@ async function iniciarChamadaV630(tipo){
 
 async function prepararMidiaInicialV633(tipo){
  if(tipo==="audio"){
-   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({
+     audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+     video:false
+   });
    return "audio";
  }
 
  try{
-   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({
+     audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+     video:{facingMode:{ideal:"user"},width:{ideal:1280},height:{ideal:720}}
+   });
+   cameraAtualFacingV651="user";
+   cameraAtualIdV651=streamLocalV630.getVideoTracks()[0]?.getSettings?.().deviceId||null;
    return "video";
  }catch(e){
    const semCamera=["NotFoundError","DevicesNotFoundError","OverconstrainedError"].includes(e?.name)
@@ -13033,7 +13085,10 @@ async function prepararMidiaInicialV633(tipo){
    );
    if(!continuar)return null;
 
-   streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+   streamLocalV630=await navigator.mediaDevices.getUserMedia({
+     audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+     video:false
+   });
    return "audio";
  }
 }
@@ -13047,12 +13102,18 @@ function configurarMidiaNaTelaV633(tipo){
  document.getElementById("chamadaVideoRemotoV630").style.display=video?"block":"none";
  document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",!video);
  document.getElementById("chamadaCameraV630").style.display=video?"inline-flex":"none";
+ document.getElementById("chamadaTrocarCameraV651").style.display=video?"inline-flex":"none";
 }
 
 async function prepararMidiaV630(tipo){
  if(tipo==="video"){
    try{
-     streamLocalV630=await navigator.mediaDevices.getUserMedia({audio:true,video:true});
+     streamLocalV630=await navigator.mediaDevices.getUserMedia({
+     audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+     video:{facingMode:{ideal:"user"},width:{ideal:1280},height:{ideal:720}}
+   });
+   cameraAtualFacingV651="user";
+   cameraAtualIdV651=streamLocalV630.getVideoTracks()[0]?.getSettings?.().deviceId||null;
    }catch(e){
      const semCamera=["NotFoundError","DevicesNotFoundError","OverconstrainedError"].includes(e?.name)
        || /Requested device not found|device not found/i.test(e?.message||"");
@@ -13076,6 +13137,8 @@ async function prepararMidiaV630(tipo){
  document.getElementById("chamadaVideoRemotoV630").style.display=tipo==="video"?"block":"none";
  document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",tipo!=="video");
  document.getElementById("chamadaCameraV630").style.display=possuiVideo?"inline-flex":"none";
+ document.getElementById("chamadaTrocarCameraV651").style.display=possuiVideo?"inline-flex":"none";
+ cameraAtualIdV651=streamLocalV630.getVideoTracks()[0]?.getSettings?.().deviceId||cameraAtualIdV651;
 }
 
 async function criarPeerV630(iniciador){
@@ -13161,90 +13224,211 @@ function tratarEstadoConexaoV650(){
 
 function iniciarTimeoutConexaoV650(){
  clearTimeout(timeoutConexaoV650);
- timeoutConexaoV650=setTimeout(()=>{
+ tentativaRelayV651=false;
+
+ timeoutConexaoV650=setTimeout(async()=>{
    if(!chamadaAtualV630||!pcV630)return;
+
    const conectado=pcV630.connectionState==="connected"||
      ["connected","completed"].includes(pcV630.iceConnectionState);
-   if(!conectado){
-     atualizarEstadoChamadaV630("Não foi possível conectar");
-     setTimeout(()=>chamadaAtualV630&&encerrarChamadaV630("encerrada"),1200);
+   if(conectado)return;
+
+   // Em redes corporativas, tenta novamente priorizando a renovação ICE/TURN.
+   if(!tentativaRelayV651){
+     tentativaRelayV651=true;
+     atualizarEstadoChamadaV630("Tentando conexão pela rede da empresa...");
+
+     try{
+       pcV630.restartIce?.();
+
+       if(pcV630.signalingState==="stable"&&chamadaAtualV630?.remetente_id===usuarioLogado?.id){
+         const oferta=await pcV630.createOffer({
+           iceRestart:true,
+           offerToReceiveAudio:true,
+           offerToReceiveVideo:chamadaAtualV630?.tipo==="video"
+         });
+         await pcV630.setLocalDescription(oferta);
+         await enviarSinalV630("offer",pcV630.localDescription);
+       }
+
+       setTimeout(()=>carregarSinaisExistentesV650(chamadaAtualV630?.id).catch(console.error),1200);
+     }catch(error){
+       console.error("Fallback TURN/ICE:",error);
+     }
+
+     timeoutConexaoV650=setTimeout(()=>{
+       if(!chamadaAtualV630||!pcV630)return;
+       const ok=pcV630.connectionState==="connected"||
+         ["connected","completed"].includes(pcV630.iceConnectionState);
+       if(!ok){
+         atualizarEstadoChamadaV630("Rede bloqueou a ligação");
+         setTimeout(()=>chamadaAtualV630&&encerrarChamadaV630("encerrada"),1800);
+       }
+     },18000);
+     return;
    }
- },25000);
+ },18000);
+}
+
+function obterElementoAudioRemotoV651(){
+ if(elementoAudioRemotoV651&&document.body.contains(elementoAudioRemotoV651)){
+   return elementoAudioRemotoV651;
+ }
+
+ let audio=document.getElementById("chamadaAudioRemotoV651");
+ if(!audio){
+   audio=document.createElement("audio");
+   audio.id="chamadaAudioRemotoV651";
+   audio.autoplay=true;
+   audio.playsInline=true;
+   audio.style.display="none";
+   document.body.appendChild(audio);
+ }
+ elementoAudioRemotoV651=audio;
+ return audio;
 }
 
 async function tentarReproduzirMidiaRemotaV650(){
  const remoto=document.getElementById("chamadaVideoRemotoV630");
- if(!remoto)return;
- try{
+ const audio=obterElementoAudioRemotoV651();
+
+ if(remoto){
    remoto.srcObject=streamRemotoV630;
-   await remoto.play();
+   remoto.autoplay=true;
+   remoto.playsInline=true;
+   remoto.muted=true;
+   try{await remoto.play()}catch(_){}
+ }
+
+ if(audio){
+   audio.srcObject=streamRemotoV630;
+   audio.muted=false;
+   audio.volume=1;
+   try{await audio.play()}catch(error){
+     console.warn("O navegador bloqueou o áudio automático:",error?.message||error);
+   }
+ }
+}
+
+async function prepararSaidaAudioV651(preferirAltoFalante=true){
+ const audio=obterElementoAudioRemotoV651();
+ if(!audio||typeof audio.setSinkId!=="function")return false;
+
+ try{
+   const dispositivos=await navigator.mediaDevices.enumerateDevices();
+   const saidas=dispositivos.filter(d=>d.kind==="audiooutput");
+   if(!saidas.length)return false;
+
+   let escolhida=null;
+   if(preferirAltoFalante){
+     escolhida=saidas.find(d=>/alto.?falante|speaker|speakers|viva.?voz|hands.?free/i.test(d.label||""));
+   }else{
+     escolhida=saidas.find(d=>/fone|headset|earpiece|communications/i.test(d.label||""));
+   }
+
+   escolhida=escolhida||saidas.find(d=>d.deviceId==="default")||saidas[0];
+   await audio.setSinkId(escolhida.deviceId);
+   saidaAudioAtualV651=escolhida.deviceId;
+   return true;
  }catch(error){
-   console.warn("Reprodução automática do áudio remoto:",error?.message||error);
+   console.warn("Seleção da saída de áudio:",error?.message||error);
+   return false;
  }
 }
 
 async function conectarAudioRemotoV650(){
  if(!streamRemotoV630?.getAudioTracks().length)return;
 
- const remoto=document.getElementById("chamadaVideoRemotoV630");
+ const audio=obterElementoAudioRemotoV651();
+ if(audio){
+   audio.srcObject=streamRemotoV630;
+   audio.muted=false;
+   audio.volume=1;
+ }
 
  try{
    const AudioCtx=window.AudioContext||window.webkitAudioContext;
    if(!AudioCtx){
-     if(remoto){remoto.muted=false;remoto.volume=1}
+     await tentarReproduzirMidiaRemotaV650();
      return;
    }
 
    if(!contextoAudioChamadaV650){
-     contextoAudioChamadaV650=new AudioCtx();
+     contextoAudioChamadaV650=new AudioCtx({latencyHint:"interactive"});
    }
    if(contextoAudioChamadaV650.state==="suspended"){
      await contextoAudioChamadaV650.resume();
    }
 
-   if(fonteAudioChamadaV650){
-     try{fonteAudioChamadaV650.disconnect()}catch(_){}
-   }
-   if(ganhoAudioChamadaV650){
-     try{ganhoAudioChamadaV650.disconnect()}catch(_){}
-   }
+   try{fonteAudioChamadaV650?.disconnect()}catch(_){}
+   try{ganhoAudioChamadaV650?.disconnect()}catch(_){}
 
    fonteAudioChamadaV650=contextoAudioChamadaV650.createMediaStreamSource(streamRemotoV630);
    ganhoAudioChamadaV650=contextoAudioChamadaV650.createGain();
-   ganhoAudioChamadaV650.gain.value=altoFalanteAtivoV650?1.8:0.65;
+   ganhoAudioChamadaV650.gain.value=altoFalanteAtivoV650?3.2:0.7;
    fonteAudioChamadaV650.connect(ganhoAudioChamadaV650);
    ganhoAudioChamadaV650.connect(contextoAudioChamadaV650.destination);
 
-   if(remoto)remoto.muted=true;
+   // Evita áudio duplicado: o elemento fica mudo quando o ganho Web Audio está ativo.
+   if(audio)audio.muted=true;
  }catch(error){
    console.warn("Ganho de áudio:",error);
-   if(remoto){remoto.muted=false;remoto.volume=altoFalanteAtivoV650?1:.55}
+   if(audio){
+     audio.muted=false;
+     audio.volume=altoFalanteAtivoV650?1:.55;
+   }
  }
+
+ await prepararSaidaAudioV651(altoFalanteAtivoV650);
+ await tentarReproduzirMidiaRemotaV650();
+
+ // Se Web Audio estiver ativo, mantém o elemento auxiliar mudo.
+ if(ganhoAudioChamadaV650&&audio)audio.muted=true;
 }
 
-async function alternarAltoFalanteV650(){
+async function alternarAltoFalanteV651(){
  altoFalanteAtivoV650=!altoFalanteAtivoV650;
  const botao=document.getElementById("chamadaAltoFalanteV650");
+ const audio=obterElementoAudioRemotoV651();
 
  if(botao){
    botao.textContent=altoFalanteAtivoV650?"🔊":"🔈";
-   botao.title=altoFalanteAtivoV650?"Som alto ativado":"Som reduzido";
+   botao.title=altoFalanteAtivoV650?"Alto-falante ativado":"Som normal";
    botao.classList.toggle("ativo",altoFalanteAtivoV650);
    botao.classList.toggle("desativado",!altoFalanteAtivoV650);
  }
 
+ // O clique do usuário libera AudioContext/autoplay em celulares.
+ try{
+   if(contextoAudioChamadaV650?.state==="suspended"){
+     await contextoAudioChamadaV650.resume();
+   }
+ }catch(_){}
+
+ await prepararSaidaAudioV651(altoFalanteAtivoV650);
+
  if(ganhoAudioChamadaV650){
    const agora=contextoAudioChamadaV650?.currentTime||0;
    ganhoAudioChamadaV650.gain.cancelScheduledValues(agora);
-   ganhoAudioChamadaV650.gain.setTargetAtTime(altoFalanteAtivoV650?1.8:.65,agora,.04);
+   ganhoAudioChamadaV650.gain.setTargetAtTime(altoFalanteAtivoV650?3.2:.7,agora,.035);
+   if(audio)audio.muted=true;
  }else{
+   if(audio){
+     audio.muted=false;
+     audio.volume=altoFalanteAtivoV650?1:.5;
+     try{await audio.play()}catch(_){}
+   }
    await conectarAudioRemotoV650();
  }
 
- const remoto=document.getElementById("chamadaVideoRemotoV630");
- if(remoto&&!contextoAudioChamadaV650){
-   remoto.volume=altoFalanteAtivoV650?1:.55;
+ if(botao){
+   botao.classList.add("confirmado-v651");
+   setTimeout(()=>botao.classList.remove("confirmado-v651"),450);
  }
+}
+
+function alternarAltoFalanteV650(){
+ return alternarAltoFalanteV651();
 }
 
 async function enviarSinalV630(tipo,payload){
@@ -13280,6 +13464,7 @@ async function processarSinalV650(sinal){
    const resposta=await pcV630.createAnswer();
    await pcV630.setLocalDescription(resposta);
    await enviarSinalV630("answer",pcV630.localDescription);
+   atualizarEstadoChamadaV630("Conectando...");
    iniciarTimeoutConexaoV650();
    return;
  }
@@ -13460,6 +13645,104 @@ function abrirTelaChamadaV630(u,tipo,status){
 }
 function atualizarEstadoChamadaV630(s){document.getElementById("chamadaStatusV630").textContent=s;document.getElementById("chamadaAudioEstadoV630").textContent=s}
 function iniciarCronometroV630(){if(timerChamadaV630)return;inicioChamadaV630=Date.now();timerChamadaV630=setInterval(()=>{const s=Math.floor((Date.now()-inicioChamadaV630)/1000);document.getElementById("chamadaTempoV630").textContent=String(Math.floor(s/60)).padStart(2,"0")+":"+String(s%60).padStart(2,"0")},1000)}
+async function trocarCameraV651(){
+ if(trocandoCameraV651||!streamLocalV630)return;
+
+ const trackAtual=streamLocalV630.getVideoTracks()[0];
+ if(!trackAtual)return alert("A chamada atual não possui câmera ativa.");
+
+ trocandoCameraV651=true;
+ const botao=document.getElementById("chamadaTrocarCameraV651");
+ botao?.classList.add("trocando");
+ if(botao)botao.textContent="⏳";
+
+ let novaStream=null;
+ let novaTrack=null;
+
+ try{
+   const dispositivos=await navigator.mediaDevices.enumerateDevices();
+   const cameras=dispositivos.filter(d=>d.kind==="videoinput");
+
+   const atualId=trackAtual.getSettings?.().deviceId||cameraAtualIdV651;
+   const indiceAtual=Math.max(0,cameras.findIndex(c=>c.deviceId===atualId));
+   const proxima=cameras.length>1?cameras[(indiceAtual+1)%cameras.length]:null;
+
+   cameraAtualFacingV651=cameraAtualFacingV651==="user"?"environment":"user";
+
+   const videoConstraint=proxima?.deviceId
+     ?{deviceId:{exact:proxima.deviceId},width:{ideal:1280},height:{ideal:720}}
+     :{facingMode:{ideal:cameraAtualFacingV651},width:{ideal:1280},height:{ideal:720}};
+
+   novaStream=await navigator.mediaDevices.getUserMedia({
+     audio:false,
+     video:videoConstraint
+   });
+   novaTrack=novaStream.getVideoTracks()[0];
+   if(!novaTrack)throw new Error("A nova câmera não forneceu imagem.");
+
+   // Aguarda a nova câmera realmente produzir quadros antes de substituir.
+   const teste=document.createElement("video");
+   teste.muted=true;
+   teste.playsInline=true;
+   teste.srcObject=new MediaStream([novaTrack]);
+
+   await new Promise((resolve,reject)=>{
+     const limite=setTimeout(()=>reject(new Error("A nova câmera não iniciou a imagem.")),6000);
+     const pronto=()=>{
+       if(teste.videoWidth>0&&teste.videoHeight>0){
+         clearTimeout(limite);
+         resolve();
+       }
+     };
+     teste.onloadedmetadata=async()=>{
+       try{await teste.play()}catch(_){}
+       pronto();
+     };
+     teste.onplaying=pronto;
+   });
+
+   const sender=pcV630?.getSenders().find(s=>s.track?.kind==="video");
+   if(sender){
+     await sender.replaceTrack(novaTrack);
+   }
+
+   const antigaTrack=trackAtual;
+   streamLocalV630.removeTrack(antigaTrack);
+   streamLocalV630.addTrack(novaTrack);
+
+   const local=document.getElementById("chamadaVideoLocalV630");
+   if(local){
+     local.srcObject=null;
+     local.srcObject=streamLocalV630;
+     local.muted=true;
+     local.playsInline=true;
+     try{await local.play()}catch(_){}
+   }
+
+   cameraAtualIdV651=novaTrack.getSettings?.().deviceId||proxima?.deviceId||null;
+   const facing=novaTrack.getSettings?.().facingMode;
+   if(facing)cameraAtualFacingV651=facing;
+
+   // Só encerra a câmera antiga depois da nova estar visível e enviada.
+   try{antigaTrack.stop()}catch(_){}
+   novaStream=null;
+ }catch(error){
+   console.error("Troca de câmera:",error);
+
+   // Mantém a câmera anterior viva; fecha apenas a tentativa nova.
+   novaStream?.getTracks().forEach(t=>{if(t!==novaTrack)try{t.stop()}catch(_){}});
+   if(novaTrack&&novaTrack.readyState!=="ended"){
+     try{novaTrack.stop()}catch(_){}
+   }
+
+   alert("Não foi possível trocar a câmera. A câmera anterior foi mantida.\n\n"+(error?.message||error));
+ }finally{
+   trocandoCameraV651=false;
+   botao?.classList.remove("trocando");
+   if(botao)botao.textContent="🔄";
+ }
+}
+
 function alternarMicrofoneV630(){const t=streamLocalV630?.getAudioTracks()[0];if(!t)return;t.enabled=!t.enabled;document.getElementById("chamadaMicV630").classList.toggle("desativado",!t.enabled)}
 function alternarCameraV630(){const t=streamLocalV630?.getVideoTracks()[0];if(!t)return;t.enabled=!t.enabled;document.getElementById("chamadaCameraV630").classList.toggle("desativado",!t.enabled)}
 
@@ -13551,6 +13834,16 @@ async function limparChamadaV630(){
  ganhoAudioChamadaV650=null;
  contextoAudioChamadaV650=null;
 
+ if(elementoAudioRemotoV651){
+   try{elementoAudioRemotoV651.pause()}catch(_){}
+   elementoAudioRemotoV651.srcObject=null;
+ }
+ saidaAudioAtualV651="";
+ tentativaRelayV651=false;
+ trocandoCameraV651=false;
+ cameraAtualIdV651=null;
+ cameraAtualFacingV651="user";
+
  pcV630=null;
  streamLocalV630=null;
  streamRemotoV630=null;
@@ -13587,9 +13880,12 @@ async function limparChamadaV630(){
 
  const mic=document.getElementById("chamadaMicV630");
  const camera=document.getElementById("chamadaCameraV630");
+ const trocarCamera=document.getElementById("chamadaTrocarCameraV651");
  const altoFalante=document.getElementById("chamadaAltoFalanteV650");
  mic?.classList.remove("desativado");
  camera?.classList.remove("desativado");
+ trocarCamera?.classList.remove("trocando");
+ if(trocarCamera)trocarCamera.textContent="🔄";
  altoFalanteAtivoV650=true;
  if(altoFalante){
    altoFalante.textContent="🔊";
