@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.5.2 - ÁUDIO DE VOZ, CÂMERA E CHAT FLUTUANTE
+   V6.5.3 - BOTÕES DE CHAMADA E COPILOTO CORRIGIDOS
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.5.2 - ÁUDIO DE VOZ, CÂMERA E CHAT FLUTUANTE E REDIMENSIONÁVEL
+   V6.5.3 - BOTÕES DE CHAMADA E COPILOTO CORRIGIDOS E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4438,6 +4438,28 @@ body.dark-mode .chat-mais-menu-v640 button:hover{background:#183b5d}
     #chatWrap.chat-atras-v652{
         opacity:0!important;
         transform:scale(.7)!important;
+    }
+}
+
+
+/* =========================================================
+   V6.5.3 - BOTÕES DE CHAMADA E COPILOTO SOBRE O CHAT
+   ========================================================= */
+#copilotoFab.oculto-chat-v653,
+body.chat-aberto-v653 #copilotoFab{
+    display:none!important;
+    visibility:hidden!important;
+    opacity:0!important;
+    pointer-events:none!important;
+    transform:scale(0)!important;
+    z-index:-1!important;
+}
+body.chat-aberto-v653 #chatPainel{
+    z-index:16000!important;
+}
+@media(max-width:760px){
+    body.chat-aberto-v653 #copilotoFab{
+        display:none!important;
     }
 }
 
@@ -10783,7 +10805,14 @@ async function alternarChatV57(ev){
     const abrir=!painel.classList.contains("aberto");
     if(abrir){
         painel.classList.add("aberto");
+        document.body.classList.add("chat-aberto-v653");
         document.getElementById("chatWrap")?.classList.add("chat-atras-v652");
+        const copilotoFab=document.getElementById("copilotoFab");
+        if(copilotoFab){
+            copilotoFab.classList.add("oculto-chat-v653");
+            copilotoFab.setAttribute("aria-hidden","true");
+            copilotoFab.style.pointerEvents="none";
+        }
         if(typeof chatRestaurarPainelV574==="function")chatRestaurarPainelV574();
         await inicializarChatV57();
     }else fecharChatV57();
@@ -10805,6 +10834,14 @@ function fecharChatV57(){
         painel.style.removeProperty("visibility");
         painel.style.removeProperty("pointer-events");
         painel.style.removeProperty("opacity");
+    }
+
+    document.body.classList.remove("chat-aberto-v653");
+    const copilotoFab=document.getElementById("copilotoFab");
+    if(copilotoFab){
+        copilotoFab.classList.remove("oculto-chat-v653");
+        copilotoFab.removeAttribute("aria-hidden");
+        copilotoFab.style.removeProperty("pointer-events");
     }
 
     const wrap=document.getElementById("chatWrap");
@@ -12822,6 +12859,13 @@ async function abrirChatPainelV620(event){
 
     // Usa exatamente o mesmo estado do botão flutuante oficial.
     painel.classList.add("aberto");
+    document.body.classList.add("chat-aberto-v653");
+    const copilotoFab=document.getElementById("copilotoFab");
+    if(copilotoFab){
+        copilotoFab.classList.add("oculto-chat-v653");
+        copilotoFab.setAttribute("aria-hidden","true");
+        copilotoFab.style.pointerEvents="none";
+    }
 
     try{
         if(typeof chatRestaurarPainelV574==="function"){
@@ -13053,8 +13097,8 @@ function usuarioRemotoV630(){return chamadaAtualV630?.remetente_id===usuarioLoga
 function avatarHTMLV630(u){return u?.avatar_url?`<img src="${chatEscV57(u.avatar_url)}" alt="">`:iniciaisV630(u?.nome)}
 
 async function iniciarChamadaV630(tipo){
- await desbloquearAudioChamadaV652();
  tipoChamadaAtualV652=tipo;
+ desbloquearAudioChamadaV653();
  if(!chatUsuarioAtualV57?.id)return alert("Selecione um usuário antes de iniciar a chamada.");
 
  if(chatUsuarioAtualV57.id===usuarioLogado?.id)return;
@@ -13240,7 +13284,7 @@ function tratarEstadoConexaoV650(){
    timeoutDesconexaoV650=null;
    atualizarEstadoChamadaV630("Em chamada");
    iniciarCronometroV630();
-   desbloquearAudioChamadaV652().then(()=>conectarAudioRemotoV650());
+   desbloquearAudioChamadaV653(); conectarAudioRemotoV650();
    tentarReproduzirMidiaRemotaV650();
    return;
  }
@@ -13315,18 +13359,18 @@ function iniciarTimeoutConexaoV650(){
  },18000);
 }
 
-async function desbloquearAudioChamadaV652(){
+function desbloquearAudioChamadaV653(){
  try{
    const AudioCtx=window.AudioContext||window.webkitAudioContext;
    if(AudioCtx){
      if(!contextoAudioChamadaV650){
        contextoAudioChamadaV650=new AudioCtx({latencyHint:"interactive"});
      }
+
      if(contextoAudioChamadaV650.state==="suspended"){
-       await contextoAudioChamadaV650.resume();
+       contextoAudioChamadaV650.resume().catch(()=>{});
      }
 
-     // Pulso inaudível para liberar a saída de áudio no gesto do usuário.
      const osc=contextoAudioChamadaV650.createOscillator();
      const ganho=contextoAudioChamadaV650.createGain();
      ganho.gain.value=0.00001;
@@ -13339,15 +13383,23 @@ async function desbloquearAudioChamadaV652(){
    const audio=obterElementoAudioRemotoV651();
    audio.muted=false;
    audio.volume=1;
+
+   // Não aguarda play() aqui. Em alguns celulares a Promise fica pendente
+   // enquanto ainda não existe uma faixa remota e bloqueava os botões.
    try{
-     const p=audio.play();
-     if(p&&typeof p.then==="function")await p.catch(()=>{});
+     const promessa=audio.play();
+     promessa?.catch?.(()=>{});
    }catch(_){}
 
    audioDesbloqueadoV652=true;
  }catch(error){
    console.warn("Desbloqueio de áudio:",error);
  }
+}
+
+function desbloquearAudioChamadaV652(){
+ desbloquearAudioChamadaV653();
+ return Promise.resolve();
 }
 
 function obterElementoAudioRemotoV651(){
@@ -13640,9 +13692,9 @@ async function aplicarCandidatosPendentesV630(){
 }
 
 async function aceitarChamadaV630(){
- await desbloquearAudioChamadaV652();
  const c=chamadaPendenteV630;
  if(c)tipoChamadaAtualV652=c.tipo||"audio";
+ desbloquearAudioChamadaV653();
  if(!c)return;
 
  clearTimeout(timeoutChamadaRecebidaV638);
