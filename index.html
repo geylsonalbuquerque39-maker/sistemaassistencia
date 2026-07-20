@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.5.1 - ÁUDIO, CÂMERA E REDE CORPORATIVA
+   V6.5.2 - ÁUDIO DE VOZ, CÂMERA E CHAT FLUTUANTE
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.5.1 - ÁUDIO, CÂMERA E REDE CORPORATIVA E REDIMENSIONÁVEL
+   V6.5.2 - ÁUDIO DE VOZ, CÂMERA E CHAT FLUTUANTE E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4407,6 +4407,38 @@ body.dark-mode .chat-mais-menu-v640 button:hover{background:#183b5d}
 }
 @keyframes pulsoAltoFalanteV651{
     50%{transform:scale(1.18);box-shadow:0 0 0 9px rgba(22,140,255,.18)}
+}
+
+
+/* =========================================================
+   V6.5.2 - ÁUDIO DE VOZ, CÂMERA E BOTÃO FLUTUANTE
+   ========================================================= */
+#chamadaVideoRemotoV630.audio-apenas-v652{
+    display:block!important;
+    position:absolute!important;
+    width:2px!important;
+    height:2px!important;
+    min-width:2px!important;
+    min-height:2px!important;
+    opacity:.01!important;
+    pointer-events:none!important;
+    left:0!important;
+    bottom:0!important;
+    z-index:-1!important;
+}
+#chatWrap.chat-atras-v652{
+    z-index:1!important;
+    pointer-events:none!important;
+    opacity:.18!important;
+}
+#chatPainel.aberto{
+    z-index:14000!important;
+}
+@media(max-width:720px){
+    #chatWrap.chat-atras-v652{
+        opacity:0!important;
+        transform:scale(.7)!important;
+    }
 }
 
 </style>
@@ -10751,6 +10783,7 @@ async function alternarChatV57(ev){
     const abrir=!painel.classList.contains("aberto");
     if(abrir){
         painel.classList.add("aberto");
+        document.getElementById("chatWrap")?.classList.add("chat-atras-v652");
         if(typeof chatRestaurarPainelV574==="function")chatRestaurarPainelV574();
         await inicializarChatV57();
     }else fecharChatV57();
@@ -10776,7 +10809,7 @@ function fecharChatV57(){
 
     const wrap=document.getElementById("chatWrap");
     if(wrap){
-        wrap.classList.remove("aberto");
+        wrap.classList.remove("aberto","chat-atras-v652");
         wrap.style.removeProperty("display");
         wrap.style.removeProperty("visibility");
         wrap.style.removeProperty("pointer-events");
@@ -12992,6 +13025,8 @@ let trocandoCameraV651=false;
 let saidaAudioAtualV651="";
 let elementoAudioRemotoV651=null;
 let tentativaRelayV651=false;
+let audioDesbloqueadoV652=false;
+let tipoChamadaAtualV652="audio";
 const rtcConfigV630={
  iceServers:[
    {urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]},
@@ -13018,6 +13053,8 @@ function usuarioRemotoV630(){return chamadaAtualV630?.remetente_id===usuarioLoga
 function avatarHTMLV630(u){return u?.avatar_url?`<img src="${chatEscV57(u.avatar_url)}" alt="">`:iniciaisV630(u?.nome)}
 
 async function iniciarChamadaV630(tipo){
+ await desbloquearAudioChamadaV652();
+ tipoChamadaAtualV652=tipo;
  if(!chatUsuarioAtualV57?.id)return alert("Selecione um usuário antes de iniciar a chamada.");
 
  if(chatUsuarioAtualV57.id===usuarioLogado?.id)return;
@@ -13099,7 +13136,11 @@ function configurarMidiaNaTelaV633(tipo){
  if(local)local.srcObject=streamLocalV630;
 
  document.getElementById("chamadaVideoLocalV630").style.display=video?"block":"none";
- document.getElementById("chamadaVideoRemotoV630").style.display=video?"block":"none";
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+ if(remoto){
+   remoto.classList.toggle("audio-apenas-v652",!video);
+   remoto.style.display=video?"block":"block";
+ }
  document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",!video);
  document.getElementById("chamadaCameraV630").style.display=video?"inline-flex":"none";
  document.getElementById("chamadaTrocarCameraV651").style.display=video?"inline-flex":"none";
@@ -13134,7 +13175,11 @@ async function prepararMidiaV630(tipo){
  const possuiVideo=streamLocalV630.getVideoTracks().length>0;
  document.getElementById("chamadaVideoLocalV630").srcObject=streamLocalV630;
  document.getElementById("chamadaVideoLocalV630").style.display=possuiVideo?"block":"none";
- document.getElementById("chamadaVideoRemotoV630").style.display=tipo==="video"?"block":"none";
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+ if(remoto){
+   remoto.classList.toggle("audio-apenas-v652",tipo!=="video");
+   remoto.style.display="block";
+ }
  document.getElementById("chamadaAudioAvatarV630").classList.toggle("ativo",tipo!=="video");
  document.getElementById("chamadaCameraV630").style.display=possuiVideo?"inline-flex":"none";
  document.getElementById("chamadaTrocarCameraV651").style.display=possuiVideo?"inline-flex":"none";
@@ -13195,7 +13240,7 @@ function tratarEstadoConexaoV650(){
    timeoutDesconexaoV650=null;
    atualizarEstadoChamadaV630("Em chamada");
    iniciarCronometroV630();
-   conectarAudioRemotoV650();
+   desbloquearAudioChamadaV652().then(()=>conectarAudioRemotoV650());
    tentarReproduzirMidiaRemotaV650();
    return;
  }
@@ -13268,6 +13313,41 @@ function iniciarTimeoutConexaoV650(){
      return;
    }
  },18000);
+}
+
+async function desbloquearAudioChamadaV652(){
+ try{
+   const AudioCtx=window.AudioContext||window.webkitAudioContext;
+   if(AudioCtx){
+     if(!contextoAudioChamadaV650){
+       contextoAudioChamadaV650=new AudioCtx({latencyHint:"interactive"});
+     }
+     if(contextoAudioChamadaV650.state==="suspended"){
+       await contextoAudioChamadaV650.resume();
+     }
+
+     // Pulso inaudível para liberar a saída de áudio no gesto do usuário.
+     const osc=contextoAudioChamadaV650.createOscillator();
+     const ganho=contextoAudioChamadaV650.createGain();
+     ganho.gain.value=0.00001;
+     osc.connect(ganho);
+     ganho.connect(contextoAudioChamadaV650.destination);
+     osc.start();
+     osc.stop(contextoAudioChamadaV650.currentTime+.03);
+   }
+
+   const audio=obterElementoAudioRemotoV651();
+   audio.muted=false;
+   audio.volume=1;
+   try{
+     const p=audio.play();
+     if(p&&typeof p.then==="function")await p.catch(()=>{});
+   }catch(_){}
+
+   audioDesbloqueadoV652=true;
+ }catch(error){
+   console.warn("Desbloqueio de áudio:",error);
+ }
 }
 
 function obterElementoAudioRemotoV651(){
@@ -13365,7 +13445,7 @@ async function conectarAudioRemotoV650(){
 
    fonteAudioChamadaV650=contextoAudioChamadaV650.createMediaStreamSource(streamRemotoV630);
    ganhoAudioChamadaV650=contextoAudioChamadaV650.createGain();
-   ganhoAudioChamadaV650.gain.value=altoFalanteAtivoV650?3.2:0.7;
+   ganhoAudioChamadaV650.gain.value=altoFalanteAtivoV650?(tipoChamadaAtualV652==="audio"?5.0:3.2):0.7;
    fonteAudioChamadaV650.connect(ganhoAudioChamadaV650);
    ganhoAudioChamadaV650.connect(contextoAudioChamadaV650.destination);
 
@@ -13410,7 +13490,7 @@ async function alternarAltoFalanteV651(){
  if(ganhoAudioChamadaV650){
    const agora=contextoAudioChamadaV650?.currentTime||0;
    ganhoAudioChamadaV650.gain.cancelScheduledValues(agora);
-   ganhoAudioChamadaV650.gain.setTargetAtTime(altoFalanteAtivoV650?3.2:.7,agora,.035);
+   ganhoAudioChamadaV650.gain.setTargetAtTime(altoFalanteAtivoV650?(tipoChamadaAtualV652==="audio"?5.0:3.2):.7,agora,.035);
    if(audio)audio.muted=true;
  }else{
    if(audio){
@@ -13560,7 +13640,9 @@ async function aplicarCandidatosPendentesV630(){
 }
 
 async function aceitarChamadaV630(){
+ await desbloquearAudioChamadaV652();
  const c=chamadaPendenteV630;
+ if(c)tipoChamadaAtualV652=c.tipo||"audio";
  if(!c)return;
 
  clearTimeout(timeoutChamadaRecebidaV638);
@@ -13656,86 +13738,116 @@ async function trocarCameraV651(){
  botao?.classList.add("trocando");
  if(botao)botao.textContent="⏳";
 
+ const facingAnterior=trackAtual.getSettings?.().facingMode||cameraAtualFacingV651||"user";
+ const facingDestino=facingAnterior==="environment"?"user":"environment";
+ const sender=pcV630?.getSenders().find(s=>s.track?.kind==="video");
+ const local=document.getElementById("chamadaVideoLocalV630");
  let novaStream=null;
  let novaTrack=null;
 
  try{
-   const dispositivos=await navigator.mediaDevices.enumerateDevices();
-   const cameras=dispositivos.filter(d=>d.kind==="videoinput");
+   // Em celulares, duas câmeras geralmente não podem ficar abertas ao mesmo tempo.
+   // Primeiro remove a faixa do envio e libera a câmera atual.
+   if(sender)await sender.replaceTrack(null);
+   try{trackAtual.stop()}catch(_){}
+   streamLocalV630.removeTrack(trackAtual);
 
-   const atualId=trackAtual.getSettings?.().deviceId||cameraAtualIdV651;
-   const indiceAtual=Math.max(0,cameras.findIndex(c=>c.deviceId===atualId));
-   const proxima=cameras.length>1?cameras[(indiceAtual+1)%cameras.length]:null;
+   const tentarCaptura=async constraint=>{
+     return navigator.mediaDevices.getUserMedia({
+       audio:false,
+       video:{
+         facingMode:constraint,
+         width:{ideal:1280},
+         height:{ideal:720},
+         frameRate:{ideal:30,max:30}
+       }
+     });
+   };
 
-   cameraAtualFacingV651=cameraAtualFacingV651==="user"?"environment":"user";
+   try{
+     novaStream=await tentarCaptura({exact:facingDestino});
+   }catch(_){
+     novaStream=await tentarCaptura({ideal:facingDestino});
+   }
 
-   const videoConstraint=proxima?.deviceId
-     ?{deviceId:{exact:proxima.deviceId},width:{ideal:1280},height:{ideal:720}}
-     :{facingMode:{ideal:cameraAtualFacingV651},width:{ideal:1280},height:{ideal:720}};
-
-   novaStream=await navigator.mediaDevices.getUserMedia({
-     audio:false,
-     video:videoConstraint
-   });
    novaTrack=novaStream.getVideoTracks()[0];
-   if(!novaTrack)throw new Error("A nova câmera não forneceu imagem.");
+   if(!novaTrack)throw new Error("A câmera selecionada não forneceu imagem.");
 
-   // Aguarda a nova câmera realmente produzir quadros antes de substituir.
+   // Aguarda a câmera produzir dimensões válidas antes de voltar ao PeerConnection.
    const teste=document.createElement("video");
    teste.muted=true;
+   teste.autoplay=true;
    teste.playsInline=true;
    teste.srcObject=new MediaStream([novaTrack]);
 
    await new Promise((resolve,reject)=>{
-     const limite=setTimeout(()=>reject(new Error("A nova câmera não iniciou a imagem.")),6000);
-     const pronto=()=>{
-       if(teste.videoWidth>0&&teste.videoHeight>0){
+     const limite=setTimeout(()=>reject(new Error("A câmera não iniciou a imagem.")),8000);
+     const verificar=()=>{
+       if(teste.videoWidth>0&&teste.videoHeight>0&&novaTrack.readyState==="live"){
          clearTimeout(limite);
          resolve();
        }
      };
      teste.onloadedmetadata=async()=>{
        try{await teste.play()}catch(_){}
-       pronto();
+       verificar();
      };
-     teste.onplaying=pronto;
+     teste.onplaying=verificar;
+     setTimeout(verificar,500);
    });
 
-   const sender=pcV630?.getSenders().find(s=>s.track?.kind==="video");
-   if(sender){
-     await sender.replaceTrack(novaTrack);
-   }
-
-   const antigaTrack=trackAtual;
-   streamLocalV630.removeTrack(antigaTrack);
    streamLocalV630.addTrack(novaTrack);
+   if(sender)await sender.replaceTrack(novaTrack);
 
-   const local=document.getElementById("chamadaVideoLocalV630");
    if(local){
-     local.srcObject=null;
-     local.srcObject=streamLocalV630;
+     local.srcObject=new MediaStream([
+       ...streamLocalV630.getAudioTracks(),
+       novaTrack
+     ]);
      local.muted=true;
+     local.autoplay=true;
      local.playsInline=true;
      try{await local.play()}catch(_){}
    }
 
-   cameraAtualIdV651=novaTrack.getSettings?.().deviceId||proxima?.deviceId||null;
-   const facing=novaTrack.getSettings?.().facingMode;
-   if(facing)cameraAtualFacingV651=facing;
-
-   // Só encerra a câmera antiga depois da nova estar visível e enviada.
-   try{antigaTrack.stop()}catch(_){}
+   cameraAtualFacingV651=novaTrack.getSettings?.().facingMode||facingDestino;
+   cameraAtualIdV651=novaTrack.getSettings?.().deviceId||null;
    novaStream=null;
  }catch(error){
    console.error("Troca de câmera:",error);
 
-   // Mantém a câmera anterior viva; fecha apenas a tentativa nova.
-   novaStream?.getTracks().forEach(t=>{if(t!==novaTrack)try{t.stop()}catch(_){}});
-   if(novaTrack&&novaTrack.readyState!=="ended"){
-     try{novaTrack.stop()}catch(_){}
+   // Se a troca falhar, tenta restaurar a câmera anterior.
+   try{
+     novaStream?.getTracks().forEach(t=>{try{t.stop()}catch(_){}});
+     const restaurada=await navigator.mediaDevices.getUserMedia({
+       audio:false,
+       video:{
+         facingMode:{ideal:facingAnterior},
+         width:{ideal:1280},
+         height:{ideal:720}
+       }
+     });
+     const trackRestaurada=restaurada.getVideoTracks()[0];
+     if(trackRestaurada){
+       streamLocalV630.addTrack(trackRestaurada);
+       if(sender)await sender.replaceTrack(trackRestaurada);
+       if(local){
+         local.srcObject=new MediaStream([
+           ...streamLocalV630.getAudioTracks(),
+           trackRestaurada
+         ]);
+         local.muted=true;
+         local.playsInline=true;
+         try{await local.play()}catch(_){}
+       }
+       cameraAtualFacingV651=trackRestaurada.getSettings?.().facingMode||facingAnterior;
+       cameraAtualIdV651=trackRestaurada.getSettings?.().deviceId||null;
+     }
+   }catch(restaurarErro){
+     console.error("Falha ao restaurar câmera:",restaurarErro);
    }
 
-   alert("Não foi possível trocar a câmera. A câmera anterior foi mantida.\n\n"+(error?.message||error));
+   alert("Não foi possível trocar a câmera neste aparelho. A câmera anterior foi restaurada quando possível.");
  }finally{
    trocandoCameraV651=false;
    botao?.classList.remove("trocando");
@@ -13840,6 +13952,8 @@ async function limparChamadaV630(){
  }
  saidaAudioAtualV651="";
  tentativaRelayV651=false;
+ audioDesbloqueadoV652=false;
+ tipoChamadaAtualV652="audio";
  trocandoCameraV651=false;
  cameraAtualIdV651=null;
  cameraAtualFacingV651="user";
