@@ -2426,7 +2426,7 @@ body.dark-mode .presenca-toolbar input{background:#07192c;color:#fff;border-colo
 
 
 /* =========================================================
-   V6.4.2 - ABERTURA DO CARTÃO DE O.S. CORRIGIDA
+   V6.5.0 - LIGAÇÃO CORRIGIDA E ALTO-FALANTE
    ========================================================= */
 .chat-wrap{position:absolute;right:305px;top:58px;z-index:13000}
 .chat-botao{
@@ -2546,7 +2546,7 @@ body.dark-mode .chat-msg.minha .chat-msg-balao{background:#064f9e}
 
 
 /* =========================================================
-   V6.4.2 - ABERTURA DO CARTÃO DE O.S. CORRIGIDA E REDIMENSIONÁVEL
+   V6.5.0 - LIGAÇÃO CORRIGIDA E ALTO-FALANTE E REDIMENSIONÁVEL
    ========================================================= */
 .chat-wrap{
     position:fixed!important;
@@ -4362,6 +4362,34 @@ body.dark-mode .chat-mais-menu-v640 button:hover{background:#183b5d}
     box-shadow:0 5px 16px rgba(0,0,0,.18);
 }
 .chat-os-cartao-v639:active{transform:scale(.99)}
+
+
+/* =========================================================
+   V6.5.0 - CONEXÃO WEBRTC E ALTO-FALANTE
+   ========================================================= */
+.chamada-alto-falante-v650{
+    position:relative;
+    font-size:22px!important;
+}
+.chamada-alto-falante-v650.ativo{
+    background:#168cff!important;
+    color:#fff!important;
+    box-shadow:0 0 0 4px rgba(22,140,255,.18),0 7px 20px rgba(0,80,180,.28);
+}
+.chamada-alto-falante-v650.ativo::after{
+    content:"ALTO";
+    position:absolute;
+    left:50%;
+    bottom:-18px;
+    transform:translateX(-50%);
+    font-size:8px;
+    font-weight:900;
+    letter-spacing:.7px;
+    color:#fff;
+}
+.chamada-alto-falante-v650.desativado{
+    opacity:.65;
+}
 
 </style>
 
@@ -12898,6 +12926,8 @@ window.addEventListener("resize",()=>{
     <div class="chamada-controles-v630">
       <button class="chamada-btn-v630" id="chamadaMicV630" onclick="alternarMicrofoneV630()" title="Silenciar microfone">🎙️</button>
       <button class="chamada-btn-v630" id="chamadaCameraV630" onclick="alternarCameraV630()" title="Desligar câmera">📹</button>
+      <button class="chamada-btn-v630 chamada-alto-falante-v650 ativo" id="chamadaAltoFalanteV650"
+              onclick="alternarAltoFalanteV650()" title="Som alto ativado">🔊</button>
       <button type="button" class="chamada-btn-v630 encerrar" id="chamadaEncerrarV631" title="Encerrar chamada" aria-label="Encerrar chamada">📞</button>
     </div>
   </div>
@@ -12928,6 +12958,14 @@ let timeoutChamadaRecebidaV638=null;
 let toqueSilenciadoV638=false;
 let segundosChamadaRecebidaV638=0;
 let contadorChamadaRecebidaV638=null;
+let timeoutConexaoV650=null;
+let timeoutDesconexaoV650=null;
+let sinaisProcessadosV650=new Set();
+let contextoAudioChamadaV650=null;
+let fonteAudioChamadaV650=null;
+let ganhoAudioChamadaV650=null;
+let altoFalanteAtivoV650=true;
+let processandoSinalV650=Promise.resolve();
 const rtcConfigV630={iceServers:[{urls:["stun:stun.l.google.com:19302","stun:stun1.l.google.com:19302"]}]};
 
 function sbV630(){return obterSupabaseClient()}
@@ -12959,10 +12997,12 @@ async function iniciarChamadaV630(tipo){
   configurarMidiaNaTelaV633(tipoReal);
 
   await criarPeerV630(true);
-  const oferta=await pcV630.createOffer();
+  await assinarSinaisV650(chamadaAtualV630.id);
+  const oferta=await pcV630.createOffer({offerToReceiveAudio:true,offerToReceiveVideo:tipoReal==="video"});
   await pcV630.setLocalDescription(oferta);
-  await enviarSinalV630("offer",oferta);
-  assinarSinaisV630(chamadaAtualV630.id);
+  await enviarSinalV630("offer",pcV630.localDescription);
+  iniciarTimeoutConexaoV650();
+  setTimeout(()=>carregarSinaisExistentesV650(chamadaAtualV630?.id),800);
  }catch(e){
   await limparChamadaV630();
   const msg=e?.name==="NotAllowedError"
@@ -13039,65 +13079,345 @@ async function prepararMidiaV630(tipo){
 }
 
 async function criarPeerV630(iniciador){
+ if(pcV630){
+   try{pcV630.close()}catch(_){}
+ }
+
  pcV630=new RTCPeerConnection(rtcConfigV630);
  streamRemotoV630=new MediaStream();
- document.getElementById("chamadaVideoRemotoV630").srcObject=streamRemotoV630;
- streamLocalV630?.getTracks().forEach(t=>pcV630.addTrack(t,streamLocalV630));
- pcV630.ontrack=e=>e.streams[0].getTracks().forEach(t=>streamRemotoV630.addTrack(t));
- pcV630.onicecandidate=e=>{if(e.candidate)enviarSinalV630("candidate",e.candidate.toJSON()).catch(console.error)};
- pcV630.onconnectionstatechange=()=>{
-  const s=pcV630.connectionState;
-  if(s==="connected"){atualizarEstadoChamadaV630("Em chamada");iniciarCronometroV630()}
-  if(["failed","disconnected","closed"].includes(s)&&chamadaAtualV630)encerrarChamadaV630("encerrada");
+
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+ if(remoto){
+   remoto.srcObject=streamRemotoV630;
+   remoto.autoplay=true;
+   remoto.playsInline=true;
+ }
+
+ streamLocalV630?.getTracks().forEach(track=>pcV630.addTrack(track,streamLocalV630));
+
+ pcV630.ontrack=event=>{
+   const faixas=event.streams?.[0]?.getTracks?.()||[event.track];
+   faixas.forEach(track=>{
+     if(track&&!streamRemotoV630.getTracks().some(t=>t.id===track.id)){
+       streamRemotoV630.addTrack(track);
+     }
+   });
+   conectarAudioRemotoV650();
+   tentarReproduzirMidiaRemotaV650();
+ };
+
+ pcV630.onicecandidate=event=>{
+   if(event.candidate&&chamadaAtualV630?.id){
+     enviarSinalV630("candidate",event.candidate.toJSON()).catch(error=>console.error("ICE:",error));
+   }
+ };
+
+ pcV630.oniceconnectionstatechange=()=>tratarEstadoConexaoV650();
+ pcV630.onconnectionstatechange=()=>tratarEstadoConexaoV650();
+ pcV630.onsignalingstatechange=()=>{
+   if(pcV630?.signalingState==="stable")aplicarCandidatosPendentesV630().catch(console.error);
  };
 }
 
+function tratarEstadoConexaoV650(){
+ if(!pcV630)return;
+
+ const estado=pcV630.connectionState;
+ const ice=pcV630.iceConnectionState;
+
+ if(estado==="connected"||ice==="connected"||ice==="completed"){
+   clearTimeout(timeoutConexaoV650);
+   clearTimeout(timeoutDesconexaoV650);
+   timeoutConexaoV650=null;
+   timeoutDesconexaoV650=null;
+   atualizarEstadoChamadaV630("Em chamada");
+   iniciarCronometroV630();
+   conectarAudioRemotoV650();
+   tentarReproduzirMidiaRemotaV650();
+   return;
+ }
+
+ if(estado==="connecting"||ice==="checking"){
+   atualizarEstadoChamadaV630("Conectando...");
+   return;
+ }
+
+ if(estado==="disconnected"||ice==="disconnected"){
+   atualizarEstadoChamadaV630("Reconectando...");
+   clearTimeout(timeoutDesconexaoV650);
+   timeoutDesconexaoV650=setTimeout(()=>{
+     if(chamadaAtualV630&&pcV630&&["disconnected","failed"].includes(pcV630.connectionState)){
+       encerrarChamadaV630("encerrada");
+     }
+   },10000);
+   return;
+ }
+
+ if(estado==="failed"||ice==="failed"){
+   atualizarEstadoChamadaV630("Falha na conexão");
+   setTimeout(()=>chamadaAtualV630&&encerrarChamadaV630("encerrada"),1200);
+ }
+}
+
+function iniciarTimeoutConexaoV650(){
+ clearTimeout(timeoutConexaoV650);
+ timeoutConexaoV650=setTimeout(()=>{
+   if(!chamadaAtualV630||!pcV630)return;
+   const conectado=pcV630.connectionState==="connected"||
+     ["connected","completed"].includes(pcV630.iceConnectionState);
+   if(!conectado){
+     atualizarEstadoChamadaV630("Não foi possível conectar");
+     setTimeout(()=>chamadaAtualV630&&encerrarChamadaV630("encerrada"),1200);
+   }
+ },25000);
+}
+
+async function tentarReproduzirMidiaRemotaV650(){
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+ if(!remoto)return;
+ try{
+   remoto.srcObject=streamRemotoV630;
+   await remoto.play();
+ }catch(error){
+   console.warn("Reprodução automática do áudio remoto:",error?.message||error);
+ }
+}
+
+async function conectarAudioRemotoV650(){
+ if(!streamRemotoV630?.getAudioTracks().length)return;
+
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+
+ try{
+   const AudioCtx=window.AudioContext||window.webkitAudioContext;
+   if(!AudioCtx){
+     if(remoto){remoto.muted=false;remoto.volume=1}
+     return;
+   }
+
+   if(!contextoAudioChamadaV650){
+     contextoAudioChamadaV650=new AudioCtx();
+   }
+   if(contextoAudioChamadaV650.state==="suspended"){
+     await contextoAudioChamadaV650.resume();
+   }
+
+   if(fonteAudioChamadaV650){
+     try{fonteAudioChamadaV650.disconnect()}catch(_){}
+   }
+   if(ganhoAudioChamadaV650){
+     try{ganhoAudioChamadaV650.disconnect()}catch(_){}
+   }
+
+   fonteAudioChamadaV650=contextoAudioChamadaV650.createMediaStreamSource(streamRemotoV630);
+   ganhoAudioChamadaV650=contextoAudioChamadaV650.createGain();
+   ganhoAudioChamadaV650.gain.value=altoFalanteAtivoV650?1.8:0.65;
+   fonteAudioChamadaV650.connect(ganhoAudioChamadaV650);
+   ganhoAudioChamadaV650.connect(contextoAudioChamadaV650.destination);
+
+   if(remoto)remoto.muted=true;
+ }catch(error){
+   console.warn("Ganho de áudio:",error);
+   if(remoto){remoto.muted=false;remoto.volume=altoFalanteAtivoV650?1:.55}
+ }
+}
+
+async function alternarAltoFalanteV650(){
+ altoFalanteAtivoV650=!altoFalanteAtivoV650;
+ const botao=document.getElementById("chamadaAltoFalanteV650");
+
+ if(botao){
+   botao.textContent=altoFalanteAtivoV650?"🔊":"🔈";
+   botao.title=altoFalanteAtivoV650?"Som alto ativado":"Som reduzido";
+   botao.classList.toggle("ativo",altoFalanteAtivoV650);
+   botao.classList.toggle("desativado",!altoFalanteAtivoV650);
+ }
+
+ if(ganhoAudioChamadaV650){
+   const agora=contextoAudioChamadaV650?.currentTime||0;
+   ganhoAudioChamadaV650.gain.cancelScheduledValues(agora);
+   ganhoAudioChamadaV650.gain.setTargetAtTime(altoFalanteAtivoV650?1.8:.65,agora,.04);
+ }else{
+   await conectarAudioRemotoV650();
+ }
+
+ const remoto=document.getElementById("chamadaVideoRemotoV630");
+ if(remoto&&!contextoAudioChamadaV650){
+   remoto.volume=altoFalanteAtivoV650?1:.55;
+ }
+}
+
 async function enviarSinalV630(tipo,payload){
- const {error}=await sbV630().from("chat_chamada_sinais").insert({chamada_id:chamadaAtualV630.id,remetente_id:usuarioLogado.id,tipo,payload});
+ if(!chamadaAtualV630?.id)throw new Error("Chamada sem identificação.");
+ const {error}=await sbV630().from("chat_chamada_sinais").insert({
+   chamada_id:chamadaAtualV630.id,
+   remetente_id:usuarioLogado.id,
+   tipo,
+   payload
+ });
  if(error)throw error;
 }
 
-function assinarSinaisV630(id){
- if(canalSinaisV630)sbV630().removeChannel(canalSinaisV630);
- canalSinaisV630=sbV630().channel("sinais-"+id).on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_chamada_sinais",filter:"chamada_id=eq."+id},async p=>{
-  const s=p.new;if(s.remetente_id===usuarioLogado?.id)return;
-  try{
-   if(s.tipo==="offer"){
-    await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));
-    const resposta=await pcV630.createAnswer();await pcV630.setLocalDescription(resposta);await enviarSinalV630("answer",resposta);
-    await aplicarCandidatosPendentesV630();
-   }else if(s.tipo==="answer"){
-    await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));await aplicarCandidatosPendentesV630();
-   }else if(s.tipo==="candidate"){
-    if(pcV630.remoteDescription)await pcV630.addIceCandidate(new RTCIceCandidate(s.payload));else candidatosPendentesV630.push(s.payload);
+async function processarSinalV650(sinal){
+ if(!sinal||sinal.remetente_id===usuarioLogado?.id||!pcV630)return;
+
+ const chave=String(sinal.id||[
+   sinal.remetente_id,sinal.tipo,
+   sinal.created_at||"",
+   JSON.stringify(sinal.payload||{})
+ ].join("|"));
+
+ if(sinaisProcessadosV650.has(chave))return;
+ sinaisProcessadosV650.add(chave);
+
+ if(sinal.tipo==="offer"){
+   if(pcV630.signalingState!=="stable"){
+     try{await pcV630.setLocalDescription({type:"rollback"})}catch(_){}
    }
-  }catch(e){console.error("Sinal WebRTC",e)}
- }).subscribe();
+   await pcV630.setRemoteDescription(new RTCSessionDescription(sinal.payload));
+   await aplicarCandidatosPendentesV630();
+
+   const resposta=await pcV630.createAnswer();
+   await pcV630.setLocalDescription(resposta);
+   await enviarSinalV630("answer",pcV630.localDescription);
+   iniciarTimeoutConexaoV650();
+   return;
+ }
+
+ if(sinal.tipo==="answer"){
+   if(!pcV630.currentRemoteDescription){
+     await pcV630.setRemoteDescription(new RTCSessionDescription(sinal.payload));
+   }
+   await aplicarCandidatosPendentesV630();
+   return;
+ }
+
+ if(sinal.tipo==="candidate"){
+   if(pcV630.remoteDescription?.type){
+     try{
+       await pcV630.addIceCandidate(new RTCIceCandidate(sinal.payload));
+     }catch(error){
+       if(!/Unknown ufrag/i.test(error?.message||""))throw error;
+     }
+   }else{
+     candidatosPendentesV630.push(sinal.payload);
+   }
+ }
 }
-async function aplicarCandidatosPendentesV630(){for(const c of candidatosPendentesV630.splice(0))await pcV630.addIceCandidate(new RTCIceCandidate(c))}
+
+async function assinarSinaisV650(id){
+ if(canalSinaisV630){
+   try{await sbV630().removeChannel(canalSinaisV630)}catch(_){}
+ }
+
+ canalSinaisV630=sbV630()
+   .channel("sinais-v650-"+id+"-"+usuarioLogado.id+"-"+Date.now())
+   .on("postgres_changes",{
+     event:"INSERT",
+     schema:"public",
+     table:"chat_chamada_sinais",
+     filter:"chamada_id=eq."+id
+   },payload=>{
+     processandoSinalV650=processandoSinalV650
+       .then(()=>processarSinalV650(payload.new))
+       .catch(error=>console.error("Sinal WebRTC:",error));
+   });
+
+ await new Promise((resolve,reject)=>{
+   let finalizado=false;
+   const limite=setTimeout(()=>{
+     if(!finalizado){finalizado=true;resolve()}
+   },3000);
+
+   canalSinaisV630.subscribe(status=>{
+     if(finalizado)return;
+     if(status==="SUBSCRIBED"){
+       finalizado=true;
+       clearTimeout(limite);
+       resolve();
+     }else if(["CHANNEL_ERROR","TIMED_OUT"].includes(status)){
+       finalizado=true;
+       clearTimeout(limite);
+       reject(new Error("Não foi possível ativar a sinalização da chamada."));
+     }
+   });
+ });
+}
+
+function assinarSinaisV630(id){
+ return assinarSinaisV650(id);
+}
+
+async function carregarSinaisExistentesV650(id){
+ if(!id||!pcV630)return;
+ const {data,error}=await sbV630()
+   .from("chat_chamada_sinais")
+   .select("*")
+   .eq("chamada_id",id)
+   .order("created_at",{ascending:true});
+ if(error)throw error;
+
+ for(const sinal of data||[]){
+   await processarSinalV650(sinal);
+ }
+}
+
+async function aplicarCandidatosPendentesV630(){
+ if(!pcV630?.remoteDescription?.type)return;
+ const pendentes=candidatosPendentesV630.splice(0);
+ for(const candidato of pendentes){
+   try{
+     await pcV630.addIceCandidate(new RTCIceCandidate(candidato));
+   }catch(error){
+     if(!/Unknown ufrag/i.test(error?.message||""))console.warn("ICE pendente:",error);
+   }
+ }
+}
 
 async function aceitarChamadaV630(){
- const c=chamadaPendenteV630;if(!c)return;
+ const c=chamadaPendenteV630;
+ if(!c)return;
+
  clearTimeout(timeoutChamadaRecebidaV638);
  pararToqueChamadaV638();
  pararContadorChamadaRecebidaV638();
 
- (()=>{const el=document.getElementById("chamadaRecebidaV630");if(el){el.classList.remove("aberta");el.style.display="none";el.setAttribute("aria-hidden","true")}})();
- chamadaAtualV630=c;chamadaPendenteV630=null;
+ const recebida=document.getElementById("chamadaRecebidaV630");
+ if(recebida){
+   recebida.classList.remove("aberta");
+   recebida.style.display="none";
+   recebida.setAttribute("aria-hidden","true");
+ }
+
+ chamadaAtualV630=c;
+ chamadaPendenteV630=null;
+ sinaisProcessadosV650.clear();
+ candidatosPendentesV630=[];
+
  try{
-  const {error}=await sbV630().rpc("responder_chamada_v633",{p_chamada_id:c.id,p_aceitar:true});if(error)throw error;
-  const u={id:c.remetente_id,nome:c.remetente_nome,avatar_url:c.remetente_avatar};
-  abrirTelaChamadaV630(u,c.tipo,"Conectando...");
-  await prepararMidiaV630(c.tipo);await criarPeerV630(false);assinarSinaisV630(c.id);
-  const {data:sinais,error:se}=await sbV630().from("chat_chamada_sinais").select("*").eq("chamada_id",c.id).order("created_at");
-  if(se)throw se;
-  for(const s of sinais||[]){
-   if(s.remetente_id===usuarioLogado.id)continue;
-   if(s.tipo==="offer"){await pcV630.setRemoteDescription(new RTCSessionDescription(s.payload));const a=await pcV630.createAnswer();await pcV630.setLocalDescription(a);await enviarSinalV630("answer",a)}
-   else if(s.tipo==="candidate"){if(pcV630.remoteDescription)await pcV630.addIceCandidate(new RTCIceCandidate(s.payload));else candidatosPendentesV630.push(s.payload)}
-  }
-  await aplicarCandidatosPendentesV630();
- }catch(e){await limparChamadaV630();alert("Não foi possível aceitar a chamada: "+(e?.message||e))}
+   const u={id:c.remetente_id,nome:c.remetente_nome,avatar_url:c.remetente_avatar};
+   abrirTelaChamadaV630(u,c.tipo,"Preparando áudio...");
+
+   await prepararMidiaV630(c.tipo);
+   await criarPeerV630(false);
+   await assinarSinaisV650(c.id);
+
+   const {error}=await sbV630().rpc("responder_chamada_v633",{
+     p_chamada_id:c.id,
+     p_aceitar:true
+   });
+   if(error)throw error;
+
+   atualizarEstadoChamadaV630("Conectando...");
+   await carregarSinaisExistentesV650(c.id);
+   iniciarTimeoutConexaoV650();
+
+   setTimeout(()=>carregarSinaisExistentesV650(c.id).catch(console.error),1200);
+   setTimeout(()=>carregarSinaisExistentesV650(c.id).catch(console.error),3000);
+ }catch(e){
+   await limparChamadaV630();
+   alert("Não foi possível aceitar a chamada: "+(e?.message||e));
+ }
 }
 async function recusarChamadaV630(){
  if(!chamadaPendenteV630)return;
@@ -13177,6 +13497,10 @@ async function encerrarChamadaV630(status="encerrada"){
 
 async function limparChamadaV630(){
  clearTimeout(timeoutChamadaRecebidaV638);
+ clearTimeout(timeoutConexaoV650);
+ clearTimeout(timeoutDesconexaoV650);
+ timeoutConexaoV650=null;
+ timeoutDesconexaoV650=null;
  pararToqueChamadaV638();
  pararContadorChamadaRecebidaV638();
 
@@ -13220,10 +13544,19 @@ async function limparChamadaV630(){
    }catch(_){}
  }
 
+ try{fonteAudioChamadaV650?.disconnect()}catch(_){}
+ try{ganhoAudioChamadaV650?.disconnect()}catch(_){}
+ try{await contextoAudioChamadaV650?.close()}catch(_){}
+ fonteAudioChamadaV650=null;
+ ganhoAudioChamadaV650=null;
+ contextoAudioChamadaV650=null;
+
  pcV630=null;
  streamLocalV630=null;
  streamRemotoV630=null;
  candidatosPendentesV630=[];
+ sinaisProcessadosV650.clear();
+ processandoSinalV650=Promise.resolve();
 
  if(canalSinaisV630){
    try{await sbV630().removeChannel(canalSinaisV630)}catch(_){}
@@ -13254,8 +13587,16 @@ async function limparChamadaV630(){
 
  const mic=document.getElementById("chamadaMicV630");
  const camera=document.getElementById("chamadaCameraV630");
+ const altoFalante=document.getElementById("chamadaAltoFalanteV650");
  mic?.classList.remove("desativado");
  camera?.classList.remove("desativado");
+ altoFalanteAtivoV650=true;
+ if(altoFalante){
+   altoFalante.textContent="🔊";
+   altoFalante.title="Som alto ativado";
+   altoFalante.classList.add("ativo");
+   altoFalante.classList.remove("desativado");
+ }
 
 }
 
