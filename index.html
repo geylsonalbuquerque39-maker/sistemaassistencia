@@ -6656,7 +6656,13 @@ function atualizarTotalVolumesCI(){
     if(planilhaCI){
         const inicio = (ciAtual === "geit") ? 1 : 0;
         for(let i = inicio; i < configCIAtual().rows; i++){
-            const os = planilhaCI.getValueFromCoords(osCol, i);
+            let os=campo.value.trim().toUpperCase();
+
+// Remove automaticamente o prefixo ILR enviado pelo leitor
+os=os.replace(/^ILR[\s\-:]*/i,"");
+
+// Mantém apenas os dígitos da O.S.
+os=os.replace(/\D/g,"");
             if(String(os || "").trim() !== ""){
                 total++;
             }
@@ -14358,7 +14364,7 @@ window.addEventListener("beforeunload",()=>{
 
 <script>
 /* =========================
-   V6.5.5 - COLETA DE O.S. COM DESTINO VIA SUPABASE
+   V6.5.4 - LÓGICA DA COLETA DE O.S.
 ========================= */
 let coletaOSItens = [];
 let coletaUltimaOS = "";
@@ -14413,31 +14419,21 @@ async function coletarOS(){
         }
         if(!item){coletaMensagem("O.S. "+os+" não encontrada no banco REXPEDLR.","erro");return;}
 
-        /* Consulta a relação ORIGEM → DESTINO cadastrada no Supabase */
-        const origemFilial=coletaTexto(item,["loja_origem","pdv","loja_de_origem"]).toUpperCase().trim();
-        item.__coleta_origem=origemFilial;
+        /* Consulta o destino usando o PDV da O.S. */
+        const origemPDV=coletaTexto(item,["pdv"]).toUpperCase().trim();
         item.__coleta_destino="";
 
-        if(origemFilial){
-            let mapa=await supa
+        if(origemPDV){
+            const consultaDestino=await supa
                 .from("destinos_filiais")
-                .select("origem,destino")
-                .eq("origem",origemFilial)
+                .select("destino")
+                .eq("origem",origemPDV)
                 .maybeSingle();
 
-            if(mapa.error){
-                /* Tenta novamente sem diferenciar maiúsculas e minúsculas */
-                mapa=await supa
-                    .from("destinos_filiais")
-                    .select("origem,destino")
-                    .ilike("origem",origemFilial)
-                    .limit(1)
-                    .maybeSingle();
-            }
+            if(consultaDestino.error) throw consultaDestino.error;
 
-            if(mapa.error) throw mapa.error;
-            if(mapa.data && mapa.data.destino){
-                item.__coleta_destino=String(mapa.data.destino).trim();
+            if(consultaDestino.data && consultaDestino.data.destino){
+                item.__coleta_destino=String(consultaDestino.data.destino).trim().toUpperCase();
             }
         }
 
@@ -14446,11 +14442,11 @@ async function coletarOS(){
         coletaOSItens.unshift(item); coletaUltimaOS=os;
         campo.value="";
         atualizarColetaKPIs(); atualizarFiltrosColeta(); renderizarColeta(item.__coleta_id); salvarColetaRascunho();
-        const destinoEncontrado=coletaDestino(item);
-        if(destinoEncontrado){
-            coletaMensagem("O.S. "+os+" adicionada. Destino: "+destinoEncontrado+".","ok");
+
+        if(item.__coleta_destino){
+            coletaMensagem("O.S. "+os+" adicionada. Destino: "+item.__coleta_destino+".","ok");
         }else{
-            coletaMensagem("O.S. "+os+" adicionada, mas a origem "+(item.__coleta_origem||"não informada")+" não possui destino cadastrado.","alerta");
+            coletaMensagem("O.S. "+os+" adicionada, mas o PDV "+(origemPDV||"não informado")+" não possui destino cadastrado.","alerta");
         }
     }catch(e){
         coletaMensagem("Erro ao consultar o Supabase: "+(e.message||e),"erro");
