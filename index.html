@@ -6656,13 +6656,7 @@ function atualizarTotalVolumesCI(){
     if(planilhaCI){
         const inicio = (ciAtual === "geit") ? 1 : 0;
         for(let i = inicio; i < configCIAtual().rows; i++){
-            let os=campo.value.trim().toUpperCase();
-
-// Remove automaticamente o prefixo ILR enviado pelo leitor
-os=os.replace(/^ILR[\s\-:]*/i,"");
-
-// Mantém apenas os dígitos da O.S.
-os=os.replace(/\D/g,"");
+            const os = planilhaCI.getValueFromCoords(osCol, i);
             if(String(os || "").trim() !== ""){
                 total++;
             }
@@ -14385,7 +14379,17 @@ function coletaNumero(v){
     const n=Number(t); return Number.isFinite(n)?n:0;
 }
 function coletaMoeda(v){return coletaNumero(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
-function coletaNormalizarOS(v){return String(v||"").trim().replace(/\s+/g,"");}
+function coletaNormalizarOS(v){
+    let os=String(v||"").trim().toUpperCase();
+
+    // O leitor pode enviar: ILR 25262, ILR-25262, ILR:25262 ou ILR25262.
+    os=os.replace(/^ILR[\s\-:]*/i,"");
+
+    // A O.S. usada no banco é somente numérica.
+    os=os.replace(/\D/g,"");
+
+    return os;
+}
 function coletaMensagem(texto,tipo){const el=document.getElementById("coletaMensagem");if(!el)return;el.className="coleta-msg"+(tipo?" "+tipo:"");el.textContent=texto;}
 function focarCampoColeta(){setTimeout(()=>{const c=document.getElementById("coletaCampoOS");if(c){c.focus();c.select();}},60);}
 function coletaTeclaOS(e){if(e.key==="Enter"){e.preventDefault();coletarOS();}}
@@ -14437,6 +14441,25 @@ async function coletarOS(){
             }
         }
 
+        /* Consulta o código da cor usando a COR cadastrada na O.S. */
+        const nomeCor=coletaTexto(item,["cor"]).trim();
+        item.__coleta_cod_cor="";
+
+        if(nomeCor){
+            const consultaCor=await supa
+                .from("codigo_cor")
+                .select("cod_cor")
+                .ilike("cor",nomeCor)
+                .limit(1);
+
+            if(consultaCor.error) throw consultaCor.error;
+
+            const registroCor=(consultaCor.data||[])[0];
+            if(registroCor && registroCor.cod_cor!==null && registroCor.cod_cor!==undefined){
+                item.__coleta_cod_cor=String(registroCor.cod_cor).trim();
+            }
+        }
+
         item.__coleta_id=Date.now()+Math.random();
         item.__coleta_hora=new Date().toISOString();
         coletaOSItens.unshift(item); coletaUltimaOS=os;
@@ -14456,7 +14479,7 @@ async function coletarOS(){
 
 function coletaDestino(i){return coletaTexto(i,["__coleta_destino","destino","pdv_expedicao","pdv_destino"]);}
 function coletaLoja(i){return coletaTexto(i,["loja_origem","pdv","loja_de_origem"]);}
-function coletaCodCor(i){return coletaTexto(i,["cod_cor","codigo_cor","codcor"]);}
+function coletaCodCor(i){return coletaTexto(i,["__coleta_cod_cor","cod_cor","codigo_cor","codcor"]);}
 function coletaCubagem(i){return coletaTexto(i,["cubagem","m3","volume_m3"]);}
 function coletaValor(i){return coletaTexto(i,["valor_transf","valor","valor_transferencia"]);}
 
