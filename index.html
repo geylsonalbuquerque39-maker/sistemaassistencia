@@ -4463,6 +4463,38 @@ body.chat-aberto-v653 #chatPainel{
     }
 }
 
+
+
+/* =========================
+   V6.5.4 - COLETA DE ORDENS DE SERVIÇO
+   Evolução da tela existente, integrada ao Supabase
+========================= */
+#telaColeta{display:none}
+.coleta-wrap{width:1280px;max-width:96%;margin:28px auto 55px}
+.coleta-hero{background:linear-gradient(135deg,#001b3d,#006cff);color:#fff;border-radius:22px;padding:25px 28px;box-shadow:0 14px 32px rgba(0,27,61,.25);display:flex;justify-content:space-between;gap:18px;align-items:center;flex-wrap:wrap}
+.coleta-hero h1{font-size:34px;margin-bottom:6px}.coleta-hero p{font-size:16px;opacity:.92}
+.coleta-status-chip{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);border-radius:999px;padding:9px 14px;font-weight:800}
+.coleta-status-chip:before{content:"";width:10px;height:10px;border-radius:50%;background:#2ee979;box-shadow:0 0 12px #2ee979}
+.coleta-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:20px 0}
+.coleta-kpi{background:#fff;border:1px solid #d8e2ee;border-radius:18px;padding:19px 20px;box-shadow:0 8px 20px rgba(0,0,0,.09);position:relative;overflow:hidden}
+.coleta-kpi:before{content:"";position:absolute;left:0;top:0;width:7px;height:100%;background:#006cff}.coleta-kpi.green:before{background:#0b8f3f}.coleta-kpi.orange:before{background:#ff9800}.coleta-kpi.purple:before{background:#7c3aed}
+.coleta-kpi small{display:block;color:#667085;font-weight:800;margin-bottom:8px}.coleta-kpi strong{font-size:31px;color:#001b3d}.coleta-kpi span{display:block;color:#667085;margin-top:7px;font-size:12px}
+.coleta-painel{background:#fff;border:1px solid #d8e2ee;border-radius:20px;padding:22px;box-shadow:0 8px 20px rgba(0,0,0,.09);margin-bottom:20px}
+.coleta-leitura-topo{display:flex;justify-content:space-between;gap:15px;align-items:end;flex-wrap:wrap}
+.coleta-campo-wrap{flex:1;min-width:280px}.coleta-campo-wrap label{display:block;color:#001b3d;font-weight:900;font-size:17px;margin-bottom:8px}
+.coleta-input-linha{display:flex;gap:10px}.coleta-input{flex:1;height:58px;border:2px solid #006cff;border-radius:14px;padding:0 17px;font-size:23px;font-weight:800;color:#001b3d;outline:none;box-shadow:0 0 0 4px rgba(0,108,255,.08)}
+.coleta-input:focus{box-shadow:0 0 0 5px rgba(0,108,255,.16)}
+.coleta-btn{border:0;border-radius:12px;padding:12px 18px;font-size:14px;font-weight:900;cursor:pointer;background:#0046b8;color:#fff;transition:.2s;white-space:nowrap}.coleta-btn:hover{background:#006cff;transform:translateY(-1px)}.coleta-btn.sec{background:#001b3d}.coleta-btn.green{background:#0b8f3f}.coleta-btn.orange{background:#ff9800;color:#001b3d}.coleta-btn.red{background:#b00020}.coleta-btn.light{background:#eef3f8;color:#001b3d;border:1px solid #c9d7e6}
+.coleta-msg{margin-top:14px;border-left:6px solid #006cff;background:#eef5ff;border-radius:11px;padding:12px 14px;color:#001b3d;font-weight:800;min-height:46px}.coleta-msg.ok{border-color:#0b8f3f;background:#ecfff2;color:#0b6b32}.coleta-msg.erro{border-color:#b00020;background:#fff0f2;color:#b00020}.coleta-msg.alerta{border-color:#ff9800;background:#fff8e8;color:#8a5200}
+.coleta-toolbar{display:grid;grid-template-columns:1.5fr repeat(3,minmax(150px,.6fr));gap:12px;margin:18px 0 14px}.coleta-filtro{height:45px;border:1px solid #c9d7e6;border-radius:11px;padding:0 12px;font-size:14px;color:#001b3d;background:#fff}
+.coleta-acoes{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:14px}
+.coleta-tabela-wrap{overflow:auto;border:1px solid #c8d2df;border-radius:14px;background:#fff;max-height:560px}
+.coleta-tabela{width:100%;border-collapse:collapse;font-size:12px;min-width:1750px}.coleta-tabela th,.coleta-tabela td{border-bottom:1px solid #d7dfe8;padding:9px 8px;text-align:left;white-space:nowrap;color:#001b3d}.coleta-tabela th{background:#001b3d;color:#fff;position:sticky;top:0;z-index:2;font-size:11px}.coleta-tabela tbody tr:hover{background:#f3f7fc}.coleta-tabela tbody tr.coleta-nova{animation:coletaPiscar 1.2s ease}.coleta-os{font-weight:900;color:#0046b8}.coleta-vazio{text-align:center!important;padding:38px!important;color:#667085!important;font-size:15px}.coleta-remover{border:0;border-radius:8px;background:#ffecec;color:#b00020;padding:7px 9px;cursor:pointer;font-weight:900}
+@keyframes coletaPiscar{0%,100%{background:transparent}30%{background:#caffd9}60%{background:#ecfff2}}
+body.dark-mode .coleta-kpi,body.dark-mode .coleta-painel,body.dark-mode .coleta-tabela-wrap{background:#0d223a;color:#eaf2ff;border-color:#1ea5ff}body.dark-mode .coleta-kpi strong,body.dark-mode .coleta-campo-wrap label,body.dark-mode .coleta-tabela td{color:#eaf2ff}body.dark-mode .coleta-kpi small,body.dark-mode .coleta-kpi span{color:#b8cae0}body.dark-mode .coleta-input,body.dark-mode .coleta-filtro{background:#07192c;color:#fff;border-color:#1ea5ff}body.dark-mode .coleta-tabela tbody tr:hover{background:#102b49}body.dark-mode .coleta-msg{background:#102b49;color:#eaf2ff}
+@media(max-width:950px){.coleta-kpis{grid-template-columns:1fr 1fr}.coleta-toolbar{grid-template-columns:1fr 1fr}.coleta-input-linha{flex-direction:column}.coleta-btn{width:100%}.coleta-acoes .coleta-btn{width:auto}.coleta-hero h1{font-size:27px}}
+@media(max-width:560px){.coleta-kpis,.coleta-toolbar{grid-template-columns:1fr}.coleta-acoes .coleta-btn{width:100%}}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -4548,7 +4580,7 @@ body.chat-aberto-v653 #chatPainel{
     <div class="line"></div>
 
     <div class="menu active" data-menu="inicio" onclick="voltarInicio()">⌂ Página Inicial</div>
-    <div class="menu" data-menu="coleta">▣ Coleta de O.S</div>
+    <div class="menu" data-menu="coleta" onclick="abrirColeta()">▣ Coleta de O.S</div>
     <div class="menu" data-menu="ci" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
@@ -4831,7 +4863,7 @@ body.chat-aberto-v653 #chatPainel{
     </div>
 
     <div class="cards">
-        <div class="card">
+        <div class="card" onclick="abrirColeta()">
             <div class="card-bar"></div><div class="icon">▣</div>
             <div class="card-content"><h2>COLETA DE<br>ORDENS DE SERVIÇO</h2><p>Registrar novas ordens de serviço</p></div>
             <div class="arrow">›</div>
@@ -4867,6 +4899,65 @@ body.chat-aberto-v653 #chatPainel{
             <div class="card-content"><h2>ADMINISTRAÇÃO</h2><p>Banco de dados, usuários, lojas, histórico e configurações</p></div>
             <div class="arrow">›</div>
         </div>
+    </div>
+</div>
+
+
+<!-- V6.5.4 - TELA EXISTENTE DE COLETA DE O.S. EVOLUÍDA -->
+<div id="telaColeta">
+    <div class="coleta-wrap">
+        <section class="coleta-hero">
+            <div>
+                <h1>▣ Coleta de Ordens de Serviço</h1>
+                <p>Leia a etiqueta com o bipador ou digite a O.S. para consultar e adicionar os dados do Supabase.</p>
+            </div>
+            <div class="coleta-status-chip" id="coletaStatusConexao">Supabase conectado</div>
+        </section>
+
+        <div class="coleta-kpis">
+            <div class="coleta-kpi"><small>O.S. coletadas</small><strong id="coletaKpiTotal">0</strong><span>Total desta coleta</span></div>
+            <div class="coleta-kpi green"><small>Valor total</small><strong id="coletaKpiValor">R$ 0,00</strong><span>Soma dos valores encontrados</span></div>
+            <div class="coleta-kpi orange"><small>Cubagem total</small><strong id="coletaKpiCubagem">0,000</strong><span>Soma da cubagem cadastrada</span></div>
+            <div class="coleta-kpi purple"><small>Última leitura</small><strong id="coletaKpiUltima">--</strong><span id="coletaKpiHora">Aguardando bipagem</span></div>
+        </div>
+
+        <section class="coleta-painel">
+            <div class="coleta-leitura-topo">
+                <div class="coleta-campo-wrap">
+                    <label for="coletaCampoOS">Bipar ou digitar a O.S.</label>
+                    <div class="coleta-input-linha">
+                        <input id="coletaCampoOS" class="coleta-input" autocomplete="off" inputmode="numeric" placeholder="Aguardando leitura do bipador..." onkeydown="coletaTeclaOS(event)">
+                        <button class="coleta-btn green" type="button" onclick="coletarOS()">Adicionar O.S.</button>
+                    </div>
+                </div>
+                <button class="coleta-btn light" type="button" onclick="focarCampoColeta()">⌖ Ativar bipador</button>
+            </div>
+            <div id="coletaMensagem" class="coleta-msg">Campo pronto. Faça a leitura da primeira O.S.</div>
+
+            <div class="coleta-toolbar">
+                <input class="coleta-filtro" id="coletaFiltroBusca" placeholder="Pesquisar na coleta..." oninput="renderizarColeta()">
+                <select class="coleta-filtro" id="coletaFiltroDestino" onchange="renderizarColeta()"><option value="">Todos os destinos</option></select>
+                <select class="coleta-filtro" id="coletaFiltroStatus" onchange="renderizarColeta()"><option value="">Todos os status</option></select>
+                <select class="coleta-filtro" id="coletaFiltroRack" onchange="renderizarColeta()"><option value="">Todos os racks</option></select>
+            </div>
+
+            <div class="coleta-acoes">
+                <button class="coleta-btn" type="button" onclick="exportarColetaCSV()">⇩ Exportar CSV</button>
+                <button class="coleta-btn sec" type="button" onclick="imprimirColeta()">🖨 Imprimir</button>
+                <button class="coleta-btn orange" type="button" onclick="salvarColetaLocal()">💾 Salvar coleta</button>
+                <button class="coleta-btn green" type="button" onclick="finalizarColeta()">✓ Finalizar coleta</button>
+                <button class="coleta-btn red" type="button" onclick="limparColeta()">🗑 Limpar</button>
+            </div>
+
+            <div class="coleta-tabela-wrap">
+                <table class="coleta-tabela" id="coletaTabela">
+                    <thead><tr>
+                        <th>#</th><th>O.S.</th><th>Data da O.S.</th><th>Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Valor</th><th>Cubagem</th><th>Ação</th>
+                    </tr></thead>
+                    <tbody id="coletaTabelaCorpo"><tr><td colspan="17" class="coleta-vazio">Nenhuma O.S. coletada.</td></tr></tbody>
+                </table>
+            </div>
+        </section>
     </div>
 </div>
 
@@ -5905,7 +5996,7 @@ function abrirListaBase(){
 
 function esconderTelas(){
     [
-        "telaInicio","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
+        "telaInicio","telaColeta","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
         "telaAdmin","telaAdminAtualizar","telaAdminUsuarios","telaAdminPresenca","telaAdminLojas",
         "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia"
     ].forEach(function(id){
@@ -14261,6 +14352,168 @@ window.addEventListener("beforeunload",()=>{
  pcV630?.close();
 });
 
+</script>
+
+
+
+<script>
+/* =========================
+   V6.5.5 - COLETA DE O.S. COM DESTINO VIA SUPABASE
+========================= */
+let coletaOSItens = [];
+let coletaUltimaOS = "";
+
+function coletaEsc(v){
+    return String(v == null ? "" : v).replace(/[&<>'"]/g,function(c){return ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'})[c];});
+}
+function coletaTexto(item, nomes){
+    for(const nome of nomes){
+        if(item && item[nome] !== undefined && item[nome] !== null && String(item[nome]).trim() !== "") return String(item[nome]).trim();
+    }
+    return "";
+}
+function coletaNumero(v){
+    if(typeof v === "number") return Number.isFinite(v) ? v : 0;
+    let t=String(v||"").trim().replace(/R\$/gi,"").replace(/\s/g,"");
+    if(t.includes(",")) t=t.replace(/\./g,"").replace(",",".");
+    const n=Number(t); return Number.isFinite(n)?n:0;
+}
+function coletaMoeda(v){return coletaNumero(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
+function coletaNormalizarOS(v){return String(v||"").trim().replace(/\s+/g,"");}
+function coletaMensagem(texto,tipo){const el=document.getElementById("coletaMensagem");if(!el)return;el.className="coleta-msg"+(tipo?" "+tipo:"");el.textContent=texto;}
+function focarCampoColeta(){setTimeout(()=>{const c=document.getElementById("coletaCampoOS");if(c){c.focus();c.select();}},60);}
+function coletaTeclaOS(e){if(e.key==="Enter"){e.preventDefault();coletarOS();}}
+
+function abrirColeta(){
+    if(typeof exigirPermissao==="function" && !exigirPermissao(["administrador","supervisor","consulta"],"Coleta de O.S.")) return;
+    esconderTelas(); definirMenuAtivo("coleta");
+    const tela=document.getElementById("telaColeta"); if(tela)tela.style.display="block";
+    document.getElementById("sidebar")?.classList.remove("mobile-open");
+    restaurarColetaLocal(); atualizarColetaKPIs(); renderizarColeta(); focarCampoColeta();
+}
+
+async function coletarOS(){
+    const campo=document.getElementById("coletaCampoOS");
+    const os=coletaNormalizarOS(campo?.value);
+    if(!os){coletaMensagem("Digite ou bipe uma O.S.","alerta");focarCampoColeta();return;}
+    if(coletaOSItens.some(x=>coletaNormalizarOS(coletaTexto(x,["os","OS"]))===os)){
+        coletaMensagem("A O.S. "+os+" já está nesta coleta.","erro");campo.value="";focarCampoColeta();return;
+    }
+    coletaMensagem("Consultando a O.S. "+os+" no Supabase...","");
+    campo.disabled=true;
+    try{
+        const supa=obterSupabaseClient();
+        const resp=await supa.from("rexpedlr").select("*").eq("os",os).limit(2);
+        if(resp.error) throw resp.error;
+        let item=(resp.data||[])[0];
+        if(!item){
+            const alt=await supa.from("rexpedlr").select("*").ilike("os",os).limit(2);
+            if(alt.error) throw alt.error;
+            item=(alt.data||[])[0];
+        }
+        if(!item){coletaMensagem("O.S. "+os+" não encontrada no banco REXPEDLR.","erro");return;}
+
+        /* Consulta a relação ORIGEM → DESTINO cadastrada no Supabase */
+        const origemFilial=coletaTexto(item,["loja_origem","pdv","loja_de_origem"]).toUpperCase().trim();
+        item.__coleta_origem=origemFilial;
+        item.__coleta_destino="";
+
+        if(origemFilial){
+            let mapa=await supa
+                .from("destinos_filiais")
+                .select("origem,destino")
+                .eq("origem",origemFilial)
+                .maybeSingle();
+
+            if(mapa.error){
+                /* Tenta novamente sem diferenciar maiúsculas e minúsculas */
+                mapa=await supa
+                    .from("destinos_filiais")
+                    .select("origem,destino")
+                    .ilike("origem",origemFilial)
+                    .limit(1)
+                    .maybeSingle();
+            }
+
+            if(mapa.error) throw mapa.error;
+            if(mapa.data && mapa.data.destino){
+                item.__coleta_destino=String(mapa.data.destino).trim();
+            }
+        }
+
+        item.__coleta_id=Date.now()+Math.random();
+        item.__coleta_hora=new Date().toISOString();
+        coletaOSItens.unshift(item); coletaUltimaOS=os;
+        campo.value="";
+        atualizarColetaKPIs(); atualizarFiltrosColeta(); renderizarColeta(item.__coleta_id); salvarColetaRascunho();
+        const destinoEncontrado=coletaDestino(item);
+        if(destinoEncontrado){
+            coletaMensagem("O.S. "+os+" adicionada. Destino: "+destinoEncontrado+".","ok");
+        }else{
+            coletaMensagem("O.S. "+os+" adicionada, mas a origem "+(item.__coleta_origem||"não informada")+" não possui destino cadastrado.","alerta");
+        }
+    }catch(e){
+        coletaMensagem("Erro ao consultar o Supabase: "+(e.message||e),"erro");
+        const chip=document.getElementById("coletaStatusConexao");if(chip)chip.textContent="Falha na conexão";
+    }finally{campo.disabled=false;focarCampoColeta();}
+}
+
+function coletaDestino(i){return coletaTexto(i,["__coleta_destino","destino","pdv_expedicao","pdv_destino"]);}
+function coletaLoja(i){return coletaTexto(i,["loja_origem","pdv","loja_de_origem"]);}
+function coletaCodCor(i){return coletaTexto(i,["cod_cor","codigo_cor","codcor"]);}
+function coletaCubagem(i){return coletaTexto(i,["cubagem","m3","volume_m3"]);}
+function coletaValor(i){return coletaTexto(i,["valor_transf","valor","valor_transferencia"]);}
+
+function atualizarColetaKPIs(){
+    const total=coletaOSItens.length;
+    const valor=coletaOSItens.reduce((s,i)=>s+coletaNumero(coletaValor(i)),0);
+    const cub=coletaOSItens.reduce((s,i)=>s+coletaNumero(coletaCubagem(i)),0);
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+    set("coletaKpiTotal",total.toLocaleString("pt-BR"));set("coletaKpiValor",valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"}));set("coletaKpiCubagem",cub.toLocaleString("pt-BR",{minimumFractionDigits:3,maximumFractionDigits:3}));set("coletaKpiUltima",coletaUltimaOS||"--");
+    set("coletaKpiHora",coletaUltimaOS?("Lida às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit",second:"2-digit"})):"Aguardando bipagem");
+}
+
+function valoresUnicos(fn){return [...new Set(coletaOSItens.map(fn).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true}));}
+function preencherSelectColeta(id,lista,rotulo){const el=document.getElementById(id);if(!el)return;const atual=el.value;el.innerHTML='<option value="">'+rotulo+'</option>'+lista.map(v=>'<option value="'+coletaEsc(v)+'">'+coletaEsc(v)+'</option>').join('');el.value=lista.includes(atual)?atual:"";}
+function atualizarFiltrosColeta(){preencherSelectColeta("coletaFiltroDestino",valoresUnicos(coletaDestino),"Todos os destinos");preencherSelectColeta("coletaFiltroStatus",valoresUnicos(i=>coletaTexto(i,["status","status_da_os"])),"Todos os status");preencherSelectColeta("coletaFiltroRack",valoresUnicos(i=>coletaTexto(i,["rack"])),"Todos os racks");}
+
+function itensColetaFiltrados(){
+    const busca=String(document.getElementById("coletaFiltroBusca")?.value||"").toLowerCase();
+    const dest=document.getElementById("coletaFiltroDestino")?.value||"", status=document.getElementById("coletaFiltroStatus")?.value||"", rack=document.getElementById("coletaFiltroRack")?.value||"";
+    return coletaOSItens.filter(i=>{
+        const hay=Object.values(i).join(" ").toLowerCase();
+        return (!busca||hay.includes(busca))&&(!dest||coletaDestino(i)===dest)&&(!status||coletaTexto(i,["status","status_da_os"])===status)&&(!rack||coletaTexto(i,["rack"])===rack);
+    });
+}
+function renderizarColeta(novoId){
+    const corpo=document.getElementById("coletaTabelaCorpo");if(!corpo)return;
+    const itens=itensColetaFiltrados();
+    if(!itens.length){corpo.innerHTML='<tr><td colspan="17" class="coleta-vazio">'+(coletaOSItens.length?'Nenhuma O.S. corresponde aos filtros.':'Nenhuma O.S. coletada.')+'</td></tr>';return;}
+    corpo.innerHTML=itens.map((i,idx)=>{
+        const id=i.__coleta_id; const cls=id===novoId?' class="coleta-nova"':'';
+        const val=coletaValor(i), cub=coletaCubagem(i);
+        return '<tr'+cls+'><td>'+(idx+1)+'</td><td class="coleta-os">'+coletaEsc(coletaTexto(i,["os","OS"]))+'</td><td>'+coletaEsc(coletaTexto(i,["dt_geracao","data_os"]))+'</td><td>'+coletaEsc(coletaDestino(i))+'</td><td>'+coletaEsc(coletaLoja(i))+'</td><td>'+coletaEsc(coletaTexto(i,["alm"]))+'</td><td>'+coletaEsc(coletaTexto(i,["grupo","grup"]))+'</td><td>'+coletaEsc(coletaTexto(i,["nce"]))+'</td><td>'+coletaEsc(coletaTexto(i,["desc_produto","descricao_produto"]))+'</td><td>'+coletaEsc(coletaCodCor(i))+'</td><td>'+coletaEsc(coletaTexto(i,["cor"]))+'</td><td>'+coletaEsc(coletaTexto(i,["n_serie","numero_serie"]))+'</td><td>'+coletaEsc(coletaTexto(i,["rack"]))+'</td><td>'+coletaEsc(coletaTexto(i,["status","status_da_os"]))+'</td><td>'+coletaEsc(val?coletaMoeda(val):"")+'</td><td>'+coletaEsc(cub)+'</td><td><button class="coleta-remover" onclick="removerOSColeta(\''+String(id)+'\')">Remover</button></td></tr>';
+    }).join('');
+}
+function removerOSColeta(id){const pos=coletaOSItens.findIndex(i=>String(i.__coleta_id)===String(id));if(pos<0)return;const os=coletaTexto(coletaOSItens[pos],["os"]);coletaOSItens.splice(pos,1);atualizarColetaKPIs();atualizarFiltrosColeta();renderizarColeta();salvarColetaRascunho();coletaMensagem("O.S. "+os+" removida da coleta.","alerta");focarCampoColeta();}
+function salvarColetaRascunho(){try{localStorage.setItem("ERP_COLETA_OS_RASCUNHO",JSON.stringify(coletaOSItens));}catch(e){}}
+function restaurarColetaLocal(){if(coletaOSItens.length)return;try{const d=JSON.parse(localStorage.getItem("ERP_COLETA_OS_RASCUNHO")||"[]");if(Array.isArray(d)){coletaOSItens=d;coletaUltimaOS=d[0]?coletaTexto(d[0],["os"]):"";atualizarFiltrosColeta();}}catch(e){}}
+function salvarColetaLocal(){salvarColetaRascunho();const hist=JSON.parse(localStorage.getItem("ERP_COLETAS_OS_HISTORICO")||"[]");hist.unshift({id:Date.now(),data:new Date().toISOString(),usuario:window.usuarioLogado?.nome||window.usuarioLogado?.email||"Usuário",itens:coletaOSItens});localStorage.setItem("ERP_COLETAS_OS_HISTORICO",JSON.stringify(hist.slice(0,30)));coletaMensagem("Coleta salva no navegador com "+coletaOSItens.length+" O.S.","ok");focarCampoColeta();}
+function finalizarColeta(){if(!coletaOSItens.length){coletaMensagem("Não há O.S. para finalizar.","alerta");return;}if(!confirm("Finalizar a coleta com "+coletaOSItens.length+" O.S.?"))return;salvarColetaLocal();coletaMensagem("Coleta finalizada com sucesso. Você pode exportar ou iniciar uma nova.","ok");}
+function limparColeta(){if(!coletaOSItens.length)return;if(!confirm("Remover todas as O.S. desta coleta?"))return;coletaOSItens=[];coletaUltimaOS="";localStorage.removeItem("ERP_COLETA_OS_RASCUNHO");atualizarColetaKPIs();atualizarFiltrosColeta();renderizarColeta();coletaMensagem("Coleta limpa. Campo pronto para nova leitura.","alerta");focarCampoColeta();}
+
+function exportarColetaCSV(){
+    const itens=itensColetaFiltrados();if(!itens.length){coletaMensagem("Não há dados para exportar.","alerta");return;}
+    const cab=["O.S.","Data da O.S.","Destino","Loja de Origem","ALM","GRUPO","N.C.E.","Descrição do produto","Cód. Cor","Cor","Nº de Série","Rack","Status","Valor","Cubagem"];
+    const q=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
+    const rows=itens.map(i=>[coletaTexto(i,["os"]),coletaTexto(i,["dt_geracao"]),coletaDestino(i),coletaLoja(i),coletaTexto(i,["alm"]),coletaTexto(i,["grupo"]),coletaTexto(i,["nce"]),coletaTexto(i,["desc_produto"]),coletaCodCor(i),coletaTexto(i,["cor"]),coletaTexto(i,["n_serie"]),coletaTexto(i,["rack"]),coletaTexto(i,["status","status_da_os"]),coletaValor(i),coletaCubagem(i)].map(q).join(';'));
+    const blob=new Blob(['\ufeff'+cab.map(q).join(';')+'\r\n'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='coleta_os_'+new Date().toISOString().slice(0,10)+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);coletaMensagem("Arquivo CSV gerado com "+itens.length+" O.S.","ok");focarCampoColeta();
+}
+function imprimirColeta(){
+    const itens=itensColetaFiltrados();if(!itens.length){coletaMensagem("Não há dados para imprimir.","alerta");return;}
+    const tabela=document.getElementById('coletaTabela').outerHTML;const w=window.open('','_blank');
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Coleta de O.S.</title><style>body{font-family:Arial;padding:14px;color:#111}h1{font-size:20px;margin:0 0 4px}p{margin:0 0 12px}table{width:100%;border-collapse:collapse;font-size:8px}th,td{border:1px solid #333;padding:4px;white-space:nowrap}th{background:#001b3d;color:#fff}.coleta-remover{display:none}</style></head><body><h1>Coleta de Ordens de Serviço</h1><p>'+itens.length+' O.S. • '+new Date().toLocaleString('pt-BR')+'</p>'+tabela+'<script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();
+}
 </script>
 
 </body>
