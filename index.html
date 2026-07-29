@@ -4495,6 +4495,22 @@ body.dark-mode .coleta-kpi,body.dark-mode .coleta-painel,body.dark-mode .coleta-
 @media(max-width:950px){.coleta-kpis{grid-template-columns:1fr 1fr}.coleta-toolbar{grid-template-columns:1fr 1fr}.coleta-input-linha{flex-direction:column}.coleta-btn{width:100%}.coleta-acoes .coleta-btn{width:auto}.coleta-hero h1{font-size:27px}}
 @media(max-width:560px){.coleta-kpis,.coleta-toolbar{grid-template-columns:1fr}.coleta-acoes .coleta-btn{width:100%}}
 
+
+/* Logo Paraíba */
+.ci-doc-logo,
+.ci-edit-logo,
+.ci-outros-logo{
+background:transparent!important;
+background-image:url('LOGO_PARAIBA_02(1).png')!important;
+background-repeat:no-repeat!important;
+background-position:center!important;
+background-size:contain!important;
+border:0!important;
+color:transparent!important;
+font-size:0!important;
+overflow:hidden!important;
+}
+
 </style>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jspreadsheet-ce@4/dist/jspreadsheet.min.css">
@@ -4564,6 +4580,262 @@ body.dark-mode .coleta-rack-input{background:#102b49;color:#fff;border-color:#42
 #telaColeta .coleta-rack-input{
     width:120px !important;
 }
+</style>
+
+
+<style id="rascunhos-abas-v680">
+.coleta-tipo-card.rascunhos:before{background:#0f9f6e}
+.rascunhos-modulo{display:none}
+.rascunhos-topo{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px;flex-wrap:wrap}
+.rascunhos-topo-acoes{display:flex;gap:10px;flex-wrap:wrap}
+.rascunhos-abas-barra{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:6px 2px 12px;margin-bottom:12px}
+.rascunho-aba{border:1px solid #c9d7e7;background:#fff;color:#18324f;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.rascunho-aba.ativa{background:#0f6fff;color:#fff;border-color:#0f6fff}
+.rascunho-aba-fechar{border:0;background:rgba(0,0,0,.08);color:inherit;border-radius:50%;width:22px;height:22px;cursor:pointer;font-weight:900}
+.rascunho-aba.ativa .rascunho-aba-fechar{background:rgba(255,255,255,.2)}
+.rascunho-add-aba{border:1px dashed #0f6fff;background:#eef5ff;color:#0f6fff;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;white-space:nowrap}
+.rascunhos-editor{background:#fff;border:1px solid #d7e1ee;border-radius:18px;padding:18px;box-shadow:0 10px 28px rgba(0,0,0,.08)}
+.rascunhos-cabecalho{display:grid;grid-template-columns:minmax(230px,1fr) minmax(300px,2fr);gap:14px;margin-bottom:14px}
+.rascunhos-cabecalho label{font-size:12px;font-weight:900;color:#52657a;display:block;margin-bottom:6px}
+.rascunhos-cabecalho input,.rascunhos-cabecalho textarea{
+width:100%;border:1px solid #b9c8d9;border-radius:10px;padding:10px 12px;font:inherit;background:#fff;color:#16283e
+}
+.rascunhos-cabecalho textarea{min-height:44px;resize:vertical}
+.rascunhos-leitura{display:flex;gap:10px;align-items:end;flex-wrap:wrap;margin:10px 0 14px}
+.rascunhos-leitura .campo{min-width:280px;flex:1}
+.rascunhos-leitura label{font-size:12px;font-weight:900;color:#52657a;display:block;margin-bottom:6px}
+.rascunhos-leitura input{width:100%;border:1px solid #9fb3c8;border-radius:11px;padding:12px 14px;font-size:16px}
+.rascunhos-msg{padding:10px 12px;border-radius:10px;background:#eef5ff;color:#183b66;font-weight:700;margin-bottom:12px}
+.rascunhos-tabela-wrap{overflow:auto;max-height:64vh;border:1px solid #d5dfeb;border-radius:14px}
+.rascunhos-tabela{width:100%;border-collapse:collapse;min-width:1250px}
+.rascunhos-tabela th{position:sticky;top:0;z-index:2;background:#073a78;color:#fff;padding:10px 8px;font-size:12px;text-align:left}
+.rascunhos-tabela td{padding:8px;border-bottom:1px solid #e3eaf2;vertical-align:middle;background:#fff}
+.rascunhos-tabela tr:hover td{background:#f7fbff}
+.rascunhos-tabela input,.rascunhos-tabela textarea{
+width:100%;border:1px solid #c4d0de;border-radius:8px;padding:7px 8px;font:inherit;background:#fff;color:#172b43
+}
+.rascunhos-tabela textarea{min-height:38px;resize:vertical}
+.rascunho-os{font-weight:900;color:#0b4a8f}
+.rascunho-vazio{text-align:center!important;padding:30px!important;color:#6d7d90}
+.rascunho-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:14px}
+.rascunho-kpi{background:#fff;border:1px solid #d7e1ee;border-radius:14px;padding:12px}
+.rascunho-kpi small{display:block;color:#64758a;font-weight:800}
+.rascunho-kpi strong{font-size:22px;color:#123b69}
+body.dark-mode .rascunhos-editor,body.dark-mode .rascunho-kpi,body.dark-mode .rascunho-aba{background:#0d223a;border-color:#294b6e;color:#eaf2ff}
+body.dark-mode .rascunhos-cabecalho input,body.dark-mode .rascunhos-cabecalho textarea,
+body.dark-mode .rascunhos-leitura input,body.dark-mode .rascunhos-tabela input,body.dark-mode .rascunhos-tabela textarea{
+background:#102b49;color:#fff;border-color:#426487
+}
+body.dark-mode .rascunhos-tabela td{background:#0f2742;border-color:#284865;color:#e8f1ff}
+body.dark-mode .rascunhos-tabela tr:hover td{background:#153354}
+body.dark-mode .rascunho-kpi strong{color:#eef6ff}
+@media(max-width:900px){
+  .rascunhos-cabecalho{grid-template-columns:1fr}
+  .rascunho-kpis{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+
+
+<style id="rascunhos-lote-v681">
+.rascunhos-progresso{display:none;margin:0 0 14px;background:#e9f1fb;border:1px solid #c2d4e8;border-radius:12px;padding:12px}
+.rascunhos-progresso-topo{display:flex;justify-content:space-between;gap:10px;font-weight:900;color:#173b67;margin-bottom:8px}
+.rascunhos-progresso-trilho{height:14px;background:#cbd9e9;border-radius:999px;overflow:hidden}
+.rascunhos-progresso-barra{height:100%;width:0%;background:linear-gradient(90deg,#0f6fff,#17a673);transition:width .2s ease}
+.rascunhos-progresso-detalhe{font-size:12px;color:#526b86;margin-top:7px;font-weight:700}
+body.dark-mode .rascunhos-progresso{background:#102b49;border-color:#31597e}
+body.dark-mode .rascunhos-progresso-topo,body.dark-mode .rascunhos-progresso-detalhe{color:#eaf3ff}
+body.dark-mode .rascunhos-progresso-trilho{background:#294766}
+</style>
+
+
+<style id="correcao-real-colunas-v692">
+#coletaTabela{min-width:1900px}
+#coletaTabela .col-os{width:105px;min-width:105px}
+#coletaTabela .col-loja{width:85px;min-width:85px;max-width:85px}
+#coletaTabela .col-grupo{width:70px;min-width:70px;max-width:70px}
+#coletaTabela .col-nce{width:95px;min-width:95px}
+#coletaTabela .col-produto{width:480px;min-width:480px;max-width:620px;white-space:normal}
+#coletaTabela .col-codcor{width:72px;min-width:72px;max-width:72px}
+#coletaTabela .col-rack{width:85px;min-width:85px;max-width:85px}
+.coleta-os-input,.coleta-campo-editavel{width:100%;box-sizing:border-box;border:1px solid #aab7c7;border-radius:6px;padding:5px 6px;background:#fff;color:#172033;font:inherit}
+.coleta-os-input{min-width:90px;font-weight:800;color:#0756b5}
+.coleta-produto-input{min-width:450px}
+.coleta-nao-encontrada td{background:#fff9e8}
+body.dark-mode .coleta-os-input,body.dark-mode .coleta-campo-editavel{background:#17324d;color:#eaf3ff;border-color:#486887}
+body.dark-mode .coleta-nao-encontrada td{background:#2a2412}
+</style>
+
+
+<style id="rascunhos-todas-colunas-v693">
+.rascunhos-tabela{min-width:2450px!important}
+.rascunhos-tabela .ras-col-os{width:105px;min-width:105px}
+.rascunhos-tabela .ras-col-data{width:115px;min-width:115px}
+.rascunhos-tabela .ras-col-destino{width:85px;min-width:85px}
+.rascunhos-tabela .ras-col-loja{width:90px;min-width:90px}
+.rascunhos-tabela .ras-col-alm{width:65px;min-width:65px}
+.rascunhos-tabela .ras-col-grupo{width:70px;min-width:70px}
+.rascunhos-tabela .ras-col-nce{width:100px;min-width:100px}
+.rascunhos-tabela .ras-col-produto{width:480px;min-width:480px}
+.rascunhos-tabela .ras-col-codcor{width:75px;min-width:75px}
+.rascunhos-tabela .ras-col-cor{width:115px;min-width:115px}
+.rascunhos-tabela .ras-col-serie{width:135px;min-width:135px}
+.rascunhos-tabela .ras-col-rack{width:85px;min-width:85px}
+.rascunhos-tabela .ras-col-status{width:100px;min-width:100px}
+.rascunhos-tabela .ras-col-valor{width:105px;min-width:105px}
+.rascunhos-tabela .ras-col-cubagem{width:95px;min-width:95px}
+.rascunhos-tabela .ras-col-observacao{width:260px;min-width:260px}
+.rascunhos-tabela .ras-col-acao{width:90px;min-width:90px}
+.rascunhos-tabela .rascunho-input-produto{min-width:455px}
+.rascunhos-tabela .rascunho-input-os{font-weight:900;color:#0756b5}
+</style>
+
+
+<style id="rascunhos-google-sheets-v694">
+.rascunhos-tabela-wrap{
+    border-radius:6px!important;
+    background:#fff;
+    max-height:68vh;
+}
+.rascunhos-tabela{
+    min-width:1850px!important;
+    table-layout:auto;
+}
+.rascunhos-tabela th{
+    padding:0!important;
+    height:38px;
+    border-right:1px solid #d7dce2;
+    border-bottom:1px solid #c7ccd1;
+    background:#f8f9fa!important;
+    color:#202124!important;
+}
+.rascunhos-tabela td{
+    padding:0!important;
+    height:36px;
+    border-right:1px solid #e0e3e7;
+    border-bottom:1px solid #e0e3e7;
+}
+.rascunhos-tabela input,
+.rascunhos-tabela textarea{
+    border:0!important;
+    border-radius:0!important;
+    padding:7px 8px!important;
+    min-height:35px;
+    background:transparent!important;
+}
+.rascunhos-tabela input:focus,
+.rascunhos-tabela textarea:focus{
+    outline:2px solid #1a73e8;
+    outline-offset:-2px;
+    background:#fff!important;
+}
+.ras-col-indice{
+    width:42px!important;
+    min-width:42px!important;
+    max-width:42px!important;
+    text-align:center!important;
+    background:#f1f3f4!important;
+    color:#5f6368!important;
+    font-weight:700;
+}
+.ras-col-os{width:105px;min-width:105px}
+.ras-col-loja{width:105px;min-width:105px}
+.ras-col-alm{width:70px;min-width:70px}
+.ras-col-grupo{width:75px;min-width:75px}
+.ras-col-nce{width:105px;min-width:105px}
+.ras-col-produto{width:500px;min-width:500px}
+.ras-col-codcor{width:85px;min-width:85px}
+.ras-col-cor{width:125px;min-width:125px}
+.ras-col-serie{width:145px;min-width:145px}
+.ras-col-rack{width:95px;min-width:95px}
+.ras-col-status{width:110px;min-width:110px}
+.ras-col-observacao{width:280px;min-width:280px}
+.ras-col-personalizada{width:150px;min-width:150px}
+.ras-col-acao{width:90px;min-width:90px;text-align:center}
+.rascunho-cabecalho-editavel{
+    display:flex;
+    align-items:center;
+    width:100%;
+    min-height:38px;
+}
+.rascunho-cabecalho-editavel input{
+    width:100%;
+    height:38px;
+    padding:0 8px!important;
+    border:0!important;
+    background:transparent!important;
+    color:#202124!important;
+    font-weight:700;
+    text-align:left;
+}
+.rascunho-cabecalho-editavel input:focus{
+    outline:2px solid #1a73e8!important;
+    outline-offset:-2px;
+    background:#fff!important;
+}
+.rascunho-remover-coluna{
+    width:25px;height:25px;min-width:25px;margin-right:4px;
+    border:0;border-radius:50%;background:transparent;color:#70757a;
+    font-size:18px;line-height:22px;cursor:pointer
+}
+.rascunho-remover-coluna:hover{background:#e8eaed;color:#c5221f}
+.rascunho-btn-coluna{background:#673ab7!important;color:#fff!important}
+body.dark-mode .rascunhos-tabela th,
+body.dark-mode .ras-col-indice{background:#162a3e!important;color:#e8eef5!important}
+body.dark-mode .rascunho-cabecalho-editavel input{color:#e8eef5!important}
+body.dark-mode .rascunhos-tabela input:focus,
+body.dark-mode .rascunhos-tabela textarea:focus,
+body.dark-mode .rascunho-cabecalho-editavel input:focus{background:#183653!important}
+</style>
+
+
+<style id="rascunhos-colunas-avancadas-v695">
+.rascunho-cabecalho-editavel{position:relative}
+.rascunho-alca-arraste{
+    width:18px;min-width:18px;text-align:center;cursor:grab;
+    color:#9aa0a6;font-size:13px;letter-spacing:-2px;user-select:none
+}
+.rascunho-alca-arraste:active{cursor:grabbing}
+.rascunho-redimensionador{
+    position:absolute;right:-3px;top:0;width:6px;height:100%;
+    cursor:col-resize;z-index:5
+}
+.rascunho-redimensionador:hover{background:#1a73e8}
+.rascunho-modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:99998;
+    display:flex;align-items:center;justify-content:center;padding:20px
+}
+.rascunho-modal{
+    width:min(430px,95vw);background:#fff;border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3);padding:18px
+}
+.rascunho-modal-topo{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.rascunho-modal-topo strong{font-size:18px}
+.rascunho-modal-topo button{
+    border:0;background:transparent;font-size:25px;cursor:pointer;color:#5f6368
+}
+.rascunho-modal label{display:block;font-weight:700;margin:11px 0 5px}
+.rascunho-modal input,.rascunho-modal select{
+    width:100%;box-sizing:border-box;border:1px solid #c5c9ce;border-radius:7px;
+    padding:10px;font:inherit;background:#fff;color:#202124
+}
+.rascunho-modal-acoes{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.rascunho-menu-coluna{
+    position:fixed;z-index:99999;min-width:220px;background:#fff;
+    border:1px solid #dadce0;border-radius:8px;padding:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,.22)
+}
+.rascunho-menu-coluna button{
+    display:block;width:100%;border:0;background:transparent;text-align:left;
+    padding:10px 12px;border-radius:5px;cursor:pointer;color:#202124
+}
+.rascunho-menu-coluna button:hover{background:#f1f3f4}
+.rascunho-menu-coluna button.perigo{color:#c5221f}
+body.dark-mode .rascunho-modal,
+body.dark-mode .rascunho-menu-coluna{background:#17324d;color:#e8eef5;border-color:#426487}
+body.dark-mode .rascunho-modal input,
+body.dark-mode .rascunho-modal select{background:#102b49;color:#e8eef5;border-color:#426487}
+body.dark-mode .rascunho-menu-coluna button{color:#e8eef5}
+body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}
 </style>
 
 </head>
@@ -4998,6 +5270,89 @@ body.dark-mode .coleta-rack-input{background:#102b49;color:#fff;border-color:#42
                     <p>Cópia da coleta Loja de Origem, mantendo destino, código da cor e demais informações.</p>
                     <span class="coleta-tipo-abrir">Abrir coleta →</span>
                 </div>
+
+                <div class="coleta-tipo-card rascunhos" onclick="abrirRascunhosColeta()">
+                    <div class="coleta-tipo-icone">📝</div>
+                    <h2>Rascunhos</h2>
+                    <p>Crie planilhas internas com abas, observações, Rack editável e inclusão de O.S. pelo bipador.</p>
+                    <span class="coleta-tipo-abrir">Abrir rascunhos →</span>
+                </div>
+            </div>
+        </div>
+
+
+        <div id="rascunhosModulo" class="rascunhos-modulo">
+            <section class="coleta-hero">
+                <div>
+                    <h1>📝 Rascunhos com Abas</h1>
+                    <p>Monte planilhas internas, faça observações e edite informações sem alterar a tabela REXPEDLR.</p>
+                    <button class="coleta-voltar-tipos" type="button" onclick="voltarRascunhosParaTipos()">← Voltar aos tipos de coleta</button>
+                </div>
+                <div class="coleta-status-chip">Salvamento automático</div>
+            </section>
+
+            <div class="rascunhos-topo">
+                <div class="rascunhos-topo-acoes">
+                    <button class="coleta-btn green" type="button" onclick="novoRascunhoAba()">＋ Nova aba</button>
+                    <button class="coleta-btn" type="button" onclick="duplicarRascunhoAba()">⧉ Duplicar aba</button>
+                    <button class="coleta-btn sec" type="button" onclick="exportarRascunhoCSV()">⇩ Exportar CSV</button>
+                    <button class="coleta-btn red" type="button" onclick="excluirRascunhoAba()">🗑 Excluir aba</button>
+                </div>
+            </div>
+
+            <div id="rascunhosAbasBarra" class="rascunhos-abas-barra"></div>
+
+            <div id="rascunhosEditor" class="rascunhos-editor">
+                <div class="rascunhos-cabecalho">
+                    <div>
+                        <label>Nome da aba / planilha</label>
+                        <input id="rascunhoNome" oninput="atualizarCabecalhoRascunho()" placeholder="Ex.: Produtos avariados">
+                    </div>
+                    <div>
+                        <label>Observação geral</label>
+                        <textarea id="rascunhoObsGeral" oninput="atualizarCabecalhoRascunho()" placeholder="Digite uma observação sobre esta planilha..."></textarea>
+                    </div>
+                </div>
+
+                <div class="rascunho-kpis">
+                    <div class="rascunho-kpi"><small>Total de O.S.</small><strong id="rascunhoKpiTotal">0</strong></div>
+                    <div class="rascunho-kpi"><small>Com Rack</small><strong id="rascunhoKpiRack">0</strong></div>
+                    <div class="rascunho-kpi"><small>Com observação</small><strong id="rascunhoKpiObs">0</strong></div>
+                    <div class="rascunho-kpi"><small>Última alteração</small><strong id="rascunhoKpiHora">--:--</strong></div>
+                </div>
+
+                <div class="rascunhos-leitura">
+                    <div class="campo">
+                        <label>Bipar ou digitar O.S.</label>
+                        <input id="rascunhoCampoOS" autocomplete="off" placeholder="Cole várias O.S. ou bipe uma por vez" onkeydown="rascunhoTeclaOS(event)" onpaste="rascunhoColarOS(event)">
+                    </div>
+                    <button class="coleta-btn green" type="button" onclick="adicionarOSRascunho()">Adicionar O.S.</button>
+                    <button class="coleta-btn light" type="button" onclick="focarCampoRascunho()">⌖ Ativar bipador</button>
+                    <button class="coleta-btn orange" type="button" onclick="adicionarLinhaVaziaRascunho()">＋ Linha manual</button>
+                    <button class="coleta-btn purple rascunho-btn-coluna" type="button" onclick="adicionarColunaRascunho()">＋ Adicionar coluna</button>
+                </div>
+
+                <div id="rascunhosMensagem" class="rascunhos-msg">Crie uma aba para começar.</div>
+
+                <div id="rascunhosProgresso" class="rascunhos-progresso">
+                    <div class="rascunhos-progresso-topo">
+                        <span id="rascunhosProgressoTitulo">Importando O.S...</span>
+                        <span id="rascunhosProgressoContador">0 / 0</span>
+                    </div>
+                    <div class="rascunhos-progresso-trilho">
+                        <div id="rascunhosProgressoBarra" class="rascunhos-progresso-barra"></div>
+                    </div>
+                    <div id="rascunhosProgressoDetalhe" class="rascunhos-progresso-detalhe"></div>
+                </div>
+
+                <div class="rascunhos-tabela-wrap">
+                    <table class="rascunhos-tabela">
+                        <thead id="rascunhosTabelaCabecalho"></thead>
+                        <tbody id="rascunhosTabelaCorpo">
+                            <tr><td colspan="14" class="rascunho-vazio">Nenhuma aba criada.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 
@@ -5024,7 +5379,7 @@ body.dark-mode .coleta-rack-input{background:#102b49;color:#fff;border-color:#42
                 <div class="coleta-campo-wrap">
                     <label for="coletaCampoOS">Bipar ou digitar a O.S.</label>
                     <div class="coleta-input-linha">
-                        <input id="coletaCampoOS" class="coleta-input" autocomplete="off" inputmode="numeric" placeholder="Aguardando leitura do bipador..." onkeydown="coletaTeclaOS(event)">
+                        <input id="coletaCampoOS" class="coleta-input" autocomplete="off" inputmode="numeric" placeholder="Bipe uma O.S. ou cole várias de uma vez..." onkeydown="coletaTeclaOS(event)" onpaste="coletaColarOSLote(event)">
                         <button class="coleta-btn green" type="button" onclick="coletarOS()">Adicionar O.S.</button>
                     </div>
                 </div>
@@ -5182,7 +5537,7 @@ body.dark-mode .coleta-rack-input{background:#102b49;color:#fff;border-color:#42
             <div class="ci-edit-assinatura">
                 <div>
                     <div style="display:flex;align-items:center;margin-bottom:4px;">
-                        <div class="ci-edit-logo">AP</div>
+                        <div class="ci-edit-logo"></div>
                         <b><i>Confirmo Embarque - IDC</i></b>
                     </div>
 
@@ -6581,7 +6936,7 @@ function montarCIOutrosEditavel(){
             <div class="ci-outros-rodape">
                 <div>
                     <div class="ci-outros-logo-linha">
-                        <div class="ci-outros-logo" contenteditable="true">AP</div>
+                        <div class="ci-outros-logo" contenteditable="true"></div>
                         <div class="ci-outros-embarque" contenteditable="true">Confirmo Embarque - IDC</div>
                     </div>
                     <div class="ci-outros-campo" contenteditable="true">VOL:______Em______/______/______</div>
@@ -6978,7 +7333,7 @@ function renderizarCIDocumento(itens, naoEncontradas){
             <div class="ci-doc-assinatura">
                 <div>
                     <div style="display:flex;align-items:center;margin-bottom:4px;">
-                        <div class="ci-doc-logo">AP</div>
+                        <div class="ci-doc-logo"></div>
                         <b><i>Confirmo Embarque - IDC</i></b>
                     </div>
 
@@ -14457,7 +14812,7 @@ window.addEventListener("beforeunload",()=>{
 
 <script>
 /* =========================
-   V6.7.2 - LAYOUT DA COLETA MELHORADO
+   V6.9.5 - RASCUNHOS COM COLUNAS REORGANIZÁVEIS
 ========================= */
 let coletaOSItens = [];
 let coletaUltimaOS = "";
@@ -14519,6 +14874,7 @@ function abrirColeta(){
     coletaUltimaOS="";
     document.getElementById("coletaSelecaoTipos").style.display="block";
     document.getElementById("coletaOperacao").style.display="none";
+    const rm=document.getElementById("rascunhosModulo"); if(rm)rm.style.display="none";
 }
 
 function selecionarTipoColeta(tipo){
@@ -14527,6 +14883,7 @@ function selecionarTipoColeta(tipo){
     coletaUltimaOS="";
     document.getElementById("coletaSelecaoTipos").style.display="none";
     document.getElementById("coletaOperacao").style.display="block";
+    const rm=document.getElementById("rascunhosModulo"); if(rm)rm.style.display="none";
 
     const titulo=document.getElementById("coletaTituloTipo");
     const descricao=document.getElementById("coletaDescricaoTipo");
@@ -14563,7 +14920,7 @@ function montarCabecalhoColeta(){
     const thead=document.querySelector("#coletaTabela thead");
     if(!thead)return;
     const destino=coletaEhEnderecamento()?"":"<th>Destino</th>";
-    thead.innerHTML="<tr><th>#</th><th>O.S.</th><th>Data da O.S.</th>"+destino+"<th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Valor</th><th>Cubagem</th><th>Ação</th></tr>";
+    thead.innerHTML="<tr><th>#</th><th class=\"col-os\">O.S.</th><th>Data da O.S.</th>"+destino+"<th class=\"col-loja\">Loja de Origem</th><th>ALM</th><th class=\"col-grupo\">GRUPO</th><th class=\"col-nce\">N.C.E.</th><th class=\"col-produto\">Descrição do produto</th><th class=\"col-codcor\">Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th class=\"col-rack\">Rack</th><th>Status</th><th>Valor</th><th>Cubagem</th><th>Ação</th></tr>";
 }
 
 async function coletarOS(){
@@ -14585,7 +14942,9 @@ async function coletarOS(){
             if(alt.error) throw alt.error;
             item=(alt.data||[])[0];
         }
-        if(!item){coletaMensagem("O.S. "+os+" não encontrada no banco REXPEDLR.","erro");return;}
+        if(!item){
+            item={os:os,dt_geracao:"",pdv:"",alm:"",grupo:"",nce:"",desc_produto:"",cor:"",n_serie:"",rack:"",status:"",valor_transf:"",cubagem:"",__os_nao_encontrada:true,__coleta_observacao:"O.S. não encontrada no banco"};
+        }
 
         /* Consulta o destino somente nas coletas Loja de Origem e ATT. */
         const origemPDV=coletaTexto(item,["pdv"]).toUpperCase().trim();
@@ -14635,7 +14994,9 @@ async function coletarOS(){
         campo.value="";
         atualizarColetaKPIs(); atualizarFiltrosColeta(); renderizarColeta(item.__coleta_id); salvarColetaRascunho();
 
-        if(item.__coleta_destino){
+        if(item.__os_nao_encontrada){
+            coletaMensagem("O.S. "+os+" adicionada sem dados do banco. Os campos ficaram editáveis.","alerta");
+        }else if(item.__coleta_destino){
             coletaMensagem("O.S. "+os+" adicionada. Destino: "+item.__coleta_destino+".","ok");
         }else{
             coletaMensagem("O.S. "+os+" adicionada, mas o PDV "+(origemPDV||"não informado")+" não possui destino cadastrado.","alerta");
@@ -14813,7 +15174,25 @@ function renderizarColeta(novoId){
             ?'<input class="coleta-rack-input" data-id="'+coletaEsc(String(id))+'" value="'+coletaEsc(coletaRack(i))+'" placeholder="Digite o rack" oninput="atualizarRackColeta(\''+String(id)+'\',this.value)" onmousedown="iniciarSelecaoRack(event,\''+String(id)+'\')" onmouseenter="estenderSelecaoRack(event,\''+String(id)+'\')" onpaste="colarRackEmLote(event,\''+String(id)+'\')" onkeydown="copiarRacksSelecionados(event)">'
             :coletaEsc(coletaRack(i));
 
-        return '<tr'+cls+'><td>'+(idx+1)+'</td><td class="coleta-os">'+coletaEsc(coletaTexto(i,["os","OS"]))+'</td><td>'+coletaEsc(coletaTexto(i,["dt_geracao","data_os"]))+'</td>'+destino+'<td>'+coletaEsc(coletaLoja(i))+'</td><td>'+coletaEsc(coletaTexto(i,["alm"]))+'</td><td>'+coletaEsc(coletaTexto(i,["grupo","grup"]))+'</td><td>'+coletaEsc(coletaTexto(i,["nce"]))+'</td><td>'+coletaEsc(coletaTexto(i,["desc_produto","descricao_produto"]))+'</td><td>'+coletaEsc(coletaCodCor(i))+'</td><td>'+coletaEsc(coletaTexto(i,["cor"]))+'</td><td>'+coletaEsc(coletaTexto(i,["n_serie","numero_serie"]))+'</td><td>'+rack+'</td><td>'+coletaEsc(coletaTexto(i,["status","status_da_os"]))+'</td><td>'+coletaEsc(val?coletaMoeda(val):"")+'</td><td>'+coletaEsc(cub)+'</td><td><button class="coleta-remover" onclick="removerOSColeta(\''+String(id)+'\')">Remover</button></td></tr>';
+        const manual=!!i.__os_nao_encontrada;
+        const input=(campo,valor,classe)=>'<input class="'+(classe||"coleta-campo-editavel")+'" value="'+coletaEsc(valor)+'" oninput="atualizarCampoColeta(\''+String(id)+'\',\''+campo+'\',this.value)">';
+        const osCampo=input("os",coletaTexto(i,["os","OS"]),"coleta-os-input");
+        const dataCampo=manual?input("dt_geracao",coletaTexto(i,["dt_geracao","data_os"])):coletaEsc(coletaTexto(i,["dt_geracao","data_os"]));
+        const lojaCampo=manual?input("pdv",coletaLoja(i)):coletaEsc(coletaLoja(i));
+        const almCampo=manual?input("alm",coletaTexto(i,["alm"])):coletaEsc(coletaTexto(i,["alm"]));
+        const grupoCampo=manual?input("grupo",coletaTexto(i,["grupo","grup"])):coletaEsc(coletaTexto(i,["grupo","grup"]));
+        const nceCampo=manual?input("nce",coletaTexto(i,["nce"])):coletaEsc(coletaTexto(i,["nce"]));
+        const produtoCampo=manual?input("desc_produto",coletaTexto(i,["desc_produto","descricao_produto"]),"coleta-campo-editavel coleta-produto-input"):coletaEsc(coletaTexto(i,["desc_produto","descricao_produto"]));
+        const codCorCampo=manual?input("__coleta_cod_cor",coletaCodCor(i)):coletaEsc(coletaCodCor(i));
+        const corCampo=manual?input("cor",coletaTexto(i,["cor"])):coletaEsc(coletaTexto(i,["cor"]));
+        const serieCampo=manual?input("n_serie",coletaTexto(i,["n_serie","numero_serie"])):coletaEsc(coletaTexto(i,["n_serie","numero_serie"]));
+        const rackCampo=manual&&!coletaEhEnderecamento()?input("__coleta_rack",coletaRack(i)):rack;
+        const statusCampo=manual?input("status",coletaTexto(i,["status","status_da_os"])):coletaEsc(coletaTexto(i,["status","status_da_os"]));
+        const valorCampo=manual?input("valor_transf",coletaTexto(i,["valor_transf","valor"])):coletaEsc(val?coletaMoeda(val):"");
+        const cubCampo=manual?input("cubagem",coletaTexto(i,["cubagem"])):coletaEsc(cub);
+        const classeLinha=manual?(cls?cls.replace(' class="',' class="coleta-nao-encontrada '):' class="coleta-nao-encontrada"'):cls;
+
+        return '<tr'+classeLinha+'><td>'+(idx+1)+'</td><td class="coleta-os col-os">'+osCampo+'</td><td>'+dataCampo+'</td>'+destino+'<td class="col-loja">'+lojaCampo+'</td><td>'+almCampo+'</td><td class="col-grupo">'+grupoCampo+'</td><td class="col-nce">'+nceCampo+'</td><td class="col-produto">'+produtoCampo+'</td><td class="col-codcor">'+codCorCampo+'</td><td>'+corCampo+'</td><td>'+serieCampo+'</td><td class="col-rack">'+rackCampo+'</td><td>'+statusCampo+'</td><td>'+valorCampo+'</td><td>'+cubCampo+'</td><td><button class="coleta-remover" onclick="removerOSColeta(\''+String(id)+'\')">Remover</button></td></tr>';
     }).join('');
     setTimeout(coletaAplicarVisualSelecaoRack,0);
 }
@@ -14848,6 +15227,1024 @@ function imprimirColeta(){
     const tabela=document.getElementById('coletaTabela').outerHTML;const w=window.open('','_blank');
     w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Coleta - '+coletaNomeTipo()+'</title><style>body{font-family:Arial;padding:14px;color:#111}h1{font-size:20px;margin:0 0 4px}p{margin:0 0 12px}table{width:100%;border-collapse:collapse;font-size:8px}th,td{border:1px solid #333;padding:4px;white-space:nowrap}th{background:#001b3d;color:#fff}.coleta-remover{display:none}</style></head><body><h1>Coleta de Ordens de Serviço</h1><p>'+itens.length+' O.S. • '+new Date().toLocaleString('pt-BR')+'</p>'+tabela+'<script>window.onload=()=>window.print()<\/script></body></html>');w.document.close();
 }
+
+
+/* ==========================================================
+   V6.9.5 - RASCUNHOS COM COLUNAS REORGANIZÁVEIS
+   Salva apenas no navegador. Não altera a tabela REXPEDLR.
+   ========================================================== */
+const RASCUNHOS_STORAGE_KEY="ERP_RASCUNHOS_ABAS_V680";
+let rascunhosAbas=[];
+let rascunhoAbaAtivaId=null;
+
+function carregarRascunhos(){
+    try{
+        const dados=JSON.parse(localStorage.getItem(RASCUNHOS_STORAGE_KEY)||"[]");
+        rascunhosAbas=Array.isArray(dados)?dados:[];
+    }catch(e){
+        rascunhosAbas=[];
+    }
+}
+
+function salvarRascunhos(){
+    try{
+        localStorage.setItem(RASCUNHOS_STORAGE_KEY,JSON.stringify(rascunhosAbas));
+    }catch(e){
+        console.error("Falha ao salvar rascunhos:",e);
+    }
+}
+
+function rascunhoAtivo(){
+    return rascunhosAbas.find(a=>String(a.id)===String(rascunhoAbaAtivaId))||null;
+}
+
+function criarIdRascunho(){
+    return "rasc_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+}
+
+function abrirRascunhosColeta(){
+    coletaTipoAtual="";
+    coletaOSItens=[];
+    coletaUltimaOS="";
+    document.getElementById("coletaSelecaoTipos").style.display="none";
+    document.getElementById("coletaOperacao").style.display="none";
+    document.getElementById("rascunhosModulo").style.display="block";
+
+    carregarRascunhos();
+    if(!rascunhosAbas.length){
+        novoRascunhoAba("Nova planilha");
+        return;
+    }
+    if(!rascunhoAbaAtivaId || !rascunhoAtivo()){
+        rascunhoAbaAtivaId=rascunhosAbas[0].id;
+    }
+    renderizarRascunhos();
+    focarCampoRascunho();
+}
+
+function voltarRascunhosParaTipos(){
+    salvarRascunhos();
+    document.getElementById("rascunhosModulo").style.display="none";
+    document.getElementById("coletaOperacao").style.display="none";
+    document.getElementById("coletaSelecaoTipos").style.display="block";
+}
+
+function novoRascunhoAba(nome){
+    const numero=rascunhosAbas.length+1;
+    const aba={
+        id:criarIdRascunho(),
+        nome:String(nome||("Planilha "+numero)),
+        observacao:"",
+        criado_em:new Date().toISOString(),
+        atualizado_em:new Date().toISOString(),
+        itens:[]
+    };
+    rascunhosAbas.push(aba);
+    rascunhoAbaAtivaId=aba.id;
+    salvarRascunhos();
+    renderizarRascunhos();
+    setTimeout(()=>document.getElementById("rascunhoNome")?.select(),80);
+}
+
+function selecionarRascunhoAba(id){
+    rascunhoAbaAtivaId=id;
+    renderizarRascunhos();
+    focarCampoRascunho();
+}
+
+function duplicarRascunhoAba(){
+    const atual=rascunhoAtivo();
+    if(!atual)return;
+    const copia=JSON.parse(JSON.stringify(atual));
+    copia.id=criarIdRascunho();
+    copia.nome=(atual.nome||"Planilha")+" - Cópia";
+    copia.criado_em=new Date().toISOString();
+    copia.atualizado_em=new Date().toISOString();
+    copia.itens=(copia.itens||[]).map(i=>({...i,__rascunho_id:"item_"+Date.now()+"_"+Math.random().toString(36).slice(2,7)}));
+    rascunhosAbas.push(copia);
+    rascunhoAbaAtivaId=copia.id;
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function excluirRascunhoAba(id){
+    const alvo=id||rascunhoAbaAtivaId;
+    const aba=rascunhosAbas.find(a=>String(a.id)===String(alvo));
+    if(!aba)return;
+    if(!confirm('Excluir a aba "'+(aba.nome||"Sem nome")+'"?'))return;
+
+    const indice=rascunhosAbas.findIndex(a=>String(a.id)===String(alvo));
+    rascunhosAbas.splice(indice,1);
+
+    if(!rascunhosAbas.length){
+        rascunhoAbaAtivaId=null;
+        salvarRascunhos();
+        novoRascunhoAba("Nova planilha");
+        return;
+    }
+
+    rascunhoAbaAtivaId=rascunhosAbas[Math.max(0,indice-1)].id;
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function atualizarCabecalhoRascunho(){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    aba.nome=document.getElementById("rascunhoNome")?.value||"Sem nome";
+    aba.observacao=document.getElementById("rascunhoObsGeral")?.value||"";
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+    renderizarAbasRascunho();
+    atualizarKpisRascunho();
+}
+
+function renderizarAbasRascunho(){
+    const barra=document.getElementById("rascunhosAbasBarra");
+    if(!barra)return;
+    barra.innerHTML=rascunhosAbas.map(aba=>{
+        const ativa=String(aba.id)===String(rascunhoAbaAtivaId)?" ativa":"";
+        return '<button class="rascunho-aba'+ativa+'" onclick="selecionarRascunhoAba(\''+String(aba.id)+'\')">'+
+            '<span>'+rascunhoEsc(aba.nome||"Sem nome")+'</span>'+
+            '<span class="rascunho-aba-fechar" onclick="event.stopPropagation();excluirRascunhoAba(\''+String(aba.id)+'\')">×</span>'+
+            '</button>';
+    }).join("")+'<button class="rascunho-add-aba" onclick="novoRascunhoAba()">＋ Nova aba</button>';
+}
+
+function renderizarRascunhos(){
+    renderizarAbasRascunho();
+    const aba=rascunhoAtivo();
+    const nome=document.getElementById("rascunhoNome");
+    const obs=document.getElementById("rascunhoObsGeral");
+    if(nome)nome.value=aba?.nome||"";
+    if(obs)obs.value=aba?.observacao||"";
+    renderizarTabelaRascunho();
+    atualizarKpisRascunho();
+    rascunhoMensagem(aba?"Rascunho salvo automaticamente no navegador.":"Crie uma aba para começar.");
+}
+
+function rascunhoEsc(v){
+    return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function rascunhoTexto(item,chaves){
+    for(const chave of chaves){
+        const valor=item?.[chave];
+        if(valor!==undefined&&valor!==null&&String(valor).trim()!=="")return String(valor).trim();
+    }
+    return "";
+}
+
+function rascunhoMensagem(texto){
+    const el=document.getElementById("rascunhosMensagem");
+    if(el)el.textContent=texto;
+}
+
+function focarCampoRascunho(){
+    setTimeout(()=>{
+        const campo=document.getElementById("rascunhoCampoOS");
+        if(campo){campo.focus();campo.select();}
+    },60);
+}
+
+function rascunhoTeclaOS(e){
+    if(e.key==="Enter"){
+        e.preventDefault();
+        adicionarOSRascunho();
+    }
+}
+
+async function adicionarOSRascunho(){
+    const aba=rascunhoAtivo();
+    if(!aba){novoRascunhoAba();return;}
+
+    const campo=document.getElementById("rascunhoCampoOS");
+    const os=coletaNormalizarOS(campo?.value);
+    if(!os){rascunhoMensagem("Digite ou bipe uma O.S.");focarCampoRascunho();return;}
+
+    if((aba.itens||[]).some(i=>coletaNormalizarOS(rascunhoTexto(i,["os","OS"]))===os)){
+        rascunhoMensagem("A O.S. "+os+" já está nesta aba.");
+        campo.value="";
+        focarCampoRascunho();
+        return;
+    }
+
+    rascunhoMensagem("Consultando a O.S. "+os+"...");
+    campo.disabled=true;
+
+    try{
+        const supa=obterSupabaseClient();
+        const resp=await supa.from("rexpedlr").select("*").eq("os",os).limit(1);
+        if(resp.error)throw resp.error;
+        let item=(resp.data||[])[0];
+
+        if(!item){
+            const alt=await supa.from("rexpedlr").select("*").ilike("os",os).limit(1);
+            if(alt.error)throw alt.error;
+            item=(alt.data||[])[0];
+        }
+
+        if(!item){
+            item={
+                os:os,
+                dt_geracao:"",
+                __rascunho_destino:"",
+                pdv:"",
+                alm:"",
+                grupo:"",
+                nce:"",
+                desc_produto:"",
+                __rascunho_cod_cor:"",
+                cor:"",
+                n_serie:"",
+                rack:"",
+                status:"",
+                valor_transf:"",
+                cubagem:"",
+                __linha_manual:true,
+                __os_nao_encontrada:true
+            };
+        }
+
+        item={...item};
+        item.__rascunho_id="item_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+        item.__rascunho_rack=rascunhoTexto(item,["rack"]);
+        item.__rascunho_observacao=item.__os_nao_encontrada?"O.S. não encontrada no banco":"";
+
+        const cor=rascunhoTexto(item,["cor"]);
+        item.__rascunho_cod_cor="";
+        if(cor){
+            const cod=await supa.from("codigo_cor").select("cod_cor").ilike("cor",cor).limit(1);
+            if(!cod.error && cod.data?.[0]?.cod_cor!==undefined){
+                item.__rascunho_cod_cor=String(cod.data[0].cod_cor??"").trim();
+            }
+        }
+
+        aba.itens=aba.itens||[];
+        aba.itens.push(item);
+        aba.atualizado_em=new Date().toISOString();
+        salvarRascunhos();
+        renderizarRascunhos();
+        rascunhoMensagem(
+            item.__os_nao_encontrada
+                ? "O.S. "+os+" adicionada sem dados do banco. Os campos ficaram disponíveis para edição."
+                : "O.S. "+os+" adicionada à aba "+(aba.nome||"Sem nome")+"."
+        );
+    }catch(e){
+        console.error(e);
+        rascunhoMensagem("Falha ao consultar a O.S.: "+(e?.message||e));
+    }finally{
+        campo.disabled=false;
+        campo.value="";
+        focarCampoRascunho();
+    }
+}
+
+function adicionarLinhaVaziaRascunho(){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    aba.itens=aba.itens||[];
+    aba.itens.push({
+        __rascunho_id:"item_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),
+        os:"",
+        desc_produto:"",
+        pdv:"",
+        grupo:"",
+        cor:"",
+        __rascunho_cod_cor:"",
+        __rascunho_rack:"",
+        status:"",
+        __rascunho_observacao:"",
+        __linha_manual:true
+    });
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function atualizarCelulaRascunho(itemId,campo,valor){
+    const aba=rascunhoAtivo();
+    const item=(aba?.itens||[]).find(i=>String(i.__rascunho_id)===String(itemId));
+    if(!item)return;
+    item[campo]=String(valor??"");
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+    atualizarKpisRascunho();
+}
+
+function removerLinhaRascunho(itemId){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    aba.itens=(aba.itens||[]).filter(i=>String(i.__rascunho_id)!==String(itemId));
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+const RASCUNHO_COLUNAS_PADRAO=[
+    {campo:"os",titulo:"O.S.",classe:"ras-col-os",tipo:"os"},
+    {campo:"pdv",titulo:"Loja de Origem",classe:"ras-col-loja"},
+    {campo:"alm",titulo:"ALM",classe:"ras-col-alm"},
+    {campo:"grupo",titulo:"Grupo",classe:"ras-col-grupo"},
+    {campo:"nce",titulo:"N.C.E.",classe:"ras-col-nce"},
+    {campo:"desc_produto",titulo:"Produto",classe:"ras-col-produto",tipo:"produto"},
+    {campo:"__rascunho_cod_cor",titulo:"Cód. Cor",classe:"ras-col-codcor"},
+    {campo:"cor",titulo:"Cor",classe:"ras-col-cor"},
+    {campo:"n_serie",titulo:"Nº de Série",classe:"ras-col-serie"},
+    {campo:"__rascunho_rack",titulo:"Rack",classe:"ras-col-rack"},
+    {campo:"status",titulo:"Status",classe:"ras-col-status"}
+];
+
+function garantirEstruturaColunasRascunho(aba){
+    if(!aba)return;
+    if(!aba.__cabecalhos || typeof aba.__cabecalhos!=="object")aba.__cabecalhos={};
+    if(!Array.isArray(aba.__colunas_personalizadas))aba.__colunas_personalizadas=[];
+}
+
+function colunasAtuaisRascunho(aba){
+    garantirEstruturaColunasRascunho(aba);
+
+    const todas=[
+        ...RASCUNHO_COLUNAS_PADRAO.map(c=>({
+            ...c,
+            titulo:aba.__cabecalhos[c.campo]||c.titulo,
+            personalizada:false
+        })),
+        ...aba.__colunas_personalizadas.map(c=>({
+            campo:c.campo,
+            titulo:c.titulo||"Nova coluna",
+            classe:"ras-col-personalizada",
+            personalizada:true
+        }))
+    ];
+
+    const mapa=new Map(todas.map(c=>[c.campo,c]));
+    let ordem=Array.isArray(aba.__ordem_colunas)?aba.__ordem_colunas.filter(c=>mapa.has(c)):[];
+    for(const c of todas)if(!ordem.includes(c.campo))ordem.push(c.campo);
+
+    aba.__ordem_colunas=ordem;
+    return ordem.map(c=>mapa.get(c)).filter(Boolean);
+}
+
+function atualizarCabecalhoColunaRascunho(campo,valor){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    garantirEstruturaColunasRascunho(aba);
+
+    const personalizada=aba.__colunas_personalizadas.find(c=>c.campo===campo);
+    if(personalizada)personalizada.titulo=String(valor||"").trim()||"Nova coluna";
+    else aba.__cabecalhos[campo]=String(valor||"").trim()||RASCUNHO_COLUNAS_PADRAO.find(c=>c.campo===campo)?.titulo||campo;
+
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+}
+
+function abrirModalAdicionarColunaRascunho(){
+    const aba=rascunhoAtivo();
+    if(!aba){rascunhoMensagem("Crie ou selecione uma aba primeiro.");return;}
+    garantirEstruturaColunasRascunho(aba);
+
+    const existente=document.getElementById("modalAdicionarColunaRascunho");
+    if(existente)existente.remove();
+
+    const colunas=colunasAtuaisRascunho(aba);
+    const opcoes=colunas.map(c=>'<option value="'+c.campo+'">'+rascunhoEsc(c.titulo)+'</option>').join("");
+
+    const modal=document.createElement("div");
+    modal.id="modalAdicionarColunaRascunho";
+    modal.className="rascunho-modal-overlay";
+    modal.innerHTML=
+        '<div class="rascunho-modal">'+
+            '<div class="rascunho-modal-topo">'+
+                '<strong>Adicionar coluna</strong>'+
+                '<button type="button" onclick="fecharModalAdicionarColunaRascunho()">×</button>'+
+            '</div>'+
+            '<label>Nome da coluna</label>'+
+            '<input id="rascunhoNovaColunaNome" value="Nova coluna" autocomplete="off">'+
+            '<label>Inserir</label>'+
+            '<select id="rascunhoNovaColunaLado">'+
+                '<option value="antes">Antes de</option>'+
+                '<option value="depois">Depois de</option>'+
+            '</select>'+
+            '<label>Coluna de referência</label>'+
+            '<select id="rascunhoNovaColunaReferencia">'+opcoes+'</select>'+
+            '<div class="rascunho-modal-acoes">'+
+                '<button type="button" class="coleta-btn light" onclick="fecharModalAdicionarColunaRascunho()">Cancelar</button>'+
+                '<button type="button" class="coleta-btn blue" onclick="confirmarAdicionarColunaRascunho()">Adicionar</button>'+
+            '</div>'+
+        '</div>';
+
+    document.body.appendChild(modal);
+    setTimeout(()=>document.getElementById("rascunhoNovaColunaNome")?.select(),50);
+}
+
+function fecharModalAdicionarColunaRascunho(){
+    document.getElementById("modalAdicionarColunaRascunho")?.remove();
+}
+
+function adicionarColunaRascunho(){
+    abrirModalAdicionarColunaRascunho();
+}
+
+function confirmarAdicionarColunaRascunho(){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    garantirEstruturaColunasRascunho(aba);
+
+    const nome=String(document.getElementById("rascunhoNovaColunaNome")?.value||"").trim()||"Nova coluna";
+    const lado=document.getElementById("rascunhoNovaColunaLado")?.value||"depois";
+    const referencia=document.getElementById("rascunhoNovaColunaReferencia")?.value||"";
+
+    const campo="__personalizada_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+    const nova={campo:campo,titulo:nome};
+
+    let ordem=Array.isArray(aba.__ordem_colunas)?[...aba.__ordem_colunas]:colunasAtuaisRascunho(aba).map(c=>c.campo);
+    ordem=ordem.filter(c=>c!==campo);
+
+    const indice=ordem.indexOf(referencia);
+    const pos=indice<0?ordem.length:(lado==="antes"?indice:indice+1);
+    ordem.splice(pos,0,campo);
+
+    aba.__colunas_personalizadas.push(nova);
+    aba.__ordem_colunas=ordem;
+
+    for(const item of (aba.itens||[]))item[campo]="";
+    aba.atualizado_em=new Date().toISOString();
+
+    salvarRascunhos();
+    fecharModalAdicionarColunaRascunho();
+    renderizarRascunhos();
+    rascunhoMensagem("Coluna adicionada na posição escolhida.");
+}
+function removerColunaRascunho(campo){
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    garantirEstruturaColunasRascunho(aba);
+    const coluna=aba.__colunas_personalizadas.find(c=>c.campo===campo);
+    if(!coluna)return;
+    if(!confirm('Remover a coluna "'+(coluna.titulo||"Nova coluna")+'" desta aba?'))return;
+
+    aba.__colunas_personalizadas=aba.__colunas_personalizadas.filter(c=>c.campo!==campo);
+    if(Array.isArray(aba.__ordem_colunas))aba.__ordem_colunas=aba.__ordem_colunas.filter(c=>c!==campo);
+    for(const item of (aba.itens||[]))delete item[campo];
+
+    aba.atualizado_em=new Date().toISOString();
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function renderizarCabecalhoRascunho(){
+    const thead=document.getElementById("rascunhosTabelaCabecalho");
+    const aba=rascunhoAtivo();
+    if(!thead)return;
+
+    const colunas=aba?colunasAtuaisRascunho(aba):RASCUNHO_COLUNAS_PADRAO;
+    const cabecalhos=colunas.map(col=>{
+        const excluir=col.personalizada
+            ?'<button class="rascunho-remover-coluna" type="button" title="Remover coluna" onclick="event.stopPropagation();removerColunaRascunho(\''+col.campo+'\')">×</button>'
+            :"";
+        const largura=(aba?.__larguras_colunas?.[col.campo]||"");
+        const style=largura?' style="width:'+largura+'px;min-width:'+largura+'px"':"";
+        return '<th class="'+(col.classe||"")+'" data-campo="'+col.campo+'" draggable="true"'+style+
+            ' ondragstart="iniciarArrasteColunaRascunho(event,\''+col.campo+'\')"'+
+            ' ondragover="permitirSoltarColunaRascunho(event)"'+
+            ' ondrop="soltarColunaRascunho(event,\''+col.campo+'\')"'+
+            ' oncontextmenu="abrirMenuColunaRascunho(event,\''+col.campo+'\')">'+
+            '<div class="rascunho-cabecalho-editavel">'+
+            '<span class="rascunho-alca-arraste" title="Arraste para mover">⋮⋮</span>'+
+            '<input value="'+rascunhoEsc(col.titulo)+'" title="Clique e digite para renomear" '+
+            'oninput="atualizarCabecalhoColunaRascunho(\''+col.campo+'\',this.value)">'+
+            excluir+
+            '<span class="rascunho-redimensionador" onmousedown="iniciarRedimensionamentoColunaRascunho(event,\''+col.campo+'\')"></span>'+
+            '</div></th>';
+    }).join("");
+
+    thead.innerHTML='<tr><th class="ras-col-indice">#</th>'+cabecalhos+'<th class="ras-col-acao">Ação</th></tr>';
+}
+
+let rascunhoColunaArrastada="";
+
+function iniciarArrasteColunaRascunho(event,campo){
+    rascunhoColunaArrastada=campo;
+    event.dataTransfer.effectAllowed="move";
+    event.dataTransfer.setData("text/plain",campo);
+}
+
+function permitirSoltarColunaRascunho(event){
+    event.preventDefault();
+    event.dataTransfer.dropEffect="move";
+}
+
+function soltarColunaRascunho(event,campoDestino){
+    event.preventDefault();
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+
+    const origem=rascunhoColunaArrastada||event.dataTransfer.getData("text/plain");
+    if(!origem||origem===campoDestino)return;
+
+    let ordem=colunasAtuaisRascunho(aba).map(c=>c.campo);
+    const iOrigem=ordem.indexOf(origem);
+    const iDestino=ordem.indexOf(campoDestino);
+    if(iOrigem<0||iDestino<0)return;
+
+    ordem.splice(iOrigem,1);
+    ordem.splice(iDestino,0,origem);
+    aba.__ordem_colunas=ordem;
+    aba.atualizado_em=new Date().toISOString();
+
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function iniciarRedimensionamentoColunaRascunho(event,campo){
+    event.preventDefault();
+    event.stopPropagation();
+
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    if(!aba.__larguras_colunas||typeof aba.__larguras_colunas!=="object")aba.__larguras_colunas={};
+
+    const th=event.target.closest("th");
+    const larguraInicial=th?.getBoundingClientRect().width||120;
+    const xInicial=event.clientX;
+
+    const mover=e=>{
+        const largura=Math.max(60,Math.round(larguraInicial+(e.clientX-xInicial)));
+        th.style.width=largura+"px";
+        th.style.minWidth=largura+"px";
+        aba.__larguras_colunas[campo]=largura;
+    };
+
+    const soltar=()=>{
+        document.removeEventListener("mousemove",mover);
+        document.removeEventListener("mouseup",soltar);
+        salvarRascunhos();
+        renderizarTabelaRascunho();
+    };
+
+    document.addEventListener("mousemove",mover);
+    document.addEventListener("mouseup",soltar);
+}
+
+function fecharMenuColunaRascunho(){
+    document.getElementById("rascunhoMenuColuna")?.remove();
+}
+
+function abrirMenuColunaRascunho(event,campo){
+    event.preventDefault();
+    fecharMenuColunaRascunho();
+
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    const coluna=colunasAtuaisRascunho(aba).find(c=>c.campo===campo);
+    if(!coluna)return;
+
+    const menu=document.createElement("div");
+    menu.id="rascunhoMenuColuna";
+    menu.className="rascunho-menu-coluna";
+    menu.style.left=event.clientX+"px";
+    menu.style.top=event.clientY+"px";
+
+    menu.innerHTML=
+        '<button onclick="inserirColunaAoLadoRascunho(\''+campo+'\',\'antes\')">Inserir coluna à esquerda</button>'+
+        '<button onclick="inserirColunaAoLadoRascunho(\''+campo+'\',\'depois\')">Inserir coluna à direita</button>'+
+        '<button onclick="renomearColunaRascunho(\''+campo+'\')">Renomear</button>'+
+        (coluna.personalizada?'<button class="perigo" onclick="removerColunaRascunho(\''+campo+'\');fecharMenuColunaRascunho()">Excluir coluna</button>':"");
+
+    document.body.appendChild(menu);
+    setTimeout(()=>document.addEventListener("click",fecharMenuColunaRascunho,{once:true}),0);
+}
+
+function inserirColunaAoLadoRascunho(campo,lado){
+    fecharMenuColunaRascunho();
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    garantirEstruturaColunasRascunho(aba);
+
+    const nome=prompt("Nome da nova coluna:","Nova coluna");
+    if(nome===null)return;
+
+    const novoCampo="__personalizada_"+Date.now()+"_"+Math.random().toString(36).slice(2,6);
+    aba.__colunas_personalizadas.push({campo:novoCampo,titulo:String(nome).trim()||"Nova coluna"});
+
+    let ordem=colunasAtuaisRascunho(aba).map(c=>c.campo).filter(c=>c!==novoCampo);
+    const indice=ordem.indexOf(campo);
+    ordem.splice(indice<0?ordem.length:(lado==="antes"?indice:indice+1),0,novoCampo);
+    aba.__ordem_colunas=ordem;
+
+    for(const item of (aba.itens||[]))item[novoCampo]="";
+    aba.atualizado_em=new Date().toISOString();
+
+    salvarRascunhos();
+    renderizarRascunhos();
+}
+
+function renomearColunaRascunho(campo){
+    fecharMenuColunaRascunho();
+    const aba=rascunhoAtivo();
+    if(!aba)return;
+    const coluna=colunasAtuaisRascunho(aba).find(c=>c.campo===campo);
+    if(!coluna)return;
+
+    const nome=prompt("Novo nome da coluna:",coluna.titulo);
+    if(nome===null)return;
+    atualizarCabecalhoColunaRascunho(campo,nome);
+    renderizarRascunhos();
+}
+function renderizarTabelaRascunho(){
+    const corpo=document.getElementById("rascunhosTabelaCorpo");
+    const aba=rascunhoAtivo();
+    if(!corpo)return;
+
+    renderizarCabecalhoRascunho();
+    const colunas=aba?colunasAtuaisRascunho(aba):RASCUNHO_COLUNAS_PADRAO;
+    const totalColunas=colunas.length+2;
+    const itens=aba?.itens||[];
+
+    if(!itens.length){
+        corpo.innerHTML='<tr><td colspan="'+totalColunas+'" class="rascunho-vazio">Nenhuma O.S. nesta aba.</td></tr>';
+        return;
+    }
+
+    corpo.innerHTML=itens.map((item,idx)=>{
+        const id=String(item.__rascunho_id);
+        const celula=col=>{
+            let valor="";
+            if(col.campo==="os")valor=rascunhoTexto(item,["os","OS"]);
+            else if(col.campo==="grupo")valor=rascunhoTexto(item,["grupo","grup"]);
+            else if(col.campo==="desc_produto")valor=rascunhoTexto(item,["desc_produto","descricao_produto"]);
+            else if(col.campo==="__rascunho_cod_cor")valor=rascunhoTexto(item,["__rascunho_cod_cor","cod_cor"]);
+            else if(col.campo==="n_serie")valor=rascunhoTexto(item,["n_serie","numero_serie"]);
+            else if(col.campo==="__rascunho_rack")valor=rascunhoTexto(item,["__rascunho_rack","rack"]);
+            else if(col.campo==="status")valor=rascunhoTexto(item,["status","status_da_os"]);
+            else valor=rascunhoTexto(item,[col.campo]);
+
+            if(col.tipo==="textarea"){
+                return '<td class="'+col.classe+'"><textarea oninput="atualizarCelulaRascunho(\''+id+'\',\''+col.campo+'\',this.value)">'+rascunhoEsc(valor)+'</textarea></td>';
+            }
+
+            const classeInput=col.tipo==="os"?"rascunho-input-os":(col.tipo==="produto"?"rascunho-input-produto":"");
+            return '<td class="'+(col.classe||"")+'"><input class="'+classeInput+'" value="'+rascunhoEsc(valor)+'" oninput="atualizarCelulaRascunho(\''+id+'\',\''+col.campo+'\',this.value)"></td>';
+        };
+
+        return '<tr>'+
+            '<td class="ras-col-indice">'+(idx+1)+'</td>'+
+            colunas.map(celula).join("")+
+            '<td class="ras-col-acao"><button class="coleta-remover" onclick="removerLinhaRascunho(\''+id+'\')">Remover</button></td>'+
+            '</tr>';
+    }).join("");
+}
+
+function atualizarKpisRascunho(){
+    const aba=rascunhoAtivo();
+    const itens=aba?.itens||[];
+    const comRack=itens.filter(i=>rascunhoTexto(i,["__rascunho_rack","rack"])).length;
+    const comObs=itens.filter(i=>rascunhoTexto(i,["__rascunho_observacao_REMOVIDA"])).length;
+    const hora=aba?.atualizado_em?new Date(aba.atualizado_em).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"--:--";
+
+    const totalEl=document.getElementById("rascunhoKpiTotal");
+    const rackEl=document.getElementById("rascunhoKpiRack");
+    const obsEl=document.getElementById("rascunhoKpiObs");
+    const horaEl=document.getElementById("rascunhoKpiHora");
+
+    if(totalEl)totalEl.textContent=itens.length;
+    if(rackEl)rackEl.textContent=comRack;
+    if(obsEl)obsEl.textContent=comObs;
+    if(horaEl)horaEl.textContent=hora;
+}
+
+function exportarRascunhoCSV(){
+    const aba=rascunhoAtivo();
+    const itens=aba?.itens||[];
+    if(!itens.length){rascunhoMensagem("Não há linhas para exportar.");return;}
+
+    const colunas=colunasAtuaisRascunho(aba);
+    const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+    const valorCampo=(item,campo)=>{
+        if(campo==="os")return rascunhoTexto(item,["os","OS"]);
+        if(campo==="grupo")return rascunhoTexto(item,["grupo","grup"]);
+        if(campo==="desc_produto")return rascunhoTexto(item,["desc_produto","descricao_produto"]);
+        if(campo==="__rascunho_cod_cor")return rascunhoTexto(item,["__rascunho_cod_cor","cod_cor"]);
+        if(campo==="n_serie")return rascunhoTexto(item,["n_serie","numero_serie"]);
+        if(campo==="__rascunho_rack")return rascunhoTexto(item,["__rascunho_rack","rack"]);
+        if(campo==="status")return rascunhoTexto(item,["status","status_da_os"]);
+        return rascunhoTexto(item,[campo]);
+    };
+
+    const cab=colunas.map(c=>c.titulo);
+    const linhas=itens.map(item=>colunas.map(c=>q(valorCampo(item,c.campo))).join(";"));
+
+    const blob=new Blob(["\ufeff"+cab.map(q).join(";")+"\r\n"+linhas.join("\r\n")],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="rascunho_"+String(aba.nome||"planilha").replace(/[^\w\-]+/g,"_")+".csv";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+    rascunhoMensagem("CSV exportado com as colunas atuais da planilha.");
+}
+
+
+
+/* ==========================================================
+   V6.9.5 - COLAGEM DE O.S. EM LOTE NOS RASCUNHOS
+   ========================================================== */
+
+let rascunhoImportandoLote=false;
+
+function rascunhoExtrairOSDoTexto(texto){
+    const partes=String(texto||"")
+        .replace(/\r/g,"\n")
+        .split(/[\n\t;,]+/)
+        .map(v=>coletaNormalizarOS(v))
+        .filter(Boolean);
+
+    const unicas=[];
+    const vistos=new Set();
+    for(const os of partes){
+        if(!vistos.has(os)){
+            vistos.add(os);
+            unicas.push(os);
+        }
+    }
+    return unicas;
+}
+
+function rascunhoColarOS(event){
+    const texto=event.clipboardData?.getData("text")||"";
+    const lista=rascunhoExtrairOSDoTexto(texto);
+
+    if(lista.length<=1){
+        return;
+    }
+
+    event.preventDefault();
+    importarOSRascunhoEmLote(lista);
+}
+
+function mostrarProgressoRascunho(atual,total,titulo,detalhe){
+    const box=document.getElementById("rascunhosProgresso");
+    const barra=document.getElementById("rascunhosProgressoBarra");
+    const contador=document.getElementById("rascunhosProgressoContador");
+    const tituloEl=document.getElementById("rascunhosProgressoTitulo");
+    const detalheEl=document.getElementById("rascunhosProgressoDetalhe");
+
+    if(!box)return;
+    box.style.display="block";
+    const percentual=total>0?Math.round((atual/total)*100):0;
+    if(barra)barra.style.width=percentual+"%";
+    if(contador)contador.textContent=atual+" / "+total;
+    if(tituloEl)tituloEl.textContent=titulo||"Importando O.S...";
+    if(detalheEl)detalheEl.textContent=detalhe||"";
+}
+
+function ocultarProgressoRascunho(){
+    const box=document.getElementById("rascunhosProgresso");
+    if(box){
+        setTimeout(()=>{box.style.display="none";},1200);
+    }
+}
+
+async function buscarOSCompletaRascunho(os,supa){
+    let resp=await supa.from("rexpedlr").select("*").eq("os",os).limit(1);
+    if(resp.error)throw resp.error;
+    let item=(resp.data||[])[0];
+
+    if(!item){
+        const alt=await supa.from("rexpedlr").select("*").ilike("os",os).limit(1);
+        if(alt.error)throw alt.error;
+        item=(alt.data||[])[0];
+    }
+
+    if(!item)return null;
+
+    item={...item};
+    item.__rascunho_id="item_"+Date.now()+"_"+Math.random().toString(36).slice(2,8);
+    item.__rascunho_rack=rascunhoTexto(item,["rack"]);
+    item.__rascunho_observacao="";
+    item.__rascunho_cod_cor="";
+
+    const cor=rascunhoTexto(item,["cor"]);
+    if(cor){
+        const cod=await supa.from("codigo_cor").select("cod_cor").ilike("cor",cor).limit(1);
+        if(!cod.error && cod.data?.[0]?.cod_cor!==undefined){
+            item.__rascunho_cod_cor=String(cod.data[0].cod_cor??"").trim();
+        }
+    }
+
+    return item;
+}
+
+async function importarOSRascunhoEmLote(lista){
+    if(rascunhoImportandoLote)return;
+
+    const aba=rascunhoAtivo();
+    if(!aba){
+        novoRascunhoAba();
+        return;
+    }
+
+    const todas=(Array.isArray(lista)?lista:rascunhoExtrairOSDoTexto(lista));
+    if(!todas.length){
+        rascunhoMensagem("Nenhuma O.S. válida foi encontrada na colagem.");
+        return;
+    }
+
+    const existentes=new Set((aba.itens||[]).map(i=>coletaNormalizarOS(rascunhoTexto(i,["os","OS"]))).filter(Boolean));
+    const pendentes=todas.filter(os=>!existentes.has(os));
+    const duplicadas=todas.length-pendentes.length;
+
+    if(!pendentes.length){
+        rascunhoMensagem("Todas as O.S. coladas já existem nesta aba.");
+        return;
+    }
+
+    rascunhoImportandoLote=true;
+    const campo=document.getElementById("rascunhoCampoOS");
+    if(campo){
+        campo.disabled=true;
+        campo.value="";
+    }
+
+    const supa=obterSupabaseClient();
+    let adicionadas=0;
+    let naoEncontradas=0;
+    let falhas=0;
+    const total=pendentes.length;
+
+    mostrarProgressoRascunho(0,total,"Importando O.S...","Preparando consulta no Supabase.");
+    rascunhoMensagem("Colagem reconhecida: "+total+" O.S. para importar.");
+
+    for(let i=0;i<pendentes.length;i++){
+        const os=pendentes[i];
+        mostrarProgressoRascunho(i,total,"Importando O.S...","Consultando O.S. "+os);
+
+        try{
+            let item=await buscarOSCompletaRascunho(os,supa);
+            aba.itens=aba.itens||[];
+
+            if(item){
+                aba.itens.push(item);
+                adicionadas++;
+            }else{
+                /* Mantém a O.S. no rascunho mesmo quando ela não existe na REXPEDLR.
+                   Os demais campos ficam vazios e totalmente editáveis. */
+                item={
+                    __rascunho_id:"item_"+Date.now()+"_"+Math.random().toString(36).slice(2,8),
+                    os:os,
+                    dt_geracao:"",
+                    __rascunho_destino:"",
+                    pdv:"",
+                    alm:"",
+                    grupo:"",
+                    nce:"",
+                    desc_produto:"",
+                    __rascunho_cod_cor:"",
+                    cor:"",
+                    n_serie:"",
+                    __rascunho_rack:"",
+                    status:"",
+                    valor_transf:"",
+                    cubagem:"",
+                    __rascunho_observacao:"O.S. não encontrada no banco",
+                    __linha_manual:true,
+                    __os_nao_encontrada:true
+                };
+                aba.itens.push(item);
+                naoEncontradas++;
+            }
+        }catch(e){
+            console.error("Falha ao importar O.S. "+os,e);
+            falhas++;
+        }
+
+        aba.atualizado_em=new Date().toISOString();
+        salvarRascunhos();
+
+        // Atualiza a tabela em blocos para não travar em listas grandes.
+        if((i+1)%10===0 || i===pendentes.length-1){
+            renderizarTabelaRascunho();
+            atualizarKpisRascunho();
+        }
+
+        mostrarProgressoRascunho(i+1,total,"Importando O.S...","Processada O.S. "+os);
+    }
+
+    rascunhoImportandoLote=false;
+    if(campo)campo.disabled=false;
+
+    renderizarRascunhos();
+    mostrarProgressoRascunho(total,total,"Importação concluída",
+        (adicionadas+naoEncontradas)+" linha(s) criada(s), "+naoEncontradas+" sem dados do banco, "+falhas+" falha(s)."
+    );
+    ocultarProgressoRascunho();
+
+    let mensagem=(adicionadas+naoEncontradas)+" O.S. adicionada(s)";
+    if(duplicadas)mensagem+=", "+duplicadas+" repetida(s) ignorada(s)";
+    if(naoEncontradas)mensagem+=", "+naoEncontradas+" inserida(s) sem dados do banco";
+    if(falhas)mensagem+=", "+falhas+" com falha";
+    rascunhoMensagem(mensagem+".");
+
+    focarCampoRascunho();
+}
+
+
+
+/* V6.9.5 - todas as colunas originais preservadas */
+function atualizarCampoColeta(id,campo,valor){
+    const item=coletaOSItens.find(i=>String(i.__coleta_id)===String(id));
+    if(!item)return;
+    item[campo]=campo==="os"?coletaNormalizarOS(valor):String(valor??"");
+    salvarColetaRascunho();
+    atualizarColetaKPIs();
+    atualizarFiltrosColeta();
+}
+
+function coletaExtrairOSLote(texto){
+    const lista=String(texto||"").replace(/\r/g,"\n").split(/[\n\t;,]+/).map(v=>coletaNormalizarOS(v)).filter(Boolean);
+    return [...new Set(lista)];
+}
+
+function coletaColarOSLote(event){
+    const texto=(event.clipboardData||window.clipboardData)?.getData("text")||"";
+    const lista=coletaExtrairOSLote(texto);
+    if(lista.length<=1)return;
+    event.preventDefault();
+    importarOSColetaLote(lista);
+}
+
+async function buscarItemColetaLote(os,supa){
+    let r=await supa.from("rexpedlr").select("*").eq("os",os).limit(1);
+    if(r.error)throw r.error;
+    let item=(r.data||[])[0];
+    if(!item){
+        const alt=await supa.from("rexpedlr").select("*").ilike("os",os).limit(1);
+        if(alt.error)throw alt.error;
+        item=(alt.data||[])[0];
+    }
+    if(!item){
+        item={os:os,dt_geracao:"",pdv:"",alm:"",grupo:"",nce:"",desc_produto:"",cor:"",n_serie:"",rack:"",status:"",valor_transf:"",cubagem:"",__os_nao_encontrada:true,__coleta_observacao:"O.S. não encontrada no banco"};
+    }else item={...item};
+
+    item.__coleta_destino="";
+    item.__coleta_cod_cor="";
+
+    if(!item.__os_nao_encontrada){
+        const origem=coletaTexto(item,["pdv"]).toUpperCase().trim();
+        if(!coletaEhEnderecamento()&&origem){
+            const d=await supa.from("destinos_filiais").select("destino").eq("origem",origem).maybeSingle();
+            if(!d.error&&d.data?.destino)item.__coleta_destino=String(d.data.destino).trim().toUpperCase();
+        }
+        const cor=coletaTexto(item,["cor"]).trim();
+        if(cor){
+            const c=await supa.from("codigo_cor").select("cod_cor").ilike("cor",cor).limit(1);
+            if(!c.error&&c.data?.[0]?.cod_cor!=null)item.__coleta_cod_cor=String(c.data[0].cod_cor).trim();
+        }
+    }
+
+    if(coletaEhEnderecamento())item.__coleta_rack="";
+    item.__coleta_tipo=coletaTipoAtual;
+    item.__coleta_id=Date.now()+Math.random();
+    item.__coleta_hora=new Date().toISOString();
+    return item;
+}
+
+async function importarOSColetaLote(lista){
+    const existentes=new Set(coletaOSItens.map(i=>coletaNormalizarOS(coletaTexto(i,["os","OS"]))).filter(Boolean));
+    const pendentes=lista.filter(os=>!existentes.has(os));
+    if(!pendentes.length){coletaMensagem("Todas as O.S. já estão nesta coleta.","alerta");return;}
+
+    const campo=document.getElementById("coletaCampoOS");
+    if(campo){campo.disabled=true;campo.value="";}
+    const supa=obterSupabaseClient();
+    let semDados=0;
+
+    try{
+        for(let i=0;i<pendentes.length;i++){
+            const os=pendentes[i];
+            coletaMensagem("Importando "+(i+1)+" de "+pendentes.length+": O.S. "+os,"");
+            let item;
+            try{
+                item=await buscarItemColetaLote(os,supa);
+            }catch(e){
+                item={os:os,dt_geracao:"",pdv:"",alm:"",grupo:"",nce:"",desc_produto:"",cor:"",n_serie:"",rack:"",status:"",valor_transf:"",cubagem:"",__os_nao_encontrada:true,__coleta_observacao:"Falha ao consultar banco",__coleta_destino:"",__coleta_cod_cor:"",__coleta_rack:"",__coleta_tipo:coletaTipoAtual,__coleta_id:Date.now()+Math.random(),__coleta_hora:new Date().toISOString()};
+            }
+            if(item.__os_nao_encontrada)semDados++;
+            coletaOSItens.push(item);
+            if((i+1)%10===0||i===pendentes.length-1){
+                salvarColetaRascunho();
+                atualizarColetaKPIs();
+                atualizarFiltrosColeta();
+                renderizarColeta();
+            }
+        }
+        coletaMensagem(pendentes.length+" O.S. adicionada(s). "+semDados+" ficaram sem dados do banco.","ok");
+    }finally{
+        if(campo)campo.disabled=false;
+        focarCampoColeta();
+    }
+}
+
 </script>
 
 </body>
