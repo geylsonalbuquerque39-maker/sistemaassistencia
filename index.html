@@ -16469,7 +16469,10 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
         conteudo.style.display="none";
 
         try{
-            const u=await buscarUsuario(id,fallback);
+            const u=await Promise.race([
+                buscarUsuario(id,fallback),
+                new Promise(resolve=>setTimeout(()=>resolve(fallback||{}),3000))
+            ]);
             selecionadoDados=u;
             const nome=u.nome||u.email||"Usuário";
             const s=statusReal(u);
@@ -16501,7 +16504,11 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
             carregando.style.display="none";
             conteudo.style.display="block";
         }catch(e){
-            carregando.textContent="Não foi possível abrir o perfil: "+(e?.message||e);
+            console.warn("Perfil público V6.9.8F:",e?.message||e);
+            carregando.style.display="none";
+            conteudo.style.display="block";
+            const nomeEl=document.getElementById("v698PerfilNome");
+            if(nomeEl&&!nomeEl.textContent.trim())nomeEl.textContent="Usuário";
         }
     }
 
@@ -16730,5 +16737,386 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
     });
 })();
 </script>
+
+
+<!-- =========================================================
+     V6.9.8D - VISUALIZADOR DE FOTO DE PERFIL EM TELA CHEIA
+     ========================================================= -->
+<style id="v698d-foto-perfil-grande">
+#v698FotoModal{
+    position:fixed;
+    inset:0;
+    z-index:19150;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(4,8,15,.88);
+    backdrop-filter:blur(8px);
+    -webkit-backdrop-filter:blur(8px);
+    padding:24px;
+}
+#v698FotoModal.aberto{display:flex}
+#v698FotoViewport{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:zoom-in;
+}
+#v698FotoGrande{
+    max-width:min(92vw,1200px);
+    max-height:88vh;
+    object-fit:contain;
+    border-radius:16px;
+    box-shadow:0 30px 100px rgba(0,0,0,.6);
+    transform:translate(0,0) scale(1);
+    transform-origin:center center;
+    transition:transform .16s ease;
+    user-select:none;
+    -webkit-user-drag:none;
+    cursor:grab;
+}
+#v698FotoGrande.arrastando{
+    cursor:grabbing;
+    transition:none;
+}
+.v698FotoFechar{
+    position:absolute;
+    right:22px;
+    top:18px;
+    z-index:3;
+    width:46px;
+    height:46px;
+    border:0;
+    border-radius:50%;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:26px;
+    cursor:pointer;
+    backdrop-filter:blur(8px);
+}
+.v698FotoFechar:hover{background:rgba(255,255,255,.22)}
+.v698FotoControles{
+    position:absolute;
+    left:50%;
+    bottom:24px;
+    transform:translateX(-50%);
+    z-index:3;
+    display:flex;
+    gap:10px;
+    padding:8px;
+    border-radius:14px;
+    background:rgba(17,24,39,.72);
+    box-shadow:0 10px 35px rgba(0,0,0,.35);
+    backdrop-filter:blur(10px);
+}
+.v698FotoControles button{
+    min-width:44px;
+    height:40px;
+    border:0;
+    border-radius:10px;
+    background:rgba(255,255,255,.12);
+    color:#fff;
+    font-size:18px;
+    font-weight:900;
+    cursor:pointer;
+}
+.v698FotoControles button:hover{background:rgba(255,255,255,.22)}
+#v698FotoZoomTexto{
+    min-width:68px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#fff;
+    font-weight:900;
+    font-size:14px;
+}
+#v698PerfilAvatar.tem-foto{
+    cursor:zoom-in!important;
+    position:relative;
+}
+#v698PerfilAvatar.tem-foto::after{
+    content:"🔍";
+    position:absolute;
+    right:2px;
+    bottom:2px;
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:#001b3d;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    border:2px solid #fff;
+}
+@media(max-width:600px){
+    #v698FotoModal{padding:10px}
+    .v698FotoFechar{right:12px;top:10px}
+    .v698FotoControles{bottom:14px}
+    #v698FotoGrande{max-width:96vw;max-height:84vh}
+}
+</style>
+
+<div id="v698FotoModal" aria-hidden="true">
+    <button type="button" class="v698FotoFechar" onclick="v698FecharFotoGrande()" aria-label="Fechar">✕</button>
+    <div id="v698FotoViewport">
+        <img id="v698FotoGrande" alt="Foto de perfil ampliada">
+    </div>
+    <div class="v698FotoControles">
+        <button type="button" onclick="v698AlterarZoom(-0.25)" aria-label="Diminuir zoom">−</button>
+        <div id="v698FotoZoomTexto">100%</div>
+        <button type="button" onclick="v698AlterarZoom(0.25)" aria-label="Aumentar zoom">+</button>
+        <button type="button" onclick="v698ResetarZoom()" aria-label="Redefinir zoom">↺</button>
+    </div>
+</div>
+
+<script>
+(function(){
+    "use strict";
+
+    let escala=1;
+    let deslocX=0;
+    let deslocY=0;
+    let arrastando=false;
+    let inicioX=0;
+    let inicioY=0;
+    let origemX=0;
+    let origemY=0;
+
+    function aplicarTransform(){
+        const img=document.getElementById("v698FotoGrande");
+        const txt=document.getElementById("v698FotoZoomTexto");
+        if(!img)return;
+        img.style.transform=`translate(${deslocX}px,${deslocY}px) scale(${escala})`;
+        if(txt)txt.textContent=Math.round(escala*100)+"%";
+        img.style.cursor=escala>1?"grab":"zoom-in";
+    }
+
+    window.v698AbrirFotoGrande=function(url){
+        if(!url)return;
+        const modal=document.getElementById("v698FotoModal");
+        const img=document.getElementById("v698FotoGrande");
+        if(!modal||!img)return;
+
+        escala=1;
+        deslocX=0;
+        deslocY=0;
+        img.src=url;
+        aplicarTransform();
+
+        modal.classList.add("aberto");
+        modal.setAttribute("aria-hidden","false");
+        document.body.style.overflow="hidden";
+    };
+
+    window.v698FecharFotoGrande=function(){
+        const modal=document.getElementById("v698FotoModal");
+        if(!modal)return;
+        modal.classList.remove("aberto");
+        modal.setAttribute("aria-hidden","true");
+        document.body.style.overflow="";
+        escala=1;
+        deslocX=0;
+        deslocY=0;
+    };
+
+    window.v698AlterarZoom=function(delta){
+        escala=Math.min(4,Math.max(1,escala+delta));
+        if(escala===1){
+            deslocX=0;
+            deslocY=0;
+        }
+        aplicarTransform();
+    };
+
+    window.v698ResetarZoom=function(){
+        escala=1;
+        deslocX=0;
+        deslocY=0;
+        aplicarTransform();
+    };
+
+    function habilitarCliqueAvatar(){
+        const avatar=document.getElementById("v698PerfilAvatar");
+        if(!avatar)return;
+
+        const img=avatar.querySelector("img");
+        if(img&&img.src){
+            if(!avatar.classList.contains("tem-foto"))avatar.classList.add("tem-foto");
+            if(avatar.title!=="Clique para ampliar a foto")avatar.title="Clique para ampliar a foto";
+            if(!avatar.dataset.v698FotoClique){
+                avatar.dataset.v698FotoClique="1";
+                avatar.onclick=function(e){
+                    e.stopPropagation();
+                    const foto=avatar.querySelector("img");
+                    if(foto?.src)v698AbrirFotoGrande(foto.currentSrc||foto.src);
+                };
+            }
+        }else{
+            avatar.classList.remove("tem-foto");
+            avatar.onclick=null;
+            delete avatar.dataset.v698FotoClique;
+            avatar.removeAttribute("title");
+        }
+    }
+
+    // Observa o modal de perfil para ativar o clique assim que a foto for carregada.
+    const alvo=document.getElementById("v698PerfilAvatar");
+    if(alvo){
+        const obs=new MutationObserver(habilitarCliqueAvatar);
+        obs.observe(alvo,{childList:true,subtree:true});
+        habilitarCliqueAvatar();
+    }
+
+    const modal=document.getElementById("v698FotoModal");
+    const viewport=document.getElementById("v698FotoViewport");
+    const img=document.getElementById("v698FotoGrande");
+
+    modal?.addEventListener("click",function(e){
+        if(e.target===modal||e.target===viewport)v698FecharFotoGrande();
+    });
+
+    viewport?.addEventListener("wheel",function(e){
+        e.preventDefault();
+        v698AlterarZoom(e.deltaY<0?0.2:-0.2);
+    },{passive:false});
+
+    img?.addEventListener("dblclick",function(e){
+        e.preventDefault();
+        if(escala===1){
+            escala=2;
+        }else{
+            escala=1;
+            deslocX=0;
+            deslocY=0;
+        }
+        aplicarTransform();
+    });
+
+    img?.addEventListener("mousedown",function(e){
+        if(escala<=1)return;
+        arrastando=true;
+        inicioX=e.clientX;
+        inicioY=e.clientY;
+        origemX=deslocX;
+        origemY=deslocY;
+        img.classList.add("arrastando");
+        e.preventDefault();
+    });
+
+    window.addEventListener("mousemove",function(e){
+        if(!arrastando)return;
+        deslocX=origemX+(e.clientX-inicioX);
+        deslocY=origemY+(e.clientY-inicioY);
+        aplicarTransform();
+    });
+
+    window.addEventListener("mouseup",function(){
+        arrastando=false;
+        img?.classList.remove("arrastando");
+    });
+
+    document.addEventListener("keydown",function(e){
+        if(e.key==="Escape"&&document.getElementById("v698FotoModal")?.classList.contains("aberto")){
+            e.stopImmediatePropagation();
+            v698FecharFotoGrande();
+        }
+    },true);
+
+    // Reaplica após abertura do perfil público.
+    if(typeof window.v698VerPerfil==="function"){
+        const originalVerPerfil=window.v698VerPerfil;
+        window.v698VerPerfil=async function(){
+            const r=await originalVerPerfil.apply(this,arguments);
+            setTimeout(habilitarCliqueAvatar,120);
+            return r;
+        };
+    }
+})();
+</script>
+
+
+
+<!-- V6.9.8E - CORREÇÃO DEFINITIVA DO CLIQUE PARA AMPLIAR FOTO -->
+<style id="v698e-fix-foto">
+#v698PerfilAvatar,
+#v698PerfilAvatar img{
+    pointer-events:auto!important;
+    cursor:zoom-in!important;
+}
+#v698PerfilAvatar::after{pointer-events:none!important}
+</style>
+<script>
+(function(){
+    "use strict";
+
+    function abrirFotoDoPerfil(ev){
+        const avatar=ev.target.closest("#v698PerfilAvatar");
+        if(!avatar)return;
+
+        const img=avatar.querySelector("img");
+        if(!img||!img.src)return;
+
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(typeof ev.stopImmediatePropagation==="function")ev.stopImmediatePropagation();
+
+        if(typeof window.v698AbrirFotoGrande==="function"){
+            window.v698AbrirFotoGrande(img.currentSrc||img.src);
+        }
+    }
+
+    // Captura o clique antes de qualquer outro evento do modal.
+    document.addEventListener("click",abrirFotoDoPerfil,true);
+
+    // Suporte também para toque em celular.
+    document.addEventListener("touchend",function(ev){
+        const avatar=ev.target.closest?.("#v698PerfilAvatar");
+        if(!avatar)return;
+        const img=avatar.querySelector("img");
+        if(!img||!img.src)return;
+
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(typeof window.v698AbrirFotoGrande==="function"){
+            window.v698AbrirFotoGrande(img.currentSrc||img.src);
+        }
+    },{capture:true,passive:false});
+
+    // O observador principal acima já acompanha a troca da foto.
+})();
+</script>
+
+
+
+<!-- V6.9.8F - SEGURANÇA CONTRA CARREGAMENTO INFINITO DO PERFIL -->
+<script>
+(function(){
+    document.addEventListener("click",function(e){
+        const botao=e.target.closest('#v698PerfilMenu button');
+        if(!botao||!botao.textContent.includes("Ver perfil"))return;
+
+        setTimeout(function(){
+            const modal=document.getElementById("v698PerfilModal");
+            const carregando=document.getElementById("v698PerfilCarregando");
+            const conteudo=document.getElementById("v698PerfilConteudo");
+            if(modal?.classList.contains("aberto")&&carregando?.style.display!=="none"){
+                carregando.style.display="none";
+                if(conteudo)conteudo.style.display="block";
+            }
+        },3500);
+    },true);
+})();
+</script>
+
+
+
+<!-- V6.9.8G - CORREÇÃO DO TRAVAMENTO DO PERFIL
+     Removido ciclo infinito do MutationObserver do avatar. -->
 </body>
 </html>
