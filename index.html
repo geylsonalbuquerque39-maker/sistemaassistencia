@@ -5644,7 +5644,6 @@ body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}
       <div class="intel-exec-box"><small>O.S. abertas</small><strong id="ieAbertas">--</strong><span>Situação ABE</span></div>
       <div class="intel-exec-box"><small>O.S. fechadas</small><strong id="ieFechadas">--</strong><span>Situação FEC</span></div>
       <div class="intel-exec-box"><small>Expedidas hoje</small><strong id="ieExpHoje">--</strong><span>Data de expedição de hoje</span></div>
-      <div class="intel-exec-box"><small>Tempo médio na oficina</small><strong id="ieTempoOficina">--</strong><span>Entrada até saída/conserto</span></div>
       <div class="intel-exec-box"><small>Tempo médio até expedição</small><strong id="ieTempoExp">--</strong><span>Geração até expedição</span></div>
       <div class="intel-exec-box"><small>Base analisada</small><strong id="ieTotal">--</strong><span>Total de O.S.</span></div>
     </div>
@@ -9830,8 +9829,7 @@ function responderAssistenteIntel(){
     // Médias verdadeiras calculadas da base.
     if(querMedia){
         let pares=[],rotulo="";
-        if(/OFICINA/.test(u)){pares=lista.map(r=>[r.dt_recb_at||r.dt_ult_entrada,r.dt_saida_oficina||r.dt_conserto]);rotulo="tempo médio na oficina"}
-        else if(/EXPEDI/.test(u)){pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio entre geração e expedição"}
+        if(/EXPEDI/.test(u)){pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio entre geração e expedição"}
         else {pares=lista.map(r=>[r.dt_geracao,r.dt_expedicao]);rotulo="tempo médio até a expedição"}
         const media=mediaDiasV36(pares);
         salvarContextoCopiloto(lista,criterios,rotulo);
@@ -9879,7 +9877,6 @@ function analisarIntel(registros){
  const oficina20=oficina.filter(r=>(diasDesdeIntel(r.dt_recb_at||r.dt_ult_entrada||r.dt_geracao)||0)>20);
  const qualidade=registros.length?Math.round(registros.filter(r=>textoIntel(r.tecnico)&&textoIntel(r.rack)).length/registros.length*100):0;
  const hoje=new Date().toISOString().slice(0,10),expHoje=registros.filter(r=>soDataV36(r.dt_expedicao)===hoje);
- const tempoOficina=mediaDiasV36(registros.map(r=>[r.dt_recb_at||r.dt_ult_entrada,r.dt_saida_oficina||r.dt_conserto]));
  const tempoExp=mediaDiasV36(registros.map(r=>[r.dt_geracao,r.dt_expedicao]));
  const prioridades=[];
  paradas.forEach(r=>prioridades.push({...r,_motivo:'Sem movimentação há mais de 30 dias',_nivel:4,_dias:diasDesdeIntel(ultimaDataIntel(r))||0}));
@@ -9889,12 +9886,12 @@ function analisarIntel(registros){
  const unicos=new Map();prioridades.sort((a,b)=>(b._nivel-a._nivel)||(b._dias-a._dias)).forEach(r=>{if(!unicos.has(r.os))unicos.set(r.os,r)});
  const rack500Abertas=abertas.filter(r=>rackCorrespondeIntel(r.rack,'500')),prontasAbertas=abertas.filter(statusProntaIntel);
  const racksAbertos=contarIntel(abertas,'rack').filter(x=>x[0]!=='(vazio)');
- return {abertas,fechadas,expHoje,tempoOficina,tempoExp,prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20,qualidade,rack500Abertas,prontasAbertas,racksAbertos,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,'tecnico'),pdvs:contarIntel(registros,'pdv'),status:contarIntel(registros,'status')};
+ return {abertas,fechadas,expHoje,tempoExp,prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20,qualidade,rack500Abertas,prontasAbertas,racksAbertos,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,'tecnico'),pdvs:contarIntel(registros,'pdv'),status:contarIntel(registros,'status')};
 }
 function renderIntel(){
  const a=intelAnalise;if(!a)return;
  setIntel('ikProntas',a.prontas.length);setIntel('ikParadas',a.paradas.length);setIntel('ikCpp',a.cpp.length);setIntel('ikQualidade',a.qualidade+'%');
- setIntel('ieAbertas',a.abertas.length);setIntel('ieFechadas',a.fechadas.length);setIntel('ieExpHoje',a.expHoje.length);setIntel('ieTempoOficina',a.tempoOficina===null?'-':a.tempoOficina+' d');setIntel('ieTempoExp',a.tempoExp===null?'-':a.tempoExp+' d');setIntel('ieTotal',intelRegistros.length);
+ setIntel('ieAbertas',a.abertas.length);setIntel('ieFechadas',a.fechadas.length);setIntel('ieExpHoje',a.expHoje.length);setIntel('ieTempoExp',a.tempoExp===null?'-':a.tempoExp+' d');setIntel('ieTotal',intelRegistros.length);
  const alertas=[];
  if(a.rack500Abertas.length)alertas.push("<div class='intel-alert red' onclick=\"abrirListaIntel('rack500Abertas')\"><b>📦 "+a.rack500Abertas.length+" O.S. abertas no Rack 500</b><span>Clique para abrir a relação.</span></div>");
  if(a.prontasAbertas.length)alertas.push("<div class='intel-alert orange' onclick=\"abrirListaIntel('prontasAbertas')\"><b>🟢 "+a.prontasAbertas.length+" O.S. prontas e abertas</b><span>Aguardando próxima ação operacional.</span></div>");
@@ -9914,14 +9911,15 @@ function renderIntel(){
 }
 function obterCartoesV36(a=intelAnalise){
  if(!a)return [];
- const fixos=[['Rack 500',a.rack500Abertas,'red'],['Prontas',a.prontasAbertas,'green'],['CPP',a.cpp,'orange'],['Oficina +20 dias',a.oficina20,'red'],['Sem técnico',a.semTecnico,'orange'],['Sem rack',a.semRack,'orange']];
+ const fixos=[['O.S. abertas no geral',a.abertas,'green'],['Rack 500',a.rack500Abertas,'red'],['Prontas',a.prontasAbertas,'green'],['CPP',a.cpp,'orange'],['Oficina +20 dias',a.oficina20,'red'],['Sem técnico',a.semTecnico,'orange'],['Sem rack',a.semRack,'orange']];
  const dinamicos=a.racksAbertos.filter(x=>normalizarRackIntel(x[0])!=='500').slice(0,6).map(x=>['Rack '+x[0],a.abertas.filter(r=>textoIntel(r.rack)===x[0]),'']);
  return fixos.concat(dinamicos);
 }
 function renderCartoesDinamicosV36(a){
  return obterCartoesV36(a).map((x,i)=>{
    const tituloSeguro=String(x[0]).replace(/'/g,"\\'");
-   return `<div class="intel-dynamic-card ${x[2]}"><b>${escaparHTML(x[0])}</b><strong>${x[1].length}</strong><span>O.S. encontradas nesta relação</span><div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaDiretaV36('${tituloSeguro}',${i})">Ver relação</button><button class="exportar" onclick="exportarCartaoV36(${i})">Exportar CSV</button><button class="imprimir" onclick="imprimirCartaoV36(${i})">Imprimir</button></div></div>`;
+   const descricao=x[0]==='O.S. abertas no geral'?'Todas as O.S. com situação ABE':'O.S. encontradas nesta relação';
+   return `<div class="intel-dynamic-card ${x[2]}"><b>${escaparHTML(x[0])}</b><strong>${x[1].length}</strong><span>${descricao}</span><div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaDiretaV36('${tituloSeguro}',${i})">Ver relação</button><button class="exportar" onclick="exportarCartaoV36(${i})">Exportar CSV</button><button class="imprimir" onclick="imprimirCartaoV36(${i})">Imprimir</button></div></div>`;
  }).join('');
 }
 function abrirListaDiretaV36(titulo,indice){const item=obterCartoesV36()[indice];abrirResultadoAssistenteIntel(titulo,item?item[1]:[])}
