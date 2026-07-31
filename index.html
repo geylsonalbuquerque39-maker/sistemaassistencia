@@ -4838,6 +4838,112 @@ body.dark-mode .rascunho-menu-coluna button{color:#e8eef5}
 body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}
 </style>
 
+
+<style id="coletas-compartilhadas-v700">
+.coleta-tipo-card.historico-supabase:before{background:#0f9f6e}
+.coletas-historico-modulo{display:none}
+.coletas-hist-toolbar{
+    display:grid;grid-template-columns:minmax(260px,1fr) 230px auto;
+    gap:12px;margin:18px 0
+}
+.coletas-hist-toolbar input,.coletas-hist-toolbar select{
+    height:46px;border:1px solid #b9c8d9;border-radius:10px;
+    padding:0 12px;font:inherit;background:#fff;color:#172b43
+}
+.coletas-hist-resumo{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px
+}
+.coletas-hist-resumo div{
+    background:#fff;border:1px solid #d7e1ee;border-radius:14px;padding:14px
+}
+.coletas-hist-resumo small{display:block;color:#65778d;font-weight:800}
+.coletas-hist-resumo strong{display:block;margin-top:5px;font-size:24px;color:#123b69}
+.coletas-hist-tabela-wrap{
+    overflow:auto;max-height:65vh;border:1px solid #d5dfeb;border-radius:14px;background:#fff
+}
+.coletas-hist-tabela{width:100%;border-collapse:collapse;min-width:800px}
+.coletas-hist-tabela th{
+    position:sticky;top:0;background:#073a78;color:#fff;padding:11px;text-align:left
+}
+.coletas-hist-tabela td{padding:11px;border-bottom:1px solid #e2e9f1;color:#172b43}
+.coletas-hist-tabela tr:hover td{background:#f6faff}
+.coletas-hist-acoes{display:flex;gap:7px;flex-wrap:wrap}
+.coletas-hist-acoes button{
+    border:0;border-radius:8px;padding:7px 10px;cursor:pointer;
+    font-weight:800;background:#0046b8;color:#fff
+}
+.coletas-hist-acoes button.sec{background:#0f766e}
+.coleta-hist-modal{
+    position:fixed;inset:0;z-index:17000;display:none;align-items:center;
+    justify-content:center;background:rgba(0,0,0,.58);padding:18px
+}
+.coleta-hist-modal.aberto{display:flex}
+.coleta-hist-modal-box{
+    position:relative;width:1250px;max-width:98%;max-height:94vh;overflow:auto;
+    background:#fff;border:2px solid #1ea5ff;border-radius:18px;padding:22px
+}
+.coleta-hist-fechar{
+    position:absolute;right:12px;top:10px;border:0;background:transparent;
+    font-size:24px;cursor:pointer
+}
+.coleta-hist-modal-acoes{display:flex;gap:8px;margin:13px 0}
+.coletas-hist-detalhe-wrap{overflow:auto;border:1px solid #d5dfeb;border-radius:10px}
+.coletas-hist-detalhe{border-collapse:collapse;min-width:1600px;width:100%;font-size:12px}
+.coletas-hist-detalhe th{
+    position:sticky;top:0;background:#073a78;color:#fff;padding:8px;white-space:nowrap
+}
+.coletas-hist-detalhe td{padding:7px;border-bottom:1px solid #e1e7ee;white-space:nowrap}
+body.dark-mode .coletas-hist-resumo div,
+body.dark-mode .coletas-hist-tabela-wrap,
+body.dark-mode .coleta-hist-modal-box{background:#0d223a;color:#eaf2ff;border-color:#315b83}
+body.dark-mode .coletas-hist-tabela td,
+body.dark-mode .coletas-hist-detalhe td{color:#eaf2ff;border-color:#294866}
+body.dark-mode .coletas-hist-toolbar input,
+body.dark-mode .coletas-hist-toolbar select{background:#102b49;color:#fff;border-color:#426487}
+@media(max-width:800px){
+    .coletas-hist-toolbar,.coletas-hist-resumo{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="coletas-realtime-v710">
+.coleta-live-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;
+    font-size:12px;font-weight:900
+}
+.coleta-live-chip.em_andamento{background:#dcfce7;color:#166534}
+.coleta-live-chip.finalizada{background:#dbeafe;color:#1e40af}
+.coleta-live-chip.cancelada{background:#fee2e2;color:#991b1b}
+.coleta-live-ponto{
+    width:8px;height:8px;border-radius:50%;background:currentColor;
+    box-shadow:0 0 0 0 currentColor;animation:coletaPulso 1.6s infinite
+}
+@keyframes coletaPulso{
+    0%{box-shadow:0 0 0 0 rgba(22,101,52,.5)}
+    70%{box-shadow:0 0 0 8px rgba(22,101,52,0)}
+    100%{box-shadow:0 0 0 0 rgba(22,101,52,0)}
+}
+.coleta-live-topo{
+    display:none;margin:10px 0;padding:10px 12px;border-radius:10px;
+    background:#ecfdf5;border:1px solid #86efac;color:#166534;font-weight:800
+}
+.coleta-live-topo.visivel{display:block}
+.coleta-live-topo button{
+    margin-left:10px;border:0;border-radius:8px;padding:7px 10px;
+    background:#166534;color:#fff;font-weight:800;cursor:pointer
+}
+.coleta-acao-assumir{background:#7c3aed!important}
+.coleta-acao-finalizar{background:#0f766e!important}
+.coleta-acao-cancelar{background:#b91c1c!important}
+.coleta-operacao-live{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0
+}
+.coleta-operacao-live .chip{
+    padding:7px 10px;border-radius:999px;background:#eef4fb;color:#123b69;font-weight:800
+}
+body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#c7f9d7}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -5277,11 +5383,86 @@ body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}
                     <p>Crie planilhas internas com abas, observações, Rack editável e inclusão de O.S. pelo bipador.</p>
                     <span class="coleta-tipo-abrir">Abrir rascunhos →</span>
                 </div>
+
+                <div class="coleta-tipo-card historico-supabase" onclick="abrirHistoricoColetasSupabase()">
+                    <div class="coleta-tipo-icone">🗂️</div>
+                    <h2>Histórico de Coletas</h2>
+                    <p>Veja as coletas finalizadas por todos os usuários, abra a relação, exporte ou imprima.</p>
+                    <span class="coleta-tipo-abrir">Abrir histórico →</span>
+                </div>
             </div>
         </div>
 
 
-        <div id="rascunhosModulo" class="rascunhos-modulo">
+        
+        <div id="coletasHistoricoModulo" class="coletas-historico-modulo">
+            <section class="coleta-hero">
+                <div>
+                    <h1>🗂️ Histórico de Coletas</h1>
+                    <p>Coletas salvas no Supabase e visíveis para todos os usuários do ERP.</p>
+                    <button class="coleta-voltar-tipos" type="button" onclick="voltarHistoricoColetas()">← Voltar aos tipos de coleta</button>
+                </div>
+                <div class="coleta-status-chip">Compartilhado no Supabase</div>
+            </section>
+
+            <div class="coletas-hist-toolbar">
+                <input id="coletasHistBusca" placeholder="Pesquisar por usuário, tipo ou O.S." oninput="filtrarHistoricoColetas()">
+                <select id="coletasHistTipo" onchange="filtrarHistoricoColetas()">
+                    <option value="">Todos os tipos</option>
+                    <option value="loja_origem">Loja de Origem</option>
+                    <option value="enderecamento">Endereçamento</option>
+                    <option value="att">ATT</option>
+                </select>
+                <button class="coleta-btn" type="button" onclick="carregarHistoricoColetasSupabase()">↻ Atualizar</button>
+            </div>
+
+            <div class="coletas-hist-resumo">
+                <div><small>Coletas encontradas</small><strong id="coletasHistTotal">0</strong></div>
+                <div><small>Total de O.S.</small><strong id="coletasHistTotalOS">0</strong></div>
+                <div><small>Última coleta</small><strong id="coletasHistUltima">—</strong></div>
+            </div>
+
+            <div id="coletasHistMensagem" class="coleta-msg">Carregando histórico...</div>
+
+            <div class="coletas-hist-tabela-wrap">
+                <table class="coletas-hist-tabela">
+                    <thead>
+                        <tr>
+                            <th>Data e hora</th>
+                            <th>Tipo</th>
+                            <th>Usuário</th>
+                            <th>Status</th>
+                            <th>Quantidade</th>
+                            <th>Última atividade</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="coletasHistCorpo">
+                        <tr><td colspan="7">Nenhuma coleta carregada.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="coletaHistDetalheModal" class="coleta-hist-modal">
+            <div class="coleta-hist-modal-box">
+                <button class="coleta-hist-fechar" type="button" onclick="fecharDetalheColeta()">✕</button>
+                <h2 id="coletaHistDetalheTitulo">Relação da coleta</h2>
+                <div id="coletaHistDetalheInfo"></div>
+                <div class="coleta-hist-modal-acoes">
+                    <button class="coleta-btn sec" type="button" onclick="exportarColetaHistoricoAtual()">⇩ Exportar CSV</button>
+                    <button class="coleta-btn" type="button" onclick="imprimirColetaHistoricoAtual()">🖨 Imprimir</button>
+                </div>
+                <div class="coletas-hist-detalhe-wrap">
+                    <table class="coletas-hist-detalhe">
+                        <thead id="coletaHistDetalheCabecalho"></thead>
+                        <tbody id="coletaHistDetalheCorpo"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+<div id="rascunhosModulo" class="rascunhos-modulo">
             <section class="coleta-hero">
                 <div>
                     <h1>📝 Rascunhos com Abas</h1>
@@ -5385,7 +5566,8 @@ body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}
                 </div>
                 <button class="coleta-btn light" type="button" onclick="focarCampoColeta()">⌖ Ativar bipador</button>
             </div>
-            <div id="coletaMensagem" class="coleta-msg">Campo pronto. Faça a leitura da primeira O.S.</div>
+            <div id="coletaLiveTopo" class="coleta-live-topo"></div>
+                <div id="coletaMensagem" class="coleta-msg">Campo pronto. Faça a leitura da primeira O.S.</div>
 
             <div class="coleta-toolbar">
                 <input class="coleta-filtro" id="coletaFiltroBusca" placeholder="Pesquisar na coleta..." oninput="renderizarColeta()">
@@ -14872,7 +15054,7 @@ function abrirColeta(){
     coletaUltimaOS="";
     document.getElementById("coletaSelecaoTipos").style.display="block";
     document.getElementById("coletaOperacao").style.display="none";
-    const rm=document.getElementById("rascunhosModulo"); if(rm)rm.style.display="none";
+    const rm=document.getElementById("rascunhosModulo"); if(rm)rm.style.display="none"; const hm=document.getElementById("coletasHistoricoModulo"); if(hm)hm.style.display="none";
 }
 
 function selecionarTipoColeta(tipo){
@@ -15197,8 +15379,101 @@ function renderizarColeta(novoId){
 function removerOSColeta(id){const pos=coletaOSItens.findIndex(i=>String(i.__coleta_id)===String(id));if(pos<0)return;const os=coletaTexto(coletaOSItens[pos],["os"]);coletaOSItens.splice(pos,1);atualizarColetaKPIs();atualizarFiltrosColeta();renderizarColeta();salvarColetaRascunho();coletaMensagem("O.S. "+os+" removida da coleta.","alerta");focarCampoColeta();}
 function salvarColetaRascunho(){if(!coletaTipoAtual)return;try{localStorage.setItem(coletaChaveRascunho(),JSON.stringify(coletaOSItens));}catch(e){}}
 function restaurarColetaLocal(){if(coletaOSItens.length||!coletaTipoAtual)return;try{const d=JSON.parse(localStorage.getItem(coletaChaveRascunho())||"[]");if(Array.isArray(d)){coletaOSItens=d;coletaUltimaOS=d[0]?coletaTexto(d[0],["os"]):"";atualizarFiltrosColeta();}}catch(e){}}
-function salvarColetaLocal(){salvarColetaRascunho();const hist=JSON.parse(localStorage.getItem("ERP_COLETAS_OS_HISTORICO")||"[]");hist.unshift({id:Date.now(),data:new Date().toISOString(),usuario:window.usuarioLogado?.nome||window.usuarioLogado?.email||"Usuário",itens:coletaOSItens});localStorage.setItem("ERP_COLETAS_OS_HISTORICO",JSON.stringify(hist.slice(0,30)));coletaMensagem("Coleta salva no navegador com "+coletaOSItens.length+" O.S.","ok");focarCampoColeta();}
-function finalizarColeta(){if(!coletaOSItens.length){coletaMensagem("Não há O.S. para finalizar.","alerta");return;}if(!confirm("Finalizar a coleta com "+coletaOSItens.length+" O.S.?"))return;salvarColetaLocal();coletaMensagem("Coleta finalizada com sucesso. Você pode exportar ou iniciar uma nova.","ok");}
+async function salvarColetaSupabase(){
+    if(!coletaOSItens.length)throw new Error("Não há O.S. para salvar.");
+
+    const supa=obterSupabaseClient();
+    const usuario=typeof usuarioLogado!=="undefined"?usuarioLogado:null;
+    const usuarioId=usuario?.id||null;
+    const usuarioNome=usuario?.nome||usuario?.email||"Usuário";
+
+    const cabecalho={
+        tipo:coletaTipoAtual,
+        titulo:"Coleta "+coletaNomeTipo(),
+        usuario_id:usuarioId,
+        usuario_nome:usuarioNome,
+        quantidade:coletaOSItens.length,
+        status:"finalizada"
+    };
+
+    const {data:coleta,error:erroColeta}=await supa
+        .from("coletas_os")
+        .insert(cabecalho)
+        .select("id")
+        .single();
+
+    if(erroColeta)throw erroColeta;
+
+    const itens=coletaOSItens.map((item,indice)=>({
+        coleta_id:coleta.id,
+        ordem:indice+1,
+        os:coletaTexto(item,["os","OS"]),
+        dt_geracao:coletaTexto(item,["dt_geracao","data_os"]),
+        destino:coletaDestino(item),
+        pdv:coletaLoja(item),
+        alm:coletaTexto(item,["alm"]),
+        grupo:coletaTexto(item,["grupo","grup"]),
+        nce:coletaTexto(item,["nce"]),
+        desc_produto:coletaTexto(item,["desc_produto","descricao_produto"]),
+        cod_cor:coletaCodCor(item),
+        cor:coletaTexto(item,["cor"]),
+        n_serie:coletaTexto(item,["n_serie","numero_serie"]),
+        rack:coletaRack(item),
+        status_os:coletaTexto(item,["status","status_da_os"]),
+        valor:String(coletaValor(item)||""),
+        cubagem:String(coletaCubagem(item)||""),
+        dados:item
+    }));
+
+    const {error:erroItens}=await supa.from("coleta_os_itens").insert(itens);
+    if(erroItens)throw erroItens;
+
+    // Mantém cópia local apenas como segurança, mas o histórico oficial é o Supabase.
+    salvarColetaRascunho();
+    return coleta.id;
+}
+
+async function finalizarColeta(){
+    if(!coletaOSItens.length){
+        coletaMensagem("Não há O.S. para finalizar.","alerta");
+        return;
+    }
+    if(!confirm("Finalizar esta coleta com "+coletaOSItens.length+" O.S.?"))return;
+
+    const botao=event?.currentTarget;
+    if(botao)botao.disabled=true;
+    coletaMensagem("Finalizando coleta no Supabase...","");
+
+    try{
+        const id=await garantirColetaTempoRealV710();
+        const supa=obterSupabaseClient();
+        const usuario=typeof usuarioLogado!=="undefined"?usuarioLogado:null;
+
+        const {error}=await supa.from("coletas_os").update({
+            status:"finalizada",
+            finalizado_em:new Date().toISOString(),
+            quantidade:coletaOSItens.length,
+            ultima_os:coletaUltimaOS||null,
+            ultima_atividade_em:new Date().toISOString(),
+            editor_id:usuario?.id||null,
+            editor_nome:usuario?.nome||usuario?.email||"Usuário"
+        }).eq("id",id);
+
+        if(error)throw error;
+
+        localStorage.removeItem(coletaChaveRascunho());
+        coletaMensagem("Coleta nº "+id+" finalizada e disponível para todos os usuários.","ok");
+        coletaRealtimeIdV710=null;
+        coletaRealtimeEditorV710=false;
+        atualizarTopoColetaLiveV710();
+    }catch(e){
+        console.error("Erro ao finalizar coleta:",e);
+        coletaMensagem("Erro ao finalizar no Supabase: "+(e?.message||e),"erro");
+    }finally{
+        if(botao)botao.disabled=false;
+        focarCampoColeta();
+    }
+}
 function limparColeta(){if(!coletaOSItens.length)return;if(!confirm("Remover todas as O.S. desta coleta?"))return;coletaOSItens=[];coletaUltimaOS="";localStorage.removeItem(coletaChaveRascunho());atualizarColetaKPIs();atualizarFiltrosColeta();renderizarColeta();coletaMensagem("Coleta limpa. Campo pronto para nova leitura.","alerta");focarCampoColeta();}
 
 function exportarColetaCSV(){
@@ -17116,7 +17391,540 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
 
 
 
-<!-- V6.9.8G - CORREÇÃO DO TRAVAMENTO DO PERFIL
+<!-- V7.0.0 - CORREÇÃO DO TRAVAMENTO DO PERFIL
      Removido ciclo infinito do MutationObserver do avatar. -->
+
+
+<script>
+/* =========================================================
+   V7.0.0 - HISTÓRICO COMPARTILHADO DE COLETAS NO SUPABASE
+   ========================================================= */
+let coletasHistoricoCache=[];
+let coletaHistoricoAtual=null;
+let coletaHistoricoItensAtual=[];
+
+function nomeTipoColetaHist(tipo){
+    return tipo==="enderecamento"?"Endereçamento":tipo==="att"?"ATT":"Loja de Origem";
+}
+function dataColetaHist(v){
+    try{return new Date(v).toLocaleString("pt-BR")}catch(_){return v||"—"}
+}
+function escColetaHist(v){
+    return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function abrirHistoricoColetasSupabase(){
+    coletaTipoAtual="";
+    coletaOSItens=[];
+    document.getElementById("coletaSelecaoTipos").style.display="none";
+    document.getElementById("coletaOperacao").style.display="none";
+    document.getElementById("rascunhosModulo").style.display="none";
+    document.getElementById("coletasHistoricoModulo").style.display="block";
+    carregarHistoricoColetasSupabase();
+}
+function voltarHistoricoColetas(){
+    document.getElementById("coletasHistoricoModulo").style.display="none";
+    document.getElementById("coletaOperacao").style.display="none";
+    document.getElementById("rascunhosModulo").style.display="none";
+    document.getElementById("coletaSelecaoTipos").style.display="block";
+}
+async function carregarHistoricoColetasSupabase(){
+    const msg=document.getElementById("coletasHistMensagem");
+    if(msg){msg.className="coleta-msg";msg.textContent="Carregando coletas do Supabase...";}
+    try{
+        const {data,error}=await obterSupabaseClient()
+            .from("coletas_os")
+            .select("id,tipo,titulo,usuario_id,usuario_nome,quantidade,status,criado_em")
+            .order("criado_em",{ascending:false})
+            .limit(500);
+        if(error)throw error;
+        coletasHistoricoCache=data||[];
+        filtrarHistoricoColetas();
+        if(msg){msg.className="coleta-msg ok";msg.textContent=coletasHistoricoCache.length+" coleta(s) carregada(s) do Supabase.";}
+    }catch(e){
+        if(msg){msg.className="coleta-msg erro";msg.textContent="Erro ao carregar histórico: "+(e?.message||e);}
+    }
+}
+function filtrarHistoricoColetas(){
+    const busca=String(document.getElementById("coletasHistBusca")?.value||"").trim().toUpperCase();
+    const tipo=document.getElementById("coletasHistTipo")?.value||"";
+    const lista=coletasHistoricoCache.filter(c=>{
+        const texto=[c.id,c.usuario_nome,c.tipo,nomeTipoColetaHist(c.tipo)].join(" ").toUpperCase();
+        return (!busca||texto.includes(busca))&&(!tipo||c.tipo===tipo);
+    });
+    renderizarHistoricoColetas(lista);
+}
+function renderizarHistoricoColetas(lista){
+    const corpo=document.getElementById("coletasHistCorpo");
+    if(!corpo)return;
+    document.getElementById("coletasHistTotal").textContent=lista.length;
+    document.getElementById("coletasHistTotalOS").textContent=lista.reduce((s,c)=>s+Number(c.quantidade||0),0);
+    document.getElementById("coletasHistUltima").textContent=lista[0]?dataColetaHist(lista[0].criado_em):"—";
+
+    if(!lista.length){
+        corpo.innerHTML='<tr><td colspan="5">Nenhuma coleta encontrada.</td></tr>';
+        return;
+    }
+    corpo.innerHTML=lista.map(c=>`
+        <tr>
+            <td>${escColetaHist(dataColetaHist(c.criado_em))}</td>
+            <td>${escColetaHist(nomeTipoColetaHist(c.tipo))}</td>
+            <td>${escColetaHist(c.usuario_nome||"Usuário")}</td>
+            <td><b>${Number(c.quantidade||0)}</b></td>
+            <td><div class="coletas-hist-acoes">
+                <button onclick="abrirDetalheColetaSupabase(${Number(c.id)})">Ver relação</button>
+                <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar</button>
+                <button onclick="imprimirColetaHistoricoDireto(${Number(c.id)})">Imprimir</button>
+            </div></td>
+        </tr>
+    `).join("");
+}
+async function carregarItensColetaHistorico(id){
+    const {data,error}=await obterSupabaseClient()
+        .from("coleta_os_itens")
+        .select("*")
+        .eq("coleta_id",id)
+        .order("ordem",{ascending:true});
+    if(error)throw error;
+    return data||[];
+}
+async function abrirDetalheColetaSupabase(id){
+    const coleta=coletasHistoricoCache.find(c=>Number(c.id)===Number(id));
+    if(!coleta)return;
+    coletaHistoricoAtual=coleta;
+    const modal=document.getElementById("coletaHistDetalheModal");
+    modal.classList.add("aberto");
+    document.getElementById("coletaHistDetalheTitulo").textContent=
+        "Coleta nº "+coleta.id+" — "+nomeTipoColetaHist(coleta.tipo);
+    document.getElementById("coletaHistDetalheInfo").textContent=
+        dataColetaHist(coleta.criado_em)+" • "+(coleta.usuario_nome||"Usuário")+" • "+coleta.quantidade+" O.S.";
+    document.getElementById("coletaHistDetalheCorpo").innerHTML='<tr><td>Carregando relação...</td></tr>';
+    try{
+        coletaHistoricoItensAtual=await carregarItensColetaHistorico(id);
+        renderizarDetalheColetaHistorico();
+    }catch(e){
+        document.getElementById("coletaHistDetalheCorpo").innerHTML=
+            '<tr><td>Erro ao carregar: '+escColetaHist(e?.message||e)+'</td></tr>';
+    }
+}
+function fecharDetalheColeta(){
+    document.getElementById("coletaHistDetalheModal")?.classList.remove("aberto");
+}
+function colunasColetaHistorico(){
+    const cols=[
+        ["os","O.S."],["dt_geracao","Data da O.S."]
+    ];
+    if(coletaHistoricoAtual?.tipo!=="enderecamento")cols.push(["destino","Destino"]);
+    cols.push(
+        ["pdv","Loja de Origem"],["alm","ALM"],["grupo","Grupo"],["nce","N.C.E."],
+        ["desc_produto","Produto"],["cod_cor","Cód. Cor"],["cor","Cor"],
+        ["n_serie","Nº de Série"],["rack","Rack"],["status_os","Status"],
+        ["valor","Valor"],["cubagem","Cubagem"]
+    );
+    return cols;
+}
+function renderizarDetalheColetaHistorico(){
+    const cols=colunasColetaHistorico();
+    document.getElementById("coletaHistDetalheCabecalho").innerHTML=
+        "<tr>"+cols.map(c=>"<th>"+escColetaHist(c[1])+"</th>").join("")+"</tr>";
+    document.getElementById("coletaHistDetalheCorpo").innerHTML=
+        coletaHistoricoItensAtual.length
+        ?coletaHistoricoItensAtual.map(i=>"<tr>"+cols.map(c=>"<td>"+escColetaHist(i[c[0]])+"</td>").join("")+"</tr>").join("")
+        :'<tr><td colspan="'+cols.length+'">Coleta sem itens.</td></tr>';
+}
+function csvColetaHistorico(){
+    const cols=colunasColetaHistorico();
+    const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';
+    return "\ufeff"+cols.map(c=>q(c[1])).join(";")+"\r\n"+
+        coletaHistoricoItensAtual.map(i=>cols.map(c=>q(i[c[0]])).join(";")).join("\r\n");
+}
+function baixarCSVColetaHistorico(){
+    const blob=new Blob([csvColetaHistorico()],{type:"text/csv;charset=utf-8"});
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="coleta_"+coletaHistoricoAtual.id+"_"+coletaHistoricoAtual.tipo+".csv";
+    a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+function exportarColetaHistoricoAtual(){
+    if(!coletaHistoricoAtual||!coletaHistoricoItensAtual.length)return;
+    baixarCSVColetaHistorico();
+}
+async function exportarColetaHistoricoDireto(id){
+    coletaHistoricoAtual=coletasHistoricoCache.find(c=>Number(c.id)===Number(id));
+    coletaHistoricoItensAtual=await carregarItensColetaHistorico(id);
+    baixarCSVColetaHistorico();
+}
+function htmlImpressaoColetaHistorico(){
+    const cols=colunasColetaHistorico();
+    return `<!doctype html><html><head><meta charset="utf-8"><title>Coleta ${coletaHistoricoAtual.id}</title>
+    <style>body{font-family:Arial;padding:18px}h1{font-size:22px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:4px}th{background:#eee}@page{size:landscape}</style>
+    </head><body><h1>Coleta nº ${coletaHistoricoAtual.id} — ${escColetaHist(nomeTipoColetaHist(coletaHistoricoAtual.tipo))}</h1>
+    <p>${escColetaHist(dataColetaHist(coletaHistoricoAtual.criado_em))} • ${escColetaHist(coletaHistoricoAtual.usuario_nome||"Usuário")} • ${coletaHistoricoItensAtual.length} O.S.</p>
+    <table><thead><tr>${cols.map(c=>"<th>"+escColetaHist(c[1])+"</th>").join("")}</tr></thead>
+    <tbody>${coletaHistoricoItensAtual.map(i=>"<tr>"+cols.map(c=>"<td>"+escColetaHist(i[c[0]])+"</td>").join("")+"</tr>").join("")}</tbody></table>
+    <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;
+}
+function imprimirColetaHistoricoAtual(){
+    if(!coletaHistoricoAtual||!coletaHistoricoItensAtual.length)return;
+    const w=window.open("","_blank");
+    w.document.write(htmlImpressaoColetaHistorico());
+    w.document.close();
+}
+async function imprimirColetaHistoricoDireto(id){
+    coletaHistoricoAtual=coletasHistoricoCache.find(c=>Number(c.id)===Number(id));
+    coletaHistoricoItensAtual=await carregarItensColetaHistorico(id);
+    imprimirColetaHistoricoAtual();
+}
+document.addEventListener("click",e=>{
+    if(e.target===document.getElementById("coletaHistDetalheModal"))fecharDetalheColeta();
+});
+</script>
+
+
+
+<script>
+/* ============================================================
+   V7.1.0 - COLETAS EM TEMPO REAL
+   ============================================================ */
+let coletaRealtimeIdV710=null;
+let coletaRealtimeCanalV710=null;
+let coletaRealtimeEditorV710=false;
+let coletaRealtimeSincronizandoV710=false;
+
+function usuarioAtualV710(){
+    return typeof usuarioLogado!=="undefined"?usuarioLogado:null;
+}
+function nomeUsuarioAtualV710(){
+    const u=usuarioAtualV710();
+    return u?.nome||u?.email||"Usuário";
+}
+function atualizarTopoColetaLiveV710(textoExtra){
+    const el=document.getElementById("coletaLiveTopo");
+    if(!el)return;
+    if(!coletaRealtimeIdV710){
+        el.className="coleta-live-topo";
+        el.innerHTML="";
+        return;
+    }
+    el.className="coleta-live-topo visivel";
+    el.innerHTML=
+        "🟢 Coleta nº <b>"+coletaRealtimeIdV710+"</b> em tempo real"+
+        (textoExtra?" • "+textoExtra:"")+
+        (coletaRealtimeEditorV710?" • Você está editando":" • Somente acompanhamento")+
+        (!coletaRealtimeEditorV710
+            ?' <button type="button" onclick="assumirEdicaoColetaV710('+Number(coletaRealtimeIdV710)+')">Assumir edição</button>'
+            :"");
+}
+
+async function garantirColetaTempoRealV710(){
+    if(coletaRealtimeIdV710)return coletaRealtimeIdV710;
+    if(!coletaTipoAtual)throw new Error("Selecione um tipo de coleta.");
+
+    const supa=obterSupabaseClient();
+    const u=usuarioAtualV710();
+    const payload={
+        tipo:coletaTipoAtual,
+        titulo:"Coleta "+coletaNomeTipo(),
+        usuario_id:u?.id||null,
+        usuario_nome:nomeUsuarioAtualV710(),
+        editor_id:u?.id||null,
+        editor_nome:nomeUsuarioAtualV710(),
+        quantidade:0,
+        status:"em_andamento",
+        ultima_atividade_em:new Date().toISOString()
+    };
+
+    const {data,error}=await supa.from("coletas_os").insert(payload).select("*").single();
+    if(error)throw error;
+
+    coletaRealtimeIdV710=data.id;
+    coletaRealtimeEditorV710=true;
+    await assinarColetaTempoRealV710(data.id);
+    atualizarTopoColetaLiveV710("Criada agora");
+    return data.id;
+}
+
+async function salvarItemColetaTempoRealV710(item){
+    if(coletaRealtimeSincronizandoV710)return;
+    const id=await garantirColetaTempoRealV710();
+    const supa=obterSupabaseClient();
+
+    const payload={
+        coleta_id:id,
+        ordem:coletaOSItens.indexOf(item)+1,
+        os:coletaTexto(item,["os","OS"]),
+        dt_geracao:coletaTexto(item,["dt_geracao","data_os"]),
+        destino:coletaDestino(item),
+        pdv:coletaLoja(item),
+        alm:coletaTexto(item,["alm"]),
+        grupo:coletaTexto(item,["grupo","grup"]),
+        nce:coletaTexto(item,["nce"]),
+        desc_produto:coletaTexto(item,["desc_produto","descricao_produto"]),
+        cod_cor:coletaCodCor(item),
+        cor:coletaTexto(item,["cor"]),
+        n_serie:coletaTexto(item,["n_serie","numero_serie"]),
+        rack:coletaRack(item),
+        status_os:coletaTexto(item,["status","status_da_os"]),
+        valor:String(coletaValor(item)||""),
+        cubagem:String(coletaCubagem(item)||""),
+        dados:item
+    };
+
+    const {error}=await supa.from("coleta_os_itens").insert(payload);
+    if(error)throw error;
+
+    await supa.from("coletas_os").update({
+        quantidade:coletaOSItens.length,
+        ultima_os:payload.os||null,
+        ultima_atividade_em:new Date().toISOString()
+    }).eq("id",id);
+}
+
+async function removerItemColetaTempoRealV710(item){
+    if(!coletaRealtimeIdV710||!coletaRealtimeEditorV710)return;
+    const supa=obterSupabaseClient();
+    const os=coletaTexto(item,["os","OS"]);
+    const {error}=await supa.from("coleta_os_itens")
+        .delete()
+        .eq("coleta_id",coletaRealtimeIdV710)
+        .eq("os",os);
+    if(error)throw error;
+    await supa.from("coletas_os").update({
+        quantidade:Math.max(0,coletaOSItens.length-1),
+        ultima_atividade_em:new Date().toISOString()
+    }).eq("id",coletaRealtimeIdV710);
+}
+
+async function atualizarItemColetaTempoRealV710(item){
+    if(!coletaRealtimeIdV710||!coletaRealtimeEditorV710)return;
+    const supa=obterSupabaseClient();
+    const os=coletaTexto(item,["os","OS"]);
+    const {error}=await supa.from("coleta_os_itens").update({
+        pdv:coletaLoja(item),
+        grupo:coletaTexto(item,["grupo","grup"]),
+        nce:coletaTexto(item,["nce"]),
+        desc_produto:coletaTexto(item,["desc_produto","descricao_produto"]),
+        cod_cor:coletaCodCor(item),
+        cor:coletaTexto(item,["cor"]),
+        n_serie:coletaTexto(item,["n_serie","numero_serie"]),
+        rack:coletaRack(item),
+        status_os:coletaTexto(item,["status","status_da_os"]),
+        dados:item
+    }).eq("coleta_id",coletaRealtimeIdV710).eq("os",os);
+    if(error)throw error;
+    await supa.from("coletas_os").update({
+        ultima_atividade_em:new Date().toISOString()
+    }).eq("id",coletaRealtimeIdV710);
+}
+
+async function carregarColetaAoVivoV710(id){
+    const supa=obterSupabaseClient();
+    coletaRealtimeSincronizandoV710=true;
+    try{
+        const {data:cab,error:ec}=await supa.from("coletas_os").select("*").eq("id",id).single();
+        if(ec)throw ec;
+        const {data:itens,error:ei}=await supa.from("coleta_os_itens").select("*").eq("coleta_id",id).order("ordem");
+        if(ei)throw ei;
+
+        coletaRealtimeIdV710=id;
+        coletaTipoAtual=cab.tipo;
+        const u=usuarioAtualV710();
+        coletaRealtimeEditorV710=String(cab.editor_id||"")===String(u?.id||"");
+
+        coletaOSItens=(itens||[]).map(x=>({
+            ...(x.dados||{}),
+            os:x.os,dt_geracao:x.dt_geracao,pdv:x.pdv,alm:x.alm,grupo:x.grupo,nce:x.nce,
+            desc_produto:x.desc_produto,__coleta_cod_cor:x.cod_cor,cor:x.cor,n_serie:x.n_serie,
+            __coleta_rack:x.rack,status:x.status_os,valor_transf:x.valor,cubagem:x.cubagem,
+            __coleta_destino:x.destino,__coleta_id:x.id,__coleta_tipo:cab.tipo
+        }));
+
+        document.getElementById("coletaSelecaoTipos").style.display="none";
+        document.getElementById("coletasHistoricoModulo").style.display="none";
+        document.getElementById("rascunhosModulo").style.display="none";
+        document.getElementById("coletaOperacao").style.display="block";
+
+        configurarTelaColeta();
+        atualizarColetaKPIs();
+        atualizarFiltrosColeta();
+        renderizarColeta();
+        atualizarTopoColetaLiveV710((cab.editor_nome||cab.usuario_nome||"Usuário")+" está editando");
+        await assinarColetaTempoRealV710(id);
+    }finally{
+        coletaRealtimeSincronizandoV710=false;
+    }
+}
+
+async function assumirEdicaoColetaV710(id){
+    const u=usuarioAtualV710();
+    if(!u)return;
+    const {error}=await obterSupabaseClient().from("coletas_os").update({
+        editor_id:u.id,
+        editor_nome:nomeUsuarioAtualV710(),
+        ultima_atividade_em:new Date().toISOString()
+    }).eq("id",id).eq("status","em_andamento");
+    if(error)return alert("Não foi possível assumir a coleta: "+error.message);
+    coletaRealtimeEditorV710=true;
+    atualizarTopoColetaLiveV710();
+}
+
+async function cancelarColetaV710(id){
+    if(!confirm("Cancelar esta coleta em andamento?"))return;
+    const {error}=await obterSupabaseClient().from("coletas_os").update({
+        status:"cancelada",
+        finalizado_em:new Date().toISOString(),
+        ultima_atividade_em:new Date().toISOString()
+    }).eq("id",id);
+    if(error)return alert(error.message);
+}
+
+async function assinarColetaTempoRealV710(id){
+    const supa=obterSupabaseClient();
+    if(coletaRealtimeCanalV710){
+        try{await supa.removeChannel(coletaRealtimeCanalV710)}catch(_){}
+    }
+    coletaRealtimeCanalV710=supa.channel("coleta_live_"+id)
+        .on("postgres_changes",{event:"*",schema:"public",table:"coleta_os_itens",filter:"coleta_id=eq."+id},
+            async()=>{ if(!coletaRealtimeEditorV710)await carregarColetaAoVivoV710(id); })
+        .on("postgres_changes",{event:"UPDATE",schema:"public",table:"coletas_os",filter:"id=eq."+id},
+            payload=>{
+                const c=payload.new||{};
+                atualizarTopoColetaLiveV710((c.editor_nome||c.usuario_nome||"Usuário")+" está editando");
+                if(c.status!=="em_andamento"){
+                    carregarHistoricoColetasSupabase();
+                }
+            })
+        .subscribe();
+}
+
+function statusTextoV710(s){
+    return s==="em_andamento"?"Em andamento":s==="cancelada"?"Cancelada":"Finalizada";
+}
+function statusChipV710(c){
+    return '<span class="coleta-live-chip '+c.status+'">'+
+        (c.status==="em_andamento"?'<span class="coleta-live-ponto"></span>':"")+
+        statusTextoV710(c.status)+'</span>';
+}
+
+const renderizarHistoricoColetasOriginalV710=renderizarHistoricoColetas;
+window.renderizarHistoricoColetas=function(lista){
+    const corpo=document.getElementById("coletasHistCorpo");
+    if(!corpo)return;
+    document.getElementById("coletasHistTotal").textContent=lista.length;
+    document.getElementById("coletasHistTotalOS").textContent=lista.reduce((s,c)=>s+Number(c.quantidade||0),0);
+    document.getElementById("coletasHistUltima").textContent=lista[0]?dataColetaHist(lista[0].criado_em):"—";
+
+    if(!lista.length){
+        corpo.innerHTML='<tr><td colspan="7">Nenhuma coleta encontrada.</td></tr>';
+        return;
+    }
+
+    corpo.innerHTML=lista.map(c=>`
+        <tr>
+            <td>${escColetaHist(dataColetaHist(c.criado_em))}</td>
+            <td>${escColetaHist(nomeTipoColetaHist(c.tipo))}</td>
+            <td>${escColetaHist(c.usuario_nome||"Usuário")}</td>
+            <td>${statusChipV710(c)}</td>
+            <td><b>${Number(c.quantidade||0)}</b></td>
+            <td>${escColetaHist(dataColetaHist(c.ultima_atividade_em||c.atualizado_em||c.criado_em))}</td>
+            <td><div class="coletas-hist-acoes">
+                ${c.status==="em_andamento"
+                    ?`<button onclick="carregarColetaAoVivoV710(${Number(c.id)})">Acompanhar ao vivo</button>
+                      <button class="coleta-acao-assumir" onclick="assumirEdicaoColetaV710(${Number(c.id)})">Assumir edição</button>
+                      <button class="coleta-acao-cancelar" onclick="cancelarColetaV710(${Number(c.id)})">Cancelar</button>`
+                    :`<button onclick="abrirDetalheColetaSupabase(${Number(c.id)})">Ver relação</button>
+                      <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar</button>
+                      <button onclick="imprimirColetaHistoricoDireto(${Number(c.id)})">Imprimir</button>`}
+            </div></td>
+        </tr>
+    `).join("");
+};
+
+const carregarHistoricoOriginalV710=carregarHistoricoColetasSupabase;
+window.carregarHistoricoColetasSupabase=async function(){
+    const msg=document.getElementById("coletasHistMensagem");
+    if(msg){msg.className="coleta-msg";msg.textContent="Carregando coletas do Supabase...";}
+    try{
+        const {data,error}=await obterSupabaseClient()
+            .from("coletas_os")
+            .select("*")
+            .order("criado_em",{ascending:false})
+            .limit(500);
+        if(error)throw error;
+        coletasHistoricoCache=data||[];
+        filtrarHistoricoColetas();
+        if(msg){msg.className="coleta-msg ok";msg.textContent=coletasHistoricoCache.length+" coleta(s) carregada(s).";}
+    }catch(e){
+        if(msg){msg.className="coleta-msg erro";msg.textContent="Erro ao carregar histórico: "+(e?.message||e);}
+    }
+};
+
+function iniciarRealtimeHistoricoV710(){
+    const supa=obterSupabaseClient();
+    supa.channel("historico_coletas_v710")
+        .on("postgres_changes",{event:"*",schema:"public",table:"coletas_os"},
+            ()=>{ if(document.getElementById("coletasHistoricoModulo")?.style.display==="block") carregarHistoricoColetasSupabase(); })
+        .subscribe();
+}
+
+// Hooks seguros nas operações já existentes.
+const adicionarOriginalV710=adicionarOSColeta;
+window.adicionarOSColeta=async function(){
+    const antes=coletaOSItens.length;
+    const r=await adicionarOriginalV710.apply(this,arguments);
+    if(coletaOSItens.length>antes&&coletaRealtimeEditorV710!==false){
+        const item=coletaOSItens[coletaOSItens.length-1];
+        try{await salvarItemColetaTempoRealV710(item)}catch(e){coletaMensagem("O.S. adicionada localmente, mas falhou no tempo real: "+e.message,"erro")}
+    }
+    return r;
+};
+
+const importarOriginalV710=typeof importarOSColetaLote==="function"?importarOSColetaLote:null;
+if(importarOriginalV710){
+    window.importarOSColetaLote=async function(lista){
+        const antes=coletaOSItens.length;
+        const r=await importarOriginalV710.apply(this,arguments);
+        const novos=coletaOSItens.slice(antes);
+        for(const item of novos){
+            try{await salvarItemColetaTempoRealV710(item)}catch(e){console.error(e)}
+        }
+        return r;
+    };
+}
+
+const removerOriginalV710=removerOSColeta;
+window.removerOSColeta=async function(id){
+    const item=coletaOSItens.find(i=>String(i.__coleta_id)===String(id));
+    if(item&&coletaRealtimeEditorV710){
+        try{await removerItemColetaTempoRealV710(item)}catch(e){return coletaMensagem("Erro ao remover no Supabase: "+e.message,"erro")}
+    }
+    return removerOriginalV710.apply(this,arguments);
+};
+
+const atualizarRackOriginalV710=atualizarRackColeta;
+window.atualizarRackColeta=function(id,valor){
+    const r=atualizarRackOriginalV710.apply(this,arguments);
+    const item=coletaOSItens.find(i=>String(i.__coleta_id)===String(id));
+    if(item&&coletaRealtimeEditorV710)setTimeout(()=>atualizarItemColetaTempoRealV710(item),250);
+    return r;
+};
+
+const selecionarTipoOriginalV710=selecionarTipoColeta;
+window.selecionarTipoColeta=function(tipo){
+    coletaRealtimeIdV710=null;
+    coletaRealtimeEditorV710=true;
+    const r=selecionarTipoOriginalV710.apply(this,arguments);
+    atualizarTopoColetaLiveV710();
+    return r;
+};
+
+window.addEventListener("load",()=>{
+    setTimeout(()=>{
+        try{iniciarRealtimeHistoricoV710()}catch(e){console.warn("Realtime histórico:",e)}
+    },1500);
+});
+</script>
+
 </body>
 </html>
