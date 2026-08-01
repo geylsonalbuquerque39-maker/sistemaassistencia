@@ -16885,30 +16885,59 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
                 ?window.chatUsuariosV57.find(u=>String(u.id)===String(id))
                 :null;
 
-            [btn.querySelector(".chat-avatar"),btn.querySelector(".chat-usuario-info")].forEach(el=>{
-                if(!el||!id)return;
-                el.classList.add("v698-perfil-clicavel");
-                el.title="Opções do perfil";
-                el.onclick=function(ev){v698AbrirMenu(ev,id,usuario)};
-            });
+            const avatar=btn.querySelector(".chat-avatar");
+            const info=btn.querySelector(".chat-usuario-info");
+
+            // Clicar no nome ou em qualquer área da pessoa mantém o evento
+            // original do botão e abre a conversa imediatamente.
+            if(info){
+                info.classList.remove("v698-perfil-clicavel");
+                info.removeAttribute("title");
+                info.onclick=null;
+            }
+
+            // Somente a foto abre o visualizador em tela cheia.
+            if(avatar&&id){
+                avatar.classList.add("v698-perfil-clicavel");
+                avatar.title=usuario?.avatar_url
+                    ?"Ver foto em tela cheia"
+                    :"Usuário sem foto de perfil";
+                avatar.onclick=function(ev){
+                    if(!usuario?.avatar_url)return;
+                    ev.preventDefault();
+                    ev.stopPropagation();
+                    if(typeof ev.stopImmediatePropagation==="function")ev.stopImmediatePropagation();
+                    if(typeof window.v698AbrirFotoGrande==="function"){
+                        window.v698AbrirFotoGrande(usuario.avatar_url);
+                    }
+                };
+            }
         });
 
         const cab=document.getElementById("chatCabecalhoAvatar");
         if(cab&&window.chatUsuarioAtualV57){
+            const usuario=window.chatUsuarioAtualV57;
             cab.classList.add("v698-perfil-clicavel");
-            cab.title="Opções do perfil";
+            cab.title=usuario.avatar_url
+                ?"Ver foto em tela cheia"
+                :"Usuário sem foto de perfil";
             cab.onclick=function(ev){
-                v698AbrirMenu(ev,window.chatUsuarioAtualV57.id,window.chatUsuarioAtualV57);
+                if(!usuario.avatar_url)return;
+                ev.preventDefault();
+                ev.stopPropagation();
+                if(typeof ev.stopImmediatePropagation==="function")ev.stopImmediatePropagation();
+                if(typeof window.v698AbrirFotoGrande==="function"){
+                    window.v698AbrirFotoGrande(usuario.avatar_url);
+                }
             };
         }
 
+        // O nome do cabeçalho não abre menu de perfil.
         const nomeCab=document.getElementById("chatCabecalhoNome");
-        if(nomeCab&&window.chatUsuarioAtualV57){
-            nomeCab.classList.add("v698-perfil-clicavel");
-            nomeCab.title="Opções do perfil";
-            nomeCab.onclick=function(ev){
-                v698AbrirMenu(ev,window.chatUsuarioAtualV57.id,window.chatUsuarioAtualV57);
-            };
+        if(nomeCab){
+            nomeCab.classList.remove("v698-perfil-clicavel");
+            nomeCab.removeAttribute("title");
+            nomeCab.onclick=null;
         }
     }
 
