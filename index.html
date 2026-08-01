@@ -5450,7 +5450,7 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
                 <h2 id="coletaHistDetalheTitulo">Relação da coleta</h2>
                 <div id="coletaHistDetalheInfo"></div>
                 <div class="coleta-hist-modal-acoes">
-                    <button class="coleta-btn sec" type="button" onclick="exportarColetaHistoricoAtual()">⇩ Exportar CSV</button>
+                    <button class="coleta-btn sec" type="button" onclick="exportarColetaHistoricoAtual()">⇩ Exportar arquivo ▾</button>
                     <button class="coleta-btn" type="button" onclick="imprimirColetaHistoricoAtual()">🖨 Imprimir</button>
                 </div>
                 <div class="coletas-hist-detalhe-wrap">
@@ -5476,7 +5476,7 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
                 <div class="rascunhos-topo-acoes">
                     <button class="coleta-btn green" type="button" onclick="novoRascunhoAba()">＋ Nova aba</button>
                     <button class="coleta-btn" type="button" onclick="duplicarRascunhoAba()">⧉ Duplicar aba</button>
-                    <button class="coleta-btn sec" type="button" onclick="exportarRascunhoCSV()">⇩ Exportar CSV</button>
+                    <button class="coleta-btn sec" type="button" onclick="exportarRascunhoCSV()">⇩ Exportar arquivo ▾</button>
                     <button class="coleta-btn red" type="button" onclick="excluirRascunhoAba()">🗑 Excluir aba</button>
                 </div>
             </div>
@@ -5577,7 +5577,7 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
             </div>
 
             <div class="coleta-acoes">
-                <button class="coleta-btn" type="button" onclick="exportarColetaCSV()">⇩ Exportar CSV</button>
+                <button class="coleta-btn" type="button" onclick="exportarColetaCSV()">⇩ Exportar arquivo ▾</button>
                 <button class="coleta-btn sec" type="button" onclick="imprimirColeta()">🖨 Imprimir</button>
                 <button class="coleta-btn orange" type="button" onclick="salvarColetaLocal()">💾 Salvar coleta</button>
                 <button class="coleta-btn green" type="button" onclick="finalizarColeta()">✓ Finalizar coleta</button>
@@ -6263,7 +6263,7 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
         </div>
         <div class="relatorio-acoes">
             <button class="btn-voltar" onclick="gerarRelatorioOS()">Gerar Relatório</button>
-            <button class="btn-voltar" onclick="exportarRelatorioCSV()">Exportar CSV</button>
+            <button class="btn-voltar" onclick="exportarRelatorioCSV()">Exportar arquivo ▾</button>
             <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao Painel</button>
             <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
         </div>
@@ -9449,7 +9449,7 @@ function tabelaPendenciaHTML(titulo, chave, lista){
     return "<div class='intel-pend-bloco'>"+
       "<div class='intel-pend-topo'><h3>"+escaparHTML(titulo)+" <span class='contagem'>"+(lista||[]).length+"</span></h3>"+
       "<div class='intel-pend-acoes'><button class='intel-pend-btn' onclick=\"abrirListaIntel('"+chave+"')\">Ver relação</button>"+
-      "<button class='intel-pend-btn exportar' onclick=\"exportarPendenciaIntelCSV('"+chave+"')\">Exportar CSV</button></div></div>"+
+      "<button class='intel-pend-btn exportar' onclick=\"exportarPendenciaIntelCSV('"+chave+"')\">Exportar arquivo ▾</button></div></div>"+
       ((lista||[]).length
         ? "<div class='intel-pend-tabela-wrap'><table class='intel-pend-tabela'><thead><tr><th>O.S.</th><th>Produto</th><th>Rack</th><th>Status</th><th>Situação da O.S.</th><th>Técnico</th><th>PDV</th></tr></thead><tbody>"+linhas+"</tbody></table></div>"
         : "<div class='intel-pend-vazio'>Nenhuma O.S. encontrada nesta pendência.</div>")+
@@ -9728,7 +9728,7 @@ function acoesChatIntel(temResultado=true){
     if(!temResultado)return "";
     return "<div class='intel-chat-actions'>"+
       "<button class='intel-chat-action' onclick='abrirUltimoResultadoIntel()'>📄 Abrir relação</button>"+
-      "<button class='intel-chat-action' onclick='exportarUltimoResultadoIntel()'>⇩ Exportar CSV</button>"+
+      "<button class='intel-chat-action' onclick='exportarUltimoResultadoIntel()'>⇩ Exportar arquivo ▾</button>"+
       "<button class='intel-chat-action' onclick=\"solicitarGeracaoCICopiloto('teresina')\">↩ Gerar C.I.</button>"+
       "</div>";
 }
@@ -10101,7 +10101,7 @@ function renderCartoesDinamicosV36(a){
  return obterCartoesV36(a).map((x,i)=>{
    const tituloSeguro=String(x[0]).replace(/'/g,"\\'");
    const descricao=x[0]==='O.S. abertas no geral'?'Todas as O.S. com situação ABE':'O.S. encontradas nesta relação';
-   return `<div class="intel-dynamic-card ${x[2]}"><b>${escaparHTML(x[0])}</b><strong>${x[1].length}</strong><span>${descricao}</span><div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaDiretaV36('${tituloSeguro}',${i})">Ver relação</button><button class="exportar" onclick="exportarCartaoV36(${i})">Exportar CSV</button><button class="imprimir" onclick="imprimirCartaoV36(${i})">Imprimir</button></div></div>`;
+   return `<div class="intel-dynamic-card ${x[2]}"><b>${escaparHTML(x[0])}</b><strong>${x[1].length}</strong><span>${descricao}</span><div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaDiretaV36('${tituloSeguro}',${i})">Ver relação</button><button class="exportar" onclick="exportarCartaoV36(${i})">Exportar arquivo ▾</button><button class="imprimir" onclick="imprimirCartaoV36(${i})">Imprimir</button></div></div>`;
  }).join('');
 }
 function abrirListaDiretaV36(titulo,indice){const item=obterCartoesV36()[indice];abrirResultadoAssistenteIntel(titulo,item?item[1]:[])}
@@ -17473,7 +17473,7 @@ function renderizarHistoricoColetas(lista){
             <td><b>${Number(c.quantidade||0)}</b></td>
             <td><div class="coletas-hist-acoes">
                 <button onclick="abrirDetalheColetaSupabase(${Number(c.id)})">Ver relação</button>
-                <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar</button>
+                <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar arquivo ▾</button>
                 <button onclick="imprimirColetaHistoricoDireto(${Number(c.id)})">Imprimir</button>
             </div></td>
         </tr>
@@ -17585,7 +17585,7 @@ document.addEventListener("click",e=>{
 
 <script>
 /* ============================================================
-   V7.2.0 - COLETAS EM TEMPO REAL
+   V7.2.1 - COLETAS EM TEMPO REAL
    ============================================================ */
 let coletaRealtimeIdV710=null;
 let coletaRealtimeCanalV710=null;
@@ -17834,7 +17834,7 @@ window.renderizarHistoricoColetas=function(lista){
                       <button class="coleta-acao-assumir" onclick="assumirEdicaoColetaV710(${Number(c.id)})">Assumir edição</button>
                       <button class="coleta-acao-cancelar" onclick="cancelarColetaV710(${Number(c.id)})">Cancelar</button>`
                     :`<button onclick="abrirDetalheColetaSupabase(${Number(c.id)})">Ver relação</button>
-                      <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar</button>
+                      <button class="sec" onclick="exportarColetaHistoricoDireto(${Number(c.id)})">Exportar arquivo ▾</button>
                       <button onclick="imprimirColetaHistoricoDireto(${Number(c.id)})">Imprimir</button>`}
             </div></td>
         </tr>
@@ -17929,7 +17929,7 @@ window.addEventListener("load",()=>{
 
 
 <!-- ============================================================
-     V7.2.0 - EXPORTAÇÃO COMPATÍVEL COM EXCEL E LIBREOFFICE
+     V7.2.1 - EXPORTAÇÃO COMPATÍVEL COM EXCEL E LIBREOFFICE
      Adiciona opções CSV, XLS e XLT a todos os botões de exportação.
      ============================================================ -->
 <style id="exportacao-office-v720">
@@ -18329,7 +18329,7 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
             const dados=await capturarExportacaoOriginalV720(botao);
             baixarOfficeV720(dados.texto,dados.nome,formato);
         }catch(e){
-            console.error("Exportação Office V7.2.0:",e);
+            console.error("Exportação Office V7.2.1:",e);
             alert("Não foi possível gerar o arquivo: "+(e?.message||e));
         }
     };
@@ -18355,6 +18355,91 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     document.addEventListener("keydown",function(event){
         if(event.key==="Escape")fecharMenuV720();
     });
+})();
+</script>
+
+
+
+<!-- ============================================================
+     V7.2.1 - RÓTULOS VISÍVEIS DE EXPORTAÇÃO XLS/XLT
+     ============================================================ -->
+<style id="exportacao-rotulos-v721">
+.botao-exportacao-office-v721::after{
+    content:"";
+}
+.botao-exportacao-office-v721{
+    position:relative!important;
+}
+</style>
+
+<script>
+(function(){
+    "use strict";
+
+    function ehExportacaoV721(el){
+        if(!el)return false;
+        const onclick=String(el.getAttribute?.("onclick")||"").toLowerCase();
+        const texto=String(el.textContent||"").toLowerCase();
+
+        return onclick.includes("exportar") ||
+               onclick.includes("csv") ||
+               texto.includes("exportar");
+    }
+
+    function ajustarBotaoV721(el){
+        if(!el || !ehExportacaoV721(el))return;
+        if(el.closest("#exportacaoOfficeMenuV720"))return;
+
+        el.classList.add("botao-exportacao-office-v721");
+
+        const texto=String(el.textContent||"").trim();
+        if(
+            texto.toLowerCase()==="exportar" ||
+            texto.toLowerCase()==="exportar csv" ||
+            texto.toLowerCase()==="exportar arquivo" ||
+            texto.toLowerCase()==="exportar arquivo ▾"
+        ){
+            el.textContent="Exportar arquivo ▾";
+        }else if(texto.toLowerCase().includes("exportar csv")){
+            el.textContent=texto.replace(/exportar csv/ig,"Exportar arquivo ▾");
+        }
+
+        el.title="Escolha CSV, XLS ou XLT";
+    }
+
+    function varrerExportacoesV721(raiz){
+        const alvo=raiz||document;
+        alvo.querySelectorAll?.("button,a").forEach(ajustarBotaoV721);
+        if(alvo.matches?.("button,a"))ajustarBotaoV721(alvo);
+    }
+
+    document.addEventListener("DOMContentLoaded",function(){
+        varrerExportacoesV721(document);
+
+        const observer=new MutationObserver(function(mutacoes){
+            for(const mutacao of mutacoes){
+                mutacao.addedNodes.forEach(no=>{
+                    if(no.nodeType===1)varrerExportacoesV721(no);
+                });
+            }
+        });
+
+        observer.observe(document.body,{
+            childList:true,
+            subtree:true
+        });
+    });
+
+    // Reforço no clique: qualquer botão de exportação abre o seletor de formato.
+    document.addEventListener("click",function(event){
+        const botao=event.target.closest?.("button,a");
+        if(!botao || !ehExportacaoV721(botao))return;
+        if(botao.closest("#exportacaoOfficeMenuV720"))return;
+
+        // O interceptor da V7.2.1 já abre o menu.
+        // Aqui só garante o rótulo correto antes da abertura.
+        ajustarBotaoV721(botao);
+    },true);
 })();
 </script>
 
