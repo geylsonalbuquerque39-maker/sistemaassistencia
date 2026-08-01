@@ -18549,5 +18549,187 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
 })();
 </script>
 
+<!-- =========================================================
+     V7.2.5 - CABEÇALHO DO CHAT ESTILO WHATSAPP + PRESENÇA REAL
+     ========================================================= -->
+<style id="chat-v725-estilo">
+#chatCabecalho{cursor:pointer}
+#chatCabecalho .chat-cabecalho-acoes,
+#chatCabecalho .chat-voltar-mobile,
+#chatCabecalhoAvatar{cursor:pointer}
+#chatMenuCabecalhoV725{
+    position:fixed;z-index:19520;display:none;width:285px;padding:7px;
+    background:#fff;border:1px solid #d7dfe8;border-radius:13px;
+    box-shadow:0 18px 55px rgba(0,0,0,.32)
+}
+#chatMenuCabecalhoV725.aberto{display:block}
+#chatMenuCabecalhoV725 button{
+    display:flex;width:100%;align-items:center;gap:12px;border:0;background:transparent;
+    color:#001b3d;text-align:left;padding:12px;border-radius:9px;cursor:pointer;
+    font-size:14px;font-weight:800
+}
+#chatMenuCabecalhoV725 button:hover{background:#eef4fb}
+#chatMenuCabecalhoV725 .chat-menu-separador{height:1px;background:#e3e8ef;margin:5px 7px}
+#chatMidiasModalV725{
+    position:fixed;inset:0;z-index:19530;display:none;align-items:center;justify-content:center;
+    padding:18px;background:rgba(0,0,0,.58)
+}
+#chatMidiasModalV725.aberto{display:flex}
+.chat-midias-card-v725{
+    width:760px;max-width:97%;max-height:90vh;overflow:hidden;background:#fff;
+    border:2px solid #1ea5ff;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.45)
+}
+.chat-midias-topo-v725{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #dde5ef}
+.chat-midias-topo-v725 h2{margin:0;color:#001b3d;font-size:23px}
+.chat-midias-topo-v725 button{border:0;background:#edf2f7;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:18px}
+.chat-midias-abas-v725{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid #dde5ef;overflow:auto}
+.chat-midias-abas-v725 button{border:0;border-radius:999px;padding:9px 15px;cursor:pointer;font-weight:800;background:#e9eff6;color:#001b3d;white-space:nowrap}
+.chat-midias-abas-v725 button.ativo{background:#006cff;color:#fff}
+#chatMidiasConteudoV725{padding:16px;max-height:62vh;overflow:auto}
+.chat-midias-grade-v725{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chat-midia-item-v725{background:#f4f7fb;border:1px solid #dbe3ed;border-radius:11px;overflow:hidden;min-height:95px}
+.chat-midia-item-v725 img,.chat-midia-item-v725 video{display:block;width:100%;height:135px;object-fit:cover;background:#0a1725}
+.chat-midia-item-v725 audio{width:100%;margin-top:25px}
+.chat-midia-item-v725 a{display:block;padding:12px;color:#0046b8;font-weight:800;word-break:break-word;text-decoration:none}
+.chat-midias-vazio-v725{text-align:center;padding:55px 20px;color:#667085;font-weight:800}
+body.dark-mode #chatMenuCabecalhoV725,body.dark-mode .chat-midias-card-v725{background:#10243a;color:#eaf2ff;border-color:#1ea5ff}
+body.dark-mode #chatMenuCabecalhoV725 button,body.dark-mode .chat-midias-topo-v725 h2{color:#eaf2ff}
+body.dark-mode #chatMenuCabecalhoV725 button:hover,body.dark-mode .chat-midia-item-v725{background:#17324d;border-color:#35516d}
+@media(max-width:650px){.chat-midias-grade-v725{grid-template-columns:repeat(2,1fr)}}
+</style>
+
+<div id="chatMenuCabecalhoV725" aria-hidden="true">
+    <button type="button" onclick="chatV725AbrirPerfil()">👤 <span>Dados do contato</span></button>
+    <button type="button" onclick="chatV725AbrirMidias('midias')">🖼️ <span>Mídia, links e documentos</span></button>
+    <button type="button" onclick="chatV725Pesquisar()">🔎 <span>Pesquisar na conversa</span></button>
+    <div class="chat-menu-separador"></div>
+    <button type="button" onclick="alternarFavoritoChatV600();chatV725FecharMenu()">☆ <span>Favoritar conversa</span></button>
+</div>
+
+<div id="chatMidiasModalV725" aria-hidden="true">
+    <div class="chat-midias-card-v725">
+        <div class="chat-midias-topo-v725"><h2 id="chatMidiasTituloV725">Mídia, links e documentos</h2><button type="button" onclick="chatV725FecharMidias()">✕</button></div>
+        <div class="chat-midias-abas-v725">
+            <button type="button" data-aba="midias" onclick="chatV725RenderMidias('midias')">Mídias</button>
+            <button type="button" data-aba="documentos" onclick="chatV725RenderMidias('documentos')">Documentos</button>
+            <button type="button" data-aba="links" onclick="chatV725RenderMidias('links')">Links</button>
+        </div>
+        <div id="chatMidiasConteudoV725"></div>
+    </div>
+</div>
+
+<script>
+(function(){
+    "use strict";
+    let timerPresencaV725=null;
+
+    function escV725(v){return typeof chatEscV57==="function"?chatEscV57(v):String(v??"")}
+    function anexosV725(v){return typeof normalizarAnexosV600==="function"?normalizarAnexosV600(v):(Array.isArray(v)?v:[])}
+
+    window.chatV725FecharMenu=function(){
+        const menu=document.getElementById("chatMenuCabecalhoV725");
+        menu?.classList.remove("aberto");menu?.setAttribute("aria-hidden","true");
+    };
+    function abrirMenuCabecalhoV725(ev){
+        if(!chatUsuarioAtualV57)return;
+        const menu=document.getElementById("chatMenuCabecalhoV725");if(!menu)return;
+        const cab=document.getElementById("chatCabecalho");
+        const r=cab?.getBoundingClientRect();
+        const x=Math.min((r?.left||ev.clientX||15)+70,window.innerWidth-300);
+        const y=Math.min((r?.bottom||ev.clientY||15)+6,window.innerHeight-230);
+        menu.style.left=Math.max(8,x)+"px";menu.style.top=Math.max(8,y)+"px";
+        menu.classList.add("aberto");menu.setAttribute("aria-hidden","false");
+    }
+    window.chatV725Pesquisar=function(){chatV725FecharMenu();if(typeof alternarPesquisaChatV600==="function")alternarPesquisaChatV600()};
+    window.chatV725AbrirPerfil=function(){
+        chatV725FecharMenu();
+        if(!chatUsuarioAtualV57)return;
+        if(typeof window.v698AbrirMenu==="function"){
+            const r=document.getElementById("chatCabecalho")?.getBoundingClientRect();
+            window.v698AbrirMenu({preventDefault(){},stopPropagation(){},clientX:(r?.left||20)+80,clientY:(r?.bottom||20)},chatUsuarioAtualV57.id,chatUsuarioAtualV57);
+            if(typeof window.v698VerPerfil==="function")window.v698VerPerfil();
+        }
+    };
+    window.chatV725FecharMidias=function(){const m=document.getElementById("chatMidiasModalV725");m?.classList.remove("aberto");m?.setAttribute("aria-hidden","true")};
+    window.chatV725AbrirMidias=function(aba){chatV725FecharMenu();const m=document.getElementById("chatMidiasModalV725");m?.classList.add("aberto");m?.setAttribute("aria-hidden","false");chatV725RenderMidias(aba||"midias")};
+    window.chatV725RenderMidias=function(aba){
+        const area=document.getElementById("chatMidiasConteudoV725");if(!area)return;
+        document.querySelectorAll(".chat-midias-abas-v725 button").forEach(b=>b.classList.toggle("ativo",b.dataset.aba===aba));
+        const itens=[];
+        (chatMensagensV57||[]).forEach(m=>{
+            anexosV725(m.anexos).forEach(a=>{
+                const tipo=String(a.tipo||"").toLowerCase(),url=String(a.url||"");if(!url)return;
+                const midia=tipo.startsWith("image/")||tipo.startsWith("video/")||tipo.startsWith("audio/");
+                if((aba==="midias"&&midia)||(aba==="documentos"&&!midia))itens.push({tipo,url,nome:a.nome||"Arquivo"});
+            });
+            if(aba==="links"){
+                const encontrados=String(m.mensagem||"").match(/https?:\/\/[^\s<]+/gi)||[];
+                encontrados.forEach(url=>itens.push({tipo:"link",url,nome:url}));
+            }
+        });
+        if(!itens.length){area.innerHTML="<div class='chat-midias-vazio-v725'>Nenhum conteúdo encontrado nesta conversa.</div>";return}
+        area.innerHTML="<div class='chat-midias-grade-v725'>"+itens.reverse().map(i=>{
+            const url=escV725(i.url),nome=escV725(i.nome);
+            if(i.tipo.startsWith("image/"))return `<div class="chat-midia-item-v725"><a href="${url}" target="_blank"><img src="${url}" alt="${nome}"></a></div>`;
+            if(i.tipo.startsWith("video/"))return `<div class="chat-midia-item-v725"><video controls src="${url}"></video><a href="${url}" target="_blank">${nome}</a></div>`;
+            if(i.tipo.startsWith("audio/"))return `<div class="chat-midia-item-v725"><audio controls src="${url}"></audio><a href="${url}" target="_blank">${nome}</a></div>`;
+            return `<div class="chat-midia-item-v725"><a href="${url}" target="_blank" rel="noopener">📎 ${nome}</a></div>`;
+        }).join("")+"</div>";
+    };
+
+    async function atualizarPresencaChatV725(){
+        if(!usuarioLogado?.id||typeof obterSupabaseClient!=="function")return;
+        try{
+            const tabela=typeof PRESENCA_V56_TABELA!=="undefined"?PRESENCA_V56_TABELA:"presenca_usuarios";
+            const {data,error}=await obterSupabaseClient().from(tabela).select("user_id,status,last_seen,updated_at,tela,contexto");
+            if(error)throw error;
+            const mapa=new Map((data||[]).map(p=>[String(p.user_id),p]));
+            // Usa diretamente as variáveis internas do chat. Top-level let não pertence a window.
+            if(Array.isArray(chatUsuariosV57)){
+                chatUsuariosV57=chatUsuariosV57.map(u=>{const p=mapa.get(String(u.id));return p?{...u,...p,id:u.id}:u});
+            }
+            if(chatUsuarioAtualV57){
+                const p=mapa.get(String(chatUsuarioAtualV57.id));
+                if(p)chatUsuarioAtualV57={...chatUsuarioAtualV57,...p,id:chatUsuarioAtualV57.id};
+                const st=document.getElementById("chatCabecalhoStatus");
+                if(st)st.textContent=chatStatusTextoV57(chatUsuarioAtualV57);
+            }
+            renderizarUsuariosChatV57();
+        }catch(e){console.warn("Presença do chat V7.2.5:",e?.message||e)}
+    }
+
+    function instalarV725(){
+        const cab=document.getElementById("chatCabecalho");
+        if(cab&&!cab.dataset.v725){
+            cab.dataset.v725="1";
+            cab.addEventListener("click",function(ev){
+                if(ev.target.closest("#chatCabecalhoAvatar,.chat-cabecalho-acoes,.chat-voltar-mobile,button,a"))return;
+                ev.preventDefault();ev.stopPropagation();abrirMenuCabecalhoV725(ev);
+            });
+        }
+        // Reforça: a foto nunca abre o menu; abre somente a imagem grande.
+        const avatar=document.getElementById("chatCabecalhoAvatar");
+        if(avatar&&!avatar.dataset.v725){
+            avatar.dataset.v725="1";
+            avatar.addEventListener("click",function(ev){
+                ev.preventDefault();ev.stopPropagation();
+                const url=chatUsuarioAtualV57?.avatar_url;
+                if(url&&typeof window.v698AbrirFotoGrande==="function")window.v698AbrirFotoGrande(url);
+            },true);
+        }
+        clearInterval(timerPresencaV725);
+        timerPresencaV725=setInterval(atualizarPresencaChatV725,5000);
+        atualizarPresencaChatV725();
+    }
+    document.addEventListener("click",function(ev){
+        if(!ev.target.closest("#chatMenuCabecalhoV725")&&!ev.target.closest("#chatCabecalho"))chatV725FecharMenu();
+        if(ev.target===document.getElementById("chatMidiasModalV725"))chatV725FecharMidias();
+    });
+    document.addEventListener("keydown",ev=>{if(ev.key==="Escape"){chatV725FecharMenu();chatV725FecharMidias()}});
+    window.addEventListener("load",()=>setTimeout(instalarV725,1300));
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(instalarV725,800));
+})();
+</script>
+
 </body>
 </html>
