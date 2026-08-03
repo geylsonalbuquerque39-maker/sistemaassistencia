@@ -9400,6 +9400,7 @@ async function buscarTodaRexpedlr(){
 function dataValidaIntel(v){ if(!v)return null; const d=new Date(v); return isNaN(d.getTime())?null:d; }
 function diasDesdeIntel(v){const d=dataValidaIntel(v);if(!d)return null;return Math.floor((Date.now()-d.getTime())/86400000)}
 function textoIntel(v){return String(v??"").trim()}
+function grupoNumeroIntel(v){const n=parseInt(String(v??"").trim().replace(/[^0-9-]/g,""),10);return Number.isFinite(n)?n:null}
 function contemIntel(v,p){return textoIntel(v).toUpperCase().includes(p)}
 function ultimaDataIntel(r){return r.dt_expedicao||r.dt_saida_oficina||r.dt_conserto||r.data_recebedor||r.data_cpp||r.dt_ult_entrada||r.dt_recb_at||r.dt_geracao||null}
 function contarIntel(lista,campo){const m={};lista.forEach(r=>{const k=textoIntel(r[campo])||"(vazio)";m[k]=(m[k]||0)+1});return Object.entries(m).sort((a,b)=>b[1]-a[1])}
@@ -9419,11 +9420,13 @@ function analisarIntel(registros){
     const unicos=new Map();prioridades.sort((a,b)=>(b._nivel-a._nivel)||(b._dias-a._dias)).forEach(r=>{if(!unicos.has(r.os))unicos.set(r.os,r)});
     const rack500Abertas=registros.filter(r=>rackCorrespondeIntel(r.rack,"500")&&situacaoAbertaIntel(r));
     const prontasAbertas=registros.filter(r=>statusProntaIntel(r)&&situacaoAbertaIntel(r));
+    const grupo1314Abertos=registros.filter(r=>situacaoAbertaIntel(r)&&[13,14].includes(grupoNumeroIntel(r.grupo)));
+    const grupo52122Abertos=registros.filter(r=>situacaoAbertaIntel(r)&&[5,21,22].includes(grupoNumeroIntel(r.grupo)));
     const hojeIntel=new Date();hojeIntel.setHours(0,0,0,0);
     const expHoje=registros.filter(r=>{const d=parseDataIntel(r.dt_expedicao);return d&&d>=hojeIntel;});
     const abertas=registros.filter(r=>situacaoAbertaIntel(r));
     const fechadas=registros.filter(r=>!situacaoAbertaIntel(r));
-    return {prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20:oficina.filter(r=>(diasDesdeIntel(r.dt_recb_at||r.dt_conserto||r.dt_geracao)||0)>20),qualidade,rack500Abertas,prontasAbertas,expHoje,abertas,fechadas,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,"tecnico"),pdvs:contarIntel(registros,"pdv"),status:contarIntel(registros,"status")};
+    return {prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20:oficina.filter(r=>(diasDesdeIntel(r.dt_recb_at||r.dt_conserto||r.dt_geracao)||0)>20),qualidade,rack500Abertas,prontasAbertas,grupo1314Abertos,grupo52122Abertos,expHoje,abertas,fechadas,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,"tecnico"),pdvs:contarIntel(registros,"pdv"),status:contarIntel(registros,"status")};
 }
 function setIntel(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
 function barrasIntel(lista,max=8){if(!lista.length)return "<div class='admin-info'>Sem dados.</div>";const maior=lista[0][1]||1;return lista.slice(0,max).map(x=>"<div class='bar-row'><b>"+escaparHTML(x[0])+"</b><div class='bar-track'><div class='bar-fill' style='width:"+Math.max(3,Math.round(x[1]/maior*100))+"%'></div></div><strong>"+x[1]+"</strong></div>").join("")}
@@ -9463,6 +9466,7 @@ function tabelaPendenciaHTML(titulo, chave, lista){
     const linhas=(lista||[]).slice(0,1000).map(r=>
         "<tr>"+
         "<td><button class='usuario-acao' onclick=\"abrirOSIntel('"+String(r.os||'').replace(/'/g,"\\'")+"')\">"+escaparHTML(r.os||'-')+"</button></td>"+
+        "<td>"+escaparHTML(r.grupo||'-')+"</td>"+
         "<td>"+escaparHTML(r.desc_produto||'-')+"</td>"+
         "<td>"+escaparHTML(r.rack||'-')+"</td>"+
         "<td>"+escaparHTML(r.status||'-')+"</td>"+
@@ -9476,19 +9480,23 @@ function tabelaPendenciaHTML(titulo, chave, lista){
       "<div class='intel-pend-acoes'><button class='intel-pend-btn' onclick=\"abrirListaIntel('"+chave+"')\">Ver relação</button>"+
       "<button class='intel-pend-btn exportar' onclick=\"exportarPendenciaIntelCSV('"+chave+"')\">Exportar arquivo ▾</button></div></div>"+
       ((lista||[]).length
-        ? "<div class='intel-pend-tabela-wrap'><table class='intel-pend-tabela'><thead><tr><th>O.S.</th><th>Produto</th><th>Rack</th><th>Status</th><th>Situação da O.S.</th><th>Técnico</th><th>PDV</th></tr></thead><tbody>"+linhas+"</tbody></table></div>"
+        ? "<div class='intel-pend-tabela-wrap'><table class='intel-pend-tabela'><thead><tr><th>O.S.</th><th>Grupo</th><th>Produto</th><th>Rack</th><th>Status</th><th>Situação da O.S.</th><th>Técnico</th><th>PDV</th></tr></thead><tbody>"+linhas+"</tbody></table></div>"
         : "<div class='intel-pend-vazio'>Nenhuma O.S. encontrada nesta pendência.</div>")+
       "</div>";
 }
 function renderTabelaPendenciasIntel(a){
     return tabelaPendenciaHTML("Rack 500 e STATUS DA OS = ABE","rack500Abertas",a.rack500Abertas||[])+
-           tabelaPendenciaHTML("STATUS = PRONTA e STATUS DA OS = ABE","prontasAbertas",a.prontasAbertas||[]);
+           tabelaPendenciaHTML("STATUS = PRONTA e STATUS DA OS = ABE","prontasAbertas",a.prontasAbertas||[])+
+           tabelaPendenciaHTML("GRUPOS 13 E 14 — O.S. ABERTAS","grupo1314Abertos",a.grupo1314Abertos||[])+
+           tabelaPendenciaHTML("GRUPOS 5, 21 E 22 — O.S. ABERTAS","grupo52122Abertos",a.grupo52122Abertos||[]);
 }
 function exportarPendenciaIntelCSV(chave){
     if(!intelAnalise){alert("A análise ainda não foi carregada.");return;}
     const mapa={
       rack500Abertas:{titulo:"rack_500_abertas",lista:intelAnalise.rack500Abertas||[]},
-      prontasAbertas:{titulo:"prontas_abertas",lista:intelAnalise.prontasAbertas||[]}
+      prontasAbertas:{titulo:"prontas_abertas",lista:intelAnalise.prontasAbertas||[]},
+      grupo1314Abertos:{titulo:"grupos_13_14_abertos",lista:intelAnalise.grupo1314Abertos||[]},
+      grupo52122Abertos:{titulo:"grupos_5_21_22_abertos",lista:intelAnalise.grupo52122Abertos||[]}
     };
     const item=mapa[chave];
     if(!item){alert("Relação inválida.");return;}
@@ -9509,7 +9517,7 @@ function exportarPendenciaIntelCSV(chave){
 function abrirListaIntel(tipo){
     const a=intelAnalise;if(!a)return;
     const lista=a[tipo]||[];
-    const titulos={rack500Abertas:"Rack 500 — O.S. abertas",prontasAbertas:"Prontas e abertas",prontas:"Prontas aguardando expedição",paradas:"Sem movimentação +30 dias",cpp:"CPP pendente",semTecnico:"Sem técnico",semRack:"Sem rack",oficina20:"Oficina há mais de 20 dias",abertas:"O.S. abertas",fechadas:"O.S. fechadas",expHoje:"Expedidas hoje"};
+    const titulos={rack500Abertas:"Rack 500 — O.S. abertas",prontasAbertas:"Prontas e abertas",grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",prontas:"Prontas aguardando expedição",paradas:"Sem movimentação +30 dias",cpp:"CPP pendente",semTecnico:"Sem técnico",semRack:"Sem rack",oficina20:"Oficina há mais de 20 dias",abertas:"O.S. abertas",fechadas:"O.S. fechadas",expHoje:"Expedidas hoje"};
     document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
 function fecharIntelModal(){document.getElementById("intelModal").style.display="none"}
 function abrirOSIntel(os){const r=intelRegistros.find(x=>String(x.os)===String(os));if(!r)return;document.getElementById("intelModalTitulo").textContent="O.S. "+os;document.getElementById("intelModalConteudo").innerHTML=Object.entries(r).filter(x=>!x[0].startsWith("_")).map(x=>"<div class='ficha-linha'><span class='ficha-label'>"+escaparHTML(x[0].replaceAll("_"," "))+":</span>"+escaparHTML(x[1]??"-")+"</div>").join("");document.getElementById("intelModal").style.display="flex"}
@@ -10092,8 +10100,10 @@ function analisarIntel(registros){
  semTecnico.forEach(r=>prioridades.push({...r,_motivo:'O.S. aberta sem técnico',_nivel:2,_dias:diasDesdeIntel(ultimaDataIntel(r))||0}));
  const unicos=new Map();prioridades.sort((a,b)=>(b._nivel-a._nivel)||(b._dias-a._dias)).forEach(r=>{if(!unicos.has(r.os))unicos.set(r.os,r)});
  const rack500Abertas=abertas.filter(r=>rackCorrespondeIntel(r.rack,'500')),prontasAbertas=abertas.filter(statusProntaIntel);
+ const grupo1314Abertos=abertas.filter(r=>[13,14].includes(grupoNumeroIntel(r.grupo)));
+ const grupo52122Abertos=abertas.filter(r=>[5,21,22].includes(grupoNumeroIntel(r.grupo)));
  const racksAbertos=contarIntel(abertas,'rack').filter(x=>x[0]!=='(vazio)');
- return {abertas,fechadas,expHoje,tempoExp,prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20,qualidade,rack500Abertas,prontasAbertas,racksAbertos,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,'tecnico'),pdvs:contarIntel(registros,'pdv'),status:contarIntel(registros,'status')};
+ return {abertas,fechadas,expHoje,tempoExp,prontas,paradas,cpp,semTecnico,semRack,oficina,oficina20,qualidade,rack500Abertas,prontasAbertas,grupo1314Abertos,grupo52122Abertos,racksAbertos,prioridades:[...unicos.values()],tecnicos:contarIntel(registros,'tecnico'),pdvs:contarIntel(registros,'pdv'),status:contarIntel(registros,'status')};
 }
 function renderIntel(){
  const a=intelAnalise;if(!a)return;
@@ -10101,6 +10111,8 @@ function renderIntel(){
  setIntel('ieAbertas',a.abertas.length);setIntel('ieFechadas',a.fechadas.length);setIntel('ieExpHoje',a.expHoje.length);setIntel('ieTempoExp',a.tempoExp===null?'-':a.tempoExp+' d');setIntel('ieTotal',intelRegistros.length);
  const alertas=[];
  if(a.rack500Abertas.length)alertas.push("<div class='intel-alert red' onclick=\"abrirListaIntel('rack500Abertas')\"><b>📦 "+a.rack500Abertas.length+" O.S. abertas no Rack 500</b><span>Clique para abrir a relação.</span></div>");
+ if((a.grupo1314Abertos||[]).length)alertas.push("<div class='intel-alert orange' onclick=\"abrirListaIntel('grupo1314Abertos')\"><b>📦 "+a.grupo1314Abertos.length+" O.S. abertas nos grupos 13 e 14</b><span>Clique para abrir a relação.</span></div>");
+ if((a.grupo52122Abertos||[]).length)alertas.push("<div class='intel-alert orange' onclick=\"abrirListaIntel('grupo52122Abertos')\"><b>📦 "+a.grupo52122Abertos.length+" O.S. abertas nos grupos 5, 21 e 22</b><span>Clique para abrir a relação.</span></div>");
  if(a.prontasAbertas.length)alertas.push("<div class='intel-alert orange' onclick=\"abrirListaIntel('prontasAbertas')\"><b>🟢 "+a.prontasAbertas.length+" O.S. prontas e abertas</b><span>Aguardando próxima ação operacional.</span></div>");
  if(a.cpp.length)alertas.push("<div class='intel-alert orange' onclick=\"abrirListaIntel('cpp')\"><b>⚠ "+a.cpp.length+" pendências de CPP</b><span>CPP ainda sem conclusão ou recebimento.</span></div>");
  if(a.oficina20.length)alertas.push("<div class='intel-alert red' onclick=\"abrirListaIntel('oficina20')\"><b>🔧 "+a.oficina20.length+" O.S. na oficina há mais de 20 dias</b><span>Clique para priorizar.</span></div>");
@@ -10118,7 +10130,7 @@ function renderIntel(){
 }
 function obterCartoesV36(a=intelAnalise){
  if(!a)return [];
- const fixos=[['O.S. abertas no geral',a.abertas,'green'],['Rack 500',a.rack500Abertas,'red'],['Prontas',a.prontasAbertas,'green'],['CPP',a.cpp,'orange'],['Oficina +20 dias',a.oficina20,'red'],['Sem técnico',a.semTecnico,'orange'],['Sem rack',a.semRack,'orange']];
+ const fixos=[['O.S. abertas no geral',a.abertas,'green'],['Rack 500',a.rack500Abertas,'red'],['Grupos 13 e 14 abertos',a.grupo1314Abertos||[],'orange'],['Grupos 5, 21 e 22 abertos',a.grupo52122Abertos||[],'orange'],['Prontas',a.prontasAbertas,'green'],['CPP',a.cpp,'orange'],['Oficina +20 dias',a.oficina20,'red'],['Sem técnico',a.semTecnico,'orange'],['Sem rack',a.semRack,'orange']];
  const dinamicos=a.racksAbertos.filter(x=>normalizarRackIntel(x[0])!=='500').slice(0,6).map(x=>['Rack '+x[0],a.abertas.filter(r=>textoIntel(r.rack)===x[0]),'']);
  return fixos.concat(dinamicos);
 }
@@ -10815,6 +10827,8 @@ function renderHomeIntegradaV502(){
 
     const alertas=[
         ["Rack 500 aberto",a.rack500Abertas||[],"rack500Abertas","O.S. abertas no Rack 500"],
+        ["Grupos 13 e 14 abertos",a.grupo1314Abertos||[],"grupo1314Abertos","O.S. abertas dos grupos 13 e 14"],
+        ["Grupos 5, 21 e 22 abertos",a.grupo52122Abertos||[],"grupo52122Abertos","O.S. abertas dos grupos 5, 21 e 22"],
         ["Prontas aguardando",a.prontasAbertas||a.prontas||[],"prontasAbertas","Prontas sem expedição"],
         ["CPP pendente",a.cpp||[],"cpp","Pendências de CPP"],
         ["Oficina +20 dias",a.oficina20||[],"oficina20","Tempo acima do limite"],
@@ -11326,6 +11340,10 @@ function renderDashboardOperacionalV55(){
     const pendencias=[
         {tipo:"rack500Abertas",icone:"🔴",classe:"critica",total:(a.rack500Abertas||[]).length,
          titulo:"O.S. no Rack 500 ainda abertas",texto:"Itens que exigem acompanhamento operacional."},
+        {tipo:"grupo1314Abertos",icone:"📦",classe:"",total:(a.grupo1314Abertos||[]).length,
+         titulo:"Grupos 13 e 14 com O.S. abertas",texto:"O.S. abertas pertencentes aos grupos 13 e 14."},
+        {tipo:"grupo52122Abertos",icone:"📦",classe:"",total:(a.grupo52122Abertos||[]).length,
+         titulo:"Grupos 5, 21 e 22 com O.S. abertas",texto:"O.S. abertas pertencentes aos grupos 5, 21 e 22."},
         {tipo:"prontasAbertas",icone:"🟡",classe:"",total:(a.prontasAbertas||[]).length,
          titulo:"O.S. prontas aguardando expedição",texto:"Produtos prontos que ainda permanecem em aberto."},
         {tipo:"semTecnico",icone:"👨‍🔧",classe:"",total:(a.semTecnico||[]).length,
@@ -18596,6 +18614,35 @@ body.dark-mode #chatMenuCabecalhoV725,body.dark-mode .chat-midias-card-v725{back
 body.dark-mode #chatMenuCabecalhoV725 button,body.dark-mode .chat-midias-topo-v725 h2{color:#eaf2ff}
 body.dark-mode #chatMenuCabecalhoV725 button:hover,body.dark-mode .chat-midia-item-v725{background:#17324d;border-color:#35516d}
 @media(max-width:650px){.chat-midias-grade-v725{grid-template-columns:repeat(2,1fr)}}
+
+
+/* =========================================================
+   V7.2.7 - ALINHAMENTO GLOBAL DO CABEÇALHO DE TODAS AS C.I.
+   Sobe somente: IDB - Logística Reversa, Para/Destino e A/C.
+   Aplicado na visualização e na impressão, sem alterar tabelas.
+   ========================================================= */
+.ci-edit-top > div:first-child{
+    top:1px!important;
+}
+.ci-edit-center{
+    position:relative!important;
+    top:-6px!important;
+}
+.ci-edit-ac{
+    position:relative!important;
+    top:-6px!important;
+}
+
+@media print{
+    .ci-edit-top > div:first-child{
+        top:1px!important;
+    }
+    .ci-edit-center,
+    .ci-edit-ac{
+        position:relative!important;
+        top:-6px!important;
+    }
+}
 </style>
 
 <div id="chatMenuCabecalhoV725" aria-hidden="true">
