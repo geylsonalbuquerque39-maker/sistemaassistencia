@@ -4961,6 +4961,15 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
 }
 </style>
 
+
+<style>
+/* V7.3.3 - MONITORAMENTO CPP */
+.cpp-wrap{width:1220px;max-width:96%;margin:30px auto 55px}.cpp-title h1{font-size:48px}.cpp-alert{border-radius:12px;padding:14px 16px;margin-bottom:18px;font-weight:800}.cpp-alert-info{background:#edf5ff;border-left:6px solid #006cff;color:#001b3d}.cpp-alert-ok{background:#ecfff0;border-left:6px solid #0b7a2a;color:#075c22}.cpp-alert-erro{background:#ffecec;border-left:6px solid #b00020;color:#b00020}.cpp-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}.cpp-kpi{appearance:none;text-align:left;background:#fff;border:2px solid #d8e2ee;border-radius:18px;padding:20px;box-shadow:0 8px 20px rgba(0,0,0,.09);cursor:pointer;transition:.2s;position:relative;overflow:hidden}.cpp-kpi:before{content:"";position:absolute;left:0;top:0;width:7px;height:100%;background:#006cff}.cpp-kpi:hover,.cpp-kpi.ativo{transform:translateY(-3px);border-color:#006cff;box-shadow:0 12px 25px rgba(0,108,255,.18)}.cpp-kpi small{display:block;color:#526277;font-size:14px;font-weight:900;margin-bottom:8px}.cpp-kpi strong{display:block;color:#001b3d;font-size:36px}.cpp-kpi span{display:block;color:#667085;font-size:12px;margin-top:7px}.cpp-panel{background:#fff;border:2px solid #001b3d;border-radius:18px;padding:22px;box-shadow:0 8px 20px rgba(0,0,0,.1)}.cpp-panel-head{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap}.cpp-panel-head h2{color:#001b3d;font-size:28px}.cpp-panel-head p{color:#667085;margin-top:5px}.cpp-actions{display:flex;gap:9px;flex-wrap:wrap}.cpp-filtros{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin:20px 0}.cpp-filtros .ci-campo{margin:0}.cpp-filtros .ci-input{min-height:44px;font-size:15px}.cpp-filtro-limpar{display:flex;align-items:end}.cpp-filtro-limpar .btn-voltar{width:100%;margin:0}.cpp-table-wrap{overflow:auto;border:1px solid #c8d2df;border-radius:13px;max-height:600px}.cpp-table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}.cpp-table th,.cpp-table td{padding:9px;border-bottom:1px solid #dce4ed;white-space:nowrap;text-align:left;color:#001b3d}.cpp-table th{position:sticky;top:0;background:#001b3d;color:#fff;z-index:2}.cpp-table tr:hover td{background:#f4f8ff}.cpp-table .cpp-produto{white-space:normal;min-width:240px}.cpp-badge{display:inline-block;border-radius:999px;padding:5px 9px;font-weight:900;background:#eef3f8;border:1px solid #c8d2df}.cpp-badge.concluido{background:#e9fff0;color:#0b7a2a;border-color:#0b7a2a}.cpp-badge.pendente{background:#fff7e6;color:#9a5a00;border-color:#ff9800}.cpp-row-btn{border:0;background:#0046b8;color:#fff;border-radius:8px;padding:7px 9px;font-weight:800;cursor:pointer}.cpp-table-footer{padding-top:12px;color:#526277;font-weight:800}.cpp-vazio{text-align:center!important;padding:25px!important;color:#667085!important}.cpp-modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.62);z-index:13000;display:none;align-items:center;justify-content:center;padding:18px}.cpp-modal-backdrop.aberto{display:flex}.cpp-modal{width:850px;max-width:98%;max-height:94vh;overflow:auto;background:#fff;border:2px solid #1ea5ff;border-radius:20px;padding:22px;box-shadow:0 25px 80px rgba(0,0,0,.5)}.cpp-modal-head{display:flex;justify-content:space-between;gap:14px;align-items:start}.cpp-modal-head h2{color:#001b3d;text-transform:capitalize}.cpp-modal-head p{color:#667085;margin-top:5px}.cpp-close{border:0;background:#b00020;color:#fff;border-radius:9px;padding:8px 11px;cursor:pointer;font-weight:900}.cpp-modal-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:18px}.cpp-span-2{grid-column:1/-1}.cpp-modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:16px}.cpp-historico{margin-top:22px;border-top:1px solid #d8e2ee;padding-top:16px}.cpp-historico h3{color:#001b3d}.cpp-historico-item{padding:11px;border-left:5px solid #006cff;background:#f4f8ff;border-radius:9px;margin:9px 0}.cpp-historico-item small{display:block;color:#667085;margin-top:5px}.cpp-historico-item a{color:#0046b8;font-weight:800}.cpp-os-link{font-weight:900;color:#0046b8;cursor:pointer;text-decoration:underline}.cpp-loading{opacity:.65;pointer-events:none}
+body.dark-mode .cpp-panel,body.dark-mode .cpp-kpi,body.dark-mode .cpp-modal{background:#0d223a;color:#eaf2ff;border-color:#1ea5ff}body.dark-mode .cpp-panel h2,body.dark-mode .cpp-kpi strong,body.dark-mode .cpp-modal h2,body.dark-mode .cpp-historico h3{color:#eaf2ff}body.dark-mode .cpp-kpi small,body.dark-mode .cpp-kpi span,body.dark-mode .cpp-panel p,body.dark-mode .cpp-modal p{color:#b8cae0}body.dark-mode .cpp-table{background:#0d223a}body.dark-mode .cpp-table td{color:#eaf2ff;border-color:#244466}body.dark-mode .cpp-table tr:hover td{background:#102b49}body.dark-mode .cpp-historico-item{background:#102b49}
+@media(max-width:950px){.cpp-kpis,.cpp-filtros{grid-template-columns:1fr 1fr}.cpp-title h1{font-size:32px}.cpp-modal-grid{grid-template-columns:1fr}.cpp-span-2{grid-column:auto}}
+@media(max-width:560px){.cpp-kpis,.cpp-filtros{grid-template-columns:1fr}.cpp-panel{padding:14px}.cpp-actions .v2-btn{width:100%}}
+@media print{#telaMonitoramentoCPP,.cpp-modal-backdrop{display:none!important}}
+</style>
 </head>
 
 <body class="sem-login">
@@ -5042,6 +5051,7 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
     <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
+    <div class="menu" data-menu="cpp" onclick="abrirMonitoramentoCPP()">📊 Monitoramento CPP</div>
     <div class="menu" data-menu="admin" onclick="abrirAdmin()">⚙ Administração</div>
 </div>
 
@@ -5906,6 +5916,99 @@ body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#
 
 <div id="intelModal" class="intel-modal" onclick="if(event.target===this)fecharIntelModal()"><div class="intel-modal-box"><button class="intel-close" onclick="fecharIntelModal()">Fechar</button><h2 id="intelModalTitulo">Detalhes</h2><div id="intelModalConteudo"></div></div></div>
 
+
+<!-- =========================
+     V7.3.3 - MONITORAMENTO CPP
+     Leitura: Supabase principal / rexpedlr
+     Gravação: Supabase CPP separado
+========================= -->
+<div id="telaMonitoramentoCPP" style="display:none">
+    <div class="title cpp-title">
+        <h1>MONITORAMENTO CPP</h1>
+        <p>Fila operacional integrada ao REXPEDLR</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="cpp-wrap">
+        <div id="cppMensagem" class="cpp-alert cpp-alert-info">Abra o módulo para carregar os dados.</div>
+
+        <div class="cpp-kpis">
+            <button class="cpp-kpi cpp-kpi-primary ativo" data-cpp-card="sem_cpp" onclick="selecionarCartaoCPP('sem_cpp')">
+                <small>Endereçados S/ CPP</small>
+                <strong id="cppKpiSemCPP">0</strong>
+                <span>Rack válido e Nº CPP vazio</span>
+            </button>
+            <button class="cpp-kpi" data-cpp-card="acompanhamento" onclick="selecionarCartaoCPP('acompanhamento')">
+                <small>Em acompanhamento</small>
+                <strong id="cppKpiAcompanhamento">0</strong>
+                <span>Registros ativos no banco CPP</span>
+            </button>
+            <button class="cpp-kpi" data-cpp-card="concluidos" onclick="selecionarCartaoCPP('concluidos')">
+                <small>Concluídos</small>
+                <strong id="cppKpiConcluidos">0</strong>
+                <span>Fluxos finalizados</span>
+            </button>
+            <button class="cpp-kpi" data-cpp-card="hoje" onclick="selecionarCartaoCPP('hoje')">
+                <small>Atualizados hoje</small>
+                <strong id="cppKpiHoje">0</strong>
+                <span>Movimentações do dia</span>
+            </button>
+        </div>
+
+        <div class="cpp-panel">
+            <div class="cpp-panel-head">
+                <div>
+                    <h2 id="cppTituloTabela">Endereçados S/ CPP</h2>
+                    <p id="cppSubtituloTabela">Consulta no REXPEDLR do Supabase principal.</p>
+                </div>
+                <div class="cpp-actions">
+                    <button class="v2-btn" onclick="carregarMonitoramentoCPP(true)">↻ Atualizar</button>
+                    <button class="v2-btn" onclick="exportarTabelaCPP()">⬇ Exportar CSV</button>
+                </div>
+            </div>
+
+            <div class="cpp-filtros">
+                <div class="ci-campo"><label>Pesquisar O.S.</label><input id="cppFiltroOS" class="ci-input" placeholder="Digite a O.S." oninput="aplicarFiltrosCPP()"></div>
+                <div class="ci-campo"><label>Loja / PDV</label><select id="cppFiltroLoja" class="ci-input" onchange="aplicarFiltrosCPP()"><option value="">Todas</option></select></div>
+                <div class="ci-campo"><label>Grupo</label><select id="cppFiltroGrupo" class="ci-input" onchange="aplicarFiltrosCPP()"><option value="">Todos</option></select></div>
+                <div class="ci-campo"><label>Status CPP</label><select id="cppFiltroStatus" class="ci-input" onchange="aplicarFiltrosCPP()"><option value="">Todos</option></select></div>
+                <div class="ci-campo"><label>Técnico</label><select id="cppFiltroTecnico" class="ci-input" onchange="aplicarFiltrosCPP()"><option value="">Todos</option></select></div>
+                <div class="ci-campo"><label>Data inicial</label><input id="cppFiltroDataIni" type="date" class="ci-input" onchange="aplicarFiltrosCPP()"></div>
+                <div class="ci-campo"><label>Data final</label><input id="cppFiltroDataFim" type="date" class="ci-input" onchange="aplicarFiltrosCPP()"></div>
+                <div class="cpp-filtro-limpar"><button class="btn-voltar" onclick="limparFiltrosCPP()">Limpar filtros</button></div>
+            </div>
+
+            <div class="cpp-table-wrap">
+                <table class="cpp-table">
+                    <thead><tr>
+                        <th>O.S.</th><th>Loja</th><th>Grupo</th><th>Produto</th><th>Rack</th>
+                        <th>Solicitante CPP</th><th>Data CPP</th><th>Nº CPP</th><th>Sit. CPP</th>
+                        <th>Acompanhamento</th><th>Técnico</th><th>Atualização</th><th>Ações</th>
+                    </tr></thead>
+                    <tbody id="cppTabelaCorpo"><tr><td colspan="13" class="cpp-vazio">Nenhum dado carregado.</td></tr></tbody>
+                </table>
+            </div>
+            <div class="cpp-table-footer"><span id="cppTotalExibido">0 registros</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="cpp-modal-backdrop" id="cppModal" onclick="if(event.target===this)fecharModalCPP()">
+    <div class="cpp-modal">
+        <div class="cpp-modal-head"><div><h2> acompanhamento CPP</h2><p id="cppModalResumoOS"></p></div><button type="button" class="cpp-close" onclick="fecharModalCPP()">✕</button></div>
+        <input type="hidden" id="cppModalOS">
+        <div class="cpp-modal-grid">
+            <div class="ci-campo"><label>Status do acompanhamento</label><select id="cppModalStatus" class="ci-input"><option>Pendente</option><option>Em análise</option><option>CPP solicitado</option><option>Aguardando emissão</option><option>CPP emitido</option><option>Aguardando recebimento</option><option>Recebido</option><option>Concluído</option><option>Cancelado</option></select></div>
+            <div class="ci-campo"><label>Técnico responsável</label><input id="cppModalTecnico" class="ci-input" placeholder="Nome do responsável"></div>
+            <div class="ci-campo cpp-span-2"><label>Observação</label><textarea id="cppModalObservacao" class="ci-input" rows="4" placeholder="Registre o andamento desta O.S."></textarea></div>
+            <div class="ci-campo cpp-span-2"><label>Anexo (URL)</label><input id="cppModalAnexo" class="ci-input" placeholder="https://..."></div>
+        </div>
+        <div class="cpp-modal-actions"><button class="btn-voltar" onclick="fecharModalCPP()">Cancelar</button><button class="btn-buscar" id="cppBtnSalvar" onclick="salvarAcompanhamentoCPP()">Salvar acompanhamento</button></div>
+        <div id="cppModalMensagem" class="ci-msg"></div>
+        <div class="cpp-historico"><h3>Histórico</h3><div id="cppHistoricoLista" class="cpp-historico-lista"><div class="cpp-vazio">Sem histórico.</div></div></div>
+    </div>
+</div>
+
 <div id="telaAdmin">
     <div class="title">
         <h1>PAINEL ADMINISTRATIVO</h1>
@@ -6650,7 +6753,7 @@ function esconderTelas(){
     [
         "telaInicio","telaColeta","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
         "telaAdmin","telaAdminAtualizar","telaAdminUsuarios","telaAdminPresenca","telaAdminLojas",
-        "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia"
+        "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia","telaMonitoramentoCPP"
     ].forEach(function(id){
         const el = document.getElementById(id);
         if(el) el.style.display = "none";
@@ -18775,6 +18878,53 @@ body.dark-mode #chatMenuCabecalhoV725 button:hover,body.dark-mode .chat-midia-it
     document.addEventListener("keydown",ev=>{if(ev.key==="Escape"){chatV725FecharMenu();chatV725FecharMidias()}});
     window.addEventListener("load",()=>setTimeout(instalarV725,1300));
     document.addEventListener("DOMContentLoaded",()=>setTimeout(instalarV725,800));
+})();
+</script>
+
+
+<script>
+/* =========================================================
+   V7.3.2 - MONITORAMENTO CPP
+   Fonte: banco principal / public.rexpedlr
+   Destino: projeto CPP / public.monitoramento_cpp
+   ========================================================= */
+(function(){
+"use strict";
+const CPP_SUPABASE_URL="https://udioyprwpecysjedlznl.supabase.co";
+const CPP_SUPABASE_ANON_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaW95cHJ3cGVjeXNqZWRsem5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDc4MjIsImV4cCI6MjEwMTQyMzgyMn0.io_nEEnlMpqItmDx1YyZPgS1Ny8KpCi5KT6pX3Phoyo";
+let cppClienteCache=null,cppFonte=[],cppAcompanhamentos=[],cppCombinados=[],cppExibidos=[],cppCartao="sem_cpp",cppCarregando=false;
+const CPP_STATUS_FINAL=["CONCLUÍDO","CONCLUIDO","CANCELADO","RECEBIDO"];
+function esc(v){return typeof escaparHTML==="function"?escaparHTML(String(v??"")):String(v??"").replace(/[&<>\"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#039;"}[m]))}
+function txt(v){return String(v??"").trim()}
+function osKey(v){return txt(v).replace(/^ILR\s*/i,"").replace(/\s+/g,"").toUpperCase()}
+function rackValido(v){const r=txt(v);return r!==""&&!(["0","1","500","999"].includes(r))}
+function semNumeroCPP(r){const numero=txt(r.nr_cpp).toUpperCase();return ["","0","-","NULL"].includes(numero)}
+function finalizado(status){return CPP_STATUS_FINAL.includes(txt(status).toUpperCase())}
+function hojeISO(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function dataLocal(v){if(!v)return "";const d=new Date(v);return isNaN(d)?txt(v):d.toLocaleString("pt-BR")}
+function usuarioAtual(){return txt(window.usuarioLogado?.nome||window.usuarioLogado?.email||window.usuarioLogado?.id||"Usuário ERP")}
+function obterClienteCPP(){if(!window.supabase)throw new Error("Biblioteca Supabase não carregada.");if(!cppClienteCache)cppClienteCache=window.supabase.createClient(CPP_SUPABASE_URL,CPP_SUPABASE_ANON_KEY,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});return cppClienteCache}
+function setMsg(texto,tipo){const el=document.getElementById("cppMensagem");if(!el)return;el.className="cpp-alert cpp-alert-"+(tipo||"info");el.innerHTML=texto}
+async function carregarPaginado(cliente,tabela,campos){const todos=[];let inicio=0;const lote=1000;while(true){const {data,error}=await cliente.from(tabela).select(campos).range(inicio,inicio+lote-1);if(error)throw error;const p=data||[];todos.push(...p);if(p.length<lote)break;inicio+=lote;if(inicio>=200000)break}return todos}
+async function lerFontePrincipal(){const supa=obterSupabaseClient();const campos="os,pdv,grupo,desc_produto,tecnico,rack,status,status_da_os,solicitante_cpp,data_cpp,nr_cpp,sit_cpp,dt_geracao";const dados=await carregarPaginado(supa,"rexpedlr",campos);return dados.filter(r=>rackValido(r.rack)&&semNumeroCPP(r))}
+async function lerAcompanhamentos(){try{return await carregarPaginado(obterClienteCPP(),"monitoramento_cpp","*")}catch(e){if(String(e?.message||e).toLowerCase().includes("does not exist")||e?.code==="42P01")throw new Error("A tabela monitoramento_cpp ainda não existe no novo Supabase. Execute o SQL entregue com esta versão.");throw e}}
+function combinar(){const mapa=new Map(cppAcompanhamentos.map(a=>[osKey(a.os),a]));cppCombinados=cppFonte.map(r=>({...r,_cpp:mapa.get(osKey(r.os))||null}));cppAcompanhamentos.forEach(a=>{if(!cppCombinados.some(r=>osKey(r.os)===osKey(a.os)))cppCombinados.push({os:a.os,pdv:a.loja,grupo:a.grupo,desc_produto:a.produto,rack:a.rack,tecnico:"",solicitante_cpp:"",data_cpp:"",nr_cpp:"",sit_cpp:"",_cpp:a})})}
+function setKpis(){const ativos=cppAcompanhamentos.filter(a=>!finalizado(a.status_cpp));const concl=cppAcompanhamentos.filter(a=>finalizado(a.status_cpp));const hoje=cppAcompanhamentos.filter(a=>txt(a.atualizado_em||a.created_at).slice(0,10)===hojeISO());document.getElementById("cppKpiSemCPP").textContent=cppFonte.length.toLocaleString("pt-BR");document.getElementById("cppKpiAcompanhamento").textContent=ativos.length.toLocaleString("pt-BR");document.getElementById("cppKpiConcluidos").textContent=concl.length.toLocaleString("pt-BR");document.getElementById("cppKpiHoje").textContent=hoje.length.toLocaleString("pt-BR")}
+function opcoes(id,valores,rotulo){const el=document.getElementById(id);if(!el)return;const atual=el.value;const unicos=[...new Set(valores.map(txt).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true}));el.innerHTML=`<option value="">${rotulo}</option>`+unicos.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if(unicos.includes(atual))el.value=atual}
+function preencherFiltros(){opcoes("cppFiltroLoja",cppCombinados.map(r=>r.pdv||r._cpp?.loja),"Todas");opcoes("cppFiltroGrupo",cppCombinados.map(r=>r.grupo||r._cpp?.grupo),"Todos");opcoes("cppFiltroStatus",cppAcompanhamentos.map(r=>r.status_cpp),"Todos");opcoes("cppFiltroTecnico",cppCombinados.map(r=>r._cpp?.tecnico_responsavel||r.tecnico),"Todos")}
+window.selecionarCartaoCPP=function(chave){cppCartao=chave;document.querySelectorAll("[data-cpp-card]").forEach(b=>b.classList.toggle("ativo",b.dataset.cppCard===chave));const tit={sem_cpp:["Endereçados S/ CPP","Rack diferente de vazio, 0, 1, 500 e 999; número do CPP vazio, nulo ou igual a 0 no REXPEDLR."],acompanhamento:["Em acompanhamento","Registros ativos armazenados no novo Supabase CPP."],concluidos:["Concluídos","Acompanhamentos finalizados."],hoje:["Atualizados hoje","Registros movimentados no dia atual."]}[chave];document.getElementById("cppTituloTabela").textContent=tit[0];document.getElementById("cppSubtituloTabela").textContent=tit[1];aplicarFiltrosCPP()}
+window.aplicarFiltrosCPP=function(){let base=cppCombinados.slice();if(cppCartao==="sem_cpp")base=base.filter(r=>cppFonte.some(f=>osKey(f.os)===osKey(r.os)));if(cppCartao==="acompanhamento")base=base.filter(r=>r._cpp&&!finalizado(r._cpp.status_cpp));if(cppCartao==="concluidos")base=base.filter(r=>r._cpp&&finalizado(r._cpp.status_cpp));if(cppCartao==="hoje")base=base.filter(r=>r._cpp&&txt(r._cpp.atualizado_em||r._cpp.created_at).slice(0,10)===hojeISO());const os=txt(document.getElementById("cppFiltroOS")?.value).toUpperCase(),loja=txt(document.getElementById("cppFiltroLoja")?.value),grupo=txt(document.getElementById("cppFiltroGrupo")?.value),status=txt(document.getElementById("cppFiltroStatus")?.value),tec=txt(document.getElementById("cppFiltroTecnico")?.value),ini=txt(document.getElementById("cppFiltroDataIni")?.value),fim=txt(document.getElementById("cppFiltroDataFim")?.value);cppExibidos=base.filter(r=>{const c=r._cpp||{};const d=txt(c.atualizado_em||c.created_at||r.data_cpp||r.dt_geracao).slice(0,10);return(!os||osKey(r.os).includes(osKey(os)))&&(!loja||txt(r.pdv||c.loja)===loja)&&(!grupo||txt(r.grupo||c.grupo)===grupo)&&(!status||txt(c.status_cpp)===status)&&(!tec||txt(c.tecnico_responsavel||r.tecnico)===tec)&&(!ini||d>=ini)&&(!fim||d<=fim)});renderTabelaCPP()}
+function statusBadge(v){const s=txt(v)||"Não iniciado";return `<span class="cpp-badge ${finalizado(s)?"concluido":"pendente"}">${esc(s)}</span>`}
+function renderTabelaCPP(){const corpo=document.getElementById("cppTabelaCorpo");if(!corpo)return;document.getElementById("cppTotalExibido").textContent=cppExibidos.length.toLocaleString("pt-BR")+" registros";if(!cppExibidos.length){corpo.innerHTML='<tr><td colspan="13" class="cpp-vazio">Nenhum registro encontrado para os filtros selecionados.</td></tr>';return}corpo.innerHTML=cppExibidos.map(r=>{const c=r._cpp||{};return `<tr><td><span class="cpp-os-link" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">${esc(r.os)}</span></td><td>${esc(r.pdv||c.loja)}</td><td>${esc(r.grupo||c.grupo)}</td><td class="cpp-produto">${esc(r.desc_produto||c.produto)}</td><td><b>${esc(r.rack||c.rack)}</b></td><td>${esc(r.solicitante_cpp)}</td><td>${esc(r.data_cpp)}</td><td>${esc(r.nr_cpp)}</td><td>${esc(r.sit_cpp)}</td><td>${statusBadge(c.status_cpp)}</td><td>${esc(c.tecnico_responsavel||r.tecnico)}</td><td>${esc(dataLocal(c.atualizado_em))}</td><td><button class="cpp-row-btn" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">Acompanhar</button></td></tr>`}).join("")}
+window.limparFiltrosCPP=function(){["cppFiltroOS","cppFiltroLoja","cppFiltroGrupo","cppFiltroStatus","cppFiltroTecnico","cppFiltroDataIni","cppFiltroDataFim"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});aplicarFiltrosCPP()}
+window.abrirMonitoramentoCPP=async function(){if(typeof esconderTelas==="function")esconderTelas();if(typeof definirMenuAtivo==="function")definirMenuAtivo("cpp");document.getElementById("telaMonitoramentoCPP").style.display="block";document.getElementById("sidebar")?.classList.remove("mobile-open");await carregarMonitoramentoCPP(false)}
+window.carregarMonitoramentoCPP=async function(forcar){if(cppCarregando)return;if(!forcar&&cppFonte.length){setKpis();aplicarFiltrosCPP();return}cppCarregando=true;document.getElementById("telaMonitoramentoCPP")?.classList.add("cpp-loading");setMsg("Carregando REXPEDLR do banco principal e acompanhamentos do banco CPP...","info");try{const resultados=await Promise.allSettled([lerFontePrincipal(),lerAcompanhamentos()]);if(resultados[0].status==="rejected")throw resultados[0].reason;cppFonte=resultados[0].value||[];if(resultados[1].status==="fulfilled")cppAcompanhamentos=resultados[1].value||[];else{cppAcompanhamentos=[];setMsg("REXPEDLR carregado, mas o banco CPP ainda precisa ser preparado: "+esc(resultados[1].reason?.message||resultados[1].reason),"erro")}combinar();setKpis();preencherFiltros();aplicarFiltrosCPP();if(resultados[1].status==="fulfilled")setMsg(`Dados atualizados: <b>${cppFonte.length.toLocaleString("pt-BR")}</b> O.S. endereçadas sem CPP e <b>${cppAcompanhamentos.length.toLocaleString("pt-BR")}</b> acompanhamentos.`,"ok")}catch(e){console.error("Monitoramento CPP:",e);setMsg("Falha ao carregar o Monitoramento CPP: "+esc(e?.message||e),"erro")}finally{cppCarregando=false;document.getElementById("telaMonitoramentoCPP")?.classList.remove("cpp-loading")}}
+window.abrirAcompanhamentoCPP=async function(os){const chave=osKey(os);const r=cppCombinados.find(x=>osKey(x.os)===chave);if(!r)return;const c=r._cpp||{};document.getElementById("cppModalOS").value=txt(r.os);document.getElementById("cppModalResumoOS").textContent=`O.S. ${txt(r.os)} • Loja ${txt(r.pdv||c.loja)||"--"} • Rack ${txt(r.rack||c.rack)||"--"}`;document.getElementById("cppModalStatus").value=txt(c.status_cpp)||"Pendente";document.getElementById("cppModalTecnico").value=txt(c.tecnico_responsavel);document.getElementById("cppModalObservacao").value=txt(c.observacao);document.getElementById("cppModalAnexo").value=txt(c.anexo_url);document.getElementById("cppModalMensagem").textContent="";document.getElementById("cppModal").classList.add("aberto");await carregarHistoricoCPP(r.os)}
+window.fecharModalCPP=function(){document.getElementById("cppModal")?.classList.remove("aberto")}
+async function carregarHistoricoCPP(os){const area=document.getElementById("cppHistoricoLista");area.innerHTML='<div class="cpp-vazio">Carregando histórico...</div>';try{const {data,error}=await obterClienteCPP().from("monitoramento_cpp_historico").select("*").eq("os",txt(os)).order("criado_em",{ascending:false}).limit(100);if(error)throw error;if(!(data||[]).length){area.innerHTML='<div class="cpp-vazio">Sem histórico.</div>';return}area.innerHTML=data.map(h=>`<div class="cpp-historico-item"><b>${esc(h.status_anterior||"Novo")} → ${esc(h.status_novo||"")}</b><div>${esc(h.observacao||"")}</div>${h.anexo_url?`<a href="${esc(h.anexo_url)}" target="_blank" rel="noopener">Abrir anexo</a>`:""}<small>${esc(h.usuario||"")} • ${esc(dataLocal(h.criado_em))}</small></div>`).join("")}catch(e){area.innerHTML='<div class="cpp-vazio">Não foi possível carregar o histórico: '+esc(e?.message||e)+'</div>'}}
+window.salvarAcompanhamentoCPP=async function(){const os=txt(document.getElementById("cppModalOS").value),status=txt(document.getElementById("cppModalStatus").value),tecnico=txt(document.getElementById("cppModalTecnico").value),obs=txt(document.getElementById("cppModalObservacao").value),anexo=txt(document.getElementById("cppModalAnexo").value),msg=document.getElementById("cppModalMensagem"),btn=document.getElementById("cppBtnSalvar");const r=cppCombinados.find(x=>osKey(x.os)===osKey(os));if(!r){msg.textContent="O.S. não encontrada.";return}const anterior=r._cpp||{};btn.disabled=true;msg.innerHTML="Salvando...";try{const agora=new Date().toISOString();const payload={os,loja:txt(r.pdv||anterior.loja),grupo:txt(r.grupo||anterior.grupo),produto:txt(r.desc_produto||anterior.produto),rack:txt(r.rack||anterior.rack),status_cpp:status,tecnico_responsavel:tecnico,observacao:obs,anexo_url:anexo,atualizado_por:usuarioAtual(),atualizado_em:agora};const {data,error}=await obterClienteCPP().from("monitoramento_cpp").upsert(payload,{onConflict:"os"}).select().single();if(error)throw error;const mudou=txt(anterior.status_cpp)!==status||txt(anterior.observacao)!==obs||txt(anterior.anexo_url)!==anexo;if(mudou){const {error:hErr}=await obterClienteCPP().from("monitoramento_cpp_historico").insert({monitoramento_id:data.id,os,status_anterior:txt(anterior.status_cpp),status_novo:status,observacao:obs,anexo_url:anexo,usuario:usuarioAtual(),criado_em:agora});if(hErr)console.warn("Histórico CPP:",hErr)}const idx=cppAcompanhamentos.findIndex(a=>osKey(a.os)===osKey(os));if(idx>=0)cppAcompanhamentos[idx]=data;else cppAcompanhamentos.push(data);combinar();setKpis();preencherFiltros();aplicarFiltrosCPP();msg.innerHTML='<span class="admin-status-ok">Acompanhamento salvo com sucesso.</span>';await carregarHistoricoCPP(os)}catch(e){console.error(e);msg.innerHTML='<span class="admin-status-erro">Erro: '+esc(e?.message||e)+'</span>'}finally{btn.disabled=false}}
+window.exportarTabelaCPP=function(){if(!cppExibidos.length){alert("Não há registros para exportar.");return}const cab=["OS","Loja","Grupo","Produto","Rack","Solicitante CPP","Data CPP","NR CPP","SIT CPP","Acompanhamento","Tecnico","Atualizacao"];const linhas=cppExibidos.map(r=>{const c=r._cpp||{};return[r.os,r.pdv||c.loja,r.grupo||c.grupo,r.desc_produto||c.produto,r.rack||c.rack,r.solicitante_cpp,r.data_cpp,r.nr_cpp,r.sit_cpp,c.status_cpp,c.tecnico_responsavel||r.tecnico,c.atualizado_em]});const q=v=>'"'+String(v??"").replace(/"/g,'""')+'"';const csv='\ufeff'+[cab,...linhas].map(l=>l.map(q).join(';')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='monitoramento_cpp_'+hojeISO()+'.csv';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")fecharModalCPP()});
 })();
 </script>
 
