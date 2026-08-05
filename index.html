@@ -5001,6 +5001,39 @@ body.dark-mode .clientes-card,body.dark-mode .clientes-kpi,body.dark-mode .clien
 @media print{#telaClientes{display:none!important}}
 </style>
 
+
+<style>
+/* V7.5.3 - CLIENTES PRESERVA DASHBOARD E REUTILIZA PADRÃO VISUAL PRINCIPAL */
+.clientes-funcoes-cards{margin-top:24px;margin-bottom:30px}.clientes-funcoes-cards .card{min-height:155px}.clientes-funcoes-cards .card-content h2{font-size:28px}.clientes-funcoes-cards .card-content p{font-size:16px}.coleta-container{width:1200px;max-width:96%;margin:30px auto}.coleta-card{background:#fff;border:2px solid #001b3d;border-radius:16px;padding:24px;box-shadow:0 8px 18px rgba(0,0,0,.12)}.coleta-topo-acoes,.coleta-final-acoes{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}.coleta-form-grid{display:grid;grid-template-columns:1.3fr 1fr auto;gap:15px;align-items:end}.coleta-btn-campo{padding-bottom:1px}.coleta-resumo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0}.coleta-resumo-box{background:#eef3f8;border-radius:12px;padding:14px;text-align:center;color:#001b3d;font-weight:bold}.coleta-resumo-box span{display:block;font-size:24px;color:#0046b8;margin-top:6px}.coleta-tabela-wrap{overflow:auto;border:1px solid #c8d2df;border-radius:12px}.coleta-tabela{width:100%;border-collapse:collapse;font-size:12px}.coleta-tabela th,.coleta-tabela td{border:1px solid #d7dfe8;padding:7px;white-space:nowrap;color:#001b3d}.coleta-tabela th{background:#001b3d;color:#fff;position:sticky;top:0}.cli-ci-regiao-doc{width:980px!important}.cli-ci-regiao-table{width:950px!important}.cli-ci-regiao-table .desc{width:260px}.cli-ci-regiao-table td[contenteditable=true]{background:#fffbe6;outline:none}.cli-ci-regiao-table td[contenteditable=true]:focus{background:#fff3a0;box-shadow:inset 0 0 0 2px #ff9800}.cli-ci-regiao-table button{border:0;border-radius:7px;background:#b00020;color:#fff;padding:5px 8px;cursor:pointer}.cli-ci-os-input{width:100%;border:0;background:#fffbe6;text-align:center;font-weight:bold}.cli-intel-bar{display:grid;grid-template-columns:160px 1fr 50px;gap:8px;align-items:center;margin:9px 0}.cli-intel-track{height:12px;background:#e8edf3;border-radius:99px;overflow:hidden}.cli-intel-fill{height:100%;background:#006cff}.cli-pendencia{padding:12px;border-left:6px solid #ff9800;background:#fff8e8;border-radius:10px;margin:9px 0}.cli-pendencia b{display:block;color:#001b3d}.cli-pendencia span{color:#4c5b70;font-size:13px}@media(max-width:950px){.coleta-form-grid,.coleta-resumo-grid{grid-template-columns:1fr}.clientes-funcoes-cards{grid-template-columns:1fr}.coleta-card{padding:15px}}@media print{body.print-ci-clientes *{visibility:hidden!important}body.print-ci-clientes #ciRegiaoClientesDocumento,body.print-ci-clientes #ciRegiaoClientesDocumento *{visibility:visible!important}body.print-ci-clientes #ciRegiaoClientesDocumento{position:absolute!important;left:10mm!important;top:5mm!important;width:190mm!important}.cli-ci-regiao-table th:last-child,.cli-ci-regiao-table td:last-child{display:none!important}}
+</style>
+
+<style id="clientes-ci-regiao-v755">
+body.ci-regiao-clientes .ci-edit-doc{width:740px!important;}
+body.ci-regiao-clientes .ci-edit-top,
+body.ci-regiao-clientes .ci-edit-center,
+body.ci-regiao-clientes .ci-jspreadsheet-area,
+body.ci-regiao-clientes #planilhaCI,
+body.ci-regiao-clientes .ci-edit-obs,
+body.ci-regiao-clientes .ci-edit-assinatura{width:720px!important;}
+body.ci-regiao-clientes #ciTextoMensagem,
+body.ci-regiao-clientes #ciTextoDanfe{width:720px!important;max-width:720px!important;margin-left:0!important;}
+body.ci-regiao-clientes #ciTextoMensagem{font-size:13px!important;height:24px!important;line-height:24px!important;border:1px solid #7aa7df!important;border-radius:0!important;background:#fff!important;}
+body.ci-regiao-clientes #ciTextoDanfe{font-size:13px!important;height:22px!important;line-height:22px!important;border:0!important;border-radius:0!important;background:#fff!important;}
+body.ci-regiao-clientes .ci-edit-center{font-size:20px!important;height:32px!important;line-height:32px!important;}
+body.ci-regiao-clientes .ci-edit-obs{line-height:18px!important;margin-top:6px!important;}
+body.ci-regiao-clientes .ci-edit-assinatura{grid-template-columns:330px 240px 150px!important;margin-top:12px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > tbody > tr > td{height:18px!important;line-height:16px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > thead > tr > td{position:relative!important;user-select:none!important;height:34px!important;min-height:34px!important;line-height:13px!important;white-space:pre-line!important;vertical-align:middle!important;font-weight:700!important;border:2px solid #000!important;padding:2px 3px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > tbody > tr > td{border:1px solid #000!important;}
+body.ci-regiao-clientes #planilhaCI .cli-ci-resize-handle{position:absolute;right:-3px;top:0;width:7px;height:100%;cursor:col-resize;z-index:20;background:transparent;}
+body.ci-regiao-clientes #planilhaCI .cli-ci-resize-handle:hover{background:rgba(0,108,255,.25);}
+body.ci-regiao-clientes #planilhaCI .jexcel{table-layout:fixed!important;max-width:720px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-overflow:ellipsis!important;}
+@media print{
+ body.ci-regiao-clientes #ciEditDocumento{width:740px!important;}
+ body.ci-regiao-clientes .ci-edit-top,body.ci-regiao-clientes .ci-edit-center,body.ci-regiao-clientes .ci-jspreadsheet-area,body.ci-regiao-clientes #planilhaCI,body.ci-regiao-clientes .ci-edit-obs,body.ci-regiao-clientes .ci-edit-assinatura{width:720px!important;}
+}
+</style>
 </head>
 
 <body class="sem-login">
@@ -6056,6 +6089,30 @@ body.dark-mode .clientes-card,body.dark-mode .clientes-kpi,body.dark-mode .clien
             </div>
         </div>
 
+
+        <div class="cards clientes-funcoes-cards" id="clientesFuncoesCards">
+            <div class="card" onclick="abrirDashboardClientesModulo()">
+                <div class="card-bar"></div><div class="icon">📊</div>
+                <div class="card-content"><h2>Dashboard</h2><p>Indicadores, gráficos, importações e consulta da Base de Clientes.</p></div><div class="arrow">›</div>
+            </div>
+            <div class="card" onclick="abrirConsultaClientesModulo()">
+                <div class="card-bar"></div><div class="icon">⌕</div>
+                <div class="card-content"><h2>Consulta de O.S.</h2><p>Pesquisa por O.S., cliente, produto, técnico, PDV e status.</p></div><div class="arrow">›</div>
+            </div>
+            <div class="card" onclick="abrirColetaClientesPrincipal()">
+                <div class="card-bar"></div><div class="icon">▣</div>
+                <div class="card-content"><h2>Coleta de O.S.</h2><p>Mesmo padrão da coleta Loja de Origem, usando a Base de Clientes.</p></div><div class="arrow">›</div>
+            </div>
+            <div class="card" onclick="abrirCIRegiaoClientes()">
+                <div class="card-bar"></div><div class="icon">↩</div>
+                <div class="card-content"><h2>C.I. Região</h2><p>Carta Interna no mesmo fluxo visual das C.I. do ERP principal.</p></div><div class="arrow">›</div>
+            </div>
+            <div class="card" onclick="abrirInteligenciaClientesModulo()">
+                <div class="card-bar"></div><div class="icon">✦</div>
+                <div class="card-content"><h2>Inteligência</h2><p>Análise operacional exclusiva das O.S. de clientes.</p></div><div class="arrow">›</div>
+            </div>
+        </div>
+
         <div id="clientesMensagem" class="dashboard-loading" style="margin-top:20px">Abra o módulo para carregar os dados.</div>
 
         <div class="clientes-kpis">
@@ -6116,6 +6173,75 @@ body.dark-mode .clientes-card,body.dark-mode .clientes-kpi,body.dark-mode .clien
             <div id="cliTabelaPrincipal" class="clientes-table-wrap"><div class="clientes-vazio">Carregue o dashboard para exibir as O.S.</div></div>
         </div>
     </div>
+</div>
+
+<!-- V7.5.3 - MÓDULOS CLIENTES NO PADRÃO DO ERP PRINCIPAL -->
+<div id="telaClientesColetaPrincipal" style="display:none">
+  <div class="title"><h1>COLETA DE O.S. — CLIENTES</h1><p>Loja de Origem | Base exclusiva de clientes</p><div class="underline"></div></div>
+  <div class="coleta-container">
+    <div class="coleta-card">
+      <div class="coleta-topo-acoes">
+        <button class="btn-voltar" onclick="abrirClientes()">← Voltar para Clientes</button>
+        <button class="btn-buscar" onclick="salvarRascunhoColetaClientes()">💾 Salvar rascunho</button>
+        <button class="btn-buscar" onclick="abrirHistoricoColetaClientesPrincipal()">🕘 Histórico</button>
+      </div>
+      <div class="coleta-form-grid">
+        <div class="ci-campo"><label>Bipar ou digitar O.S.</label><input id="cliColetaOSInput" class="ci-input" placeholder="Ex.: ILR 123456" onkeydown="if(event.key==='Enter'){event.preventDefault();adicionarOSColetaClientesPrincipal();}"></div>
+        <div class="ci-campo"><label>Destino</label><input id="cliColetaDestinoPrincipal" class="ci-input" placeholder="Destino / rota / observação"></div>
+        <div class="ci-campo coleta-btn-campo"><button class="btn-buscar" onclick="adicionarOSColetaClientesPrincipal()">Adicionar O.S.</button></div>
+      </div>
+      <div id="cliColetaMensagemPrincipal" class="ci-msg"></div>
+      <div class="coleta-resumo-grid">
+        <div class="coleta-resumo-box">O.S. na coleta<span id="cliColetaQtdPrincipal">0</span></div>
+        <div class="coleta-resumo-box">Valor total<span id="cliColetaValorPrincipal">R$ 0,00</span></div>
+        <div class="coleta-resumo-box">Cubagem total<span id="cliColetaCubagemPrincipal">0</span></div>
+      </div>
+      <div class="coleta-tabela-wrap">
+        <table class="coleta-tabela">
+          <thead><tr><th>#</th><th>O.S.</th><th>Data da O.S.</th><th>Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Cliente</th><th>Valor</th><th>Cubagem</th><th>Ação</th></tr></thead>
+          <tbody id="cliColetaTabelaCorpoPrincipal"><tr><td colspan="18" class="clientes-vazio">Nenhuma O.S. adicionada.</td></tr></tbody>
+        </table>
+      </div>
+      <div class="coleta-final-acoes"><button class="btn-buscar" onclick="finalizarColetaClientesPrincipal()">✓ Finalizar coleta</button><button class="btn-voltar" onclick="limparColetaClientesPrincipal()">Limpar</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="telaClientesHistoricoColetaPrincipal" style="display:none">
+  <div class="title"><h1>HISTÓRICO DE COLETAS — CLIENTES</h1><p>Registros armazenados no Supabase de Clientes</p><div class="underline"></div></div>
+  <div class="admin-painel"><button class="btn-voltar" onclick="abrirColetaClientesPrincipal()">← Voltar</button><button class="btn-buscar" onclick="carregarHistoricoColetaClientesPrincipal()">⟳ Atualizar</button><div id="cliHistoricoColetaPrincipal" class="historico-tabela-wrap"><div class="dashboard-loading">Carregando histórico...</div></div></div>
+</div>
+
+<div id="telaClientesCIRegiao" style="display:none">
+  <div class="title"><h1>CARTA INTERNA — REGIÃO</h1><p>Modelo exclusivo para O.S. de clientes</p><div class="underline"></div></div>
+  <div class="ci-edit-actions">
+    <button class="btn-voltar" onclick="abrirClientes()">← Voltar para Clientes</button>
+    <button class="btn-buscar" onclick="adicionarLinhaCIRegiaoClientes()">+ Adicionar O.S.</button>
+    <button class="btn-buscar" onclick="imprimirCIRegiaoClientes()">🖨 Imprimir</button>
+  </div>
+  <div class="ci-edit-wrap cli-ci-regiao-wrap">
+    <div id="ciRegiaoClientesDocumento" class="ci-edit-doc cli-ci-regiao-doc">
+      <div class="ci-edit-top"><div>C.I. REGIÃO</div><div id="cliCIHora"></div><div id="cliCIData"></div></div>
+      <div class="ci-edit-center">IDC</div>
+      <div class="ci-edit-ac">ESTAMOS ENVIANDO MERCADORIA(S) DEVIDAMENTE CONSERTADA(S)</div>
+      <div class="ci-edit-msg">PELO(S) DANFE(S): <span contenteditable="true">____________________</span></div>
+      <table class="ci-edit-table cli-ci-regiao-table">
+        <thead><tr><th>AL</th><th>GR</th><th>NCE</th><th class="desc">DESCRIÇÃO</th><th>COR</th><th>VOL</th><th>NF. ORIGEM</th><th>CI. ORIGEM</th><th>O.S.</th><th>CLIENTE</th><th>AÇÃO</th></tr></thead>
+        <tbody id="cliCIRegiaoCorpo"></tbody>
+      </table>
+      <div class="ci-edit-obs"><div>Observações:</div><div contenteditable="true">1. Favor confirmar o recebimento, devolvendo a 2ª via devidamente assinada e citando número de N.F.</div></div>
+      <div class="ci-edit-assinatura"><div class="ci-edit-small"><b>Confirmo Embarque - IDC</b><br>VOL:______ Em____/____/______<br>Visto:_____________________</div><div class="ci-edit-small"><b>PESO TOTAL:</b> <span contenteditable="true">0,000</span> kg<br><b>CUBAGEM TOTAL:</b> <span contenteditable="true">0,0000</span> m³</div><div class="ci-edit-nome" contenteditable="true">Responsável</div></div>
+    </div>
+  </div>
+</div>
+
+<div id="telaClientesInteligenciaPrincipal" style="display:none">
+  <div class="intel-wrap">
+    <div class="intel-head"><div><h1>✦ Inteligência — Clientes</h1><p>Análise da base REXPEDLR Clientes cruzada com o RATEC04.</p></div><div class="intel-head-actions"><button class="v2-btn" onclick="carregarInteligenciaClientesPrincipal(true)">⟳ Reanalisar</button><button class="v2-btn" onclick="abrirClientes()">← Funções</button></div></div>
+    <div id="cliIntelMensagem" class="dashboard-loading" style="margin-top:20px">Clique em reanalisar.</div>
+    <div class="intel-grid-kpi"><div class="intel-kpi"><small>Total de O.S.</small><strong id="cliIntelTotal">--</strong><span>Base de clientes</span></div><div class="intel-kpi alerta"><small>Sem técnico</small><strong id="cliIntelSemTecnico">--</strong><span>Exigem triagem</span></div><div class="intel-kpi critico"><small>Sem cliente</small><strong id="cliIntelSemCliente">--</strong><span>Sem correspondência RATEC04</span></div><div class="intel-kpi ok"><small>Prontas</small><strong id="cliIntelProntas">--</strong><span>Aguardando expedição</span></div></div>
+    <div class="intel-main-grid"><div class="intel-card"><h2>Principais pendências</h2><div id="cliIntelPendencias"></div></div><div class="intel-card"><h2>Ranking por técnico</h2><div id="cliIntelTecnicos" class="intel-bars"></div></div></div>
+  </div>
 </div>
 
 <div id="telaAdmin">
@@ -6828,6 +6954,7 @@ let linhasPlanilha = [];
 let cabecalhoPlanilha = [];
 
 let ciAtual = "";
+let ciClientesDestinoPrimeiraOS = "";
 
 const nomesCI = {
     regiao: "C.I REGIÃO",
@@ -6896,6 +7023,17 @@ function abrirTelaCI(){
 function abrirCI(nome){
     if(!linksCIEdit[nome]) return;
 
+    document.querySelectorAll("#telaPlanilhaCI .ci-edit-actions .btn-voltar").forEach(function(btn){
+        if((btn.textContent || "").trim() === "Voltar para CLIENTES"){
+            btn.onclick = abrirTelaCI;
+            btn.textContent = "Voltar para C.I";
+        }
+        if((btn.textContent || "").trim() === "Área de Clientes"){
+            btn.onclick = voltarInicio;
+            btn.textContent = "Página inicial";
+        }
+    });
+
     ciAtual = nome;
 
     esconderTelas();
@@ -6933,7 +7071,9 @@ function abrirCI(nome){
 }
 
 function aplicarModeloCIVisual(){
-    document.body.classList.remove("ci-geit", "ci-outros");
+    document.body.classList.remove("ci-geit", "ci-outros", "ci-regiao-clientes");
+    const topoPadraoCI = document.querySelector(".ci-edit-top div:first-child");
+    if(topoPadraoCI) topoPadraoCI.innerHTML = "IDB - Logística Reversa";
     const destino = document.getElementById("ciDestinoTitulo");
     const ac = document.querySelector(".ci-edit-ac");
     const msg = document.getElementById("ciTextoMensagem");
@@ -6941,7 +7081,70 @@ function aplicarModeloCIVisual(){
 
     if(!destino || !ac || !msg || !danfe) return;
 
-    if(ciAtual === "regiao"){
+    ac.style.height = "";
+    ac.style.lineHeight = "";
+    ac.style.margin = "";
+    ac.style.overflow = "";
+    ac.setAttribute("contenteditable", "true");
+
+    if(ciAtual === "regiao_clientes"){
+        document.body.classList.add("ci-regiao-clientes");
+        ciClientesDestinoPrimeiraOS = "";
+        const topoTitulo = document.querySelector(".ci-edit-top div:first-child");
+        if(topoTitulo) topoTitulo.innerHTML = "IDC";
+        destino.innerHTML = "AUG";
+        ac.innerHTML = "";
+        ac.style.height = "0";
+        ac.style.lineHeight = "0";
+        ac.style.margin = "0";
+        ac.style.overflow = "hidden";
+        ac.removeAttribute("contenteditable");
+        msg.innerHTML = `
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) DEVIDAMENTE CONSERTADA(S) ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) SEM CONSERTO ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) TROCADA(S) PELO FABRICANTE ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) SEM DEFEITO ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO MERCADORIA(S) PARA CONSERTO ACOBERTADA(S)</option>
+            <option>ESTAMOS ENVIANDO SOMENTE PEÇA(S) DE REPOSIÇÃO ACOBERTADA(S)</option>
+            <option>ESTAMOS DEVOLVENDO SALDO 99, TROCA OU DEVOLUÇÃO COMERCIAL</option>
+        `;
+        danfe.innerHTML = `
+            <option>PELO(S) DANFE(S) :____________________</option>
+            <option>PELO(S) DANFE(S):____________________</option>
+            <option>PELO(S) DANFE(S) INFORMADO(S) ABAIXO</option>
+            <option>.</option>
+        `;
+
+        const obs = document.querySelector(".ci-edit-obs");
+        if(obs) obs.innerHTML = `
+            <div style="background:#3a3838;color:white;display:inline-block;padding:2px 6px;font-weight:bold;">Observações:</div>
+            <div contenteditable="true">1. Favor confirmar o recebimento, devolvendo a 2ª via devidamente assinada e citando número de N.F.<br>ao dar baixa em estoque.<br>2. Como medida preventiva e evitar transtornos futuros, solicitamos manter em vossa loja, documento<br>assinado e datado pelo recebedor, comprovando a devolução do produto consertado. <b>(ficha entrega)</b></div>
+        `;
+
+        atualizarTextoMensagemCI();
+
+        const assinatura = document.querySelector(".ci-edit-assinatura");
+        if(assinatura) assinatura.innerHTML = `
+            <div>
+                <div style="display:flex;align-items:center;margin-bottom:4px;">
+                    <div class="ci-edit-logo"></div>
+                    <b><i>Confirmo Embarque - IDC</i></b>
+                </div>
+                <div class="ci-edit-small">
+                    <b><i>VOL:</i></b>_______<b><i>Em</i></b>_______/_______/_______<br>
+                    <b><i>Visto:</i></b>_____________________________<br>
+                    <b>TOTAL DE VOLUME:</b> &nbsp;&nbsp; <span id="ciTotalVolumes">1</span>
+                </div>
+            </div>
+            <div class="ci-edit-small">
+                <b>PESO TOTAL:</b> ______ <span contenteditable="true">11,900</span> ______ kg<br>
+                <b>CUBAGEM TOTAL:</b> ____ <span contenteditable="true">0,1152</span> ____ m3
+            </div>
+            <div class="ci-edit-nome" contenteditable="true">Marcos Silva</div>
+        `;
+    }else if(ciAtual === "regiao"){
+        const topoTitulo = document.querySelector(".ci-edit-top div:first-child");
+        if(topoTitulo) topoTitulo.innerHTML = "IDB - Logística Reversa";
         destino.innerHTML = "RDP";
         ac.innerHTML = "A/C.: GERÊNCIA";
         msg.innerHTML = `
@@ -7156,6 +7359,25 @@ function atualizarTextoMensagemCI(){
 
 
 function configCIAtual(){
+    if(ciAtual === "regiao_clientes"){
+        return {
+            osCol:8,
+            rowLength:10,
+            rows:6,
+            columns:[
+                { title:"AL", width:24, readOnly:true },
+                { title:"GR", width:24, readOnly:true },
+                { title:"NCE", width:48, readOnly:true },
+                { title:"DESCRIÇÃO", width:250, readOnly:true, wordWrap:false },
+                { title:"COR", width:40, readOnly:true },
+                { title:"VOL", width:34, readOnly:false },
+                { title:"NF.\nORIGEM", width:62, readOnly:false },
+                { title:"C.I.\nORIGEM", width:62, readOnly:false },
+                { title:"O.S", width:58 },
+                { title:"CLIENTE", width:118, readOnly:true }
+            ]
+        };
+    }
     if(ciAtual === "teresina" || ciAtual === "assurant"){
         return {
             osCol:5,
@@ -7233,6 +7455,58 @@ function configCIAtual(){
 
 function osColCI(){ return configCIAtual().osCol; }
 
+function habilitarRedimensionamentoColunasCIClientes(){
+    if(ciAtual !== "regiao_clientes" || !planilhaCI) return;
+    const tabela = document.querySelector("#planilhaCI table.jexcel, #planilhaCI table");
+    if(!tabela) return;
+    const headers = tabela.querySelectorAll("thead tr td[data-x], thead tr td");
+    const chave = "CI_CLIENTES_LARGURAS_V756";
+    let salvas = [];
+    try{ salvas = JSON.parse(localStorage.getItem(chave) || "[]"); }catch(_){ salvas=[]; }
+
+    function aplicarLargura(indice, largura){
+        largura = Math.max(20, Math.round(Number(largura) || 20));
+        try{
+            if(planilhaCI && typeof planilhaCI.setWidth === "function") planilhaCI.setWidth(indice, largura);
+        }catch(_){ }
+        tabela.querySelectorAll('[data-x="'+indice+'"]').forEach(function(c){
+            c.style.width = largura + "px";
+            c.style.minWidth = largura + "px";
+            c.style.maxWidth = largura + "px";
+        });
+    }
+
+    headers.forEach(function(th, pos){
+        const indiceAttr = th.getAttribute("data-x");
+        const indice = indiceAttr !== null ? Number(indiceAttr) : pos - (headers.length > configCIAtual().rowLength ? 1 : 0);
+        if(indice < 0 || indice >= configCIAtual().rowLength) return;
+        if(salvas[indice]) aplicarLargura(indice, salvas[indice]);
+        if(th.querySelector(".cli-ci-resize-handle")) return;
+        const handle = document.createElement("span");
+        handle.className = "cli-ci-resize-handle";
+        handle.title = "Arraste para alterar a largura desta coluna";
+        handle.addEventListener("mousedown", function(ev){
+            ev.preventDefault(); ev.stopPropagation();
+            const inicioX = ev.clientX;
+            const inicioW = th.getBoundingClientRect().width;
+            function mover(e){ aplicarLargura(indice, inicioW + (e.clientX - inicioX)); }
+            function soltar(){
+                document.removeEventListener("mousemove", mover);
+                document.removeEventListener("mouseup", soltar);
+                const atuais=[];
+                for(let i=0;i<configCIAtual().rowLength;i++){
+                    const cel=tabela.querySelector('[data-x="'+i+'"]');
+                    atuais[i]=cel ? Math.round(cel.getBoundingClientRect().width) : null;
+                }
+                localStorage.setItem(chave, JSON.stringify(atuais));
+            }
+            document.addEventListener("mousemove", mover);
+            document.addEventListener("mouseup", soltar);
+        });
+        th.appendChild(handle);
+    });
+}
+
 function montarGradeCIEditavel(){
     if(typeof window.jSuites==="undefined"){
         throw new Error("A biblioteca jSuites não foi carregada. Verifique se este computador consegue acessar cdn.jsdelivr.net.");
@@ -7265,7 +7539,12 @@ function montarGradeCIEditavel(){
             linha[5] = "";
             linha[6] = "O.S IMP";
         }else{
-            linha[0] = "1";
+            if(ciAtual === "regiao_clientes"){
+                linha[0] = "99";
+                linha[5] = "1";
+            }else{
+                linha[0] = "1";
+            }
         }
 
         dadosIniciais.push(linha);
@@ -7295,7 +7574,9 @@ function montarGradeCIEditavel(){
             if(x === osColCI()){
                 if(ciAtual === "geit"){
                     atualizarTotalVolumesCI();
-                }else{
+                }else if(ciAtual !== "regiao_clientes"){
+                    // Nas C.I. de clientes a busca ocorre no Enter/colar para evitar
+                    // que a O.S. seja apagada enquanto o usuário ainda está digitando.
                     preencherLinhaCIEditavel(y, value);
                 }
             }else if(ciAtual === "regiao" && x === 8){
@@ -7315,6 +7596,7 @@ function montarGradeCIEditavel(){
         configurarEnterJSpreadsheet();
         configurarTTRPorCI();
         atualizarTotalVolumesCI();
+        habilitarRedimensionamentoColunasCIClientes();
     }, 300);
 }
 
@@ -7387,48 +7669,157 @@ function configurarTTRPorCI(){
 
 function configurarEnterJSpreadsheet(){
     const area = document.getElementById("planilhaCI");
+    if(!area) return;
 
-    area.onkeydown = function(e){
-        if(e.key === "Enter"){
-            e.preventDefault();
+    area.onkeydown = async function(e){
+        if(e.key !== "Enter") return;
 
-            const selected = document.querySelector("#planilhaCI .highlight");
-            let x = osColCI();
-            let y = 0;
+        const celulaAlvo = e.target && e.target.closest
+            ? e.target.closest("td[data-x][data-y]")
+            : null;
+        const selecionada = celulaAlvo || document.querySelector("#planilhaCI td.highlight[data-x][data-y]");
 
-            if(selected){
-                x = Number(selected.getAttribute("data-x") || osColCI());
-                y = Number(selected.getAttribute("data-y") || 0);
-            }
+        let x = selecionada ? Number(selecionada.getAttribute("data-x")) : osColCI();
+        let y = selecionada ? Number(selecionada.getAttribute("data-y")) : 0;
 
-            if(planilhaCI){
-                const valor = planilhaCI.getValueFromCoords(x, y);
-                if(x === osColCI()){
-                    if(ciAtual === "geit"){
-                        atualizarTotalVolumesCI();
-                    }else{
-                        preencherLinhaCIEditavel(y, valor);
-                    }
-                }
+        if(x !== osColCI()) return;
+        e.preventDefault();
+        e.stopPropagation();
 
-                const proximaLinha = Math.min(y + 1, configCIAtual().rows - 1);
-                planilhaCI.updateSelectionFromCoords(osColCI(), proximaLinha, osColCI(), proximaLinha);
-            }
-
-            return false;
+        let valor = "";
+        const alvo = e.target;
+        if(alvo){
+            if(typeof alvo.value !== "undefined") valor = alvo.value;
+            else if(alvo.isContentEditable) valor = alvo.textContent;
         }
+        if(!String(valor || "").trim() && planilhaCI){
+            valor = planilhaCI.getValueFromCoords(x, y);
+        }
+
+        valor = String(valor || "").trim();
+        if(planilhaCI && valor){
+            try{ planilhaCI.setValueFromCoords(x, y, valor, true); }catch(_){ }
+        }
+
+        if(ciAtual === "geit"){
+            atualizarTotalVolumesCI();
+        }else{
+            await preencherLinhaCIEditavel(y, valor);
+        }
+
+        if(planilhaCI){
+            const proximaLinha = Math.min(y + 1, configCIAtual().rows - 1);
+            try{ planilhaCI.updateSelectionFromCoords(osColCI(), proximaLinha, osColCI(), proximaLinha); }catch(_){ }
+        }
+        return false;
     };
+
+    // Colar ou sair da célula também dispara a consulta, sem apagar o valor digitado.
+    area.addEventListener("paste", function(e){
+        const td = e.target && e.target.closest ? e.target.closest("td[data-x][data-y]") : null;
+        if(!td || Number(td.getAttribute("data-x")) !== osColCI()) return;
+        const y = Number(td.getAttribute("data-y") || 0);
+        setTimeout(function(){
+            const valor = planilhaCI ? planilhaCI.getValueFromCoords(osColCI(), y) : "";
+            if(String(valor || "").trim()) preencherLinhaCIEditavel(y, valor);
+        }, 80);
+    });
+}
+
+function normalizarOSCIClientes(valor){
+    if(typeof normalizarOSClientes === "function") return normalizarOSClientes(valor);
+    return String(valor ?? "")
+        .trim()
+        .toUpperCase()
+        .replace(/^ILR\s*/i, "")
+        .replace(/\.0+$/, "")
+        .replace(/[^0-9A-Z]/g, "");
+}
+
+async function buscarOSClientesDireto(os){
+    const chave = normalizarOSCIClientes(os);
+    if(!chave) return null;
+
+    const memoriaLista = Array.isArray(window.clientesDadosCombinados)
+        ? window.clientesDadosCombinados
+        : (typeof clientesDadosCombinados !== "undefined" && Array.isArray(clientesDadosCombinados) ? clientesDadosCombinados : []);
+    const memoria = memoriaLista.find(r => normalizarOSCIClientes(r.os) === chave);
+    if(memoria) return memoria;
+
+    const supa = obterSupabaseClientes();
+
+    // A coluna é text, porém planilhas antigas podem ter espaços, prefixo ILR ou sufixo .0.
+    const candidatos = Array.from(new Set([
+        String(os ?? "").trim(),
+        chave,
+        "ILR " + chave,
+        chave + ".0"
+    ].filter(Boolean)));
+
+    let item = null;
+    for(const candidato of candidatos){
+        const resp = await supa.from("rexpedlr_clientes").select("*").eq("os", candidato).limit(1);
+        if(resp.error) throw resp.error;
+        if(resp.data && resp.data.length){ item = resp.data[0]; break; }
+    }
+
+    // Último recurso: procura uma faixa curta e compara já normalizado.
+    if(!item){
+        const resp = await supa.from("rexpedlr_clientes").select("*").ilike("os", "%" + chave + "%").limit(100);
+        if(resp.error) throw resp.error;
+        item = (resp.data || []).find(r => normalizarOSCIClientes(r.os) === chave) || null;
+    }
+    if(!item) return null;
+
+    let nome = "";
+    for(const candidato of candidatos){
+        const resp = await supa.from("ratec04_clientes").select("os,nome_cliente").eq("os", candidato).limit(1);
+        if(resp.error) throw resp.error;
+        if(resp.data && resp.data.length){ nome = resp.data[0].nome_cliente || ""; break; }
+    }
+    if(!nome){
+        const resp = await supa.from("ratec04_clientes").select("os,nome_cliente").ilike("os", "%" + chave + "%").limit(100);
+        if(!resp.error){
+            const achado = (resp.data || []).find(r => normalizarOSCIClientes(r.os) === chave);
+            nome = achado ? (achado.nome_cliente || "") : "";
+        }
+    }
+
+    return { ...item, nome_cliente: nome };
+}
+
+function atualizarDestinoCIClientesPelaPrimeiraOS(){
+    if(ciAtual !== "regiao_clientes" || !planilhaCI) return;
+    let destino = "";
+    for(let i=0;i<configCIAtual().rows;i++){
+        const osLinha = String(planilhaCI.getValueFromCoords(configCIAtual().osCol, i) || "").trim();
+        if(!osLinha) continue;
+        const chave = normalizarOSCIClientes(osLinha);
+        const lista = Array.isArray(window.clientesDadosCombinados) ? window.clientesDadosCombinados : [];
+        const item = lista.find(r => normalizarOSCIClientes(r.os) === chave);
+        if(item){
+            destino = String(item.pdv || item.loja || item.loja_origem || "").trim();
+            break;
+        }
+    }
+    if(destino) ciClientesDestinoPrimeiraOS = destino;
+    const el = document.getElementById("ciDestinoTitulo");
+    if(el) el.innerHTML = ciClientesDestinoPrimeiraOS || "DESTINO";
 }
 
 async function preencherLinhaCIEditavel(indice, os){
     try{
-        await carregarBancoREXPEDLR();
-        if(ciAtual === "regiao"){
-            await Promise.all([carregarBancoCadastroCI(), carregarBancoLojasCI()]);
+        if(ciAtual === "regiao_clientes"){
+            // A C.I. consulta diretamente o Supabase de Clientes; não depende do dashboard.
+        }else{
+            await carregarBancoREXPEDLR();
+            if(ciAtual === "regiao"){
+                await Promise.all([carregarBancoCadastroCI(), carregarBancoLojasCI()]);
+            }
         }
     }catch(e){
         document.getElementById("ciEditMensagem").innerHTML =
-            "Erro ao carregar banco: " + e.message;
+            "Erro ao buscar O.S.: " + (e && e.message ? e.message : e);
         return;
     }
 
@@ -7445,8 +7836,45 @@ async function preencherLinhaCIEditavel(indice, os){
             return;
         }
 
-        const item = buscarOSBanco(os);
         const cfg = configCIAtual();
+
+        if(ciAtual === "regiao_clientes"){
+            const osDigitada = String(os || "").trim();
+            const itemCliente = await buscarOSClientesDireto(osDigitada);
+
+            if(!itemCliente){
+                // Nunca apaga a O.S. digitada quando não encontra o registro.
+                planilhaCI.setValueFromCoords(cfg.osCol, indice, osDigitada, true);
+                planilhaCI.setValueFromCoords(3, indice, "O.S não encontrada", true);
+                planilhaCI.setValueFromCoords(0, indice, "99", true);
+                planilhaCI.setValueFromCoords(5, indice, "1", true);
+                document.getElementById("ciEditMensagem").innerHTML =
+                    "O.S. <b>" + osDigitada + "</b> não encontrada em rexpedlr_clientes.";
+                atualizarTotalVolumesCI();
+                return;
+            }
+
+            planilhaCI.setValueFromCoords(0, indice, "99", true);
+            planilhaCI.setValueFromCoords(1, indice, itemCliente.grupo || "", true);
+            planilhaCI.setValueFromCoords(2, indice, itemCliente.nce || "", true);
+            planilhaCI.setValueFromCoords(3, indice, itemCliente.desc_produto || "", true);
+            planilhaCI.setValueFromCoords(4, indice, itemCliente.cor || "", true);
+            planilhaCI.setValueFromCoords(5, indice, "1", true);
+            planilhaCI.setValueFromCoords(6, indice, itemCliente.nf_origem || "", true);
+            planilhaCI.setValueFromCoords(7, indice, itemCliente.ci_origem || "", true);
+            planilhaCI.setValueFromCoords(8, indice, itemCliente.os || os, true);
+            planilhaCI.setValueFromCoords(9, indice, itemCliente.nome_cliente || "Não identificado", true);
+            if(!ciClientesDestinoPrimeiraOS){
+                ciClientesDestinoPrimeiraOS = String(itemCliente.pdv || itemCliente.loja || itemCliente.loja_origem || "").trim();
+            }
+            atualizarDestinoCIClientesPelaPrimeiraOS();
+            document.getElementById("ciEditMensagem").innerHTML =
+                "O.S. <b>" + (itemCliente.os || osDigitada) + "</b> carregada com sucesso.";
+            atualizarTotalVolumesCI();
+            return;
+        }
+
+        const item = buscarOSBanco(os);
 
         if(!item){
             limparLinhaCISemEventos(indice);
@@ -7506,8 +7934,13 @@ function limparLinhaCISemEventos(indice){
     }
 
     for(let x = 0; x < cfg.rowLength; x++){
-        planilhaCI.setValueFromCoords(x, indice, x === 0 ? "1" : "", true);
+        let valor = x === 0 ? "1" : "";
+        if(ciAtual === "regiao_clientes"){
+            valor = x === 0 ? "99" : (x === 5 ? "1" : "");
+        }
+        planilhaCI.setValueFromCoords(x, indice, valor, true);
     }
+    if(ciAtual === "regiao_clientes") atualizarDestinoCIClientesPelaPrimeiraOS();
 }
 
 function limparLinhaCI(indice){
@@ -7550,6 +7983,11 @@ function limparCIEditavel(){
         }
     }
 
+    if(ciAtual === "regiao_clientes"){
+        ciClientesDestinoPrimeiraOS = "";
+        const elDestino = document.getElementById("ciDestinoTitulo");
+        if(elDestino) elDestino.innerHTML = "DESTINO";
+    }
     atualizarTotalVolumesCI();
     document.getElementById("ciEditMensagem").innerHTML = "C.I limpa.";
 }
@@ -19220,6 +19658,7 @@ async function carregarDashboardClientes(forcar){
         ]);
         const nomes=new Map(ratec.map(r=>[normalizarOSClientes(r.os),r.nome_cliente]));
         clientesDadosCombinados=rex.map(r=>({...r,nome_cliente:nomes.get(normalizarOSClientes(r.os))||""}));
+        window.clientesDadosCombinados=clientesDadosCombinados;
         const identificados=clientesDadosCombinados.filter(r=>String(r.nome_cliente||"").trim()).length;
         setDash("cliTotalOS",clientesDadosCombinados.length);setDash("cliTotalIdentificados",identificados);setDash("cliSemNome",clientesDadosCombinados.length-identificados);setDash("cliBancoStatus","🟢 Online");
         const porStatus=contarPorCampo(clientesDadosCombinados,"status");const porTec=contarPorCampo(clientesDadosCombinados,"tecnico");const porPDV=contarPorCampo(clientesDadosCombinados,"pdv");
@@ -19242,6 +19681,71 @@ function renderTabelaPrincipalClientes(lista){
     area.innerHTML=h+'</tbody></table>';
 }
 function limparFiltrosClientes(){["cliBusca","cliFiltroStatus","cliFiltroTecnico","cliFiltroPDV"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});filtrarTabelaClientes();}
+</script>
+
+<script>
+/* V7.5.3 - MÓDULOS CLIENTES NO PADRÃO PRINCIPAL */
+(function(){
+const telasCliNovas=["telaClientesColetaPrincipal","telaClientesHistoricoColetaPrincipal","telaClientesCIRegiao","telaClientesInteligenciaPrincipal"];
+function esconderCliNovas(){telasCliNovas.forEach(id=>{const e=document.getElementById(id);if(e)e.style.display="none"})}
+function esconderTodasParaCli(){if(typeof esconderTelas==="function")esconderTelas();esconderCliNovas();}
+const abrirClientesOriginal=window.abrirClientes;
+window.abrirClientes=function(){esconderCliNovas();if(typeof abrirClientesOriginal==="function")abrirClientesOriginal();const t=document.getElementById("telaClientes");if(t)t.style.display="block";setTimeout(()=>document.getElementById("clientesFuncoesCards")?.scrollIntoView({behavior:"smooth",block:"start"}),40)};
+window.abrirDashboardClientesModulo=function(){window.abrirClientes();setTimeout(()=>document.getElementById("clientesMensagem")?.scrollIntoView({behavior:"smooth",block:"start"}),80)};
+window.abrirConsultaClientesModulo=function(){window.abrirClientes();setTimeout(()=>document.getElementById("cliContagemTabela")?.scrollIntoView({behavior:"smooth",block:"start"}),80)};
+function abrirTelaCliNova(id){esconderTodasParaCli();const t=document.getElementById(id);if(t)t.style.display="block";window.scrollTo({top:0,behavior:"smooth"})}
+window.garantirDadosClientes=async function(){if(!Array.isArray(window.clientesDadosCombinados)||!window.clientesDadosCombinados.length){await carregarDashboardClientes(false)};return window.clientesDadosCombinados||[]}
+function osNorm(v){return String(v??"").trim().toUpperCase().replace(/^ILR\s*/,"").replace(/\.0$/,"").replace(/\s+/g,"")}
+function money(v){let n=Number(String(v??"").replace(/\./g,"").replace(",","."));return Number.isFinite(n)?n:0}
+function cub(v){let n=Number(String(v??"").replace(",","."));return Number.isFinite(n)?n:0}
+function esc(v){return typeof escaparHTML==="function"?escaparHTML(String(v??"")):String(v??"").replace(/[&<>\"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]))}
+let coletaCli=[];
+window.abrirColetaClientesPrincipal=async function(){abrirTelaCliNova("telaClientesColetaPrincipal");await window.garantirDadosClientes();const salvo=localStorage.getItem("CLIENTES_COLETA_RASCUNHO_V753");if(salvo&&!coletaCli.length){try{coletaCli=JSON.parse(salvo)||[]}catch(_){}}renderColetaCli();setTimeout(()=>document.getElementById("cliColetaOSInput")?.focus(),60)};
+window.adicionarOSColetaClientesPrincipal=function(){const inp=document.getElementById("cliColetaOSInput");const os=osNorm(inp?.value);if(!os)return;const r=(window.clientesDadosCombinados||[]).find(x=>osNorm(x.os)===os);const msg=document.getElementById("cliColetaMensagemPrincipal");if(!r){msg.textContent="O.S. não encontrada na Base de Clientes.";msg.style.color="#b00020";return}if(coletaCli.some(x=>osNorm(x.os)===os)){msg.textContent="Esta O.S. já está na coleta.";msg.style.color="#b36b00";return}coletaCli.push({...r});inp.value="";msg.textContent="O.S. adicionada com sucesso.";msg.style.color="#0b7a2a";renderColetaCli();inp.focus()};
+window.removerOSColetaClientesPrincipal=function(os){coletaCli=coletaCli.filter(x=>osNorm(x.os)!==osNorm(os));renderColetaCli()};
+function renderColetaCli(){const tb=document.getElementById("cliColetaTabelaCorpoPrincipal");if(!tb)return;document.getElementById("cliColetaQtdPrincipal").textContent=coletaCli.length;document.getElementById("cliColetaValorPrincipal").textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(coletaCli.reduce((a,r)=>a+money(r.valor_transf||r.valor),0));document.getElementById("cliColetaCubagemPrincipal").textContent=coletaCli.reduce((a,r)=>a+cub(r.cubagem),0).toLocaleString("pt-BR");if(!coletaCli.length){tb.innerHTML='<tr><td colspan="18" class="clientes-vazio">Nenhuma O.S. adicionada.</td></tr>';return}const destino=esc(document.getElementById("cliColetaDestinoPrincipal")?.value||"");tb.innerHTML=coletaCli.map((r,i)=>`<tr><td>${i+1}</td><td><b>${esc(r.os)}</b></td><td>${esc(r.dt_geracao||"")}</td><td>${destino}</td><td>${esc(r.pdv||"")}</td><td>${esc(r.alm||"")}</td><td>${esc(r.grupo||"")}</td><td>${esc(r.nce||"")}</td><td>${esc(r.desc_produto||"")}</td><td>${esc(r.cod_cor||r.codigo_cor||"")}</td><td>${esc(r.cor||"")}</td><td>${esc(r.n_serie||"")}</td><td>${esc(r.rack||"")}</td><td>${esc(r.status||r.status_da_os||"")}</td><td>${esc(r.nome_cliente||"Não identificado")}</td><td>${esc(r.valor_transf||r.valor||"")}</td><td>${esc(r.cubagem||"")}</td><td><button class="usuario-acao danger" onclick="removerOSColetaClientesPrincipal('${esc(r.os)}')">Excluir</button></td></tr>`).join("")};
+window.salvarRascunhoColetaClientes=function(){localStorage.setItem("CLIENTES_COLETA_RASCUNHO_V753",JSON.stringify(coletaCli));const m=document.getElementById("cliColetaMensagemPrincipal");m.textContent="Rascunho salvo neste computador.";m.style.color="#0b7a2a"};
+window.limparColetaClientesPrincipal=function(){if(coletaCli.length&&!confirm("Limpar toda a coleta atual?"))return;coletaCli=[];localStorage.removeItem("CLIENTES_COLETA_RASCUNHO_V753");renderColetaCli()};
+window.finalizarColetaClientesPrincipal=async function(){if(!coletaCli.length){alert("Adicione pelo menos uma O.S.");return}const destino=String(document.getElementById("cliColetaDestinoPrincipal")?.value||"").trim();const lote="CLI-"+Date.now();const usuario=window.usuarioLogado?.nome||window.usuarioLogado?.email||"";const rows=coletaCli.map(r=>({lote_id:lote,os:osNorm(r.os),nome_cliente:r.nome_cliente||"",pdv:r.pdv||"",grupo:r.grupo||"",produto:r.desc_produto||"",destino,usuario}));const m=document.getElementById("cliColetaMensagemPrincipal");try{m.textContent="Finalizando coleta...";const {error}=await obterSupabaseClientes().from("coletas_clientes").insert(rows);if(error)throw error;m.textContent=`Coleta ${lote} finalizada com ${rows.length} O.S.`;m.style.color="#0b7a2a";coletaCli=[];localStorage.removeItem("CLIENTES_COLETA_RASCUNHO_V753");renderColetaCli()}catch(e){m.textContent="Erro ao finalizar: "+(e.message||e)+". Confirme a tabela coletas_clientes.";m.style.color="#b00020"}};
+window.abrirHistoricoColetaClientesPrincipal=function(){abrirTelaCliNova("telaClientesHistoricoColetaPrincipal");carregarHistoricoColetaClientesPrincipal()};
+window.carregarHistoricoColetaClientesPrincipal=async function(){const a=document.getElementById("cliHistoricoColetaPrincipal");a.innerHTML='<div class="dashboard-loading">Carregando...</div>';try{const {data,error}=await obterSupabaseClientes().from("coletas_clientes").select("*").order("criado_em",{ascending:false}).limit(3000);if(error)throw error;const rows=data||[];if(!rows.length){a.innerHTML='<div class="clientes-vazio">Nenhuma coleta registrada.</div>';return}a.innerHTML='<table class="historico-tabela"><thead><tr><th>Data</th><th>Lote</th><th>O.S.</th><th>Cliente</th><th>PDV</th><th>Grupo</th><th>Produto</th><th>Destino</th><th>Usuário</th></tr></thead><tbody>'+rows.map(r=>`<tr><td>${esc(new Date(r.criado_em).toLocaleString("pt-BR"))}</td><td>${esc(r.lote_id)}</td><td>${esc(r.os)}</td><td>${esc(r.nome_cliente)}</td><td>${esc(r.pdv)}</td><td>${esc(r.grupo)}</td><td>${esc(r.produto)}</td><td>${esc(r.destino)}</td><td>${esc(r.usuario)}</td></tr>`).join("")+'</tbody></table>'}catch(e){a.innerHTML='<div class="dashboard-erro">Erro: '+esc(e.message||e)+'</div>'}};
+let ciLinhas=[];
+window.abrirCIRegiaoClientes=async function(){
+    ciAtual = "regiao_clientes";
+    esconderTelas();
+    definirMenuAtivo("clientes");
+
+    document.getElementById("tituloCIEditavel").innerHTML = "C.I REGIÃO — CLIENTES";
+    aplicarModeloCIVisual();
+    montarGradeCIEditavel();
+
+    document.getElementById("telaPlanilhaCI").style.display = "block";
+    document.getElementById("sidebar").classList.remove("mobile-open");
+    document.getElementById("ciEditMensagem").innerHTML =
+        "Digite a O.S na coluna O.S. Os dados serão puxados de REXPEDLR Clientes e o nome do cliente do RATEC04.";
+
+    document.querySelectorAll("#telaPlanilhaCI .ci-edit-actions .btn-voltar").forEach(function(btn){
+        if((btn.textContent || "").trim() === "Voltar para C.I"){
+            btn.onclick = function(){ abrirClientes(); };
+            btn.textContent = "Voltar para CLIENTES";
+        }
+        if((btn.textContent || "").trim() === "Página inicial"){
+            btn.onclick = function(){ abrirClientes(); };
+            btn.textContent = "Área de Clientes";
+        }
+    });
+
+    try{
+        await window.garantirDadosClientes();
+        document.getElementById("ciEditMensagem").innerHTML =
+            "Base de Clientes carregada. Digite a O.S. na coluna O.S. e pressione Enter. Arraste as divisórias do cabeçalho para ajustar as larguras.";
+    }catch(e){
+        document.getElementById("ciEditMensagem").innerHTML = "Erro ao carregar Base de Clientes: " + (e.message || e);
+    }
+};
+
+window.carregarInteligenciaClientesPrincipal=async function(forcar){const m=document.getElementById("cliIntelMensagem");m.className="dashboard-loading";m.textContent="Analisando Base de Clientes...";try{await window.garantirDadosClientes();const d=window.clientesDadosCombinados||[];const semTec=d.filter(r=>!String(r.tecnico||"").trim());const semCli=d.filter(r=>!String(r.nome_cliente||"").trim());const prontas=d.filter(r=>/PRONT|CONSERT|CONCLU|FINALIZ/i.test(String(r.status||r.status_da_os||"")));document.getElementById("cliIntelTotal").textContent=d.length;document.getElementById("cliIntelSemTecnico").textContent=semTec.length;document.getElementById("cliIntelSemCliente").textContent=semCli.length;document.getElementById("cliIntelProntas").textContent=prontas.length;document.getElementById("cliIntelPendencias").innerHTML=[[`O.S. sem técnico`,semTec.length,`Registros que ainda precisam de responsável.`],[`O.S. sem cliente`,semCli.length,`Sem correspondência na tabela RATEC04.`],[`O.S. prontas`,prontas.length,`Possivelmente aguardando coleta ou expedição.`]].map(x=>`<div class="cli-pendencia"><b>${esc(x[0])}: ${x[1]}</b><span>${esc(x[2])}</span></div>`).join("");const mapa={};d.forEach(r=>{const k=String(r.tecnico||"Sem técnico").trim()||"Sem técnico";mapa[k]=(mapa[k]||0)+1});const rank=Object.entries(mapa).sort((a,b)=>b[1]-a[1]).slice(0,12);const max=rank[0]?.[1]||1;document.getElementById("cliIntelTecnicos").innerHTML=rank.map(([k,v])=>`<div class="cli-intel-bar"><span>${esc(k)}</span><div class="cli-intel-track"><div class="cli-intel-fill" style="width:${Math.round(v/max*100)}%"></div></div><b>${v}</b></div>`).join("");m.className="dashboard-ok";m.textContent=`Análise concluída sobre ${d.length} O.S.`}catch(e){m.className="dashboard-erro";m.textContent="Erro: "+(e.message||e)}};
+})();
 </script>
 </body>
 </html>
