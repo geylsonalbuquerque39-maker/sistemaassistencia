@@ -5034,6 +5034,51 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
  body.ci-regiao-clientes .ci-edit-top,body.ci-regiao-clientes .ci-edit-center,body.ci-regiao-clientes .ci-jspreadsheet-area,body.ci-regiao-clientes #planilhaCI,body.ci-regiao-clientes .ci-edit-obs,body.ci-regiao-clientes .ci-edit-assinatura{width:720px!important;}
 }
 </style>
+
+<style id="ajusteMenuLateralV7511">
+/* V7.5.11 - menu lateral compacto, rolável e sem itens escondidos */
+.sidebar,#sidebar{
+  display:flex!important;
+  flex-direction:column!important;
+  width:300px!important;
+  height:100vh!important;
+  padding:20px 18px 145px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  scrollbar-width:thin;
+}
+#sidebar .logo{font-size:25px!important;line-height:27px!important;flex:0 0 auto!important}
+#sidebar .sublogo{margin-top:9px!important;font-size:14px!important;flex:0 0 auto!important}
+#sidebar .line{margin:15px 0!important;flex:0 0 auto!important}
+#sidebar .menu{
+  flex:0 0 auto!important;
+  min-height:42px!important;
+  height:42px!important;
+  line-height:42px!important;
+  padding:0 12px!important;
+  margin-bottom:7px!important;
+  font-size:16px!important;
+  border-radius:9px!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#sidebar .menu:last-of-type{margin-bottom:12px!important}
+@media(max-height:760px) and (min-width:951px){
+  #sidebar{padding-top:12px!important;padding-bottom:132px!important}
+  #sidebar .logo{font-size:21px!important;line-height:23px!important}
+  #sidebar .sublogo{font-size:12px!important;margin-top:5px!important}
+  #sidebar .line{margin:9px 0!important}
+  #sidebar .menu{height:36px!important;min-height:36px!important;line-height:36px!important;margin-bottom:4px!important;font-size:14px!important}
+}
+@media(max-width:950px){
+  .sidebar,#sidebar{width:300px!important;padding:20px 18px 145px!important}
+}
+/* deixa os seletores de arquivo e ações claramente clicáveis */
+#clientesImportadores input[type=file]{display:block!important;width:100%!important;min-height:46px!important;padding:9px!important;cursor:pointer!important}
+#clientesImportadores .clientes-import-actions{display:flex!important;gap:8px!important;flex-wrap:wrap!important}
+#clientesImportadores .clientes-import-actions .v2-btn{pointer-events:auto!important;cursor:pointer!important}
+</style>
 </head>
 
 <body class="sem-login">
@@ -5111,12 +5156,12 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
 
     <div class="menu active" data-menu="inicio" onclick="voltarInicio()">⌂ Página Inicial</div>
     <div class="menu" data-menu="coleta" onclick="abrirColeta()">▣ Coleta de O.S</div>
+    <div class="menu" data-menu="clientes" onclick="abrirClientes()">👥 CLIENTES</div>
     <div class="menu" data-menu="ci" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
     <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
     <div class="menu" data-menu="cpp" onclick="abrirMonitoramentoCPP()">📊 Monitoramento CPP</div>
-    <div class="menu" data-menu="clientes" onclick="abrirClientes()">👥 CLIENTES</div>
     <div class="menu" data-menu="admin" onclick="abrirAdmin()">⚙ Administração</div>
 </div>
 
@@ -6129,7 +6174,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="clientes-import-box">
                     <h3>1. REXPEDLR Clientes</h3>
                     <p>Planilha com cabeçalho e informações operacionais das O.S.</p>
-                    <input id="arquivoRexpedlrClientes" type="file" accept=".xlt,.xlsx,.xls,.csv,.html,.htm">
+                    <input id="arquivoRexpedlrClientes" type="file" accept=".xlt,.xlsx,.xls,.csv,.html,.htm" onchange="arquivoClientesSelecionado('rexpedlr',this)">
                     <div class="clientes-import-actions">
                         <button class="v2-btn" onclick="preVisualizarRexpedlrClientes()">Pré-visualizar</button>
                         <button class="v2-btn" onclick="importarRexpedlrClientes()">Importar / Atualizar</button>
@@ -6140,7 +6185,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="clientes-import-box">
                     <h3>2. RATEC04</h3>
                     <p>Arquivo sem cabeçalho: coluna A = O.S. e coluna C = nome do cliente.</p>
-                    <input id="arquivoRatec04Clientes" type="file" accept=".xlt,.xlsx,.xls,.csv,.html,.htm,.txt">
+                    <input id="arquivoRatec04Clientes" type="file" accept=".xlt,.xlsx,.xls,.csv,.html,.htm,.txt" onchange="arquivoClientesSelecionado('ratec04',this)">
                     <div class="clientes-import-actions">
                         <button class="v2-btn" onclick="preVisualizarRatec04Clientes()">Pré-visualizar</button>
                         <button class="v2-btn" onclick="importarRatec04Clientes()">Importar / Atualizar</button>
@@ -9202,9 +9247,27 @@ function exportarRelatorioCSV(){
         alert("Gere um relatório antes de exportar.");
         return;
     }
-    const campos = ["os","dt_geracao","pdv","nf","nce","desc_produto","cor","n_serie","tecnico","rack","status","status_da_os","dt_recb_at"];
-    const linhas = [campos.join(";")].concat(relatorioAtual.map(function(r){
-        return campos.map(function(c){ return '"' + String(r[c] ?? "").replace(/"/g,'""') + '"'; }).join(";");
+    const colunas = [
+        ["O.S.", "os"],
+        ["GR", "grupo"],
+        ["N.C.E", "nce"],
+        ["PRODUTO", "desc_produto"],
+        ["DATA GERAÇÃO", "dt_geracao"],
+        ["PDV", "pdv"],
+        ["NF", "nf"],
+        ["COR", "cor"],
+        ["N. SÉRIE", "n_serie"],
+        ["TÉCNICO", "tecnico"],
+        ["RACK", "rack"],
+        ["STATUS", "status"],
+        ["STATUS DA O.S.", "status_da_os"],
+        ["DATA RECEBIMENTO A.T.", "dt_recb_at"]
+    ];
+    const escaparCSV = function(valor){
+        return '"' + String(valor ?? "").replace(/"/g,'""') + '"';
+    };
+    const linhas = [colunas.map(function(c){ return escaparCSV(c[0]); }).join(";")].concat(relatorioAtual.map(function(r){
+        return colunas.map(function(c){ return escaparCSV(r[c[1]]); }).join(";");
     }));
     const blob = new Blob(["\ufeff" + linhas.join("\n")], {type:"text/csv;charset=utf-8"});
     const url = URL.createObjectURL(blob);
@@ -10814,7 +10877,7 @@ function limparConsultaIntel(){['icBusca','icRack','icStatusOS','icStatus','icTe
 function salvarConsultaIntel(){const nome=prompt('Nome para esta consulta:');if(!nome)return;const salvas=JSON.parse(localStorage.getItem('erp_consultas_intel')||'[]');salvas.push({nome,filtros:filtrosAtuaisV36()});localStorage.setItem('erp_consultas_intel',JSON.stringify(salvas.slice(-20)));renderConsultasSalvasV36()}
 function renderConsultasSalvasV36(){const e=document.getElementById('intelConsultasSalvas');if(!e)return;const salvas=JSON.parse(localStorage.getItem('erp_consultas_intel')||'[]');e.innerHTML=salvas.map((x,i)=>"<button class='intel-salva-chip' onclick='carregarConsultaSalvaV36("+i+")'>"+escaparHTML(x.nome)+"</button>").join('')}
 function carregarConsultaSalvaV36(i){const x=JSON.parse(localStorage.getItem('erp_consultas_intel')||'[]')[i];if(!x)return;Object.entries({icBusca:x.filtros.busca,icRack:x.filtros.rack,icStatusOS:x.filtros.statusOS,icStatus:x.filtros.status,icTecnico:x.filtros.tecnico,icGarantia:x.filtros.garantia}).forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.value=v||''});aplicarConsultaIntel()}
-function exportarConsultaIntelCSV(){if(!intelConsultaAtual.length){alert('Não há dados para exportar.');return}const cols=[['O.S.','os'],['Produto','desc_produto'],['Rack','rack'],['Status','status'],['Situação da O.S.','status_da_os'],['Técnico','tecnico'],['PDV','pdv'],['Garantia','tipo_garantia'],['NF','nf'],['NCE','nce'],['Data geração','dt_geracao'],['Data expedição','dt_expedicao']];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const linhas=[cols.map(c=>esc(c[0])).join(';')].concat(intelConsultaAtual.map(r=>cols.map(c=>esc(r[c[1]])).join(';')));const b=new Blob(['\uFEFF'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='consulta_avancada_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(u)}
+function exportarConsultaIntelCSV(){if(!intelConsultaAtual.length){alert('Não há dados para exportar.');return}const cols=[['O.S.','os'],['GR','grupo'],['N.C.E','nce'],['PRODUTO','desc_produto'],['Rack','rack'],['Status','status'],['Situação da O.S.','status_da_os'],['Técnico','tecnico'],['PDV','pdv'],['Garantia','tipo_garantia'],['NF','nf'],['Data geração','dt_geracao'],['Data expedição','dt_expedicao']];const esc=v=>'"'+String(v??'').replace(/"/g,'""')+'"';const linhas=[cols.map(c=>esc(c[0])).join(';')].concat(intelConsultaAtual.map(r=>cols.map(c=>esc(r[c[1]])).join(';')));const b=new Blob(['\uFEFF'+linhas.join('\r\n')],{type:'text/csv;charset=utf-8'}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download='consulta_avancada_'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(u)}
 function imprimirConsultaIntel(){if(!intelConsultaAtual.length){alert('Não há dados para imprimir.');return}const conteudo=document.getElementById('intelConsultaTabela').innerHTML,w=window.open('','_blank');w.document.write("<!doctype html><html><head><meta charset='utf-8'><title>Consulta avançada</title><style>body{font-family:Arial;padding:18px}table{width:100%;border-collapse:collapse;font-size:10px}th,td{border:1px solid #000;padding:4px;text-align:left}button{display:none}h2{margin-bottom:6px}</style></head><body><h2>Consulta avançada de O.S.</h2><p>"+intelConsultaAtual.length+" registro(s) • "+new Date().toLocaleString('pt-BR')+"</p>"+conteudo+"<script>window.onload=()=>window.print()<\/script></body></html>");w.document.close()}
 
 
@@ -19509,6 +19572,17 @@ function alternarImportadoresClientes(){
     const el=document.getElementById("clientesImportadores");
     if(el) el.style.display=el.style.display==="none"?"block":"none";
 }
+function arquivoClientesSelecionado(tipo,input){
+    const ehRexpedlr=tipo==="rexpedlr";
+    if(ehRexpedlr) clientesRexpedlrPreview=[]; else clientesRatec04Preview=[];
+    const msg=document.getElementById(ehRexpedlr?"msgImportRexpedlrClientes":"msgImportRatec04Clientes");
+    const preview=document.getElementById(ehRexpedlr?"previewRexpedlrClientes":"previewRatec04Clientes");
+    if(preview){preview.innerHTML="";preview.style.display="none";}
+    if(msg){
+      msg.className="clientes-status";
+      msg.textContent=input?.files?.[0]?`Arquivo selecionado: ${input.files[0].name}`:"Selecione um arquivo.";
+    }
+}
 function normalizarOSClientes(v){
     return String(v??"").trim().toUpperCase().replace(/^ILR\s*/i,"").replace(/\.0+$/,"").replace(/[^0-9A-Z]/g,"");
 }
@@ -19681,6 +19755,14 @@ function renderTabelaPrincipalClientes(lista){
     area.innerHTML=h+'</tbody></table>';
 }
 function limparFiltrosClientes(){["cliBusca","cliFiltroStatus","cliFiltroTecnico","cliFiltroPDV"].forEach(id=>{const e=document.getElementById(id);if(e)e.value="";});filtrarTabelaClientes();}
+
+/* Exportação explícita para os onclicks funcionarem em qualquer navegador */
+Object.assign(window,{
+  abrirClientes,alternarImportadoresClientes,arquivoClientesSelecionado,
+  preVisualizarRexpedlrClientes,preVisualizarRatec04Clientes,
+  importarRexpedlrClientes,importarRatec04Clientes,
+  carregarDashboardClientes,filtrarTabelaClientes,limparFiltrosClientes
+});
 </script>
 
 <script>
@@ -19747,5 +19829,7 @@ window.abrirCIRegiaoClientes=async function(){
 window.carregarInteligenciaClientesPrincipal=async function(forcar){const m=document.getElementById("cliIntelMensagem");m.className="dashboard-loading";m.textContent="Analisando Base de Clientes...";try{await window.garantirDadosClientes();const d=window.clientesDadosCombinados||[];const semTec=d.filter(r=>!String(r.tecnico||"").trim());const semCli=d.filter(r=>!String(r.nome_cliente||"").trim());const prontas=d.filter(r=>/PRONT|CONSERT|CONCLU|FINALIZ/i.test(String(r.status||r.status_da_os||"")));document.getElementById("cliIntelTotal").textContent=d.length;document.getElementById("cliIntelSemTecnico").textContent=semTec.length;document.getElementById("cliIntelSemCliente").textContent=semCli.length;document.getElementById("cliIntelProntas").textContent=prontas.length;document.getElementById("cliIntelPendencias").innerHTML=[[`O.S. sem técnico`,semTec.length,`Registros que ainda precisam de responsável.`],[`O.S. sem cliente`,semCli.length,`Sem correspondência na tabela RATEC04.`],[`O.S. prontas`,prontas.length,`Possivelmente aguardando coleta ou expedição.`]].map(x=>`<div class="cli-pendencia"><b>${esc(x[0])}: ${x[1]}</b><span>${esc(x[2])}</span></div>`).join("");const mapa={};d.forEach(r=>{const k=String(r.tecnico||"Sem técnico").trim()||"Sem técnico";mapa[k]=(mapa[k]||0)+1});const rank=Object.entries(mapa).sort((a,b)=>b[1]-a[1]).slice(0,12);const max=rank[0]?.[1]||1;document.getElementById("cliIntelTecnicos").innerHTML=rank.map(([k,v])=>`<div class="cli-intel-bar"><span>${esc(k)}</span><div class="cli-intel-track"><div class="cli-intel-fill" style="width:${Math.round(v/max*100)}%"></div></div><b>${v}</b></div>`).join("");m.className="dashboard-ok";m.textContent=`Análise concluída sobre ${d.length} O.S.`}catch(e){m.className="dashboard-erro";m.textContent="Erro: "+(e.message||e)}};
 })();
 </script>
+
+<!-- V7.5.12: exportações iniciam por O.S., GR, N.C.E e PRODUTO -->
 </body>
 </html>
