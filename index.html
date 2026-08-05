@@ -13468,13 +13468,40 @@ function renderizarSolicitacoesCadastroV580(){
 
 async function aprovarSolicitacaoV580(userId){
     if(!confirm("Aprovar esta conta e liberar o acesso ao sistema?"))return;
+
+    const supabase=obterSupabaseClient();
     try{
-        const {error}=await obterSupabaseClient().rpc("aprovar_solicitacao_cadastro_v582",{
+        // Mantém compatibilidade com a RPC já existente.
+        const respostaRpc=await supabase.rpc("aprovar_solicitacao_cadastro_v582",{
             p_user_id:userId,
             p_perfil:"consulta"
         });
-        if(error)throw error;
-        alert("Conta aprovada com sucesso.");
+        if(respostaRpc.error){
+            console.warn("RPC de aprovação falhou; aplicando atualização direta.",respostaRpc.error);
+        }
+
+        // Correção definitiva: a aprovação precisa alterar os dois campos.
+        const {data:perfilAtualizado,error:updateError}=await supabase
+            .from("usuarios")
+            .update({
+                ativo:true,
+                status_aprovacao:"aprovado",
+                perfil:"consulta"
+            })
+            .eq("id",userId)
+            .select("id,ativo,status_aprovacao,perfil")
+            .maybeSingle();
+
+        if(updateError)throw updateError;
+        if(!perfilAtualizado){
+            throw new Error("O cadastro não foi encontrado na tabela usuarios.");
+        }
+        if(perfilAtualizado.ativo!==true || String(perfilAtualizado.status_aprovacao||"").toLowerCase()!=="aprovado"){
+            throw new Error("A conta não ficou marcada como aprovada no banco.");
+        }
+
+        alert("Conta aprovada com sucesso. O usuário já pode entrar no sistema.");
+        await carregarSolicitacoesCadastroV580();
         await carregarUsuariosAdmin();
     }catch(e){
         alert("Erro ao aprovar: "+(e?.message||e));
@@ -13484,13 +13511,37 @@ async function aprovarSolicitacaoV580(userId){
 async function negarSolicitacaoV580(userId){
     const motivo=prompt("Motivo da negativa (opcional):","")??null;
     if(motivo===null)return;
+
+    const supabase=obterSupabaseClient();
     try{
-        const {error}=await obterSupabaseClient().rpc("negar_solicitacao_cadastro_v582",{
+        // Mantém compatibilidade com a RPC já existente.
+        const respostaRpc=await supabase.rpc("negar_solicitacao_cadastro_v582",{
             p_user_id:userId,
             p_motivo:motivo
         });
-        if(error)throw error;
+        if(respostaRpc.error){
+            console.warn("RPC de negativa falhou; aplicando atualização direta.",respostaRpc.error);
+        }
+
+        const atualizacao={
+            ativo:false,
+            status_aprovacao:"negado"
+        };
+
+        const {data:perfilAtualizado,error:updateError}=await supabase
+            .from("usuarios")
+            .update(atualizacao)
+            .eq("id",userId)
+            .select("id,ativo,status_aprovacao")
+            .maybeSingle();
+
+        if(updateError)throw updateError;
+        if(!perfilAtualizado){
+            throw new Error("O cadastro não foi encontrado na tabela usuarios.");
+        }
+
         alert("Solicitação negada.");
+        await carregarSolicitacoesCadastroV580();
         await carregarUsuariosAdmin();
     }catch(e){
         alert("Erro ao negar: "+(e?.message||e));
