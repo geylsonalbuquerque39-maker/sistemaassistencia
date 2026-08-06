@@ -1,0 +1,72 @@
+#chatCabecalho{cursor:pointer}
+#chatCabecalho .chat-cabecalho-acoes,
+#chatCabecalho .chat-voltar-mobile,
+#chatCabecalhoAvatar{cursor:pointer}
+#chatMenuCabecalhoV725{
+    position:fixed;z-index:19520;display:none;width:285px;padding:7px;
+    background:#fff;border:1px solid #d7dfe8;border-radius:13px;
+    box-shadow:0 18px 55px rgba(0,0,0,.32)
+}
+#chatMenuCabecalhoV725.aberto{display:block}
+#chatMenuCabecalhoV725 button{
+    display:flex;width:100%;align-items:center;gap:12px;border:0;background:transparent;
+    color:#001b3d;text-align:left;padding:12px;border-radius:9px;cursor:pointer;
+    font-size:14px;font-weight:800
+}
+#chatMenuCabecalhoV725 button:hover{background:#eef4fb}
+#chatMenuCabecalhoV725 .chat-menu-separador{height:1px;background:#e3e8ef;margin:5px 7px}
+#chatMidiasModalV725{
+    position:fixed;inset:0;z-index:19530;display:none;align-items:center;justify-content:center;
+    padding:18px;background:rgba(0,0,0,.58)
+}
+#chatMidiasModalV725.aberto{display:flex}
+.chat-midias-card-v725{
+    width:760px;max-width:97%;max-height:90vh;overflow:hidden;background:#fff;
+    border:2px solid #1ea5ff;border-radius:20px;box-shadow:0 24px 80px rgba(0,0,0,.45)
+}
+.chat-midias-topo-v725{display:flex;align-items:center;justify-content:space-between;padding:18px 20px;border-bottom:1px solid #dde5ef}
+.chat-midias-topo-v725 h2{margin:0;color:#001b3d;font-size:23px}
+.chat-midias-topo-v725 button{border:0;background:#edf2f7;border-radius:50%;width:38px;height:38px;cursor:pointer;font-size:18px}
+.chat-midias-abas-v725{display:flex;gap:6px;padding:12px 16px;border-bottom:1px solid #dde5ef;overflow:auto}
+.chat-midias-abas-v725 button{border:0;border-radius:999px;padding:9px 15px;cursor:pointer;font-weight:800;background:#e9eff6;color:#001b3d;white-space:nowrap}
+.chat-midias-abas-v725 button.ativo{background:#006cff;color:#fff}
+#chatMidiasConteudoV725{padding:16px;max-height:62vh;overflow:auto}
+.chat-midias-grade-v725{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.chat-midia-item-v725{background:#f4f7fb;border:1px solid #dbe3ed;border-radius:11px;overflow:hidden;min-height:95px}
+.chat-midia-item-v725 img,.chat-midia-item-v725 video{display:block;width:100%;height:135px;object-fit:cover;background:#0a1725}
+.chat-midia-item-v725 audio{width:100%;margin-top:25px}
+.chat-midia-item-v725 a{display:block;padding:12px;color:#0046b8;font-weight:800;word-break:break-word;text-decoration:none}
+.chat-midias-vazio-v725{text-align:center;padding:55px 20px;color:#667085;font-weight:800}
+body.dark-mode #chatMenuCabecalhoV725,body.dark-mode .chat-midias-card-v725{background:#10243a;color:#eaf2ff;border-color:#1ea5ff}
+body.dark-mode #chatMenuCabecalhoV725 button,body.dark-mode .chat-midias-topo-v725 h2{color:#eaf2ff}
+body.dark-mode #chatMenuCabecalhoV725 button:hover,body.dark-mode .chat-midia-item-v725{background:#17324d;border-color:#35516d}
+@media(max-width:650px){.chat-midias-grade-v725{grid-template-columns:repeat(2,1fr)}}
+
+
+/* =========================================================
+   V7.2.7 - ALINHAMENTO GLOBAL DO CABEÇALHO DE TODAS AS C.I.
+   Sobe somente: IDB - Logística Reversa, Para/Destino e A/C.
+   Aplicado na visualização e na impressão, sem alterar tabelas.
+   ========================================================= */
+.ci-edit-top > div:first-child{
+    top:1px!important;
+}
+.ci-edit-center{
+    position:relative!important;
+    top:-6px!important;
+}
+.ci-edit-ac{
+    position:relative!important;
+    top:-6px!important;
+}
+
+@media print{
+    .ci-edit-top > div:first-child{
+        top:1px!important;
+    }
+    .ci-edit-center,
+    .ci-edit-ac{
+        position:relative!important;
+        top:-6px!important;
+    }
+}

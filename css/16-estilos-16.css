@@ -1,0 +1,25 @@
+body.ci-regiao-clientes .ci-edit-doc{width:740px!important;}
+body.ci-regiao-clientes .ci-edit-top,
+body.ci-regiao-clientes .ci-edit-center,
+body.ci-regiao-clientes .ci-jspreadsheet-area,
+body.ci-regiao-clientes #planilhaCI,
+body.ci-regiao-clientes .ci-edit-obs,
+body.ci-regiao-clientes .ci-edit-assinatura{width:720px!important;}
+body.ci-regiao-clientes #ciTextoMensagem,
+body.ci-regiao-clientes #ciTextoDanfe{width:720px!important;max-width:720px!important;margin-left:0!important;}
+body.ci-regiao-clientes #ciTextoMensagem{font-size:13px!important;height:24px!important;line-height:24px!important;border:1px solid #7aa7df!important;border-radius:0!important;background:#fff!important;}
+body.ci-regiao-clientes #ciTextoDanfe{font-size:13px!important;height:22px!important;line-height:22px!important;border:0!important;border-radius:0!important;background:#fff!important;}
+body.ci-regiao-clientes .ci-edit-center{font-size:20px!important;height:32px!important;line-height:32px!important;}
+body.ci-regiao-clientes .ci-edit-obs{line-height:18px!important;margin-top:6px!important;}
+body.ci-regiao-clientes .ci-edit-assinatura{grid-template-columns:330px 240px 150px!important;margin-top:12px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > tbody > tr > td{height:18px!important;line-height:16px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > thead > tr > td{position:relative!important;user-select:none!important;height:34px!important;min-height:34px!important;line-height:13px!important;white-space:pre-line!important;vertical-align:middle!important;font-weight:700!important;border:2px solid #000!important;padding:2px 3px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel > tbody > tr > td{border:1px solid #000!important;}
+body.ci-regiao-clientes #planilhaCI .cli-ci-resize-handle{position:absolute;right:-3px;top:0;width:7px;height:100%;cursor:col-resize;z-index:20;background:transparent;}
+body.ci-regiao-clientes #planilhaCI .cli-ci-resize-handle:hover{background:rgba(0,108,255,.25);}
+body.ci-regiao-clientes #planilhaCI .jexcel{table-layout:fixed!important;max-width:720px!important;}
+body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-overflow:ellipsis!important;}
+@media print{
+ body.ci-regiao-clientes #ciEditDocumento{width:740px!important;}
+ body.ci-regiao-clientes .ci-edit-top,body.ci-regiao-clientes .ci-edit-center,body.ci-regiao-clientes .ci-jspreadsheet-area,body.ci-regiao-clientes #planilhaCI,body.ci-regiao-clientes .ci-edit-obs,body.ci-regiao-clientes .ci-edit-assinatura{width:720px!important;}
+}

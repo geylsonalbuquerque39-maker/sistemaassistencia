@@ -1,0 +1,14 @@
+.midias-os-atalho-v7527{
+  display:inline-flex!important;align-items:center!important;justify-content:center!important;
+  width:26px!important;height:26px!important;min-width:26px!important;padding:0!important;
+  margin-left:6px!important;border:1px solid #bfd2e8!important;border-radius:7px!important;
+  background:#eef6ff!important;color:#075cab!important;cursor:pointer!important;
+  font-size:14px!important;line-height:1!important;vertical-align:middle!important;
+  box-shadow:0 1px 2px rgba(0,27,61,.08)!important;transition:.16s ease!important;
+}
+.midias-os-atalho-v7527:hover{background:#dcebff!important;border-color:#5c9de0!important;transform:translateY(-1px)!important}
+.midias-os-atalho-v7527:focus{outline:2px solid #2f80ed!important;outline-offset:2px!important}
+.midias-os-atalho-v7527[data-sem-os="1"]{display:none!important}
+td>.midias-os-atalho-v7527{float:right!important;margin-top:-2px!important}
+body.dark-mode .midias-os-atalho-v7527{background:#17324d!important;color:#8fc5ff!important;border-color:#315a80!important}
+@media print{.midias-os-atalho-v7527{display:none!important}}

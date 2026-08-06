@@ -1,0 +1,47 @@
+.rascunho-cabecalho-editavel{position:relative}
+.rascunho-alca-arraste{
+    width:18px;min-width:18px;text-align:center;cursor:grab;
+    color:#9aa0a6;font-size:13px;letter-spacing:-2px;user-select:none
+}
+.rascunho-alca-arraste:active{cursor:grabbing}
+.rascunho-redimensionador{
+    position:absolute;right:-3px;top:0;width:6px;height:100%;
+    cursor:col-resize;z-index:5
+}
+.rascunho-redimensionador:hover{background:#1a73e8}
+.rascunho-modal-overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.42);z-index:99998;
+    display:flex;align-items:center;justify-content:center;padding:20px
+}
+.rascunho-modal{
+    width:min(430px,95vw);background:#fff;border-radius:12px;
+    box-shadow:0 20px 60px rgba(0,0,0,.3);padding:18px
+}
+.rascunho-modal-topo{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.rascunho-modal-topo strong{font-size:18px}
+.rascunho-modal-topo button{
+    border:0;background:transparent;font-size:25px;cursor:pointer;color:#5f6368
+}
+.rascunho-modal label{display:block;font-weight:700;margin:11px 0 5px}
+.rascunho-modal input,.rascunho-modal select{
+    width:100%;box-sizing:border-box;border:1px solid #c5c9ce;border-radius:7px;
+    padding:10px;font:inherit;background:#fff;color:#202124
+}
+.rascunho-modal-acoes{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.rascunho-menu-coluna{
+    position:fixed;z-index:99999;min-width:220px;background:#fff;
+    border:1px solid #dadce0;border-radius:8px;padding:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,.22)
+}
+.rascunho-menu-coluna button{
+    display:block;width:100%;border:0;background:transparent;text-align:left;
+    padding:10px 12px;border-radius:5px;cursor:pointer;color:#202124
+}
+.rascunho-menu-coluna button:hover{background:#f1f3f4}
+.rascunho-menu-coluna button.perigo{color:#c5221f}
+body.dark-mode .rascunho-modal,
+body.dark-mode .rascunho-menu-coluna{background:#17324d;color:#e8eef5;border-color:#426487}
+body.dark-mode .rascunho-modal input,
+body.dark-mode .rascunho-modal select{background:#102b49;color:#e8eef5;border-color:#426487}
+body.dark-mode .rascunho-menu-coluna button{color:#e8eef5}
+body.dark-mode .rascunho-menu-coluna button:hover{background:#234766}

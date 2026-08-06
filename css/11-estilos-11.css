@@ -1,0 +1,35 @@
+.coleta-live-chip{
+    display:inline-flex;align-items:center;gap:6px;padding:5px 9px;border-radius:999px;
+    font-size:12px;font-weight:900
+}
+.coleta-live-chip.em_andamento{background:#dcfce7;color:#166534}
+.coleta-live-chip.finalizada{background:#dbeafe;color:#1e40af}
+.coleta-live-chip.cancelada{background:#fee2e2;color:#991b1b}
+.coleta-live-ponto{
+    width:8px;height:8px;border-radius:50%;background:currentColor;
+    box-shadow:0 0 0 0 currentColor;animation:coletaPulso 1.6s infinite
+}
+@keyframes coletaPulso{
+    0%{box-shadow:0 0 0 0 rgba(22,101,52,.5)}
+    70%{box-shadow:0 0 0 8px rgba(22,101,52,0)}
+    100%{box-shadow:0 0 0 0 rgba(22,101,52,0)}
+}
+.coleta-live-topo{
+    display:none;margin:10px 0;padding:10px 12px;border-radius:10px;
+    background:#ecfdf5;border:1px solid #86efac;color:#166534;font-weight:800
+}
+.coleta-live-topo.visivel{display:block}
+.coleta-live-topo button{
+    margin-left:10px;border:0;border-radius:8px;padding:7px 10px;
+    background:#166534;color:#fff;font-weight:800;cursor:pointer
+}
+.coleta-acao-assumir{background:#7c3aed!important}
+.coleta-acao-finalizar{background:#0f766e!important}
+.coleta-acao-cancelar{background:#b91c1c!important}
+.coleta-operacao-live{
+    display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:10px 0
+}
+.coleta-operacao-live .chip{
+    padding:7px 10px;border-radius:999px;background:#eef4fb;color:#123b69;font-weight:800
+}
+body.dark-mode .coleta-live-topo{background:#12311f;border-color:#2f7a4a;color:#c7f9d7}

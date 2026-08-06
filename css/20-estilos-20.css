@@ -1,0 +1,6 @@
+#v698PerfilAvatar,
+#v698PerfilAvatar img{
+    pointer-events:auto!important;
+    cursor:zoom-in!important;
+}
+#v698PerfilAvatar::after{pointer-events:none!important}

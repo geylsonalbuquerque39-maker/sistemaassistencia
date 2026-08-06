@@ -1,0 +1,63 @@
+.coleta-tipo-card.historico-supabase:before{background:#0f9f6e}
+.coletas-historico-modulo{display:none}
+.coletas-hist-toolbar{
+    display:grid;grid-template-columns:minmax(260px,1fr) 230px auto;
+    gap:12px;margin:18px 0
+}
+.coletas-hist-toolbar input,.coletas-hist-toolbar select{
+    height:46px;border:1px solid #b9c8d9;border-radius:10px;
+    padding:0 12px;font:inherit;background:#fff;color:#172b43
+}
+.coletas-hist-resumo{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px
+}
+.coletas-hist-resumo div{
+    background:#fff;border:1px solid #d7e1ee;border-radius:14px;padding:14px
+}
+.coletas-hist-resumo small{display:block;color:#65778d;font-weight:800}
+.coletas-hist-resumo strong{display:block;margin-top:5px;font-size:24px;color:#123b69}
+.coletas-hist-tabela-wrap{
+    overflow:auto;max-height:65vh;border:1px solid #d5dfeb;border-radius:14px;background:#fff
+}
+.coletas-hist-tabela{width:100%;border-collapse:collapse;min-width:800px}
+.coletas-hist-tabela th{
+    position:sticky;top:0;background:#073a78;color:#fff;padding:11px;text-align:left
+}
+.coletas-hist-tabela td{padding:11px;border-bottom:1px solid #e2e9f1;color:#172b43}
+.coletas-hist-tabela tr:hover td{background:#f6faff}
+.coletas-hist-acoes{display:flex;gap:7px;flex-wrap:wrap}
+.coletas-hist-acoes button{
+    border:0;border-radius:8px;padding:7px 10px;cursor:pointer;
+    font-weight:800;background:#0046b8;color:#fff
+}
+.coletas-hist-acoes button.sec{background:#0f766e}
+.coleta-hist-modal{
+    position:fixed;inset:0;z-index:17000;display:none;align-items:center;
+    justify-content:center;background:rgba(0,0,0,.58);padding:18px
+}
+.coleta-hist-modal.aberto{display:flex}
+.coleta-hist-modal-box{
+    position:relative;width:1250px;max-width:98%;max-height:94vh;overflow:auto;
+    background:#fff;border:2px solid #1ea5ff;border-radius:18px;padding:22px
+}
+.coleta-hist-fechar{
+    position:absolute;right:12px;top:10px;border:0;background:transparent;
+    font-size:24px;cursor:pointer
+}
+.coleta-hist-modal-acoes{display:flex;gap:8px;margin:13px 0}
+.coletas-hist-detalhe-wrap{overflow:auto;border:1px solid #d5dfeb;border-radius:10px}
+.coletas-hist-detalhe{border-collapse:collapse;min-width:1600px;width:100%;font-size:12px}
+.coletas-hist-detalhe th{
+    position:sticky;top:0;background:#073a78;color:#fff;padding:8px;white-space:nowrap
+}
+.coletas-hist-detalhe td{padding:7px;border-bottom:1px solid #e1e7ee;white-space:nowrap}
+body.dark-mode .coletas-hist-resumo div,
+body.dark-mode .coletas-hist-tabela-wrap,
+body.dark-mode .coleta-hist-modal-box{background:#0d223a;color:#eaf2ff;border-color:#315b83}
+body.dark-mode .coletas-hist-tabela td,
+body.dark-mode .coletas-hist-detalhe td{color:#eaf2ff;border-color:#294866}
+body.dark-mode .coletas-hist-toolbar input,
+body.dark-mode .coletas-hist-toolbar select{background:#102b49;color:#fff;border-color:#426487}
+@media(max-width:800px){
+    .coletas-hist-toolbar,.coletas-hist-resumo{grid-template-columns:1fr}
+}

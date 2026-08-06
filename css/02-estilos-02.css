@@ -1,0 +1,29 @@
+.coleta-selecao-tipos{display:none;margin-top:22px}
+.coleta-tipos-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.coleta-tipo-card{background:#fff;border:1px solid #d8e2ee;border-radius:20px;padding:25px;cursor:pointer;box-shadow:0 10px 24px rgba(0,0,0,.09);transition:.2s;position:relative;overflow:hidden;min-height:190px;display:flex;flex-direction:column}
+.coleta-tipo-card:before{content:"";position:absolute;left:0;top:0;width:8px;height:100%;background:#006cff}
+.coleta-tipo-card.enderecamento:before{background:#f59e0b}
+.coleta-tipo-card.att:before{background:#7c3aed}
+.coleta-tipo-card:hover{transform:translateY(-4px);box-shadow:0 16px 32px rgba(0,0,0,.14)}
+.coleta-tipo-icone{font-size:38px;margin-bottom:18px}
+.coleta-tipo-card h2{font-size:23px;color:#001b3d;margin:0 0 8px}
+.coleta-tipo-card p{color:#5b6b7d;line-height:1.45;margin:0 0 18px}
+.coleta-tipo-abrir{margin-top:auto;font-weight:900;color:#006cff}
+.coleta-operacao{display:none}
+.coleta-voltar-tipos{border:1px solid rgba(255,255,255,.5);background:rgba(255,255,255,.14);color:#fff;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;margin-top:12px}
+.coleta-rack-input{width:105px;min-width:82px;padding:7px 8px;border:1px solid #9eb2c8;border-radius:8px;font:inherit;text-transform:uppercase;background:#fff;color:#10243e}
+.coleta-rack-input:focus{outline:2px solid #006cff;border-color:#006cff}
+.coleta-rack-input.coleta-rack-selecionado{
+outline:3px solid #60a5fa!important;
+border:2px solid #60a5fa!important;
+background:#2563eb!important;
+color:#fff!important;
+font-weight:700!important;
+}
+.coleta-ajuda-rack{display:none;margin:10px 0 0;padding:11px 14px;border-radius:12px;background:#fff7d6;border:1px solid #ead480;color:#654f00;font-weight:700;font-size:13px}
+body.dark-mode .coleta-ajuda-rack{background:#312b0f;border-color:#75651e;color:#fff2a8}
+body.dark-mode .coleta-tipo-card{background:#0d223a;border-color:#244466}
+body.dark-mode .coleta-tipo-card h2{color:#eaf2ff}
+body.dark-mode .coleta-tipo-card p{color:#b8c7d9}
+body.dark-mode .coleta-rack-input{background:#102b49;color:#fff;border-color:#426487}
+@media(max-width:900px){.coleta-tipos-grid{grid-template-columns:1fr}}
