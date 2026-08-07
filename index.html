@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.42 PERFORMANCE REAL: reduz polling, chamadas Supabase e observers sem tocar no login -->
+<!-- V7.5.44 ON-DEMAND: somente o módulo ativo permanece montado e trabalhando -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -5982,7 +5982,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
     <div class="intel-card" style="margin-bottom:20px">
       <h2>🔍 Consulta avançada</h2>
       <div class="intel-consulta-grid">
-        <input id="icBusca" placeholder="O.S., produto, NF, NCE, série..." oninput="aplicarConsultaIntel()">
+        <input id="icBusca" placeholder="O.S., produto, NF, NCE, série..." oninput="agendarConsultaIntelV7543()">
         <select id="icRack" onchange="aplicarConsultaIntel()"><option value="">Todos os racks</option></select>
         <select id="icStatusOS" onchange="aplicarConsultaIntel()"><option value="">Todas as situações</option></select>
         <select id="icStatus" onchange="aplicarConsultaIntel()"><option value="">Todos os status</option></select>
@@ -7000,6 +7000,17 @@ const urlBancoREXPEDLR =
 
 let bancoREXPEDLR = [];
 let bancoCarregado = false;
+let indiceOSREXPEDLR = new Map();
+
+function reconstruirIndiceOSREXPEDLR(){
+    const mapa = new Map();
+    for(let i=1;i<bancoREXPEDLR.length;i++){
+        const linha=bancoREXPEDLR[i];
+        const chave=somenteNumeros(linha?.[0]||"");
+        if(chave && !mapa.has(chave)) mapa.set(chave,linha);
+    }
+    indiceOSREXPEDLR=mapa;
+}
 
 /* Bancos opcionais para a C.I REGIÃO.
    Se depois você publicar as abas CADASTRO e LOJAS em CSV, basta colocar os links abaixo.
@@ -7316,6 +7327,7 @@ async function carregarBancoREXPEDLR(){
     const linhas = csv.split(/\r?\n/).filter(l => l.trim() !== "");
 
     bancoREXPEDLR = linhas.map(linha => parseCSVLine(linha));
+    reconstruirIndiceOSREXPEDLR();
     bancoCarregado = true;
 }
 
@@ -7384,31 +7396,25 @@ function separarLista(texto){
 
 function buscarOSBanco(os){
     const osLimpa = somenteNumeros(os);
-
-    for(let i = 1; i < bancoREXPEDLR.length; i++){
-        const linha = bancoREXPEDLR[i];
-        const osBanco = somenteNumeros(linha[0] || "");
-
-        if(osBanco === osLimpa){
-            return {
-                os: linha[0] || os,
-                data: linha[1] || "",
-                loja: linha[2] || "",
-                gr: linha[5] || "",
-                nce: linha[6] || "",
-                descricao: linha[7] || "",
-                cor: linha[8] || "",
-                serie: linha[9] || "",
-                valorTrans: linha[10] || "",
-                tecnico: linha[11] || "",
-                rack: linha[12] || "",
-                status: linha[13] || "",
-                usuario: linha[14] || ""
-            };
-        }
-    }
-
-    return null;
+    if(!osLimpa) return null;
+    if(!indiceOSREXPEDLR.size && bancoREXPEDLR.length>1) reconstruirIndiceOSREXPEDLR();
+    const linha = indiceOSREXPEDLR.get(osLimpa);
+    if(!linha) return null;
+    return {
+        os: linha[0] || os,
+        data: linha[1] || "",
+        loja: linha[2] || "",
+        gr: linha[5] || "",
+        nce: linha[6] || "",
+        descricao: linha[7] || "",
+        cor: linha[8] || "",
+        serie: linha[9] || "",
+        valorTrans: linha[10] || "",
+        tecnico: linha[11] || "",
+        rack: linha[12] || "",
+        status: linha[13] || "",
+        usuario: linha[14] || ""
+    };
 }
 
 
@@ -8711,26 +8717,24 @@ async function carregarDashboardAdmin(){
         // O Supabase normalmente limita cada resposta a 1.000 linhas, mesmo quando
         // um limite maior é solicitado. Carrega a base em páginas para que os
         // gráficos e totais considerem TODAS as O.S.
-        const registros = [];
-        const tamanhoLote = 1000;
-        let inicioLote = 0;
-
-        while(true){
-            const { data:lote, error } = await supa
-                .from("rexpedlr")
-                .select("os,dt_geracao,pdv,tecnico,status")
-                .range(inicioLote, inicioLote + tamanhoLote - 1);
-
-            if(error) throw error;
-
-            const pagina = lote || [];
-            registros.push(...pagina);
-
-            if(pagina.length < tamanhoLote) break;
-            inicioLote += tamanhoLote;
-
-            // Proteção contra loop acidental em uma resposta anormal.
-            if(inicioLote >= 100000) break;
+        let registros = [];
+        if(Array.isArray(intelRegistros)&&intelRegistros.length){
+            registros=intelRegistros;
+        }else if(typeof rexpedlrIntelCacheV7543!=="undefined"&&Array.isArray(rexpedlrIntelCacheV7543)&&rexpedlrIntelCacheV7543.length){
+            registros=rexpedlrIntelCacheV7543;
+        }else{
+            const tamanhoLote=1000;
+            let inicioLote=0;
+            while(true){
+                const {data:lote,error}=await supa.from("rexpedlr").select("os,dt_geracao,pdv,tecnico,status").range(inicioLote,inicioLote+tamanhoLote-1);
+                if(error)throw error;
+                const pagina=lote||[];
+                registros.push(...pagina);
+                if(pagina.length<tamanhoLote)break;
+                inicioLote+=tamanhoLote;
+                if(inicioLote>=100000)break;
+                await new Promise(r=>setTimeout(r,0));
+            }
         }
         const porStatus = contarPorCampo(registros, "status");
         const porTecnico = contarPorCampo(registros, "tecnico");
@@ -8905,6 +8909,8 @@ async function importarNettermParaSupabase(){
         localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR_DUP", String(retorno.duplicados_removidos || Math.max(0, recebidos - importados)));
 
         bancoREXPEDLR = [];
+        indiceOSREXPEDLR.clear();
+        rexpedlrIntelCacheV7543=null;rexpedlrIntelCacheEmV7543=0;
         bancoCarregado = false;
 
         msg.innerHTML = "<span class='admin-status-ok'>Banco atualizado com sucesso:</span> " + importados + " de " + recebidos + " O.S. enviadas para o Supabase em " + agora + ".";
@@ -10120,18 +10126,31 @@ function abrirInteligencia(){
     carregarInteligencia(false);
 }
 
+let rexpedlrIntelCacheV7543=null;
+let rexpedlrIntelCacheEmV7543=0;
+let rexpedlrIntelPromiseV7543=null;
 async function buscarTodaRexpedlr(){
-    const supa=obterSupabaseClient();
-    const campos="os,dt_geracao,pdv,nf,grupo,nce,desc_produto,cor,n_serie,tecnico,rack,status,dt_expedicao,pdv_expedicao,analise_do_defeito,dt_conserto,obs_status,obs_ordem_de_servico,solicitante_cpp,data_cpp,nr_cpp,sit_cpp,recebedor_cpp,data_recebedor,dt_ult_entrada,dt_saida_oficina,dt_recb_at,status_da_os,tipo_garantia";
-    let todos=[],inicio=0,tamanho=1000;
-    while(true){
-        const {data,error}=await supa.from("rexpedlr").select(campos).range(inicio,inicio+tamanho-1);
-        if(error) throw error;
-        const lote=data||[]; todos=todos.concat(lote);
-        if(lote.length<tamanho || todos.length>=50000) break;
-        inicio+=tamanho;
-    }
-    return todos;
+    const agora=Date.now();
+    if(rexpedlrIntelCacheV7543&&agora-rexpedlrIntelCacheEmV7543<300000)return rexpedlrIntelCacheV7543;
+    if(rexpedlrIntelPromiseV7543)return rexpedlrIntelPromiseV7543;
+    rexpedlrIntelPromiseV7543=(async()=>{
+        const supa=obterSupabaseClient();
+        const campos="os,dt_geracao,pdv,nf,grupo,nce,desc_produto,cor,n_serie,tecnico,rack,status,dt_expedicao,pdv_expedicao,analise_do_defeito,dt_conserto,obs_status,obs_ordem_de_servico,solicitante_cpp,data_cpp,nr_cpp,sit_cpp,recebedor_cpp,data_recebedor,dt_ult_entrada,dt_saida_oficina,dt_recb_at,status_da_os,tipo_garantia";
+        let todos=[],inicio=0,tamanho=1000;
+        while(true){
+            const {data,error}=await supa.from("rexpedlr").select(campos).range(inicio,inicio+tamanho-1);
+            if(error)throw error;
+            const lote=data||[];todos.push(...lote);
+            if(lote.length<tamanho||todos.length>=50000)break;
+            inicio+=tamanho;
+            await new Promise(r=>setTimeout(r,0));
+        }
+        rexpedlrIntelCacheV7543=todos;
+        rexpedlrIntelCacheEmV7543=Date.now();
+        return todos;
+    })();
+    try{return await rexpedlrIntelPromiseV7543}
+    finally{rexpedlrIntelPromiseV7543=null}
 }
 function dataValidaIntel(v){ if(!v)return null; const d=new Date(v); return isNaN(d.getTime())?null:d; }
 function diasDesdeIntel(v){const d=dataValidaIntel(v);if(!d)return null;return Math.floor((Date.now()-d.getTime())/86400000)}
@@ -10199,7 +10218,7 @@ async function carregarInteligencia(forcar){
 }
 
 function tabelaPendenciaHTML(titulo, chave, lista){
-    const linhas=(lista||[]).slice(0,1000).map(r=>
+    const linhas=(lista||[]).slice(0,150).map(r=>
         "<tr>"+
         "<td><button class='usuario-acao' onclick=\"abrirOSIntel('"+String(r.os||'').replace(/'/g,"\\'")+"')\">"+escaparHTML(r.os||'-')+"</button></td>"+
         "<td>"+escaparHTML(r.grupo||'-')+"</td>"+
@@ -10254,7 +10273,7 @@ function abrirListaIntel(tipo){
     const a=intelAnalise;if(!a)return;
     const lista=a[tipo]||[];
     const titulos={rack500Abertas:"Rack 500 — O.S. abertas",prontasAbertas:"Prontas e abertas",grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",prontas:"Prontas aguardando expedição",paradas:"Sem movimentação +30 dias",cpp:"CPP pendente",semTecnico:"Sem técnico",semRack:"Sem rack",oficina20:"Oficina há mais de 20 dias",abertas:"O.S. abertas",fechadas:"O.S. fechadas",expHoje:"Expedidas hoje"};
-    document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,1000).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
+    document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,250).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
 function fecharIntelModal(){document.getElementById("intelModal").style.display="none"}
 function abrirOSIntel(os){const r=intelRegistros.find(x=>String(x.os)===String(os));if(!r)return;document.getElementById("intelModalTitulo").textContent="O.S. "+os;document.getElementById("intelModalConteudo").innerHTML=Object.entries(r).filter(x=>!x[0].startsWith("_")).map(x=>"<div class='ficha-linha'><span class='ficha-label'>"+escaparHTML(x[0].replaceAll("_"," "))+":</span>"+escaparHTML(x[1]??"-")+"</div>").join("");document.getElementById("intelModal").style.display="flex"}
 function carregarTimelineOS(){
@@ -10894,8 +10913,47 @@ function valoresUnicosV36(campo){return [...new Set(intelRegistros.map(r=>textoI
 function preencherSelectV36(id,valores,rotulo){const e=document.getElementById(id);if(!e)return;const atual=e.value;e.innerHTML='<option value="">'+rotulo+'</option>'+valores.map(v=>'<option>'+escaparHTML(v)+'</option>').join('');e.value=atual}
 function inicializarFiltrosIntelV36(){if(!intelRegistros.length)return;preencherSelectV36('icRack',valoresUnicosV36('rack'),'Todos os racks');preencherSelectV36('icStatusOS',valoresUnicosV36('status_da_os'),'Todas as situações');preencherSelectV36('icStatus',valoresUnicosV36('status'),'Todos os status');preencherSelectV36('icTecnico',valoresUnicosV36('tecnico'),'Todos os técnicos');preencherSelectV36('icGarantia',valoresUnicosV36('tipo_garantia'),'Todas as garantias');renderConsultasSalvasV36();intelFiltrosInicializados=true}
 function filtrosAtuaisV36(){return {busca:document.getElementById('icBusca').value,rack:document.getElementById('icRack').value,statusOS:document.getElementById('icStatusOS').value,status:document.getElementById('icStatus').value,tecnico:document.getElementById('icTecnico').value,garantia:document.getElementById('icGarantia').value,categoria:document.getElementById('icCategoria')?.value||''}}
-function aplicarConsultaIntel(){if(!intelRegistros.length)return;const f=filtrosAtuaisV36(),q=normalizarV36(f.busca);intelConsultaAtual=intelRegistros.filter(r=>(!q||normalizarV36([r.os,r.desc_produto,r.nf,r.nce,r.n_serie,r.pdv,r.obs_status,r.obs_ordem_de_servico].join(' ')).includes(q))&&(!f.rack||textoIntel(r.rack)===f.rack)&&(!f.statusOS||textoIntel(r.status_da_os)===f.statusOS)&&(!f.status||textoIntel(r.status)===f.status)&&(!f.tecnico||textoIntel(r.tecnico)===f.tecnico)&&(!f.garantia||textoIntel(r.tipo_garantia)===f.garantia)&&(!f.categoria||classificarCategoriaProduto(r.desc_produto,r.grupo)===f.categoria));renderConsultaIntelV36()}
-function renderConsultaIntelV36(){const l=intelConsultaAtual;document.getElementById('intelConsultaResumo').textContent=l.length.toLocaleString('pt-BR')+' O.S. encontrada(s).';document.getElementById('intelConsultaTabela').innerHTML=l.length?"<table><thead><tr><th>O.S.</th><th>GR</th><th>N.C.E</th><th>Produto</th><th>Categoria</th><th>Rack</th><th>Status</th><th>Situação</th><th>Técnico</th><th>PDV</th><th>Garantia</th><th>Ação</th></tr></thead><tbody>"+l.slice(0,2000).map(r=>"<tr><td><b>"+escaparHTML(r.os||'-')+"</b></td><td>"+escaparHTML(r.grupo||'-')+"</td><td>"+escaparHTML(r.nce||'-')+"</td><td>"+escaparHTML(r.desc_produto||'-')+"</td><td>"+escaparHTML(classificarCategoriaProduto(r.desc_produto,r.grupo))+"</td><td>"+escaparHTML(r.rack||'-')+"</td><td>"+escaparHTML(r.status||'-')+"</td><td>"+escaparHTML(r.status_da_os||'-')+"</td><td>"+escaparHTML(r.tecnico||'-')+"</td><td>"+escaparHTML(r.pdv||'-')+"</td><td>"+escaparHTML(r.tipo_garantia||'-')+"</td><td><button class='usuario-acao' onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></td></tr>").join('')+"</tbody></table>":"<div class='admin-info'>Nenhuma O.S. encontrada.</div>"}
+let intelConsultaPaginaV7543=0;
+const INTEL_CONSULTA_PAGINA_V7543=100;
+let intelConsultaTimerV7543=0;
+function agendarConsultaIntelV7543(){
+    clearTimeout(intelConsultaTimerV7543);
+    intelConsultaTimerV7543=setTimeout(()=>aplicarConsultaIntel(),260);
+}
+function aplicarConsultaIntel(){
+    if(!intelRegistros.length)return;
+    const f=filtrosAtuaisV36(),q=normalizarV36(f.busca);
+    intelConsultaAtual=intelRegistros.filter(r=>
+        (!q||normalizarV36([r.os,r.desc_produto,r.nf,r.nce,r.n_serie,r.pdv,r.obs_status,r.obs_ordem_de_servico].join(' ')).includes(q))&&
+        (!f.rack||textoIntel(r.rack)===f.rack)&&
+        (!f.statusOS||textoIntel(r.status_da_os)===f.statusOS)&&
+        (!f.status||textoIntel(r.status)===f.status)&&
+        (!f.tecnico||textoIntel(r.tecnico)===f.tecnico)&&
+        (!f.garantia||textoIntel(r.tipo_garantia)===f.garantia)&&
+        (!f.categoria||classificarCategoriaProduto(r.desc_produto,r.grupo)===f.categoria)
+    );
+    intelConsultaPaginaV7543=0;
+    renderConsultaIntelV36();
+}
+function mudarPaginaConsultaIntelV7543(delta){
+    const total=Math.max(1,Math.ceil(intelConsultaAtual.length/INTEL_CONSULTA_PAGINA_V7543));
+    intelConsultaPaginaV7543=Math.max(0,Math.min(total-1,intelConsultaPaginaV7543+delta));
+    renderConsultaIntelV36();
+}
+function renderConsultaIntelV36(){
+    const l=intelConsultaAtual,box=document.getElementById('intelConsultaTabela'),resumo=document.getElementById('intelConsultaResumo');
+    if(!box)return;
+    if(resumo)resumo.textContent=l.length.toLocaleString('pt-BR')+' O.S. encontrada(s).';
+    if(!l.length){box.innerHTML="<div class='admin-info'>Nenhuma O.S. encontrada.</div>";return}
+    const totalPag=Math.max(1,Math.ceil(l.length/INTEL_CONSULTA_PAGINA_V7543));
+    if(intelConsultaPaginaV7543>=totalPag)intelConsultaPaginaV7543=totalPag-1;
+    const ini=intelConsultaPaginaV7543*INTEL_CONSULTA_PAGINA_V7543;
+    const fim=Math.min(l.length,ini+INTEL_CONSULTA_PAGINA_V7543);
+    const pagina=l.slice(ini,fim);
+    const linhas=pagina.map(r=>"<tr><td><b>"+escaparHTML(r.os||'-')+"</b></td><td>"+escaparHTML(r.grupo||'-')+"</td><td>"+escaparHTML(r.nce||'-')+"</td><td>"+escaparHTML(r.desc_produto||'-')+"</td><td>"+escaparHTML(classificarCategoriaProduto(r.desc_produto,r.grupo))+"</td><td>"+escaparHTML(r.rack||'-')+"</td><td>"+escaparHTML(r.status||'-')+"</td><td>"+escaparHTML(r.status_da_os||'-')+"</td><td>"+escaparHTML(r.tecnico||'-')+"</td><td>"+escaparHTML(r.pdv||'-')+"</td><td>"+escaparHTML(r.tipo_garantia||'-')+"</td><td><button class='usuario-acao' onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></td></tr>").join('');
+    const nav="<div style='display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:10px 0'><button class='usuario-acao' "+(intelConsultaPaginaV7543===0?'disabled':'')+" onclick='mudarPaginaConsultaIntelV7543(-1)'>‹ Anterior</button><b>"+(ini+1).toLocaleString('pt-BR')+"–"+fim.toLocaleString('pt-BR')+" de "+l.length.toLocaleString('pt-BR')+"</b><button class='usuario-acao' "+(intelConsultaPaginaV7543>=totalPag-1?'disabled':'')+" onclick='mudarPaginaConsultaIntelV7543(1)'>Próxima ›</button></div>";
+    box.innerHTML=nav+"<table><thead><tr><th>O.S.</th><th>GR</th><th>N.C.E</th><th>Produto</th><th>Categoria</th><th>Rack</th><th>Status</th><th>Situação</th><th>Técnico</th><th>PDV</th><th>Garantia</th><th>Ação</th></tr></thead><tbody>"+linhas+"</tbody></table>"+nav;
+}
 function limparConsultaIntel(){['icBusca','icRack','icStatusOS','icStatus','icTecnico','icGarantia'].forEach(id=>document.getElementById(id).value='');aplicarConsultaIntel()}
 function salvarConsultaIntel(){const nome=prompt('Nome para esta consulta:');if(!nome)return;const salvas=JSON.parse(localStorage.getItem('erp_consultas_intel')||'[]');salvas.push({nome,filtros:filtrosAtuaisV36()});localStorage.setItem('erp_consultas_intel',JSON.stringify(salvas.slice(-20)));renderConsultasSalvasV36()}
 function renderConsultasSalvasV36(){const e=document.getElementById('intelConsultasSalvas');if(!e)return;const salvas=JSON.parse(localStorage.getItem('erp_consultas_intel')||'[]');e.innerHTML=salvas.map((x,i)=>"<button class='intel-salva-chip' onclick='carregarConsultaSalvaV36("+i+")'>"+escaparHTML(x.nome)+"</button>").join('')}
@@ -11513,7 +11571,7 @@ window.importarNettermParaSupabase=async function(){
   passoAtual="Resposta";atualizarImportacaoV40(78,"Confirmando a resposta do servidor...","Resposta","ativo");await erpYieldV40(120);
   const importados=retorno.total_importado||retorno.totalImportado||registrosNettermPreview.length,recebidos=retorno.total_recebido||registrosNettermPreview.length,duplicados=retorno.duplicados_removidos||Math.max(0,recebidos-importados);
   concluirPassoV40("Resposta");atualizarImportacaoV40(83,importados.toLocaleString("pt-BR")+" O.S. confirmadas pelo servidor.");erpImportLogV40("Servidor confirmou "+importados.toLocaleString("pt-BR")+" registros.");
-  const agora=new Date().toLocaleString("pt-BR");localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR",agora);localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR_QTD",String(importados));localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR_DUP",String(duplicados));bancoREXPEDLR=[];bancoCarregado=false;
+  const agora=new Date().toLocaleString("pt-BR");localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR",agora);localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR_QTD",String(importados));localStorage.setItem("ULTIMA_IMPORTACAO_REXPEDLR_DUP",String(duplicados));bancoREXPEDLR=[];indiceOSREXPEDLR.clear();rexpedlrIntelCacheV7543=null;rexpedlrIntelCacheEmV7543=0;bancoCarregado=false;
   passoAtual="Comparacao";atualizarImportacaoV40(86,"Comparando alterações após a importação...","Comparacao","ativo");erpImportLogV40("Carregando base atualizada para gerar o comparador.");
   try{const baseDepoisImportacao=await buscarTodaRexpedlr();if(erpImportCanceladaV40)throw new Error("Importação cancelada pelo usuário.");const comparacao=compararBasesImportacao(baseAntesImportacao,baseDepoisImportacao,{arquivo,data:new Date().toISOString(),usuario:(usuarioLogado&&(usuarioLogado.nome||usuarioLogado.email))||"Usuário"});await salvarComparacaoImportacao(comparacao);concluirPassoV40("Comparacao");atualizarImportacaoV40(94,"Comparação concluída.");erpImportLogV40((comparacao.todas?.length||0).toLocaleString("pt-BR")+" alterações identificadas.");setTimeout(()=>abrirComparadorImportacao(comparacao),400)}catch(compErro){console.warn(compErro);concluirPassoV40("Comparacao");erpImportLogV40("Importação concluída, mas o comparador não pôde ser gerado.");}
   passoAtual="Atualizacao";atualizarImportacaoV40(96,"Atualizando dashboard, histórico e indicadores...","Atualizacao","ativo");await Promise.allSettled([carregarDashboardAdmin(),carregarHistoricoImportacoes()]);concluirPassoV40("Atualizacao");atualizarImportacaoV40(100,"Importação concluída com sucesso.");erpImportLogV40("Todos os painéis foram atualizados.");
@@ -12290,6 +12348,8 @@ function chatDiaV57(v){try{return new Date(v).toLocaleDateString("pt-BR",{day:"2
 
 async function inicializarChatV57(){
     if(!usuarioLogado?.id)return;
+    const painelChatV7544=document.getElementById("chatPainel");
+    if(!painelChatV7544?.classList.contains("aberto"))return;
     if(!chatInicializadoV57){
         chatInicializadoV57=true;
         iniciarResumoRealtimeChatV57();
@@ -12331,6 +12391,11 @@ async function alternarChatV57(ev){
 }
 
 function fecharChatV57(){
+    clearInterval(chatPollingV57);
+    chatPollingV57=null;
+    if(chatRealtimeV57){try{chatSbV57().removeChannel(chatRealtimeV57)}catch(e){} chatRealtimeV57=null}
+    if(chatRealtimeResumoV57){try{chatSbV57().removeChannel(chatRealtimeResumoV57)}catch(e){} chatRealtimeResumoV57=null}
+    chatInicializadoV57=false;
     if(chatMediaRecorderV600?.state==="recording"){
         try{chatMediaRecorderV600.stop()}catch(_){}
     }
@@ -19680,9 +19745,11 @@ function setKpis(){const ativos=cppAcompanhamentos.filter(a=>!finalizado(a.statu
 function opcoes(id,valores,rotulo){const el=document.getElementById(id);if(!el)return;const atual=el.value;const unicos=[...new Set(valores.map(txt).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true}));el.innerHTML=`<option value="">${rotulo}</option>`+unicos.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");if(unicos.includes(atual))el.value=atual}
 function preencherFiltros(){opcoes("cppFiltroLoja",cppCombinados.map(r=>r.pdv||r._cpp?.loja),"Todas");opcoes("cppFiltroGrupo",cppCombinados.map(r=>r.grupo||r._cpp?.grupo),"Todos");opcoes("cppFiltroStatus",cppAcompanhamentos.map(r=>r.status_cpp),"Todos");opcoes("cppFiltroTecnico",cppCombinados.map(r=>r._cpp?.tecnico_responsavel||r.tecnico),"Todos")}
 window.selecionarCartaoCPP=function(chave){cppCartao=chave;document.querySelectorAll("[data-cpp-card]").forEach(b=>b.classList.toggle("ativo",b.dataset.cppCard===chave));const tit={sem_cpp:["Endereçados S/ CPP","Rack diferente de vazio, 0, 1, 500 e 999; número do CPP vazio, nulo ou igual a 0 no REXPEDLR."],acompanhamento:["Em acompanhamento","Registros ativos armazenados no novo Supabase CPP."],concluidos:["Concluídos","Acompanhamentos finalizados."],hoje:["Atualizados hoje","Registros movimentados no dia atual."]}[chave];document.getElementById("cppTituloTabela").textContent=tit[0];document.getElementById("cppSubtituloTabela").textContent=tit[1];aplicarFiltrosCPP()}
-window.aplicarFiltrosCPP=function(){let base=cppCombinados.slice();if(cppCartao==="sem_cpp")base=base.filter(r=>cppFonte.some(f=>osKey(f.os)===osKey(r.os)));if(cppCartao==="acompanhamento")base=base.filter(r=>r._cpp&&!finalizado(r._cpp.status_cpp));if(cppCartao==="concluidos")base=base.filter(r=>r._cpp&&finalizado(r._cpp.status_cpp));if(cppCartao==="hoje")base=base.filter(r=>r._cpp&&txt(r._cpp.atualizado_em||r._cpp.created_at).slice(0,10)===hojeISO());const os=txt(document.getElementById("cppFiltroOS")?.value).toUpperCase(),loja=txt(document.getElementById("cppFiltroLoja")?.value),grupo=txt(document.getElementById("cppFiltroGrupo")?.value),status=txt(document.getElementById("cppFiltroStatus")?.value),tec=txt(document.getElementById("cppFiltroTecnico")?.value),ini=txt(document.getElementById("cppFiltroDataIni")?.value),fim=txt(document.getElementById("cppFiltroDataFim")?.value);cppExibidos=base.filter(r=>{const c=r._cpp||{};const d=txt(c.atualizado_em||c.created_at||r.data_cpp||r.dt_geracao).slice(0,10);return(!os||osKey(r.os).includes(osKey(os)))&&(!loja||txt(r.pdv||c.loja)===loja)&&(!grupo||txt(r.grupo||c.grupo)===grupo)&&(!status||txt(c.status_cpp)===status)&&(!tec||txt(c.tecnico_responsavel||r.tecnico)===tec)&&(!ini||d>=ini)&&(!fim||d<=fim)});renderTabelaCPP()}
+window.aplicarFiltrosCPP=function(){let base=cppCombinados.slice();if(cppCartao==="sem_cpp")base=base.filter(r=>cppFonte.some(f=>osKey(f.os)===osKey(r.os)));if(cppCartao==="acompanhamento")base=base.filter(r=>r._cpp&&!finalizado(r._cpp.status_cpp));if(cppCartao==="concluidos")base=base.filter(r=>r._cpp&&finalizado(r._cpp.status_cpp));if(cppCartao==="hoje")base=base.filter(r=>r._cpp&&txt(r._cpp.atualizado_em||r._cpp.created_at).slice(0,10)===hojeISO());const os=txt(document.getElementById("cppFiltroOS")?.value).toUpperCase(),loja=txt(document.getElementById("cppFiltroLoja")?.value),grupo=txt(document.getElementById("cppFiltroGrupo")?.value),status=txt(document.getElementById("cppFiltroStatus")?.value),tec=txt(document.getElementById("cppFiltroTecnico")?.value),ini=txt(document.getElementById("cppFiltroDataIni")?.value),fim=txt(document.getElementById("cppFiltroDataFim")?.value);cppPaginaV7543=0;cppExibidos=base.filter(r=>{const c=r._cpp||{};const d=txt(c.atualizado_em||c.created_at||r.data_cpp||r.dt_geracao).slice(0,10);return(!os||osKey(r.os).includes(osKey(os)))&&(!loja||txt(r.pdv||c.loja)===loja)&&(!grupo||txt(r.grupo||c.grupo)===grupo)&&(!status||txt(c.status_cpp)===status)&&(!tec||txt(c.tecnico_responsavel||r.tecnico)===tec)&&(!ini||d>=ini)&&(!fim||d<=fim)});renderTabelaCPP()}
 function statusBadge(v){const s=txt(v)||"Não iniciado";return `<span class="cpp-badge ${finalizado(s)?"concluido":"pendente"}">${esc(s)}</span>`}
-function renderTabelaCPP(){const corpo=document.getElementById("cppTabelaCorpo");if(!corpo)return;document.getElementById("cppTotalExibido").textContent=cppExibidos.length.toLocaleString("pt-BR")+" registros";if(!cppExibidos.length){corpo.innerHTML='<tr><td colspan="13" class="cpp-vazio">Nenhum registro encontrado para os filtros selecionados.</td></tr>';return}corpo.innerHTML=cppExibidos.map(r=>{const c=r._cpp||{};return `<tr><td><span class="cpp-os-link" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">${esc(r.os)}</span></td><td>${esc(r.pdv||c.loja)}</td><td>${esc(r.grupo||c.grupo)}</td><td class="cpp-produto">${esc(r.desc_produto||c.produto)}</td><td><b>${esc(r.rack||c.rack)}</b></td><td>${esc(r.solicitante_cpp)}</td><td>${esc(r.data_cpp)}</td><td>${esc(r.nr_cpp)}</td><td>${esc(r.sit_cpp)}</td><td>${statusBadge(c.status_cpp)}</td><td>${esc(c.tecnico_responsavel||r.tecnico)}</td><td>${esc(dataLocal(c.atualizado_em))}</td><td><button class="cpp-row-btn" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">Acompanhar</button></td></tr>`}).join("")}
+let cppPaginaV7543=0;const CPP_PAGINA_V7543=100;
+window.mudarPaginaCPPV7543=function(delta){const total=Math.max(1,Math.ceil(cppExibidos.length/CPP_PAGINA_V7543));cppPaginaV7543=Math.max(0,Math.min(total-1,cppPaginaV7543+delta));renderTabelaCPP()};
+function renderTabelaCPP(){const corpo=document.getElementById("cppTabelaCorpo");if(!corpo)return;const total=cppExibidos.length;document.getElementById("cppTotalExibido").textContent=total.toLocaleString("pt-BR")+" registros";if(!total){corpo.innerHTML='<tr><td colspan="13" class="cpp-vazio">Nenhum registro encontrado para os filtros selecionados.</td></tr>';return}const pags=Math.max(1,Math.ceil(total/CPP_PAGINA_V7543));if(cppPaginaV7543>=pags)cppPaginaV7543=0;const ini=cppPaginaV7543*CPP_PAGINA_V7543,fim=Math.min(total,ini+CPP_PAGINA_V7543),dados=cppExibidos.slice(ini,fim);corpo.innerHTML=dados.map(r=>{const c=r._cpp||{};return `<tr><td><span class="cpp-os-link" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">${esc(r.os)}</span></td><td>${esc(r.pdv||c.loja)}</td><td>${esc(r.grupo||c.grupo)}</td><td class="cpp-produto">${esc(r.desc_produto||c.produto)}</td><td><b>${esc(r.rack||c.rack)}</b></td><td>${esc(r.solicitante_cpp)}</td><td>${esc(r.data_cpp)}</td><td>${esc(r.nr_cpp)}</td><td>${esc(r.sit_cpp)}</td><td>${statusBadge(c.status_cpp)}</td><td>${esc(c.tecnico_responsavel||r.tecnico)}</td><td>${esc(dataLocal(c.atualizado_em))}</td><td><button class="cpp-row-btn" onclick="abrirAcompanhamentoCPP('${esc(osKey(r.os))}')">Acompanhar</button></td></tr>`}).join("");const tabela=corpo.closest("table");let nav=document.getElementById("cppPagerV7543");if(!nav&&tabela){nav=document.createElement("div");nav.id="cppPagerV7543";nav.style.cssText="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:10px 0";tabela.insertAdjacentElement("afterend",nav)}if(nav)nav.innerHTML=`<button class="cpp-row-btn" ${cppPaginaV7543===0?'disabled':''} onclick="mudarPaginaCPPV7543(-1)">‹ Anterior</button><b>${ini+1}–${fim} de ${total}</b><button class="cpp-row-btn" ${cppPaginaV7543>=pags-1?'disabled':''} onclick="mudarPaginaCPPV7543(1)">Próxima ›</button>`}
 window.limparFiltrosCPP=function(){["cppFiltroOS","cppFiltroLoja","cppFiltroGrupo","cppFiltroStatus","cppFiltroTecnico","cppFiltroDataIni","cppFiltroDataFim"].forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});aplicarFiltrosCPP()}
 window.abrirMonitoramentoCPP=async function(){if(typeof esconderTelas==="function")esconderTelas();if(typeof definirMenuAtivo==="function")definirMenuAtivo("cpp");document.getElementById("telaMonitoramentoCPP").style.display="block";document.getElementById("sidebar")?.classList.remove("mobile-open");await carregarMonitoramentoCPP(false)}
 window.carregarMonitoramentoCPP=async function(forcar){if(cppCarregando)return;if(!forcar&&cppFonte.length){setKpis();aplicarFiltrosCPP();return}cppCarregando=true;document.getElementById("telaMonitoramentoCPP")?.classList.add("cpp-loading");setMsg("Carregando REXPEDLR do banco principal e acompanhamentos do banco CPP...","info");try{const resultados=await Promise.allSettled([lerFontePrincipal(),lerAcompanhamentos()]);if(resultados[0].status==="rejected")throw resultados[0].reason;cppFonte=resultados[0].value||[];if(resultados[1].status==="fulfilled")cppAcompanhamentos=resultados[1].value||[];else{cppAcompanhamentos=[];setMsg("REXPEDLR carregado, mas o banco CPP ainda precisa ser preparado: "+esc(resultados[1].reason?.message||resultados[1].reason),"erro")}combinar();setKpis();preencherFiltros();aplicarFiltrosCPP();if(resultados[1].status==="fulfilled")setMsg(`Dados atualizados: <b>${cppFonte.length.toLocaleString("pt-BR")}</b> O.S. endereçadas sem CPP e <b>${cppAcompanhamentos.length.toLocaleString("pt-BR")}</b> acompanhamentos.`,"ok")}catch(e){console.error("Monitoramento CPP:",e);setMsg("Falha ao carregar o Monitoramento CPP: "+esc(e?.message||e),"erro")}finally{cppCarregando=false;document.getElementById("telaMonitoramentoCPP")?.classList.remove("cpp-loading")}}
@@ -20685,11 +20752,11 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V7.5.42</div>
+<div id="erpVersionBadgeV7542">ERP V7.5.44</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
-window.ERP_VERSION="7.5.42";
+window.ERP_VERSION="7.5.44";
 const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
 window.erpMedir=async function(nome,fn){
     const t=performance.now();
@@ -20699,7 +20766,216 @@ window.erpMedir=async function(nome,fn){
 document.addEventListener("visibilitychange",()=>{
     if(debug())console.info("[PERF] aba",document.hidden?"em segundo plano":"ativa");
 });
-console.info("ERP V7.5.42 Performance carregado.");
+console.info("ERP V7.5.44 On-Demand carregado.");
+})();
+</script>
+
+
+<!-- =========================================================
+     V7.5.44 - CARREGAMENTO SOB DEMANDA / HIBERNAÇÃO DE MÓDULOS
+     ========================================================= -->
+<style id="erp-v7544-style">
+#erpModoDemandaV7544{
+    position:fixed;right:10px;bottom:30px;z-index:9996;
+    background:rgba(0,27,61,.88);color:#fff;border-radius:999px;
+    padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.62;
+    pointer-events:none;
+}
+</style>
+<div id="erpModoDemandaV7544">⚡ sob demanda</div>
+<script id="erp-v7544-on-demand">
+(function(){
+"use strict";
+
+const TELAS_PESADAS = new Set([
+    "telaInteligencia",
+    "telaMonitoramentoCPP",
+    "telaClientes",
+    "telaAdmin",
+    "telaAdminAtualizar",
+    "telaAdminUsuarios",
+    "telaAdminPresenca",
+    "telaAdminHistorico",
+    "telaAdminHistoricoCI",
+    "telaAdminAuditoria",
+    "telaRelatorios"
+]);
+
+const estacionadas = new Map();
+let telaAtivaV7544 = "";
+let timerV7544 = 0;
+
+function visivel(el){
+    if(!el || !el.isConnected)return false;
+    const s=getComputedStyle(el);
+    return s.display!=="none" && s.visibility!=="hidden";
+}
+function marcador(id,el){
+    const c=document.createComment("ERP-V7544:"+id);
+    el.parentNode?.insertBefore(c,el);
+    return c;
+}
+function estacionar(id){
+    if(!TELAS_PESADAS.has(id)||estacionadas.has(id))return false;
+    const el=document.getElementById(id);
+    if(!el||visivel(el))return false;
+    const c=marcador(id,el);
+    el.remove();
+    estacionadas.set(id,{el,c});
+    return true;
+}
+function montar(id){
+    const g=estacionadas.get(id);
+    if(g){
+        g.c.parentNode?.insertBefore(g.el,g.c.nextSibling);
+        g.c.remove();
+        estacionadas.delete(id);
+        return g.el;
+    }
+    return document.getElementById(id);
+}
+function detectarAtiva(){
+    const ids=[
+        "telaInicio","telaColeta","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
+        "telaInteligencia","telaMonitoramentoCPP","telaClientes","telaAdmin","telaAdminAtualizar",
+        "telaAdminUsuarios","telaAdminPresenca","telaAdminHistorico","telaAdminHistoricoCI",
+        "telaAdminAuditoria","telaRelatorios"
+    ];
+    for(const id of ids){
+        const el=document.getElementById(id);
+        if(visivel(el))return id;
+    }
+    return "";
+}
+function limparGerado(id){
+    if(id==="telaInteligencia"){
+        for(const x of ["intelConsultaTabela","intelModalConteudo"]){
+            const el=document.getElementById(x);
+            if(el)el.innerHTML="";
+        }
+        const modal=document.getElementById("intelModal");
+        if(modal)modal.style.display="none";
+    }
+    if(id==="telaMonitoramentoCPP"){
+        const corpo=document.getElementById("cppTabelaCorpo");
+        if(corpo)corpo.innerHTML='<tr><td colspan="13" class="cpp-vazio">Abra o módulo para carregar os dados.</td></tr>';
+        document.getElementById("cppPagerV7543")?.remove();
+        const hist=document.getElementById("cppHistoricoLista");
+        if(hist)hist.innerHTML='<div class="cpp-vazio">Sem histórico carregado.</div>';
+    }
+    if(id==="telaRelatorios"){
+        const tabela=document.querySelector("#telaRelatorios .relatorio-tabela");
+        if(tabela)tabela.innerHTML="";
+    }
+}
+function pararTimers(id){
+    if(id==="telaAdmin" && typeof dashboardOperacionalIntervaloV55!=="undefined"){
+        clearInterval(dashboardOperacionalIntervaloV55);
+        dashboardOperacionalIntervaloV55=null;
+    }
+    if(id==="telaAdminPresenca" && typeof presencaPainelTimerV56!=="undefined"){
+        clearInterval(presencaPainelTimerV56);
+        presencaPainelTimerV56=null;
+    }
+    if(id==="telaInteligencia" && typeof intelConsultaTimerV7543!=="undefined"){
+        clearTimeout(intelConsultaTimerV7543);
+    }
+}
+function iniciarTimers(id){
+    if(id==="telaAdmin" && typeof iniciarAtualizacaoAutomaticaDashboardV55==="function"){
+        iniciarAtualizacaoAutomaticaDashboardV55();
+    }
+    if(id==="telaAdminPresenca" && typeof iniciarPainelPresencaV56==="function"){
+        iniciarPainelPresencaV56();
+    }
+}
+function sincronizar(){
+    clearTimeout(timerV7544);
+    timerV7544=setTimeout(()=>{
+        const ativa=detectarAtiva();
+        if(ativa!==telaAtivaV7544){
+            if(telaAtivaV7544){
+                pararTimers(telaAtivaV7544);
+                limparGerado(telaAtivaV7544);
+            }
+            telaAtivaV7544=ativa;
+            iniciarTimers(ativa);
+        }
+        TELAS_PESADAS.forEach(id=>{if(id!==ativa)estacionar(id)});
+        if(localStorage.getItem("ERP_DEBUG_PERF")==="1"){
+            console.info("[ON-DEMAND] ativa:",ativa,
+                "montadas:",[...TELAS_PESADAS].filter(id=>document.getElementById(id)).length,
+                "estacionadas:",estacionadas.size,
+                "DOM:",document.getElementsByTagName("*").length);
+        }
+    },25);
+}
+
+window.erpMontarTelaV7544=montar;
+window.erpSincronizarModulosV7544=sincronizar;
+
+// Monta a tela necessária ANTES do onclick inline executar.
+document.addEventListener("click",function(e){
+    const alvo=e.target.closest("[onclick],.menu,[data-menu]");
+    if(!alvo)return;
+    const acao=((alvo.getAttribute("onclick")||"")+" "+(alvo.dataset?.menu||"")).toLowerCase();
+    if(acao.includes("abririnteligencia")||acao.includes("inteligencia"))montar("telaInteligencia");
+    if(acao.includes("abrirmonitoramentocpp")||/\bcpp\b/.test(acao))montar("telaMonitoramentoCPP");
+    if(acao.includes("abrirclientes")||acao.includes("clientes"))montar("telaClientes");
+    if(acao.includes("abrirrelatorios")||acao.includes("relatorios"))montar("telaRelatorios");
+    if(acao.includes("abriradmin")||acao.includes("administração")||acao.includes("administracao"))montar("telaAdmin");
+    setTimeout(sincronizar,0);
+},true);
+
+// Também reage a mudanças de layout que não vieram de clique.
+const observer=new MutationObserver(()=>{
+    if(timerV7544)return;
+    timerV7544=setTimeout(()=>{timerV7544=0;sincronizar()},100);
+});
+observer.observe(document.body,{attributes:true,attributeFilter:["style","class"],subtree:false,childList:true});
+
+// Só depois que os instaladores antigos terminarem, estaciona os módulos ocultos.
+function iniciar(){
+    setTimeout(()=>{
+        telaAtivaV7544=detectarAtiva();
+        TELAS_PESADAS.forEach(id=>{if(id!==telaAtivaV7544)estacionar(id)});
+        iniciarTimers(telaAtivaV7544);
+        if(localStorage.getItem("ERP_DEBUG_PERF")==="1"){
+            console.info("[ON-DEMAND] inicializado:",telaAtivaV7544,
+                "DOM:",document.getElementsByTagName("*").length);
+        }
+    },1800);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",iniciar,{once:true});
+else iniciar();
+})();
+</script>
+
+
+<script id="erp-v7544-wraps">
+(function(){
+"use strict";
+function wrap(nome,tela){
+    const original=window[nome];
+    if(typeof original!=="function"||original.__v7544)return;
+    const fn=function(){
+        window.erpMontarTelaV7544?.(tela);
+        const r=original.apply(this,arguments);
+        setTimeout(()=>window.erpSincronizarModulosV7544?.(),0);
+        return r;
+    };
+    fn.__v7544=true;
+    window[nome]=fn;
+}
+function instalar(){
+    wrap("abrirInteligencia","telaInteligencia");
+    wrap("abrirMonitoramentoCPP","telaMonitoramentoCPP");
+    wrap("abrirClientes","telaClientes");
+    wrap("abrirRelatorios","telaRelatorios");
+    wrap("abrirAdmin","telaAdmin");
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(instalar,2200),{once:true});
+else setTimeout(instalar,2200);
 })();
 </script>
 
