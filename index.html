@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.46: Atualizar Banco, Usuários e Histórico C.I. compatíveis com carregamento sob demanda -->
+<!-- V7.5.47: Inteligência com relações lazy + limpeza total do DOM ao sair -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -10234,26 +10234,18 @@ async function carregarInteligencia(forcar){
 }
 
 function tabelaPendenciaHTML(titulo, chave, lista){
-    const linhas=(lista||[]).slice(0,150).map(r=>
-        "<tr>"+
-        "<td><button class='usuario-acao' onclick=\"abrirOSIntel('"+String(r.os||'').replace(/'/g,"\\'")+"')\">"+escaparHTML(r.os||'-')+"</button></td>"+
-        "<td>"+escaparHTML(r.grupo||'-')+"</td>"+
-        "<td>"+escaparHTML(r.desc_produto||'-')+"</td>"+
-        "<td>"+escaparHTML(r.rack||'-')+"</td>"+
-        "<td>"+escaparHTML(r.status||'-')+"</td>"+
-        "<td>"+escaparHTML(r.status_da_os||'-')+"</td>"+
-        "<td>"+escaparHTML(r.tecnico||'-')+"</td>"+
-        "<td>"+escaparHTML(r.pdv||'-')+"</td>"+
-        "</tr>"
-    ).join("");
-    return "<div class='intel-pend-bloco'>"+
-      "<div class='intel-pend-topo'><h3>"+escaparHTML(titulo)+" <span class='contagem'>"+(lista||[]).length+"</span></h3>"+
-      "<div class='intel-pend-acoes'><button class='intel-pend-btn' onclick=\"abrirListaIntel('"+chave+"')\">Ver relação</button>"+
-      "<button class='intel-pend-btn exportar' onclick=\"exportarPendenciaIntelCSV('"+chave+"')\">Exportar arquivo ▾</button></div></div>"+
-      ((lista||[]).length
-        ? "<div class='intel-pend-tabela-wrap'><table class='intel-pend-tabela'><thead><tr><th>O.S.</th><th>Grupo</th><th>Produto</th><th>Rack</th><th>Status</th><th>Situação da O.S.</th><th>Técnico</th><th>PDV</th></tr></thead><tbody>"+linhas+"</tbody></table></div>"
-        : "<div class='intel-pend-vazio'>Nenhuma O.S. encontrada nesta pendência.</div>")+
-      "</div>";
+    const total=(lista||[]).length;
+    return "<div class='intel-pend-bloco intel-pend-resumo-v7547'>"+
+      "<div class='intel-pend-topo'><h3>"+escaparHTML(titulo)+" <span class='contagem'>"+total+"</span></h3>"+
+      "<div class='intel-pend-acoes'>"+
+      "<button class='intel-pend-btn' "+(total?"":"disabled")+" onclick=\"abrirListaIntel('"+chave+"')\">Ver relação</button>"+
+      "<button class='intel-pend-btn exportar' "+(total?"":"disabled")+" onclick=\"exportarPendenciaIntelCSV('"+chave+"')\">Exportar arquivo ▾</button>"+
+      "</div></div>"+
+      "<div class='intel-pend-vazio'>"+
+        (total
+          ? "<b>"+total.toLocaleString('pt-BR')+" O.S.</b> nesta relação. Os registros só serão renderizados ao clicar em <b>Ver relação</b>."
+          : "Nenhuma O.S. encontrada nesta pendência.")+
+      "</div></div>";
 }
 function renderTabelaPendenciasIntel(a){
     return tabelaPendenciaHTML("Rack 500 e STATUS DA OS = ABE","rack500Abertas",a.rack500Abertas||[])+
@@ -10285,12 +10277,84 @@ function exportarPendenciaIntelCSV(chave){
     document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
 
+let intelRelacaoAtualV7547=[];
+let intelRelacaoTituloV7547="";
+let intelRelacaoPaginaV7547=0;
+const INTEL_RELACAO_PAGINA_V7547=100;
+
+function renderRelacaoIntelV7547(){
+    const modal=document.getElementById("intelModal");
+    const titulo=document.getElementById("intelModalTitulo");
+    const conteudo=document.getElementById("intelModalConteudo");
+    if(!modal||!titulo||!conteudo)return;
+
+    const lista=intelRelacaoAtualV7547||[];
+    const total=lista.length;
+    const paginas=Math.max(1,Math.ceil(total/INTEL_RELACAO_PAGINA_V7547));
+    intelRelacaoPaginaV7547=Math.max(0,Math.min(paginas-1,intelRelacaoPaginaV7547));
+    const ini=intelRelacaoPaginaV7547*INTEL_RELACAO_PAGINA_V7547;
+    const fim=Math.min(total,ini+INTEL_RELACAO_PAGINA_V7547);
+    const pagina=lista.slice(ini,fim);
+
+    titulo.textContent=intelRelacaoTituloV7547+" ("+total.toLocaleString("pt-BR")+")";
+
+    if(!total){
+        conteudo.innerHTML="<div class='admin-info'>Nenhuma O.S. nesta relação.</div>";
+        modal.style.display="flex";
+        return;
+    }
+
+    const nav="<div style='display:flex;gap:10px;justify-content:flex-end;align-items:center;margin:8px 0 12px'>"+
+      "<button class='usuario-acao' "+(intelRelacaoPaginaV7547===0?"disabled":"")+" onclick='mudarPaginaRelacaoIntelV7547(-1)'>‹ Anterior</button>"+
+      "<b>"+(ini+1).toLocaleString("pt-BR")+"–"+fim.toLocaleString("pt-BR")+" de "+total.toLocaleString("pt-BR")+"</b>"+
+      "<button class='usuario-acao' "+(intelRelacaoPaginaV7547>=paginas-1?"disabled":"")+" onclick='mudarPaginaRelacaoIntelV7547(1)'>Próxima ›</button></div>";
+
+    const linhas=pagina.map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+
+        escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+
+        "</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+
+        "</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("");
+
+    conteudo.innerHTML=nav+"<div class='intel-list'>"+linhas+"</div>"+nav;
+    modal.style.display="flex";
+}
+
+window.mudarPaginaRelacaoIntelV7547=function(delta){
+    intelRelacaoPaginaV7547+=Number(delta||0);
+    renderRelacaoIntelV7547();
+};
+
 function abrirListaIntel(tipo){
     const a=intelAnalise;if(!a)return;
     const lista=a[tipo]||[];
-    const titulos={rack500Abertas:"Rack 500 — O.S. abertas",prontasAbertas:"Prontas e abertas",grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",prontas:"Prontas aguardando expedição",paradas:"Sem movimentação +30 dias",cpp:"CPP pendente",semTecnico:"Sem técnico",semRack:"Sem rack",oficina20:"Oficina há mais de 20 dias",abertas:"O.S. abertas",fechadas:"O.S. fechadas",expHoje:"Expedidas hoje"};
-    document.getElementById("intelModalTitulo").textContent=(titulos[tipo]||("Relação: "+tipo))+" ("+lista.length+")";document.getElementById("intelModalConteudo").innerHTML="<div class='intel-list'>"+lista.slice(0,250).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r.desc_produto||"")+"<br><small>"+escaparHTML(r.status||r.status_da_os||"")+"</small></span><span>"+escaparHTML(r.tecnico||"Sem técnico")+"</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")+"</div>";document.getElementById("intelModal").style.display="flex"}
-function fecharIntelModal(){document.getElementById("intelModal").style.display="none"}
+    const titulos={
+      rack500Abertas:"Rack 500 — O.S. abertas",
+      prontasAbertas:"Prontas e abertas",
+      grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",
+      grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",
+      prontas:"Prontas aguardando expedição",
+      paradas:"Sem movimentação +30 dias",
+      cpp:"CPP pendente",
+      semTecnico:"Sem técnico",
+      semRack:"Sem rack",
+      oficina20:"Oficina há mais de 20 dias",
+      abertas:"O.S. abertas",
+      fechadas:"O.S. fechadas",
+      expHoje:"Expedidas hoje"
+    };
+    intelRelacaoAtualV7547=lista;
+    intelRelacaoTituloV7547=titulos[tipo]||("Relação: "+tipo);
+    intelRelacaoPaginaV7547=0;
+    renderRelacaoIntelV7547();
+}
+function fecharIntelModal(){
+    const modal=document.getElementById("intelModal");
+    const conteudo=document.getElementById("intelModalConteudo");
+    if(modal)modal.style.display="none";
+    if(conteudo)conteudo.innerHTML="";
+    intelRelacaoAtualV7547=[];
+    intelRelacaoTituloV7547="";
+    intelRelacaoPaginaV7547=0;
+}
 function abrirOSIntel(os){const r=intelRegistros.find(x=>String(x.os)===String(os));if(!r)return;document.getElementById("intelModalTitulo").textContent="O.S. "+os;document.getElementById("intelModalConteudo").innerHTML=Object.entries(r).filter(x=>!x[0].startsWith("_")).map(x=>"<div class='ficha-linha'><span class='ficha-label'>"+escaparHTML(x[0].replaceAll("_"," "))+":</span>"+escaparHTML(x[1]??"-")+"</div>").join("");document.getElementById("intelModal").style.display="flex"}
 function carregarTimelineOS(){
     const os=textoIntel(document.getElementById("intelOsTimeline").value);
@@ -10892,12 +10956,16 @@ function renderIntel(){
  if(!alertas.length)alertas.push("<div class='intel-alert green'><b>✔ Nenhuma inconsistência crítica encontrada</b><span>As regras atuais não detectaram pendências.</span></div>");
  document.getElementById('intelAlertas').innerHTML=alertas.join('');
  document.getElementById('intelCartoesDinamicos').innerHTML=renderCartoesDinamicosV36(a);
- document.getElementById('intelPrioridades').innerHTML=a.prioridades.slice(0,18).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||'-')+"</b><span>"+escaparHTML(r._motivo)+"<br><small>"+escaparHTML(r.desc_produto||'')+"</small></span><span>"+(r._dias||0)+" dias</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join('')||"<div class='admin-info'>Nenhuma prioridade.</div>";
+ document.getElementById('intelPrioridades').innerHTML=a.prioridades.length
+   ? "<div class='intel-pend-bloco intel-pend-resumo-v7547'><div class='intel-pend-topo'><h3>Prioridades <span class='contagem'>"+a.prioridades.length+"</span></h3><div class='intel-pend-acoes'><button class='intel-pend-btn' onclick=\"abrirPrioridadesV7547()\">Ver relação</button></div></div><div class='intel-pend-vazio'><b>"+a.prioridades.length.toLocaleString('pt-BR')+" O.S.</b> priorizadas. A relação só será renderizada quando você clicar.</div></div>"
+   : "<div class='admin-info'>Nenhuma prioridade.</div>";
  document.getElementById('intelPendencias').innerHTML=renderTabelaPendenciasIntel(a)+tabelaPendenciaHTML('Sem técnico','semTecnico',a.semTecnico)+tabelaPendenciaHTML('Sem rack','semRack',a.semRack)+tabelaPendenciaHTML('Oficina há mais de 20 dias','oficina20',a.oficina20)+tabelaPendenciaHTML('CPP pendente','cpp',a.cpp);
  document.getElementById('intelRankingTecnicos').innerHTML=barrasIntel(a.tecnicos.filter(x=>x[0]!=='(vazio)'),10);
  document.getElementById('intelRankingPDV').innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=='(vazio)'),10);
  document.getElementById('intelMapa').innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=='(vazio)'),12);
- inicializarFiltrosIntelV36();aplicarConsultaIntel();
+ inicializarFiltrosIntelV36();
+ const tabelaConsulta=document.getElementById('intelConsultaTabela');
+ if(tabelaConsulta)tabelaConsulta.innerHTML="<div class='admin-info'>Use os filtros acima para pesquisar. Os resultados só serão renderizados quando você pesquisar.</div>";
 }
 function obterCartoesV36(a=intelAnalise){
  if(!a)return [];
@@ -10912,7 +10980,20 @@ function renderCartoesDinamicosV36(a){
    return `<div class="intel-dynamic-card ${x[2]}"><b>${escaparHTML(x[0])}</b><strong>${x[1].length}</strong><span>${descricao}</span><div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaDiretaV36('${tituloSeguro}',${i})">Ver relação</button><button class="exportar" onclick="exportarCartaoV36(${i})">Exportar arquivo ▾</button><button class="imprimir" onclick="imprimirCartaoV36(${i})">Imprimir</button></div></div>`;
  }).join('');
 }
-function abrirListaDiretaV36(titulo,indice){const item=obterCartoesV36()[indice];abrirResultadoAssistenteIntel(titulo,item?item[1]:[])}
+function abrirListaDiretaV36(titulo,indice){
+    const item=obterCartoesV36()[indice];
+    intelRelacaoAtualV7547=item?item[1]:[];
+    intelRelacaoTituloV7547=titulo||item?.[0]||"Relação";
+    intelRelacaoPaginaV7547=0;
+    renderRelacaoIntelV7547();
+}
+function abrirPrioridadesV7547(){
+    if(!intelAnalise)return;
+    intelRelacaoAtualV7547=intelAnalise.prioridades||[];
+    intelRelacaoTituloV7547="Prioridades";
+    intelRelacaoPaginaV7547=0;
+    renderRelacaoIntelV7547();
+}
 function nomeArquivoV36(v){return String(v||'relacao').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-zA-Z0-9]+/g,'_').replace(/^_+|_+$/g,'').toLowerCase()||'relacao'}
 function exportarCartaoV36(indice){
  const item=obterCartoesV36()[indice];if(!item||!item[1].length){alert('Não há O.S. nessa relação para exportar.');return}
@@ -20809,11 +20890,11 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V7.5.46</div>
+<div id="erpVersionBadgeV7542">ERP V7.5.47</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
-window.ERP_VERSION="7.5.46";
+window.ERP_VERSION="7.5.47";
 const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
 window.erpMedir=async function(nome,fn){
     const t=performance.now();
@@ -20900,12 +20981,18 @@ function detectarAtiva(){
 }
 function limparGerado(id){
     if(id==="telaInteligencia"){
-        for(const x of ["intelConsultaTabela","intelModalConteudo"]){
-            const el=document.getElementById(x);
-            if(el)el.innerHTML="";
-        }
+        // V7.5.47: ao sair, destrói TODO HTML gerado pela Inteligência.
+        const ids=[
+          "intelConsultaTabela","intelModalConteudo","intelAlertas","intelCartoesDinamicos",
+          "intelPrioridades","intelPendencias","intelRankingTecnicos","intelRankingPDV","intelMapa"
+        ];
+        ids.forEach(x=>{const el=document.getElementById(x);if(el)el.innerHTML=""});
         const modal=document.getElementById("intelModal");
         if(modal)modal.style.display="none";
+        if(typeof intelRelacaoAtualV7547!=="undefined")intelRelacaoAtualV7547=[];
+        if(typeof intelRelacaoTituloV7547!=="undefined")intelRelacaoTituloV7547="";
+        if(typeof intelConsultaAtual!=="undefined")intelConsultaAtual=[];
+        // Dados analisados permanecem em memória; somente o DOM é destruído.
     }
     if(id==="telaMonitoramentoCPP"){
         const corpo=document.getElementById("cppTabelaCorpo");
@@ -21106,6 +21193,12 @@ setTimeout(instalarTodos,4000);
 console.info("ERP V7.5.46: subtelas administrativas compatíveis com modo sob demanda.");
 })();
 </script>
+
+
+<style id="intel-lazy-v7547-style">
+.intel-pend-resumo-v7547 .intel-pend-vazio{padding:14px 16px!important}
+.intel-pend-resumo-v7547 table,.intel-pend-resumo-v7547 tbody,.intel-pend-resumo-v7547 tr{display:none!important}
+</style>
 
 </body>
 </html>
