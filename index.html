@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.37: correção definitiva da exclusão de mídias órfãs -->
+<!-- V7.5.38: dossiê compatível em todos os PCs + desempenho + correção do gerenciador de senhas na coleta -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -5649,7 +5649,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="rascunhos-leitura">
                     <div class="campo">
                         <label>Bipar ou digitar O.S.</label>
-                        <input id="rascunhoCampoOS" autocomplete="off" placeholder="Cole várias O.S. ou bipe uma por vez" onkeydown="rascunhoTeclaOS(event)" onpaste="rascunhoColarOS(event)">
+                        <input id="rascunhoCampoOS" autocomplete="one-time-code" name="rascunho_os_operacao" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Cole várias O.S. ou bipe uma por vez" onkeydown="rascunhoTeclaOS(event)" onpaste="rascunhoColarOS(event)">
                     </div>
                     <button class="coleta-btn green" type="button" onclick="adicionarOSRascunho()">Adicionar O.S.</button>
                     <button class="coleta-btn light" type="button" onclick="focarCampoRascunho()">⌖ Ativar bipador</button>
@@ -5704,7 +5704,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="coleta-campo-wrap">
                     <label for="coletaCampoOS">Bipar ou digitar a O.S.</label>
                     <div class="coleta-input-linha">
-                        <input id="coletaCampoOS" class="coleta-input" autocomplete="off" inputmode="numeric" placeholder="Bipe uma O.S. ou cole várias de uma vez..." onkeydown="coletaTeclaOS(event)" onpaste="coletaColarOSLote(event)">
+                        <input id="coletaCampoOS" class="coleta-input" autocomplete="one-time-code" inputmode="numeric" name="coleta_os_operacao" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Bipe uma O.S. ou cole várias de uma vez..." onkeydown="coletaTeclaOS(event)" onpaste="coletaColarOSLote(event)">
                         <button class="coleta-btn green" type="button" onclick="coletarOS()">Adicionar O.S.</button>
                     </div>
                 </div>
@@ -6765,12 +6765,19 @@ function exigirPermissao(perfis, modulo){
 
 function mostrarLogin(){
     const tela = document.getElementById("telaLogin");
+    const senha = document.getElementById("loginSenha");
+    if(senha) senha.disabled = false;
     if(tela) tela.style.display = "flex";
     document.body.classList.add("sem-login");
 }
 
 function ocultarLogin(){
     const tela = document.getElementById("telaLogin");
+    const senha = document.getElementById("loginSenha");
+    if(senha){
+        senha.value = "";
+        senha.disabled = true;
+    }
     if(tela) tela.style.display = "none";
     document.body.classList.remove("sem-login");
 }
@@ -10045,7 +10052,81 @@ async function atualizarNumeroHistoricoCI(){
 function fecharModalHistoricoCI(){document.getElementById("cihModal").style.display="none";historicoCIAtual=null}
 function documentoImpressaoHistoricoCI(x){
     const estilos=[...document.querySelectorAll("style,link[rel='stylesheet']")].map(e=>e.outerHTML).join("\n");
-    return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script></body></html>";
+    return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
+<!-- V7.5.38 - Compatibilidade do Dossiê/Mídias + proteção contra gerenciador de senhas -->
+<style id="patch-v7538-dossie-compat">
+#fotosos-menu.fotosos-menu-forcado-v7538{display:flex!important;align-items:center!important;gap:8px!important}
+#fotosos-menu .fotosos-menu-badge{margin-left:auto!important}
+</style>
+<script id="patch-v7538-dossie-compat">
+(function(){
+"use strict";
+function origemAtual(){
+    const ativo=document.querySelector('.menu.active,[data-menu].active');
+    const marca=((ativo?.dataset?.menu||'')+' '+(ativo?.id||'')+' '+(ativo?.textContent||'')).toLowerCase();
+    if(marca.includes('cliente'))return 'clientes';
+    if(marca.includes('cpp'))return 'cpp';
+    return 'principal';
+}
+function garantirMenuDossie(){
+    const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+    if(!sidebar)return;
+    let botao=document.getElementById('fotosos-menu');
+    if(botao && botao.isConnected){
+        botao.classList.add('fotosos-menu-forcado-v7538');
+        return;
+    }
+    botao=document.createElement('div');
+    botao.id='fotosos-menu';
+    botao.className='menu fotosos-menu-forcado-v7538';
+    botao.dataset.menu='midias';
+    botao.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';
+    botao.setAttribute('role','button');
+    botao.setAttribute('tabindex','0');
+    const abrir=()=>{
+        if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual());
+        else setTimeout(()=>{if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual())},250);
+    };
+    botao.addEventListener('click',abrir);
+    botao.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir()}});
+    const consulta=sidebar.querySelector('[data-menu="consulta"]');
+    if(consulta)consulta.insertAdjacentElement('afterend',botao);
+    else sidebar.appendChild(botao);
+}
+function protegerCamposColeta(){
+    ['coletaCampoOS','rascunhoCampoOS','cliColetaOSPrincipal'].forEach((id,i)=>{
+        const el=document.getElementById(id);
+        if(!el)return;
+        el.setAttribute('autocomplete','one-time-code');
+        el.setAttribute('aria-autocomplete','none');
+        el.setAttribute('autocapitalize','off');
+        el.setAttribute('spellcheck','false');
+        el.setAttribute('data-lpignore','true');
+        el.setAttribute('data-1p-ignore','true');
+        el.setAttribute('data-form-type','other');
+        if(!el.name)el.name='os_operacao_'+(i+1);
+    });
+}
+function iniciar(){
+    garantirMenuDossie();
+    protegerCamposColeta();
+    const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+    if(sidebar){
+        let timer=0;
+        new MutationObserver(()=>{
+            clearTimeout(timer);
+            timer=setTimeout(garantirMenuDossie,80);
+        }).observe(sidebar,{childList:true,subtree:false});
+    }
+    setTimeout(()=>{garantirMenuDossie();protegerCamposColeta()},500);
+    setTimeout(()=>{garantirMenuDossie();protegerCamposColeta()},1800);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});
+else iniciar();
+})();
+</script>
+
+</body></html>";
 }
 async function imprimirHistoricoCIDireto(id){
     const x=obterHistoricoCI(id);
@@ -20393,7 +20474,7 @@ function abrir(os='',origem='principal'){$('fotosos-os').value=normalizarOS(os);
 function instalarMenu(){const sidebar=$('sidebar');if(!sidebar||$('fotosos-menu'))return;const div=document.createElement('div');div.className='menu';div.id='fotosos-menu';div.dataset.menu='midias';div.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';div.onclick=()=>abrir('',origemAutomatica());const consulta=sidebar.querySelector('[data-menu="consulta"]');if(consulta)consulta.insertAdjacentElement('afterend',div);else sidebar.appendChild(div)}function encontrarIndiceOS(t){return[...t.querySelectorAll('thead th')].findIndex(h=>/^(O\.?\s*S\.?|O,S|OS)$/i.test(texto(h.textContent).replace(/\s+/g,' ')))}function decorarTabelas(){document.querySelectorAll('.fotosos-mini-btn').forEach(b=>b.remove())}
 function visualizar(url,tipo,nome){if(!url)return;if(tipo==='imagem'){$('fotosos-lightbox-frame').style.display='none';$('fotosos-lightbox-img').style.display='block';$('fotosos-lightbox-img').src=url;$('fotosos-lightbox').classList.add('aberto')}else if(tipo==='pdf'){$('fotosos-lightbox-img').style.display='none';$('fotosos-lightbox-frame').style.display='block';$('fotosos-lightbox-frame').src=url;$('fotosos-lightbox').classList.add('aberto')}else{const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener';a.download=nome||'';a.click()}}function fecharPreview(){$('fotosos-lightbox').classList.remove('aberto');$('fotosos-lightbox-img').src='';$('fotosos-lightbox-frame').src='about:blank'}
 async function excluirPermanenteMidia({id,caminho,bucket,nome,card}){id=texto(id);caminho=texto(caminho);bucket=texto(bucket)||config().bucket;nome=texto(nome)||'arquivo';if(!id||!caminho)throw new Error('Dados do anexo incompletos para exclusão.');const confirmar=window.confirm(`Excluir permanentemente "${nome}"?\n\nO registro e o arquivo serão removidos definitivamente. Esta ação não poderá ser desfeita.`);if(!confirmar)return;const s=cliente(),c=config();$('fotosos-galeria-status').textContent='Excluindo permanentemente...';if(card){card.style.opacity='.45';card.style.pointerEvents='none'}const del=await s.from(c.tabela).delete().eq('id',id);if(del.error){if(card){card.style.opacity='';card.style.pointerEvents=''}throw new Error('Não foi possível remover o registro da tabela de mídias: '+del.error.message)}if(card?.isConnected)card.remove();let remErro=null;for(let tentativa=1;tentativa<=2;tentativa++){const rem=await s.storage.from(bucket).remove([caminho]);if(!rem.error){remErro=null;break}remErro=rem.error;await new Promise(r=>setTimeout(r,300*tentativa))}$('fotosos-galeria-status').textContent=remErro?'Registro excluído. Não foi possível confirmar a remoção do arquivo no Storage; o card não será mais exibido.':'Arquivo excluído permanentemente.';await carregarGaleria();if(remErro)console.warn('[Mídias] Registro removido, mas Storage retornou erro:',remErro)}
-function bind(){instalarMenu();preencherConfig();$('fotosos-fechar').onclick=fechar;$('fotosos-modal').addEventListener('click',e=>{if(e.target===$('fotosos-modal'))fechar()});$('fotosos-config-btn').onclick=()=>$('fotosos-config').classList.toggle('aberta');$('fotosos-salvar-config').onclick=salvarConfig;$('fotosos-testar-config').onclick=testarConfig;$('fotosos-selecionar').onclick=()=>$('fotosos-arquivos').click();$('fotosos-camera').onclick=()=>$('fotosos-camera-input').click();$('fotosos-arquivos').onchange=e=>adicionarArquivos(e.target.files);$('fotosos-camera-input').onchange=e=>adicionarArquivos(e.target.files);$('fotosos-limpar').onclick=limparFila;$('fotosos-enviar').onclick=()=>enviar().catch(e=>{console.error(e);status('Erro: '+(e.message||e),0);alert('Erro ao enviar: '+(e.message||e));atualizarEnviar()});$('fotosos-carregar').onclick=()=>carregarGaleria().catch(e=>$('fotosos-galeria-status').textContent='Erro: '+(e.message||e));$('fotosos-filtro-tipo').onchange=()=>carregarGaleria().catch(console.error);$('fotosos-os').addEventListener('input',e=>{atualizarEnviar();$('fotosos-os-selecionada').textContent='';fotososRenderDetalhes(null);clearTimeout(fotososBuscaTimer);fotososBuscaTimer=setTimeout(()=>fotososBuscarOS(e.target.value),220)});$('fotosos-os').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();fotososMoverSugestao(1)}else if(e.key==='ArrowUp'){e.preventDefault();fotososMoverSugestao(-1)}else if(e.key==='Enter'){if(fotososSugestaoAtiva>=0){e.preventDefault();fotososSelecionarOS(fotososSugestoes[fotososSugestaoAtiva])}else if(fotososSugestoes.length===1){e.preventDefault();fotososSelecionarOS(fotososSugestoes[0])}else{const os=normalizarOS(e.target.value);if(os){e.target.value=os;fotososFecharSugestoes();atualizarEnviar();fotososCarregarDetalhesOS(os,$('fotosos-origem').value)}}}else if(e.key==='Escape')fotososFecharSugestoes()});$('fotosos-os-sugestoes').addEventListener('click',e=>{const b=e.target.closest('.fotosos-os-item');if(b)fotososSelecionarOS(fotososSugestoes[Number(b.dataset.i)])});$('fotosos-origem').addEventListener('change',()=>{fotososFecharSugestoes();$('fotosos-os-selecionada').textContent='';const os=normalizarOS($('fotosos-os').value);if(os)fotososCarregarDetalhesOS(os,$('fotosos-origem').value);if(os.length>=2)fotososBuscarOS(os)});document.addEventListener('click',e=>{if(!e.target.closest('.fotosos-os-wrap'))fotososFecharSugestoes()});document.querySelectorAll('.fotosos-aba').forEach(b=>b.onclick=()=>trocarAba(b.dataset.aba));document.querySelectorAll('.fotosos-perfil').forEach(b=>b.onclick=()=>{estado.perfil=b.dataset.perfil;document.querySelectorAll('.fotosos-perfil').forEach(x=>x.classList.toggle('ativo',x===b))});const drop=$('fotosos-drop');drop.onclick=()=>$('fotosos-arquivos').click();drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('fotosos-arquivos').click()}};['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('arrastando')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('arrastando')}));drop.addEventListener('drop',e=>adicionarArquivos(e.dataTransfer.files));$('fotosos-fila').onclick=e=>{const card=e.target.closest('.fotosos-card'),acao=e.target.dataset.acao;if(!card||!acao)return;const i=estado.fila.findIndex(x=>x.id===card.dataset.id);if(i<0)return;if(acao==='remover'){if(estado.fila[i].url)URL.revokeObjectURL(estado.fila[i].url);estado.fila.splice(i,1);renderFila();atualizarEnviar();status(estado.fila.length?estado.fila.length+' arquivo(s) pronto(s).':'Nenhum arquivo selecionado.',estado.fila.length?100:0)}else if(acao==='editar'&&estado.fila[i].tipo==='imagem'){abrirEditorFila(estado.fila[i]).catch(err=>alert('Erro ao abrir editor: '+(err.message||err)))}else if(estado.fila[i].tipo==='imagem'||estado.fila[i].tipo==='pdf'){visualizar(estado.fila[i].url,estado.fila[i].tipo,estado.fila[i].original.name)}else alert('Pré-visualização não disponível. O arquivo será preservado para download após o envio.')};$('fotosos-galeria').onclick=e=>{const editar=e.target.closest('button[data-acao="editar-existente"]');if(editar){abrirEditorRegistro({id:editar.dataset.id,url:editar.dataset.url,caminho:editar.dataset.caminho,bucket:editar.dataset.bucket,nome_original:editar.dataset.nome}).catch(err=>{console.error(err);alert('Erro ao editar foto: '+(err.message||err))});return}const excluir=e.target.closest('button[data-acao="excluir-permanente"]');if(excluir){excluir.disabled=true;const cardExcluir=excluir.closest('.fotosos-card');excluirPermanenteMidia({id:excluir.dataset.id,caminho:excluir.dataset.caminho,bucket:excluir.dataset.bucket,nome:excluir.dataset.nome,card:cardExcluir}).catch(err=>{console.error(err);$('fotosos-galeria-status').textContent='Erro: '+(err.message||err);alert('Erro ao excluir permanentemente: '+(err.message||err))}).finally(()=>{if(excluir.isConnected)excluir.disabled=false});return}const b=e.target.closest('button[data-url]'),img=e.target.closest('img[data-url]');const el=b||img;if(el)visualizar(el.dataset.url,el.dataset.tipo,el.dataset.nome)};$('fotosos-editor-fechar').onclick=fecharEditor;$('fotosos-editor-cancelar').onclick=fecharEditor;$('fotosos-editor-girar-esq').onclick=()=>editorTransformar('esq');$('fotosos-editor-girar-dir').onclick=()=>editorTransformar('dir');$('fotosos-editor-espelhar-h').onclick=()=>editorTransformar('h');$('fotosos-editor-espelhar-v').onclick=()=>editorTransformar('v');$('fotosos-editor-cortar').onclick=editorAtivarCorte;$('fotosos-editor-reset').onclick=()=>{const ed=estado.editor;if(!ed)return;createImageBitmap(ed.originalBlob).then(b=>{ed.bitmap.close?.();ed.bitmap=b;ed.rotacao=0;ed.flipH=false;ed.flipV=false;ed.cortando=false;$('fotosos-editor-cortar').classList.remove('ativo');editorDesenhar()})};$('fotosos-editor-aplicar-corte').onclick=editorAplicarCorte;$('fotosos-editor-salvar').onclick=()=>salvarEditor().catch(err=>{console.error(err);alert('Erro ao salvar edição: '+(err.message||err))});const editorCanvas=$('fotosos-editor-canvas');editorCanvas.addEventListener('pointerdown',e=>{const ed=estado.editor;if(!ed?.cortando)return;e.preventDefault();const p=editorCoords(e);ed.drag={x:p.x,y:p.y};ed.crop={x:p.x,y:p.y,w:0,h:0};editorCanvas.setPointerCapture?.(e.pointerId);editorAtualizarCropVisual()});editorCanvas.addEventListener('pointermove',e=>{const ed=estado.editor;if(!ed?.drag)return;const p=editorCoords(e),x=Math.min(ed.drag.x,p.x),y=Math.min(ed.drag.y,p.y);ed.crop={x,y,w:Math.abs(p.x-ed.drag.x),h:Math.abs(p.y-ed.drag.y)};editorAtualizarCropVisual()});editorCanvas.addEventListener('pointerup',e=>{const ed=estado.editor;if(ed)ed.drag=null;editorCanvas.releasePointerCapture?.(e.pointerId)});$('fotosos-editor').addEventListener('click',e=>{if(e.target===$('fotosos-editor'))fecharEditor()});$('fotosos-lightbox-fechar').onclick=fecharPreview;$('fotosos-lightbox').onclick=e=>{if(e.target===$('fotosos-lightbox'))fecharPreview()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('fotosos-lightbox').classList.contains('aberto'))fecharPreview();else if($('fotosos-modal').classList.contains('aberto'))fechar()}});decorarTabelas();new MutationObserver(decorarTabelas).observe(document.body,{childList:true,subtree:true});window.abrirMidiasOS=abrir;console.info('Módulo Mídias O.S. v'+VERSAO+' carregado.')}
+function bind(){instalarMenu();preencherConfig();$('fotosos-fechar').onclick=fechar;$('fotosos-modal').addEventListener('click',e=>{if(e.target===$('fotosos-modal'))fechar()});$('fotosos-config-btn').onclick=()=>$('fotosos-config').classList.toggle('aberta');$('fotosos-salvar-config').onclick=salvarConfig;$('fotosos-testar-config').onclick=testarConfig;$('fotosos-selecionar').onclick=()=>$('fotosos-arquivos').click();$('fotosos-camera').onclick=()=>$('fotosos-camera-input').click();$('fotosos-arquivos').onchange=e=>adicionarArquivos(e.target.files);$('fotosos-camera-input').onchange=e=>adicionarArquivos(e.target.files);$('fotosos-limpar').onclick=limparFila;$('fotosos-enviar').onclick=()=>enviar().catch(e=>{console.error(e);status('Erro: '+(e.message||e),0);alert('Erro ao enviar: '+(e.message||e));atualizarEnviar()});$('fotosos-carregar').onclick=()=>carregarGaleria().catch(e=>$('fotosos-galeria-status').textContent='Erro: '+(e.message||e));$('fotosos-filtro-tipo').onchange=()=>carregarGaleria().catch(console.error);$('fotosos-os').addEventListener('input',e=>{atualizarEnviar();$('fotosos-os-selecionada').textContent='';fotososRenderDetalhes(null);clearTimeout(fotososBuscaTimer);fotososBuscaTimer=setTimeout(()=>fotososBuscarOS(e.target.value),220)});$('fotosos-os').addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();fotososMoverSugestao(1)}else if(e.key==='ArrowUp'){e.preventDefault();fotososMoverSugestao(-1)}else if(e.key==='Enter'){if(fotososSugestaoAtiva>=0){e.preventDefault();fotososSelecionarOS(fotososSugestoes[fotososSugestaoAtiva])}else if(fotososSugestoes.length===1){e.preventDefault();fotososSelecionarOS(fotososSugestoes[0])}else{const os=normalizarOS(e.target.value);if(os){e.target.value=os;fotososFecharSugestoes();atualizarEnviar();fotososCarregarDetalhesOS(os,$('fotosos-origem').value)}}}else if(e.key==='Escape')fotososFecharSugestoes()});$('fotosos-os-sugestoes').addEventListener('click',e=>{const b=e.target.closest('.fotosos-os-item');if(b)fotososSelecionarOS(fotososSugestoes[Number(b.dataset.i)])});$('fotosos-origem').addEventListener('change',()=>{fotososFecharSugestoes();$('fotosos-os-selecionada').textContent='';const os=normalizarOS($('fotosos-os').value);if(os)fotososCarregarDetalhesOS(os,$('fotosos-origem').value);if(os.length>=2)fotososBuscarOS(os)});document.addEventListener('click',e=>{if(!e.target.closest('.fotosos-os-wrap'))fotososFecharSugestoes()});document.querySelectorAll('.fotosos-aba').forEach(b=>b.onclick=()=>trocarAba(b.dataset.aba));document.querySelectorAll('.fotosos-perfil').forEach(b=>b.onclick=()=>{estado.perfil=b.dataset.perfil;document.querySelectorAll('.fotosos-perfil').forEach(x=>x.classList.toggle('ativo',x===b))});const drop=$('fotosos-drop');drop.onclick=()=>$('fotosos-arquivos').click();drop.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('fotosos-arquivos').click()}};['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('arrastando')}));['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('arrastando')}));drop.addEventListener('drop',e=>adicionarArquivos(e.dataTransfer.files));$('fotosos-fila').onclick=e=>{const card=e.target.closest('.fotosos-card'),acao=e.target.dataset.acao;if(!card||!acao)return;const i=estado.fila.findIndex(x=>x.id===card.dataset.id);if(i<0)return;if(acao==='remover'){if(estado.fila[i].url)URL.revokeObjectURL(estado.fila[i].url);estado.fila.splice(i,1);renderFila();atualizarEnviar();status(estado.fila.length?estado.fila.length+' arquivo(s) pronto(s).':'Nenhum arquivo selecionado.',estado.fila.length?100:0)}else if(acao==='editar'&&estado.fila[i].tipo==='imagem'){abrirEditorFila(estado.fila[i]).catch(err=>alert('Erro ao abrir editor: '+(err.message||err)))}else if(estado.fila[i].tipo==='imagem'||estado.fila[i].tipo==='pdf'){visualizar(estado.fila[i].url,estado.fila[i].tipo,estado.fila[i].original.name)}else alert('Pré-visualização não disponível. O arquivo será preservado para download após o envio.')};$('fotosos-galeria').onclick=e=>{const editar=e.target.closest('button[data-acao="editar-existente"]');if(editar){abrirEditorRegistro({id:editar.dataset.id,url:editar.dataset.url,caminho:editar.dataset.caminho,bucket:editar.dataset.bucket,nome_original:editar.dataset.nome}).catch(err=>{console.error(err);alert('Erro ao editar foto: '+(err.message||err))});return}const excluir=e.target.closest('button[data-acao="excluir-permanente"]');if(excluir){excluir.disabled=true;const cardExcluir=excluir.closest('.fotosos-card');excluirPermanenteMidia({id:excluir.dataset.id,caminho:excluir.dataset.caminho,bucket:excluir.dataset.bucket,nome:excluir.dataset.nome,card:cardExcluir}).catch(err=>{console.error(err);$('fotosos-galeria-status').textContent='Erro: '+(err.message||err);alert('Erro ao excluir permanentemente: '+(err.message||err))}).finally(()=>{if(excluir.isConnected)excluir.disabled=false});return}const b=e.target.closest('button[data-url]'),img=e.target.closest('img[data-url]');const el=b||img;if(el)visualizar(el.dataset.url,el.dataset.tipo,el.dataset.nome)};$('fotosos-editor-fechar').onclick=fecharEditor;$('fotosos-editor-cancelar').onclick=fecharEditor;$('fotosos-editor-girar-esq').onclick=()=>editorTransformar('esq');$('fotosos-editor-girar-dir').onclick=()=>editorTransformar('dir');$('fotosos-editor-espelhar-h').onclick=()=>editorTransformar('h');$('fotosos-editor-espelhar-v').onclick=()=>editorTransformar('v');$('fotosos-editor-cortar').onclick=editorAtivarCorte;$('fotosos-editor-reset').onclick=()=>{const ed=estado.editor;if(!ed)return;createImageBitmap(ed.originalBlob).then(b=>{ed.bitmap.close?.();ed.bitmap=b;ed.rotacao=0;ed.flipH=false;ed.flipV=false;ed.cortando=false;$('fotosos-editor-cortar').classList.remove('ativo');editorDesenhar()})};$('fotosos-editor-aplicar-corte').onclick=editorAplicarCorte;$('fotosos-editor-salvar').onclick=()=>salvarEditor().catch(err=>{console.error(err);alert('Erro ao salvar edição: '+(err.message||err))});const editorCanvas=$('fotosos-editor-canvas');editorCanvas.addEventListener('pointerdown',e=>{const ed=estado.editor;if(!ed?.cortando)return;e.preventDefault();const p=editorCoords(e);ed.drag={x:p.x,y:p.y};ed.crop={x:p.x,y:p.y,w:0,h:0};editorCanvas.setPointerCapture?.(e.pointerId);editorAtualizarCropVisual()});editorCanvas.addEventListener('pointermove',e=>{const ed=estado.editor;if(!ed?.drag)return;const p=editorCoords(e),x=Math.min(ed.drag.x,p.x),y=Math.min(ed.drag.y,p.y);ed.crop={x,y,w:Math.abs(p.x-ed.drag.x),h:Math.abs(p.y-ed.drag.y)};editorAtualizarCropVisual()});editorCanvas.addEventListener('pointerup',e=>{const ed=estado.editor;if(ed)ed.drag=null;editorCanvas.releasePointerCapture?.(e.pointerId)});$('fotosos-editor').addEventListener('click',e=>{if(e.target===$('fotosos-editor'))fecharEditor()});$('fotosos-lightbox-fechar').onclick=fecharPreview;$('fotosos-lightbox').onclick=e=>{if(e.target===$('fotosos-lightbox'))fecharPreview()};document.addEventListener('keydown',e=>{if(e.key==='Escape'){if($('fotosos-lightbox').classList.contains('aberto'))fecharPreview();else if($('fotosos-modal').classList.contains('aberto'))fechar()}});decorarTabelas();window.abrirMidiasOS=abrir;console.info('Módulo Mídias O.S. v'+VERSAO+' carregado.')}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();})();
 </script>
 
@@ -20525,16 +20606,46 @@ function decorarTextosRotulados(raiz=document){
 function decorarTudo(raiz=document){
   decorarTabelas(raiz);decorarInputs(raiz);decorarDataOS(raiz);decorarTextosRotulados(raiz);
 }
+const raizesPendentes=new Set();
 let pendente=false;
-function agendar(){if(pendente)return;pendente=true;requestAnimationFrame(()=>{pendente=false;decorarTudo(document)})}
+function agendar(raiz=document){
+  if(raiz && raiz.nodeType===1)raizesPendentes.add(raiz);
+  if(pendente)return;
+  pendente=true;
+  requestAnimationFrame(()=>{
+    pendente=false;
+    const lista=[...raizesPendentes];
+    raizesPendentes.clear();
+    if(!lista.length)lista.push(document);
+    lista.forEach(r=>decorarTudo(r));
+  });
+}
 function iniciar(){
   decorarTudo(document);
-  new MutationObserver(muts=>{
-    // Revarre também tabelas já existentes quando novas linhas são renderizadas.
-    if(muts.some(m=>m.addedNodes.length||m.type==='characterData'))agendar();
-  }).observe(document.body,{childList:true,subtree:true,characterData:true});
-  document.addEventListener('change',e=>{if(e.target?.matches?.(SEL_INPUT))agendar()},true);
-  console.info('Atalhos globais de mídias O.S. v'+V+' carregados.');
+  const observer=new MutationObserver(muts=>{
+    for(const m of muts){
+      if(!m.addedNodes?.length)continue;
+      const alvo=m.target?.nodeType===1?m.target:null;
+      const tabela=alvo?.closest?.('table');
+      if(tabela){agendar(tabela);continue}
+      for(const n of m.addedNodes){
+        if(n.nodeType!==1)continue;
+        agendar(n);
+        const t=n.closest?.('table');
+        if(t)agendar(t);
+      }
+    }
+  });
+  observer.observe(document.body,{childList:true,subtree:true});
+  document.addEventListener('input',e=>{
+    if(e.target?.matches?.(SEL_INPUT)){
+      const b=e.target.nextElementSibling;
+      if(b?.classList?.contains('midias-os-atalho-v7527'))atualizarBotao(b,e.target.value);
+      else agendar(e.target.parentElement||e.target);
+    }
+  },true);
+  document.addEventListener('change',e=>{if(e.target?.matches?.(SEL_INPUT))agendar(e.target.parentElement||e.target)},true);
+  console.info('Atalhos globais de mídias O.S. v7.5.38 otimizados.');
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});else iniciar();
 })();
