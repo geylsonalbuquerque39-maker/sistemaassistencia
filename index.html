@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.39: login restaurado + dossiê compatível + desempenho + proteção da coleta -->
+<!-- V7.5.40: login intacto + dossiê compatível + desempenho otimizado -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -5649,7 +5649,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="rascunhos-leitura">
                     <div class="campo">
                         <label>Bipar ou digitar O.S.</label>
-                        <input id="rascunhoCampoOS" autocomplete="one-time-code" name="rascunho_os_operacao" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Cole várias O.S. ou bipe uma por vez" onkeydown="rascunhoTeclaOS(event)" onpaste="rascunhoColarOS(event)">
+                        <input id="rascunhoCampoOS" autocomplete="one-time-code" name="numero_os_rascunho" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Cole várias O.S. ou bipe uma por vez" onkeydown="rascunhoTeclaOS(event)" onpaste="rascunhoColarOS(event)">
                     </div>
                     <button class="coleta-btn green" type="button" onclick="adicionarOSRascunho()">Adicionar O.S.</button>
                     <button class="coleta-btn light" type="button" onclick="focarCampoRascunho()">⌖ Ativar bipador</button>
@@ -5704,7 +5704,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <div class="coleta-campo-wrap">
                     <label for="coletaCampoOS">Bipar ou digitar a O.S.</label>
                     <div class="coleta-input-linha">
-                        <input id="coletaCampoOS" class="coleta-input" autocomplete="one-time-code" inputmode="numeric" name="coleta_os_operacao" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Bipe uma O.S. ou cole várias de uma vez..." onkeydown="coletaTeclaOS(event)" onpaste="coletaColarOSLote(event)">
+                        <input id="coletaCampoOS" class="coleta-input" autocomplete="one-time-code" inputmode="numeric" name="numero_os_coleta" aria-autocomplete="none" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Bipe uma O.S. ou cole várias de uma vez..." onkeydown="coletaTeclaOS(event)" onpaste="coletaColarOSLote(event)">
                         <button class="coleta-btn green" type="button" onclick="coletarOS()">Adicionar O.S.</button>
                     </div>
                 </div>
@@ -10046,73 +10046,53 @@ function fecharModalHistoricoCI(){document.getElementById("cihModal").style.disp
 function documentoImpressaoHistoricoCI(x){
     const estilos=[...document.querySelectorAll("style,link[rel='stylesheet']")].map(e=>e.outerHTML).join("\n");
     return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
-<!-- V7.5.39 - Compatibilidade do Dossiê/Mídias + proteção do autocomplete somente nos campos de O.S. -->
-<style id="patch-v7538-dossie-compat">
-#fotosos-menu.fotosos-menu-forcado-v7538{display:flex!important;align-items:center!important;gap:8px!important}
+<!-- V7.5.40 - Patch isolado: compatibilidade do botão Dossiê/Mídias -->
+<style id="patch-v7540-menu-midias">
+#fotosos-menu.fotosos-menu-forcado-v7540{display:flex!important;align-items:center!important;gap:8px!important}
 #fotosos-menu .fotosos-menu-badge{margin-left:auto!important}
 </style>
-<script id="patch-v7538-dossie-compat">
+<script id="patch-v7540-menu-midias">
 (function(){
 "use strict";
 function origemAtual(){
-    const ativo=document.querySelector('.menu.active,[data-menu].active');
-    const marca=((ativo?.dataset?.menu||'')+' '+(ativo?.id||'')+' '+(ativo?.textContent||'')).toLowerCase();
-    if(marca.includes('cliente'))return 'clientes';
-    if(marca.includes('cpp'))return 'cpp';
-    return 'principal';
+  const ativo=document.querySelector('.menu.active,[data-menu].active');
+  const txt=((ativo?.dataset?.menu||'')+' '+(ativo?.id||'')+' '+(ativo?.textContent||'')).toLowerCase();
+  if(txt.includes('cliente'))return 'clientes';
+  if(txt.includes('cpp'))return 'cpp';
+  return 'principal';
 }
-function garantirMenuDossie(){
-    const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
-    if(!sidebar)return;
-    let botao=document.getElementById('fotosos-menu');
-    if(botao && botao.isConnected){
-        botao.classList.add('fotosos-menu-forcado-v7538');
-        return;
-    }
-    botao=document.createElement('div');
-    botao.id='fotosos-menu';
-    botao.className='menu fotosos-menu-forcado-v7538';
-    botao.dataset.menu='midias';
-    botao.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';
-    botao.setAttribute('role','button');
-    botao.setAttribute('tabindex','0');
-    const abrir=()=>{
-        if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual());
-        else setTimeout(()=>{if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual())},250);
-    };
-    botao.addEventListener('click',abrir);
-    botao.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir()}});
-    const consulta=sidebar.querySelector('[data-menu="consulta"]');
-    if(consulta)consulta.insertAdjacentElement('afterend',botao);
-    else sidebar.appendChild(botao);
-}
-function protegerCamposColeta(){
-    ['coletaCampoOS','rascunhoCampoOS','cliColetaOSPrincipal'].forEach((id,i)=>{
-        const el=document.getElementById(id);
-        if(!el)return;
-        el.setAttribute('autocomplete','one-time-code');
-        el.setAttribute('aria-autocomplete','none');
-        el.setAttribute('autocapitalize','off');
-        el.setAttribute('spellcheck','false');
-        el.setAttribute('data-lpignore','true');
-        el.setAttribute('data-1p-ignore','true');
-        el.setAttribute('data-form-type','other');
-        if(!el.name)el.name='os_operacao_'+(i+1);
-    });
+function garantir(){
+  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+  if(!sidebar)return;
+  let b=document.getElementById('fotosos-menu');
+  if(b&&b.isConnected){b.classList.add('fotosos-menu-forcado-v7540');return}
+  b=document.createElement('div');
+  b.id='fotosos-menu';
+  b.className='menu fotosos-menu-forcado-v7540';
+  b.dataset.menu='midias';
+  b.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';
+  b.setAttribute('role','button');
+  b.setAttribute('tabindex','0');
+  const abrir=()=>{
+    if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual());
+  };
+  b.addEventListener('click',abrir);
+  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir()}});
+  const ref=sidebar.querySelector('[data-menu="consulta"]');
+  if(ref)ref.insertAdjacentElement('afterend',b); else sidebar.appendChild(b);
 }
 function iniciar(){
-    garantirMenuDossie();
-    protegerCamposColeta();
-    const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
-    if(sidebar){
-        let timer=0;
-        new MutationObserver(()=>{
-            clearTimeout(timer);
-            timer=setTimeout(garantirMenuDossie,80);
-        }).observe(sidebar,{childList:true,subtree:false});
-    }
-    setTimeout(()=>{garantirMenuDossie();protegerCamposColeta()},500);
-    setTimeout(()=>{garantirMenuDossie();protegerCamposColeta()},1800);
+  garantir();
+  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+  if(sidebar){
+    let t=0;
+    new MutationObserver(()=>{
+      clearTimeout(t);
+      t=setTimeout(garantir,100);
+    }).observe(sidebar,{childList:true,subtree:false});
+  }
+  setTimeout(garantir,700);
+  setTimeout(garantir,2000);
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});
 else iniciar();
@@ -20638,7 +20618,7 @@ function iniciar(){
     }
   },true);
   document.addEventListener('change',e=>{if(e.target?.matches?.(SEL_INPUT))agendar(e.target.parentElement||e.target)},true);
-  console.info('Atalhos globais de mídias O.S. v7.5.38 otimizados.');
+  console.info('Atalhos globais de mídias O.S. v7.5.40 otimizados.');
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});else iniciar();
 })();
