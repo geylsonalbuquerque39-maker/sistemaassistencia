@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.44 ON-DEMAND: somente o módulo ativo permanece montado e trabalhando -->
+<!-- V7.5.46: Atualizar Banco, Usuários e Histórico C.I. compatíveis com carregamento sob demanda -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -10202,19 +10202,35 @@ function renderIntel(){
     if(typeof renderDashboardOperacionalV55==="function")renderDashboardOperacionalV55();
 }
 async function carregarInteligencia(forcar){
-    if(intelCarregando)return;if(intelRegistros.length&&!forcar){renderIntel();return}
-    intelCarregando=true;const m=document.getElementById("intelMensagem");m.className="dashboard-loading";m.textContent="Analisando toda a base REXPEDLR...";
+    if(intelCarregando)return;
+    if(intelRegistros.length&&!forcar){
+        if(document.getElementById("telaInteligencia"))renderIntel();
+        return;
+    }
+    intelCarregando=true;
+    const m=document.getElementById("intelMensagem");
+    if(m){m.className="dashboard-loading";m.textContent="Analisando toda a base REXPEDLR...";}
     try{
         intelRegistros=await buscarTodaRexpedlr();
         intelAnalise=analisarIntel(intelRegistros);
-        renderIntel();
-        if(typeof renderHomeIntegradaV502==="function") renderHomeIntegradaV502();
-        if(typeof atualizarBadgeCopilotoERP==="function") atualizarBadgeCopilotoERP();
-        if(typeof restaurarContextoCopiloto==="function") restaurarContextoCopiloto();
-        m.className="dashboard-ok";
-        m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
+
+        // Só renderiza a Inteligência se a tela estiver realmente montada.
+        if(document.getElementById("telaInteligencia"))renderIntel();
+
+        if(typeof renderHomeIntegradaV502==="function")renderHomeIntegradaV502();
+        if(typeof atualizarBadgeCopilotoERP==="function")atualizarBadgeCopilotoERP();
+        if(typeof restaurarContextoCopiloto==="function")restaurarContextoCopiloto();
+
+        if(m){
+            m.className="dashboard-ok";
+            m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
+        }
+    }catch(e){
+        if(m){m.className="dashboard-erro";m.textContent="Erro ao analisar a base: "+(e.message||e);}
+        else console.error("Erro ao analisar Inteligência:",e);
+    }finally{
+        intelCarregando=false;
     }
-    catch(e){m.className="dashboard-erro";m.textContent="Erro ao analisar a base: "+(e.message||e)}finally{intelCarregando=false}
 }
 
 function tabelaPendenciaHTML(titulo, chave, lista){
@@ -11604,6 +11620,57 @@ function homeV502Status(texto,tipo){
     el.className="home-integrada-status"+(tipo?" "+tipo:"");
     el.textContent=texto;
 }
+
+let homeAnalisePromiseV7545=null;
+let homeAnaliseAtualizadaEmV7545=0;
+
+async function carregarAnaliseLeveHomeV7545(forcar){
+    const agora=Date.now();
+
+    if(!forcar &&
+       typeof intelAnalise!=="undefined" && intelAnalise &&
+       typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros) && intelRegistros.length){
+        return intelAnalise;
+    }
+
+    if(!forcar && homeAnalisePromiseV7545){
+        return homeAnalisePromiseV7545;
+    }
+
+    homeAnalisePromiseV7545=(async()=>{
+        homeV502Status("Carregando somente os dados necessários aos indicadores...");
+        const inicio=performance.now();
+
+        // Usa o cache compartilhado da V7.5.43 quando disponível.
+        const registros=await buscarTodaRexpedlr();
+
+        if(!Array.isArray(registros) || !registros.length){
+            throw new Error("A base REXPEDLR não retornou registros.");
+        }
+
+        // Mantém a base/resultado em memória para Inteligência reaproveitar depois.
+        intelRegistros=registros;
+
+        // Cálculo é feito sem renderizar nenhum painel da Inteligência.
+        await new Promise(resolve=>setTimeout(resolve,0));
+        intelAnalise=analisarIntel(registros);
+        homeAnaliseAtualizadaEmV7545=Date.now();
+
+        const ms=Math.round(performance.now()-inicio);
+        if(localStorage.getItem("ERP_DEBUG_PERF")==="1"){
+            console.info("[PERF] Indicadores HOME:",ms+"ms",registros.length+" registros");
+        }
+
+        return intelAnalise;
+    })();
+
+    try{
+        return await homeAnalisePromiseV7545;
+    }finally{
+        homeAnalisePromiseV7545=null;
+    }
+}
+
 function renderHomeIntegradaV502(){
     const a=(typeof intelAnalise!=="undefined")?intelAnalise:null;
     const regs=(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))?intelRegistros:[];
@@ -11645,39 +11712,29 @@ function renderHomeIntegradaV502(){
     return true;
 }
 function aguardarAnaliseHomeV502(){
-    clearTimeout(homeV502Timer);
-    if(renderHomeIntegradaV502()){
-        homeV502Tentativa=0;
-        return;
+    // V7.5.45: mantida apenas por compatibilidade com chamadas antigas.
+    // Os indicadores não usam mais polling nem timeout fixo de 20 segundos.
+    if(!renderHomeIntegradaV502()){
+        carregarHomeIntegradaV502(false);
     }
-    homeV502Tentativa++;
-    if(homeV502Tentativa>=40){
-        homeV502Status("A análise não respondeu dentro de 20 segundos. Clique em “Atualizar indicadores” para tentar novamente.","erro");
-        homeV502Set("homeIntegradaAtualizacao","Análise indisponível");
-        homeV502Tentativa=0;
-        return;
-    }
-    const segundos=Math.ceil((40-homeV502Tentativa)/2);
-    homeV502Status("Analisando a base em segundo plano... limite de espera: "+segundos+" s.");
-    homeV502Timer=setTimeout(aguardarAnaliseHomeV502,500);
 }
 async function carregarHomeIntegradaV502(forcar){
     homeV502Saudacao();
     homeV502Tentativa=0;
+
     if(renderHomeIntegradaV502()&&!forcar)return;
 
-    homeV502Status(forcar?"Reanalisando a base...":"Preparando indicadores em segundo plano...");
+    homeV502Status(forcar?"Reanalisando indicadores...":"Preparando indicadores em segundo plano...");
+    homeV502Set("homeIntegradaAtualizacao","Atualizando...");
+
     try{
-        if(typeof carregarInteligencia!=="function"){
-            throw new Error("Módulo de inteligência não encontrado.");
-        }
-        if(forcar || !(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros)&&intelRegistros.length)){
-            await carregarInteligencia(!!forcar);
-        }
+        await carregarAnaliseLeveHomeV7545(!!forcar);
+
         if(!renderHomeIntegradaV502()){
-            aguardarAnaliseHomeV502();
+            throw new Error("A análise terminou, mas os indicadores não puderam ser montados.");
         }
     }catch(e){
+        console.error("Indicadores HOME V7.5.45:",e);
         homeV502Status("Não foi possível carregar os indicadores: "+(e.message||e),"erro");
         homeV502Set("homeIntegradaAtualizacao","Falha na análise");
     }
@@ -20752,11 +20809,11 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V7.5.44</div>
+<div id="erpVersionBadgeV7542">ERP V7.5.46</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
-window.ERP_VERSION="7.5.44";
+window.ERP_VERSION="7.5.46";
 const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
 window.erpMedir=async function(nome,fn){
     const t=performance.now();
@@ -20766,7 +20823,7 @@ window.erpMedir=async function(nome,fn){
 document.addEventListener("visibilitychange",()=>{
     if(debug())console.info("[PERF] aba",document.hidden?"em segundo plano":"ativa");
 });
-console.info("ERP V7.5.44 On-Demand carregado.");
+console.info("ERP V7.5.46 Admin On-Demand corrigido.");
 })();
 </script>
 
@@ -20792,12 +20849,6 @@ const TELAS_PESADAS = new Set([
     "telaMonitoramentoCPP",
     "telaClientes",
     "telaAdmin",
-    "telaAdminAtualizar",
-    "telaAdminUsuarios",
-    "telaAdminPresenca",
-    "telaAdminHistorico",
-    "telaAdminHistoricoCI",
-    "telaAdminAuditoria",
     "telaRelatorios"
 ]);
 
@@ -20976,6 +21027,83 @@ function instalar(){
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(instalar,2200),{once:true});
 else setTimeout(instalar,2200);
+})();
+</script>
+
+
+<!-- =========================================================
+     V7.5.46 - SUBTELAS ADMINISTRATIVAS SOB DEMANDA
+     ========================================================= -->
+<script id="erp-v7546-admin-on-demand">
+(function(){
+"use strict";
+
+const MAPA = {
+  abrirAdminAtualizar: "telaAdminAtualizar",
+  abrirAtualizarBanco: "telaAdminAtualizar",
+  abrirAtualizarBancoDados: "telaAdminAtualizar",
+  abrirAdminUsuarios: "telaAdminUsuarios",
+  abrirUsuarios: "telaAdminUsuarios",
+  abrirAdminHistoricoCI: "telaAdminHistoricoCI",
+  abrirHistoricoCI: "telaAdminHistoricoCI",
+  abrirAdminHistorico: "telaAdminHistorico",
+  abrirHistorico: "telaAdminHistorico",
+  abrirAdminAuditoria: "telaAdminAuditoria",
+  abrirAuditoria: "telaAdminAuditoria",
+  abrirAdminPresenca: "telaAdminPresenca",
+  abrirPresenca: "telaAdminPresenca"
+};
+
+function montar(id){
+  if(typeof window.erpMontarTelaV7544==="function")return window.erpMontarTelaV7544(id);
+  return document.getElementById(id);
+}
+
+function instalarWrapper(nome,id){
+  const original=window[nome];
+  if(typeof original!=="function"||original.__v7546)return false;
+  const fn=function(){
+    montar(id);
+    const r=original.apply(this,arguments);
+    setTimeout(()=>window.erpSincronizarModulosV7544?.(),0);
+    return r;
+  };
+  fn.__v7546=true;
+  window[nome]=fn;
+  return true;
+}
+
+function instalarTodos(){
+  Object.entries(MAPA).forEach(([nome,id])=>instalarWrapper(nome,id));
+}
+
+function montarPorAcao(acao){
+  const a=(acao||"").toLowerCase();
+  if(!a)return;
+  if(a.includes("atualizar")&&(a.includes("banco")||a.includes("adminatualizar")))montar("telaAdminAtualizar");
+  if(a.includes("usuario"))montar("telaAdminUsuarios");
+  if(a.includes("historico")&&a.includes("ci"))montar("telaAdminHistoricoCI");
+  else if(a.includes("historico"))montar("telaAdminHistorico");
+  if(a.includes("auditoria"))montar("telaAdminAuditoria");
+  if(a.includes("presenca")||a.includes("presença"))montar("telaAdminPresenca");
+}
+
+// Captura ANTES do onclick inline.
+document.addEventListener("click",function(e){
+  const alvo=e.target.closest("[onclick],button,.admin-acao,.menu");
+  if(!alvo)return;
+  montarPorAcao((alvo.getAttribute("onclick")||"")+" "+(alvo.textContent||""));
+  setTimeout(instalarTodos,0);
+  setTimeout(()=>window.erpSincronizarModulosV7544?.(),0);
+},true);
+
+// Se alguma sub-tela for desmontada e depois aberta por código, reinstala wrappers.
+setTimeout(instalarTodos,2200);
+setTimeout(instalarTodos,4000);
+
+// Não limpa o conteúdo estrutural das subtelas administrativas ao sair.
+// Elas são apenas estacionadas fora do DOM e voltam intactas ao clicar.
+console.info("ERP V7.5.46: subtelas administrativas compatíveis com modo sob demanda.");
 })();
 </script>
 
