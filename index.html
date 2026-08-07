@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.0.0 FASE 1: Kernel ERP + ModuleManager + Cache + Events + ResourceManager -->
+<!-- V8.1.0 FASE 2: Inteligência + CPP + CLIENTES controlados pelo ModuleManager -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -20926,7 +20926,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.0.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.1.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21541,8 +21541,8 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.0.0",active:inicial});
-    console.info("ERP Kernel V8.0.0 pronto. Módulo ativo:",inicial);
+    ERP.Events.emit("kernel:ready",{version:"8.1.0",active:inicial});
+    console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
 ERP.Kernel={
@@ -21559,6 +21559,314 @@ ERP.Kernel={
     }
 };
 
+})();
+</script>
+
+
+<!-- =========================================================
+     ERP V8.1.0 — FASE 2
+     Migração real: Inteligência + CPP + CLIENTES
+     ========================================================= -->
+<script id="erp-v810-heavy-modules">
+(function(){
+"use strict";
+
+function kernelReady(){
+    return !!(window.ERP?.ModuleManager && window.ERP?.Cache && window.ERP?.Resources);
+}
+
+function tela(id){
+    if(typeof window.erpMontarTelaV7544==="function"){
+        window.erpMontarTelaV7544(id);
+    }
+    return document.getElementById(id);
+}
+
+function mostrarModulo(idTela,menu){
+    if(typeof esconderTelas==="function")esconderTelas();
+    if(typeof definirMenuAtivo==="function")definirMenuAtivo(menu);
+    const el=tela(idTela);
+    if(el)el.style.display="block";
+    document.getElementById("sidebar")?.classList.remove("mobile-open");
+    return el;
+}
+
+function limparHTML(ids){
+    ids.forEach(id=>{
+        const el=document.getElementById(id);
+        if(el)el.innerHTML="";
+    });
+}
+
+/* =========================================================
+   INTELIGÊNCIA
+   Dados ficam em cache/memória.
+   DOM é destruído ao sair.
+   ========================================================= */
+function registrarInteligencia(){
+    ERP.ModuleManager.register("inteligencia",{
+        mount(){
+            tela("telaInteligencia");
+        },
+        async load(ctx={}){
+            const forcar=!!ctx.force;
+
+            const cacheReg=ERP.Cache.get("intel:registros");
+            const cacheAnalise=ERP.Cache.get("intel:analise");
+
+            if(!forcar && cacheReg && cacheAnalise){
+                intelRegistros=cacheReg;
+                intelAnalise=cacheAnalise;
+                return;
+            }
+
+            await carregarInteligencia(forcar);
+
+            if(Array.isArray(intelRegistros)&&intelRegistros.length){
+                ERP.Cache.set("intel:registros",intelRegistros,300000);
+            }
+            if(intelAnalise){
+                ERP.Cache.set("intel:analise",intelAnalise,300000);
+            }
+        },
+        render(){
+            if(intelAnalise && document.getElementById("telaInteligencia")){
+                renderIntel();
+                const m=document.getElementById("intelMensagem");
+                if(m){
+                    m.className="dashboard-ok";
+                    m.textContent="Análise pronta: "+intelRegistros.length.toLocaleString("pt-BR")+
+                        " O.S. em memória. Relações são renderizadas somente ao clicar.";
+                }
+            }
+        },
+        refresh(){
+            // Clique repetido não refaz consulta nem reconstrói a base.
+        },
+        sleep(){
+            if(typeof intelConsultaTimerV7543!=="undefined")clearTimeout(intelConsultaTimerV7543);
+        },
+        destroy(){
+            if(typeof fecharIntelModal==="function")fecharIntelModal();
+
+            limparHTML([
+                "intelConsultaTabela",
+                "intelModalConteudo",
+                "intelAlertas",
+                "intelCartoesDinamicos",
+                "intelPrioridades",
+                "intelPendencias",
+                "intelRankingTecnicos",
+                "intelRankingPDV",
+                "intelMapa"
+            ]);
+
+            if(typeof intelConsultaAtual!=="undefined")intelConsultaAtual=[];
+            // intelRegistros/intelAnalise NÃO são apagados.
+        }
+    });
+}
+
+/* =========================================================
+   CPP
+   O módulo existente já mantém arrays em memória.
+   Aqui controlamos quando consultar e quando renderizar.
+   ========================================================= */
+function registrarCPP(){
+    ERP.ModuleManager.register("cpp",{
+        mount(){
+            tela("telaMonitoramentoCPP");
+        },
+        async load(ctx={}){
+            await window.carregarMonitoramentoCPP?.(!!ctx.force);
+            ERP.Cache.set("cpp:last-load",Date.now(),120000);
+        },
+        render(){
+            // O carregador legado já atualiza KPIs/filtros/tabela.
+            // Nenhuma segunda consulta é feita aqui.
+        },
+        refresh(){
+            // Evita duplicidade causada por clique + bridge legado.
+        },
+        destroy(){
+            const corpo=document.getElementById("cppTabelaCorpo");
+            if(corpo){
+                corpo.innerHTML='<tr><td colspan="13" class="cpp-vazio">Abra o módulo para carregar a relação.</td></tr>';
+            }
+            document.getElementById("cppPagerV7543")?.remove();
+
+            const hist=document.getElementById("cppHistoricoLista");
+            if(hist)hist.innerHTML='<div class="cpp-vazio">Histórico será carregado ao abrir uma O.S.</div>';
+
+            const modal=document.getElementById("cppModal");
+            if(modal)modal.style.display="none";
+        }
+    });
+}
+
+/* =========================================================
+   CLIENTES
+   Mantém dados combinados em memória/cache.
+   Destrói gráficos/tabelas ao sair.
+   ========================================================= */
+function destruirChartsClientesV810(){
+    try{
+        if(typeof clientesCharts!=="undefined" && clientesCharts){
+            Object.keys(clientesCharts).forEach(id=>{
+                try{clientesCharts[id]?.destroy?.()}catch(e){}
+                delete clientesCharts[id];
+            });
+        }
+    }catch(e){}
+}
+
+function restaurarResumoClientesV810(){
+    const d=Array.isArray(window.clientesDadosCombinados)?window.clientesDadosCombinados:[];
+    if(!d.length)return false;
+
+    try{
+        clientesDadosCombinados=d;
+    }catch(e){}
+
+    const identificados=d.filter(r=>String(r.nome_cliente||"").trim()).length;
+    if(typeof setDash==="function"){
+        setDash("cliTotalOS",d.length);
+        setDash("cliTotalIdentificados",identificados);
+        setDash("cliSemNome",d.length-identificados);
+        setDash("cliBancoStatus","🟢 Cache");
+    }
+
+    const msg=document.getElementById("clientesMensagem");
+    if(msg){
+        msg.className="dashboard-ok";
+        msg.textContent="Base de Clientes pronta: "+d.length.toLocaleString("pt-BR")+
+            " O.S. em memória. Tabelas são renderizadas somente quando utilizadas.";
+    }
+    return true;
+}
+
+function registrarClientes(){
+    ERP.ModuleManager.register("clientes",{
+        mount(){
+            tela("telaClientes");
+        },
+        async load(ctx={}){
+            const forcar=!!ctx.force;
+            const cache=ERP.Cache.get("clientes:dados");
+
+            if(!forcar && Array.isArray(cache) && cache.length){
+                window.clientesDadosCombinados=cache;
+                try{clientesDadosCombinados=cache}catch(e){}
+                restaurarResumoClientesV810();
+                return;
+            }
+
+            if(!forcar && Array.isArray(window.clientesDadosCombinados) && window.clientesDadosCombinados.length){
+                ERP.Cache.set("clientes:dados",window.clientesDadosCombinados,300000);
+                restaurarResumoClientesV810();
+                return;
+            }
+
+            await carregarDashboardClientes(!!forcar);
+
+            if(Array.isArray(window.clientesDadosCombinados)&&window.clientesDadosCombinados.length){
+                ERP.Cache.set("clientes:dados",window.clientesDadosCombinados,300000);
+            }
+        },
+        render(){
+            restaurarResumoClientesV810();
+            if(typeof renderConsultasSalvasClientes==="function")renderConsultasSalvasClientes();
+        },
+        refresh(){
+            // Clique repetido não baixa novamente as tabelas.
+        },
+        destroy(){
+            destruirChartsClientesV810();
+
+            limparHTML([
+                "cliTabelaPrincipal",
+                "cliTabelaStatus",
+                "cliTabelaTecnicos",
+                "cliTabelaPDV"
+            ]);
+
+            const cont=document.getElementById("cliContagemTabela");
+            if(cont)cont.textContent="Os resultados serão renderizados quando você pesquisar.";
+
+            // Dados combinados permanecem em memória/cache.
+        }
+    });
+}
+
+/* =========================================================
+   NAVEGAÇÃO DIRETA PELO KERNEL
+   As funções públicas continuam com os mesmos nomes.
+   ========================================================= */
+function instalarNavegacaoDireta(){
+    window.abrirInteligencia=function(){
+        if(!usuarioLogado){
+            mostrarBloqueioPermissao("Faça login para acessar a Central de Inteligência.");
+            return;
+        }
+        mostrarModulo("telaInteligencia","inteligencia");
+        ERP.ModuleManager.open("inteligencia",{source:"direct"}).catch(console.error);
+    };
+
+    window.abrirMonitoramentoCPP=function(){
+        mostrarModulo("telaMonitoramentoCPP","cpp");
+        ERP.ModuleManager.open("cpp",{source:"direct"}).catch(console.error);
+    };
+
+    window.abrirClientes=function(){
+        mostrarModulo("telaClientes","clientes");
+        ERP.ModuleManager.open("clientes",{source:"direct"}).catch(console.error);
+    };
+}
+
+/* =========================================================
+   INVALIDAÇÃO DE CACHE
+   Importações/atualizações podem chamar isto.
+   ========================================================= */
+ERP.invalidateHeavyModules=function(modulo="all"){
+    if(modulo==="all"||modulo==="inteligencia"){
+        ERP.Cache.clear("intel:");
+        if(typeof rexpedlrIntelCacheV7543!=="undefined"){
+            rexpedlrIntelCacheV7543=null;
+            rexpedlrIntelCacheEmV7543=0;
+        }
+    }
+    if(modulo==="all"||modulo==="clientes"){
+        ERP.Cache.clear("clientes:");
+    }
+    if(modulo==="all"||modulo==="cpp"){
+        ERP.Cache.clear("cpp:");
+    }
+};
+
+function iniciar(){
+    if(!kernelReady()){
+        setTimeout(iniciar,100);
+        return;
+    }
+
+    registrarInteligencia();
+    registrarCPP();
+    registrarClientes();
+    instalarNavegacaoDireta();
+
+    ERP.Events.emit("phase2:ready",{
+        modules:["inteligencia","cpp","clientes"],
+        version:"8.1.0"
+    });
+
+    console.info("ERP V8.1.0 Fase 2 pronta: Inteligência, CPP e CLIENTES migrados ao ModuleManager.");
+}
+
+if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciar,2500),{once:true});
+}else{
+    setTimeout(iniciar,2500);
+}
 })();
 </script>
 
