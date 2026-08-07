@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.2.1: botão Salvar observação visível no Dossiê + ExportManager -->
+<!-- V8.3.0 FASE 3: Coleta + C.I. + Administração + Históricos + Relatórios no ciclo de vida -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -20931,7 +20931,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.2.1</div>
+<div id="erpVersionBadgeV7542">ERP V8.3.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21546,7 +21546,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.2.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.3.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22394,6 +22394,243 @@ document.addEventListener("input",function(e){
         ?"● Observação ainda não salva"
         :"A observação pode ser salva mesmo sem anexar arquivos.");
 });
+})();
+</script>
+
+
+<!-- =========================================================
+     ERP V8.3.0 — FASE 3
+     Coleta + C.I. + Administração + Históricos + Relatórios
+     ========================================================= -->
+<script id="erp-v830-core-modules">
+(function(){
+"use strict";
+
+function ready(){
+    return !!window.ERP?.ModuleManager;
+}
+function mount(id){
+    if(typeof window.erpMontarTelaV7544==="function")window.erpMontarTelaV7544(id);
+    return document.getElementById(id);
+}
+function clearHTML(id,msg=""){
+    const el=document.getElementById(id);
+    if(el)el.innerHTML=msg;
+}
+function clearTbodies(scopeId){
+    const root=document.getElementById(scopeId);
+    if(!root)return;
+    root.querySelectorAll("tbody").forEach(tb=>{
+        if(tb.closest(".ci-sheet,.ci-outros-grid"))return;
+        tb.innerHTML="";
+    });
+}
+
+/* =========================
+   COLETA
+   ========================= */
+function registerColeta(){
+    ERP.ModuleManager.register("coleta",{
+        mount(){mount("telaColeta");},
+        load(){
+            // A Coleta trabalha com consulta pontual por O.S.
+            // Nenhuma carga massiva é iniciada aqui.
+        },
+        render(){
+            if(typeof renderTabelaColeta==="function" && Array.isArray(window.coletaOSItens)){
+                try{renderTabelaColeta()}catch(e){}
+            }
+        },
+        sleep(){
+            // Nada continua processando ao sair.
+            if(typeof coletaTimerBusca!=="undefined")clearTimeout(coletaTimerBusca);
+        },
+        destroy(){
+            // Mantém os itens em memória para não perder trabalho,
+            // mas destrói as linhas renderizadas e históricos abertos.
+            const tbody=document.getElementById("coletaTabelaCorpo");
+            if(tbody)tbody.innerHTML="";
+            clearHTML("coletasHistCorpo","");
+            clearHTML("coletasHistDetalhe","");
+            const hist=document.getElementById("coletasHistoricoModulo");
+            if(hist)hist.style.display="none";
+        }
+    });
+}
+
+/* =========================
+   C.I.
+   Não apaga os dados digitados.
+   Apenas encerra recursos e conteúdo temporário.
+   ========================= */
+function registerCI(){
+    ERP.ModuleManager.register("ci",{
+        mount(){mount("telaCI");},
+        sleep(){},
+        destroy(){
+            document.querySelectorAll("#telaCI .ci-temp,#telaCI .resultado-temporario").forEach(el=>el.remove());
+        }
+    });
+    ERP.ModuleManager.register("planilha_ci",{
+        mount(){mount("telaPlanilhaCI");},
+        sleep(){},
+        destroy(){
+            // Preserva a planilha em edição. Somente menus/popups temporários somem.
+            document.querySelectorAll("#telaPlanilhaCI .dropdown-menu.aberto,#telaPlanilhaCI .popup.aberto").forEach(el=>el.classList.remove("aberto"));
+        }
+    });
+}
+
+/* =========================
+   ADMINISTRAÇÃO
+   ========================= */
+function registerAdmin(){
+    ERP.ModuleManager.register("admin",{
+        mount(){mount("telaAdmin");},
+        load(){
+            if(typeof carregarDashboardAdmin==="function")return carregarDashboardAdmin();
+        },
+        sleep(){
+            if(typeof dashboardOperacionalIntervaloV55!=="undefined"){
+                clearInterval(dashboardOperacionalIntervaloV55);
+                dashboardOperacionalIntervaloV55=null;
+            }
+            if(typeof presencaPainelTimerV56!=="undefined"){
+                clearInterval(presencaPainelTimerV56);
+                presencaPainelTimerV56=null;
+            }
+        },
+        destroy(){
+            // Gráficos deixam de existir quando a Administração não está aberta.
+            if(typeof dashboardCharts!=="undefined"&&dashboardCharts){
+                Object.keys(dashboardCharts).forEach(id=>{
+                    try{dashboardCharts[id]?.destroy?.()}catch(e){}
+                    delete dashboardCharts[id];
+                });
+            }
+        }
+    });
+
+    const adminSubs={
+        atualizar:"telaAdminAtualizar",
+        usuarios:"telaAdminUsuarios",
+        presenca:"telaAdminPresenca",
+        historico:"telaAdminHistorico",
+        historico_ci:"telaAdminHistoricoCI",
+        auditoria:"telaAdminAuditoria"
+    };
+
+    for(const [id,telaId] of Object.entries(adminSubs)){
+        ERP.ModuleManager.register("admin_"+id,{
+            mount(){mount(telaId);},
+            load(){
+                if(id==="usuarios"&&typeof carregarUsuariosAdmin==="function")return carregarUsuariosAdmin();
+                if(id==="presenca"&&typeof carregarPresencasV56==="function")return carregarPresencasV56(true);
+                if(id==="historico"&&typeof carregarHistoricoImportacoes==="function")return carregarHistoricoImportacoes();
+                if(id==="historico_ci"&&typeof carregarHistoricoCI==="function")return carregarHistoricoCI();
+                if(id==="auditoria"&&typeof carregarAuditoria==="function")return carregarAuditoria();
+            },
+            sleep(){
+                if(id==="presenca"&&typeof presencaPainelTimerV56!=="undefined"){
+                    clearInterval(presencaPainelTimerV56);
+                    presencaPainelTimerV56=null;
+                }
+            },
+            destroy(){
+                // Só as relações geradas são apagadas. Estrutura, filtros e botões ficam.
+                const root=document.getElementById(telaId);
+                if(!root)return;
+                root.querySelectorAll("tbody").forEach(tb=>tb.innerHTML="");
+                root.querySelectorAll(".resultado-lista,.historico-lista,.auditoria-lista").forEach(el=>el.innerHTML="");
+            }
+        });
+    }
+}
+
+/* =========================
+   RELATÓRIOS
+   ========================= */
+function registerRelatorios(){
+    ERP.ModuleManager.register("relatorios",{
+        mount(){mount("telaRelatorios");},
+        load(){},
+        render(){},
+        sleep(){},
+        destroy(){
+            if(typeof dashboardCharts!=="undefined"&&dashboardCharts){
+                ["chartStatus","chartTecnicos","chartPDV"].forEach(id=>{
+                    try{dashboardCharts[id]?.destroy?.()}catch(e){}
+                    if(dashboardCharts[id])delete dashboardCharts[id];
+                });
+            }
+            clearHTML("relatorioTabela","");
+            const msg=document.getElementById("relMensagem");
+            if(msg)msg.textContent="Escolha os filtros e gere o relatório quando precisar.";
+        }
+    });
+}
+
+/* =========================
+   BRIDGE DAS SUBTELAS ADMIN
+   ========================= */
+function wrapAdminSecao(){
+    const original=window.abrirAdminSecao;
+    if(typeof original!=="function"||original.__v830)return;
+    const fn=function(secao){
+        const id=String(secao||"");
+        const moduleId={
+            atualizar:"admin_atualizar",
+            usuarios:"admin_usuarios",
+            presenca:"admin_presenca",
+            historico:"admin_historico",
+            historico_ci:"admin_historico_ci",
+            auditoria:"admin_auditoria"
+        }[id]||"admin";
+
+        // Executa o comportamento existente primeiro, depois sincroniza o Kernel.
+        const r=original.apply(this,arguments);
+        setTimeout(()=>ERP.ModuleManager.open(moduleId,{source:"admin-section"}).catch(console.error),0);
+        return r;
+    };
+    fn.__v830=true;
+    window.abrirAdminSecao=fn;
+}
+
+/* =========================
+   DIAGNÓSTICO LEVE
+   ========================= */
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.snapshot=function(){
+    const active=ERP.ModuleManager?.current?.()||"";
+    return {
+        modulo:active,
+        dom:document.getElementsByTagName("*").length,
+        heap:performance?.memory?.usedJSHeapSize||null,
+        cache:ERP.Cache?.mem?.size||0,
+        timestamp:new Date().toISOString()
+    };
+};
+
+function iniciar(){
+    if(!ready()){setTimeout(iniciar,100);return}
+    registerColeta();
+    registerCI();
+    registerAdmin();
+    registerRelatorios();
+    wrapAdminSecao();
+
+    ERP.Events?.emit?.("phase3:ready",{
+        version:"8.3.0",
+        modules:["coleta","ci","planilha_ci","admin","admin_*","relatorios"]
+    });
+    console.info("ERP V8.3.0 Fase 3 pronta: módulos centrais migrados ao ciclo de vida.");
+}
+
+if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciar,2800),{once:true});
+}else{
+    setTimeout(iniciar,2800);
+}
 })();
 </script>
 
