@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.47: Inteligência com relações lazy + limpeza total do DOM ao sair -->
+<!-- V7.5.48: Inteligência lazy com estado de análise corrigido -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -10202,16 +10202,52 @@ function renderIntel(){
     if(typeof renderDashboardOperacionalV55==="function")renderDashboardOperacionalV55();
 }
 async function carregarInteligencia(forcar){
-    if(intelCarregando)return;
-    if(intelRegistros.length&&!forcar){
-        if(document.getElementById("telaInteligencia"))renderIntel();
+    const m=document.getElementById("intelMensagem");
+
+    if(intelCarregando){
+        if(m){m.className="dashboard-loading";m.textContent="Análise em andamento...";}
         return;
     }
+
+    // V7.5.48: a HOME pode já ter carregado intelRegistros/intelAnalise.
+    // Nesse caso apenas renderiza a tela e atualiza o status, sem baixar tudo novamente.
+    if(!forcar && intelRegistros.length && intelAnalise){
+        if(document.getElementById("telaInteligencia"))renderIntel();
+        if(m){
+            m.className="dashboard-ok";
+            m.textContent="Análise pronta: "+intelRegistros.length.toLocaleString("pt-BR")+" O.S. em memória. Relações serão carregadas somente ao clicar.";
+        }
+        return;
+    }
+
+    // Se houver registros em memória, mas a análise ainda não existir, calcula localmente.
+    if(!forcar && intelRegistros.length && !intelAnalise){
+        intelCarregando=true;
+        if(m){m.className="dashboard-loading";m.textContent="Calculando indicadores da base já carregada...";}
+        try{
+            await new Promise(resolve=>setTimeout(resolve,0));
+            intelAnalise=analisarIntel(intelRegistros);
+            if(document.getElementById("telaInteligencia"))renderIntel();
+            if(m){
+                m.className="dashboard-ok";
+                m.textContent="Análise pronta: "+intelRegistros.length.toLocaleString("pt-BR")+" O.S. em memória. Relações serão carregadas somente ao clicar.";
+            }
+        }catch(e){
+            if(m){m.className="dashboard-erro";m.textContent="Erro ao calcular a análise: "+(e.message||e);}
+            else console.error("Erro ao calcular Inteligência:",e);
+        }finally{
+            intelCarregando=false;
+        }
+        return;
+    }
+
     intelCarregando=true;
-    const m=document.getElementById("intelMensagem");
-    if(m){m.className="dashboard-loading";m.textContent="Analisando toda a base REXPEDLR...";}
+    if(m){m.className="dashboard-loading";m.textContent="Carregando dados para análise...";}
     try{
         intelRegistros=await buscarTodaRexpedlr();
+
+        if(m)m.textContent="Calculando indicadores...";
+        await new Promise(resolve=>setTimeout(resolve,0));
         intelAnalise=analisarIntel(intelRegistros);
 
         // Só renderiza a Inteligência se a tela estiver realmente montada.
@@ -10223,7 +10259,7 @@ async function carregarInteligencia(forcar){
 
         if(m){
             m.className="dashboard-ok";
-            m.textContent="Análise concluída: "+intelRegistros.length+" O.S. avaliadas em "+new Date().toLocaleTimeString("pt-BR")+".";
+            m.textContent="Análise concluída: "+intelRegistros.length.toLocaleString("pt-BR")+" O.S. avaliadas. Relações serão carregadas somente ao clicar.";
         }
     }catch(e){
         if(m){m.className="dashboard-erro";m.textContent="Erro ao analisar a base: "+(e.message||e);}
@@ -20890,11 +20926,11 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V7.5.47</div>
+<div id="erpVersionBadgeV7542">ERP V7.5.48</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
-window.ERP_VERSION="7.5.47";
+window.ERP_VERSION="7.5.48";
 const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
 window.erpMedir=async function(nome,fn){
     const t=performance.now();
