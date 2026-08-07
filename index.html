@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.40: login intacto + dossiê compatível + desempenho otimizado -->
+<!-- V7.5.41: login corrigido + dossiê compatível + desempenho otimizado -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -10045,61 +10045,7 @@ async function atualizarNumeroHistoricoCI(){
 function fecharModalHistoricoCI(){document.getElementById("cihModal").style.display="none";historicoCIAtual=null}
 function documentoImpressaoHistoricoCI(x){
     const estilos=[...document.querySelectorAll("style,link[rel='stylesheet']")].map(e=>e.outerHTML).join("\n");
-    return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
-<!-- V7.5.40 - Patch isolado: compatibilidade do botão Dossiê/Mídias -->
-<style id="patch-v7540-menu-midias">
-#fotosos-menu.fotosos-menu-forcado-v7540{display:flex!important;align-items:center!important;gap:8px!important}
-#fotosos-menu .fotosos-menu-badge{margin-left:auto!important}
-</style>
-<script id="patch-v7540-menu-midias">
-(function(){
-"use strict";
-function origemAtual(){
-  const ativo=document.querySelector('.menu.active,[data-menu].active');
-  const txt=((ativo?.dataset?.menu||'')+' '+(ativo?.id||'')+' '+(ativo?.textContent||'')).toLowerCase();
-  if(txt.includes('cliente'))return 'clientes';
-  if(txt.includes('cpp'))return 'cpp';
-  return 'principal';
-}
-function garantir(){
-  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
-  if(!sidebar)return;
-  let b=document.getElementById('fotosos-menu');
-  if(b&&b.isConnected){b.classList.add('fotosos-menu-forcado-v7540');return}
-  b=document.createElement('div');
-  b.id='fotosos-menu';
-  b.className='menu fotosos-menu-forcado-v7540';
-  b.dataset.menu='midias';
-  b.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';
-  b.setAttribute('role','button');
-  b.setAttribute('tabindex','0');
-  const abrir=()=>{
-    if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual());
-  };
-  b.addEventListener('click',abrir);
-  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir()}});
-  const ref=sidebar.querySelector('[data-menu="consulta"]');
-  if(ref)ref.insertAdjacentElement('afterend',b); else sidebar.appendChild(b);
-}
-function iniciar(){
-  garantir();
-  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
-  if(sidebar){
-    let t=0;
-    new MutationObserver(()=>{
-      clearTimeout(t);
-      t=setTimeout(garantir,100);
-    }).observe(sidebar,{childList:true,subtree:false});
-  }
-  setTimeout(garantir,700);
-  setTimeout(garantir,2000);
-}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});
-else iniciar();
-})();
-</script>
-
-</body></html>";
+    return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script></body></html>";
 }
 async function imprimirHistoricoCIDireto(id){
     const x=obterHistoricoCI(id);
@@ -20618,7 +20564,7 @@ function iniciar(){
     }
   },true);
   document.addEventListener('change',e=>{if(e.target?.matches?.(SEL_INPUT))agendar(e.target.parentElement||e.target)},true);
-  console.info('Atalhos globais de mídias O.S. v7.5.40 otimizados.');
+  console.info('Atalhos globais de mídias O.S. v7.5.41 otimizados.');
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});else iniciar();
 })();
@@ -20666,6 +20612,55 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 
 <!-- V7.5.36 - Correção definitiva: um único ícone de mídia por O.S.; botão fixo sem aumentar linha -->
+
+<!-- V7.5.41 - Compatibilidade do botão Dossiê/Mídias -->
+<style id="patch-v7541-menu-midias">
+#fotosos-menu.fotosos-menu-forcado-v7541{display:flex!important;align-items:center!important;gap:8px!important}
+#fotosos-menu .fotosos-menu-badge{margin-left:auto!important}
+</style>
+<script id="patch-v7541-menu-midias">
+(function(){
+"use strict";
+function origemAtual(){
+  const ativo=document.querySelector('.menu.active,[data-menu].active');
+  const txt=((ativo?.dataset?.menu||'')+' '+(ativo?.id||'')+' '+(ativo?.textContent||'')).toLowerCase();
+  if(txt.includes('cliente'))return 'clientes';
+  if(txt.includes('cpp'))return 'cpp';
+  return 'principal';
+}
+function garantir(){
+  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+  if(!sidebar)return;
+  let b=document.getElementById('fotosos-menu');
+  if(b&&b.isConnected){b.classList.add('fotosos-menu-forcado-v7541');return}
+  b=document.createElement('div');
+  b.id='fotosos-menu';
+  b.className='menu fotosos-menu-forcado-v7541';
+  b.dataset.menu='midias';
+  b.innerHTML='📎 Mídias de O.S.<span class="fotosos-menu-badge">NOVO</span>';
+  b.setAttribute('role','button');
+  b.setAttribute('tabindex','0');
+  const abrir=()=>{ if(typeof window.abrirMidiasOS==='function')window.abrirMidiasOS('',origemAtual()); };
+  b.addEventListener('click',abrir);
+  b.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();abrir()}});
+  const ref=sidebar.querySelector('[data-menu="consulta"]');
+  if(ref)ref.insertAdjacentElement('afterend',b); else sidebar.appendChild(b);
+}
+function iniciar(){
+  garantir();
+  const sidebar=document.getElementById('sidebar')||document.querySelector('.sidebar');
+  if(sidebar){
+    let t=0;
+    new MutationObserver(()=>{clearTimeout(t);t=setTimeout(garantir,100)}).observe(sidebar,{childList:true,subtree:false});
+  }
+  setTimeout(garantir,700);
+  setTimeout(garantir,2000);
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});
+else iniciar();
+})();
+</script>
+
 </body>
 </html>
 
