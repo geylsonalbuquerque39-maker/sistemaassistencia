@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.41: login corrigido + dossiê compatível + desempenho otimizado -->
+<!-- V7.5.42 PERFORMANCE REAL: reduz polling, chamadas Supabase e observers sem tocar no login -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -12243,7 +12243,13 @@ function iniciarPainelPresencaV56(){clearInterval(presencaPainelTimerV56);presen
 ["mousemove","mousedown","keydown","touchstart","scroll"].forEach(evt=>document.addEventListener(evt,marcarInteracaoPresencaV56,{passive:true}));
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)marcarInteracaoPresencaV56();enviarHeartbeatPresencaV56()});
 window.addEventListener("focus",()=>{marcarInteracaoPresencaV56();enviarHeartbeatPresencaV56()});
-document.addEventListener("click",()=>setTimeout(atualizarPresencaAgoraV56,800),true);
+let presencaUltimoCliqueSyncV7542=0;
+document.addEventListener("click",()=>{
+    const agora=Date.now();
+    if(agora-presencaUltimoCliqueSyncV7542<30000)return;
+    presencaUltimoCliqueSyncV7542=agora;
+    setTimeout(atualizarPresencaAgoraV56,800);
+},true);
 document.addEventListener("DOMContentLoaded",iniciarPainelPresencaV56);
 </script>
 
@@ -12289,10 +12295,12 @@ async function inicializarChatV57(){
         iniciarResumoRealtimeChatV57();
         clearInterval(chatPollingV57);
         chatPollingV57=setInterval(async()=>{
+            if(document.hidden)return;
             await marcarMensagensEntreguesV575();
             carregarResumoChatV57();
-            if(chatConversaAtualV57)carregarMensagensChatV57(false);
-        },10000);
+            const painel=document.getElementById("chatPainel");
+            if(chatConversaAtualV57&&painel?.classList.contains("aberto"))carregarMensagensChatV57(false);
+        },20000);
     }
     await marcarMensagensEntreguesV575();
     await Promise.all([carregarUsuariosChatV57(),carregarResumoChatV57()]);
@@ -17907,13 +17915,16 @@ body.dark-mode .v698-perfil-link{color:#65bfff}
 
         clearInterval(timerPresenca);
         timerPresenca=setInterval(function(){
-            if(v698LoginConcluido()){
-                mesclarPresencaNoChat();
-                anotarPerfisChat();
-                anotarPresencas();
-                anotarTabelaUsuarios();
-            }
-        },10000);
+            if(!v698LoginConcluido()||document.hidden)return;
+            const chatAberto=document.getElementById("chatPainel")?.classList.contains("aberto");
+            const telaPresenca=document.getElementById("telaAdminPresenca");
+            const presencaAberta=telaPresenca&&getComputedStyle(telaPresenca).display!=="none";
+            if(!chatAberto&&!presencaAberta)return;
+            mesclarPresencaNoChat();
+            anotarPerfisChat();
+            anotarPresencas();
+            anotarTabelaUsuarios();
+        },30000);
     }
 
     document.addEventListener("click",function(e){
@@ -19620,8 +19631,12 @@ body.dark-mode #chatMenuCabecalhoV725 button:hover,body.dark-mode .chat-midia-it
             },true);
         }
         clearInterval(timerPresencaV725);
-        timerPresencaV725=setInterval(atualizarPresencaChatV725,5000);
-        atualizarPresencaChatV725();
+        timerPresencaV725=setInterval(()=>{
+            if(document.hidden)return;
+            const painel=document.getElementById("chatPainel");
+            if(painel?.classList.contains("aberto"))atualizarPresencaChatV725();
+        },30000);
+        if(document.getElementById("chatPainel")?.classList.contains("aberto"))atualizarPresencaChatV725();
     }
     document.addEventListener("click",function(ev){
         if(!ev.target.closest("#chatMenuCabecalhoV725")&&!ev.target.closest("#chatCabecalho"))chatV725FecharMenu();
@@ -20658,6 +20673,33 @@ function iniciar(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});
 else iniciar();
+})();
+</script>
+
+
+<!-- V7.5.42 - Performance: diagnóstico e versão -->
+<style id="v7542-version-style">
+#erpVersionBadgeV7542{
+  position:fixed;right:10px;bottom:8px;z-index:9997;
+  background:rgba(0,27,61,.88);color:#fff;border-radius:999px;
+  padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
+}
+</style>
+<div id="erpVersionBadgeV7542">ERP V7.5.42</div>
+<script id="v7542-performance-diagnostics">
+(function(){
+"use strict";
+window.ERP_VERSION="7.5.42";
+const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
+window.erpMedir=async function(nome,fn){
+    const t=performance.now();
+    try{return await fn()}
+    finally{if(debug())console.info("[PERF]",nome,(performance.now()-t).toFixed(1)+"ms")}
+};
+document.addEventListener("visibilitychange",()=>{
+    if(debug())console.info("[PERF] aba",document.hidden?"em segundo plano":"ativa");
+});
+console.info("ERP V7.5.42 Performance carregado.");
 })();
 </script>
 
