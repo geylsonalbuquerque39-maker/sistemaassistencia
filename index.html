@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.1.0 FASE 2: Inteligência + CPP + CLIENTES controlados pelo ModuleManager -->
+<!-- V8.1.1: painel de pendências removido da Inteligência -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -6008,7 +6008,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
       </div>
     </div>
     <div class="intel-main-grid">
-      <div class="intel-card"><h2>📊 Painel de pendências</h2><div class="intel-pend-wrap" id="intelPendencias"></div></div>
+      
       <div class="intel-card"><h2>🏆 Ranking de técnicos</h2><div class="intel-bars" id="intelRankingTecnicos"></div></div>
     </div>
     <div class="intel-main-grid">
@@ -10195,7 +10195,6 @@ function renderIntel(){
     if(!alertas.length)alertas.push("<div class='intel-alert green'><b>🟢 Nenhuma prioridade crítica detectada</b><span>A base está sem alertas nas regras atuais.</span></div>");
     document.getElementById("intelAlertas").innerHTML=alertas.join("");
     document.getElementById("intelPrioridades").innerHTML=a.prioridades.slice(0,18).map(r=>"<div class='intel-row'><b>"+escaparHTML(r.os||"-")+"</b><span>"+escaparHTML(r._motivo)+"<br><small>"+escaparHTML(r.desc_produto||"")+"</small></span><span>"+(r._dias||0)+" dias</span><button onclick=\"abrirOSIntel('"+String(r.os).replace(/'/g,"\\'")+"')\">Abrir</button></div>").join("")||"<div class='admin-info'>Nenhuma prioridade.</div>";
-    document.getElementById("intelPendencias").innerHTML=renderTabelaPendenciasIntel(a);
     document.getElementById("intelRankingTecnicos").innerHTML=barrasIntel(a.tecnicos.filter(x=>x[0]!=="(vazio)"),10);
     document.getElementById("intelRankingPDV").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),10);
     document.getElementById("intelMapa").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),12)+"<div class='admin-info' style='font-size:13px'>Distribuição baseada no campo PDV. Quando o cadastro de lojas tiver UF/região, este quadro passará a agrupar geograficamente.</div>";
@@ -10995,7 +10994,6 @@ function renderIntel(){
  document.getElementById('intelPrioridades').innerHTML=a.prioridades.length
    ? "<div class='intel-pend-bloco intel-pend-resumo-v7547'><div class='intel-pend-topo'><h3>Prioridades <span class='contagem'>"+a.prioridades.length+"</span></h3><div class='intel-pend-acoes'><button class='intel-pend-btn' onclick=\"abrirPrioridadesV7547()\">Ver relação</button></div></div><div class='intel-pend-vazio'><b>"+a.prioridades.length.toLocaleString('pt-BR')+" O.S.</b> priorizadas. A relação só será renderizada quando você clicar.</div></div>"
    : "<div class='admin-info'>Nenhuma prioridade.</div>";
- document.getElementById('intelPendencias').innerHTML=renderTabelaPendenciasIntel(a)+tabelaPendenciaHTML('Sem técnico','semTecnico',a.semTecnico)+tabelaPendenciaHTML('Sem rack','semRack',a.semRack)+tabelaPendenciaHTML('Oficina há mais de 20 dias','oficina20',a.oficina20)+tabelaPendenciaHTML('CPP pendente','cpp',a.cpp);
  document.getElementById('intelRankingTecnicos').innerHTML=barrasIntel(a.tecnicos.filter(x=>x[0]!=='(vazio)'),10);
  document.getElementById('intelRankingPDV').innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=='(vazio)'),10);
  document.getElementById('intelMapa').innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=='(vazio)'),12);
@@ -20926,7 +20924,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.1.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.1.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21020,7 +21018,7 @@ function limparGerado(id){
         // V7.5.47: ao sair, destrói TODO HTML gerado pela Inteligência.
         const ids=[
           "intelConsultaTabela","intelModalConteudo","intelAlertas","intelCartoesDinamicos",
-          "intelPrioridades","intelPendencias","intelRankingTecnicos","intelRankingPDV","intelMapa"
+          "intelPrioridades","intelRankingTecnicos","intelRankingPDV","intelMapa"
         ];
         ids.forEach(x=>{const el=document.getElementById(x);if(el)el.innerHTML=""});
         const modal=document.getElementById("intelModal");
@@ -21541,7 +21539,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.1.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.1.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -21655,7 +21653,6 @@ function registrarInteligencia(){
                 "intelAlertas",
                 "intelCartoesDinamicos",
                 "intelPrioridades",
-                "intelPendencias",
                 "intelRankingTecnicos",
                 "intelRankingPDV",
                 "intelMapa"
@@ -21856,7 +21853,7 @@ function iniciar(){
 
     ERP.Events.emit("phase2:ready",{
         modules:["inteligencia","cpp","clientes"],
-        version:"8.1.0"
+        version:"8.1.1"
     });
 
     console.info("ERP V8.1.0 Fase 2 pronta: Inteligência, CPP e CLIENTES migrados ao ModuleManager.");
