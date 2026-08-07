@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.38: dossiê compatível em todos os PCs + desempenho + correção do gerenciador de senhas na coleta -->
+<!-- V7.5.39: login restaurado + dossiê compatível + desempenho + proteção da coleta -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -6765,19 +6765,12 @@ function exigirPermissao(perfis, modulo){
 
 function mostrarLogin(){
     const tela = document.getElementById("telaLogin");
-    const senha = document.getElementById("loginSenha");
-    if(senha) senha.disabled = false;
     if(tela) tela.style.display = "flex";
     document.body.classList.add("sem-login");
 }
 
 function ocultarLogin(){
     const tela = document.getElementById("telaLogin");
-    const senha = document.getElementById("loginSenha");
-    if(senha){
-        senha.value = "";
-        senha.disabled = true;
-    }
     if(tela) tela.style.display = "none";
     document.body.classList.remove("sem-login");
 }
@@ -10053,7 +10046,7 @@ function fecharModalHistoricoCI(){document.getElementById("cihModal").style.disp
 function documentoImpressaoHistoricoCI(x){
     const estilos=[...document.querySelectorAll("style,link[rel='stylesheet']")].map(e=>e.outerHTML).join("\n");
     return "<!doctype html><html><head><meta charset='utf-8'><title>"+escaparHTML(x.numero_ci||"C.I.")+"</title>"+estilos+"<style>body{background:#fff!important;margin:0}.segunda-via-cab{font:700 12px Arial;text-align:center;margin:4px 0}.cih-print{padding:0}</style></head><body><div class='segunda-via-cab'>SEGUNDA VIA • "+escaparHTML(x.numero_ci||"")+"</div><div class='cih-print'>"+(x.html_ci||"")+"</div><script>window.onload=()=>setTimeout(()=>window.print(),400)<\/script>
-<!-- V7.5.38 - Compatibilidade do Dossiê/Mídias + proteção contra gerenciador de senhas -->
+<!-- V7.5.39 - Compatibilidade do Dossiê/Mídias + proteção do autocomplete somente nos campos de O.S. -->
 <style id="patch-v7538-dossie-compat">
 #fotosos-menu.fotosos-menu-forcado-v7538{display:flex!important;align-items:center!important;gap:8px!important}
 #fotosos-menu .fotosos-menu-badge{margin-left:auto!important}
