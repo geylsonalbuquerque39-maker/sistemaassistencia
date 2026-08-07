@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V7.5.48: Inteligência lazy com estado de análise corrigido -->
+<!-- V8.0.0 FASE 1: Kernel ERP + ModuleManager + Cache + Events + ResourceManager -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -20926,11 +20926,11 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V7.5.48</div>
+<div id="erpVersionBadgeV7542">ERP V8.0.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
-window.ERP_VERSION="7.5.48";
+window.ERP_VERSION="8.0.0";
 const debug=()=>localStorage.getItem("ERP_DEBUG_PERF")==="1";
 window.erpMedir=async function(nome,fn){
     const t=performance.now();
@@ -21235,6 +21235,332 @@ console.info("ERP V7.5.46: subtelas administrativas compatíveis com modo sob de
 .intel-pend-resumo-v7547 .intel-pend-vazio{padding:14px 16px!important}
 .intel-pend-resumo-v7547 table,.intel-pend-resumo-v7547 tbody,.intel-pend-resumo-v7547 tr{display:none!important}
 </style>
+
+
+<!-- =========================================================
+     ERP V8.0.0 — KERNEL / FASE 1
+     Não substitui os módulos atuais: passa a coordená-los.
+     ========================================================= -->
+<script id="erp-v800-kernel">
+(function(){
+"use strict";
+
+if(window.ERP?.Kernel?.version==="8.0.0") return;
+
+const ERP = window.ERP = window.ERP || {};
+
+/* =========================
+   CACHE GLOBAL
+   ========================= */
+class ERPCache {
+    constructor(){
+        this.mem = new Map();
+    }
+    set(key,value,ttl=0){
+        const expires = ttl > 0 ? Date.now()+ttl : 0;
+        this.mem.set(String(key),{value,expires});
+        return value;
+    }
+    get(key){
+        const k=String(key);
+        const item=this.mem.get(k);
+        if(!item) return undefined;
+        if(item.expires && item.expires<Date.now()){
+            this.mem.delete(k);
+            return undefined;
+        }
+        return item.value;
+    }
+    has(key){
+        return this.get(key)!==undefined;
+    }
+    delete(key){
+        this.mem.delete(String(key));
+    }
+    clear(prefix=""){
+        if(!prefix){ this.mem.clear(); return; }
+        const p=String(prefix);
+        for(const k of [...this.mem.keys()]){
+            if(k.startsWith(p)) this.mem.delete(k);
+        }
+    }
+    async remember(key,loader,ttl=0){
+        const cached=this.get(key);
+        if(cached!==undefined) return cached;
+        const pendingKey="__promise__:"+key;
+        const pending=this.get(pendingKey);
+        if(pending) return pending;
+        const promise=Promise.resolve().then(loader);
+        this.set(pendingKey,promise);
+        try{
+            const value=await promise;
+            this.set(key,value,ttl);
+            return value;
+        }finally{
+            this.delete(pendingKey);
+        }
+    }
+}
+ERP.Cache = ERP.Cache || new ERPCache();
+
+/* =========================
+   EVENT BUS
+   ========================= */
+class ERPEvents {
+    constructor(){ this.map=new Map(); }
+    on(name,fn){
+        if(!this.map.has(name)) this.map.set(name,new Set());
+        this.map.get(name).add(fn);
+        return ()=>this.off(name,fn);
+    }
+    off(name,fn){
+        this.map.get(name)?.delete(fn);
+    }
+    emit(name,payload){
+        const listeners=[...(this.map.get(name)||[])];
+        for(const fn of listeners){
+            try{ fn(payload); }catch(e){ console.error("[ERP.Events]",name,e); }
+        }
+    }
+    clear(name){
+        if(name) this.map.delete(name);
+        else this.map.clear();
+    }
+}
+ERP.Events = ERP.Events || new ERPEvents();
+
+/* =========================
+   GERENCIADOR DE RECURSOS
+   Cada módulo pode registrar timers/listeners/observers
+   e o Kernel encerra tudo ao sair.
+   ========================= */
+class ERPResourceManager {
+    constructor(){ this.modules=new Map(); }
+    bucket(moduleId){
+        const id=String(moduleId);
+        if(!this.modules.has(id)){
+            this.modules.set(id,{
+                intervals:new Set(),
+                timeouts:new Set(),
+                observers:new Set(),
+                cleanups:new Set(),
+                aborters:new Set()
+            });
+        }
+        return this.modules.get(id);
+    }
+    interval(moduleId,fn,ms){
+        const b=this.bucket(moduleId);
+        const id=setInterval(fn,ms);
+        b.intervals.add(id);
+        return id;
+    }
+    timeout(moduleId,fn,ms){
+        const b=this.bucket(moduleId);
+        const id=setTimeout(()=>{
+            b.timeouts.delete(id);
+            fn();
+        },ms);
+        b.timeouts.add(id);
+        return id;
+    }
+    observer(moduleId,observer){
+        this.bucket(moduleId).observers.add(observer);
+        return observer;
+    }
+    cleanup(moduleId,fn){
+        this.bucket(moduleId).cleanups.add(fn);
+        return fn;
+    }
+    aborter(moduleId,controller){
+        this.bucket(moduleId).aborters.add(controller);
+        return controller;
+    }
+    destroy(moduleId){
+        const id=String(moduleId);
+        const b=this.modules.get(id);
+        if(!b) return;
+        b.intervals.forEach(clearInterval);
+        b.timeouts.forEach(clearTimeout);
+        b.observers.forEach(o=>{ try{o.disconnect()}catch(e){} });
+        b.aborters.forEach(a=>{ try{a.abort()}catch(e){} });
+        b.cleanups.forEach(fn=>{ try{fn()}catch(e){console.error("[ERP.Resources]",id,e)} });
+        this.modules.delete(id);
+    }
+}
+ERP.Resources = ERP.Resources || new ERPResourceManager();
+
+/* =========================
+   MODULE MANAGER
+   ========================= */
+class ERPModuleManager {
+    constructor(){
+        this.registry=new Map();
+        this.active=null;
+        this.transition=Promise.resolve();
+    }
+    register(id,config={}){
+        const key=String(id);
+        const previous=this.registry.get(key)||{};
+        this.registry.set(key,{...previous,...config,id:key});
+        return this;
+    }
+    get(id){ return this.registry.get(String(id)); }
+    current(){ return this.active; }
+
+    async open(id,ctx={}){
+        const key=String(id);
+        this.transition=this.transition.then(()=>this._open(key,ctx));
+        return this.transition;
+    }
+    async _open(id,ctx){
+        if(this.active===id){
+            const mod=this.get(id);
+            if(mod?.refresh) await mod.refresh(ctx);
+            ERP.Events.emit("module:refresh",{id,ctx});
+            return;
+        }
+
+        const previous=this.active;
+        if(previous){
+            const prev=this.get(previous);
+            ERP.Events.emit("module:before-close",{id:previous,next:id});
+            try{ if(prev?.sleep) await prev.sleep({next:id}); }catch(e){console.error("[ERP.ModuleManager] sleep",previous,e)}
+            try{ if(prev?.destroy) await prev.destroy({next:id}); }catch(e){console.error("[ERP.ModuleManager] destroy",previous,e)}
+            ERP.Resources.destroy(previous);
+            ERP.Events.emit("module:closed",{id:previous,next:id});
+        }
+
+        this.active=id;
+        const mod=this.get(id);
+        ERP.Events.emit("module:before-open",{id,previous,ctx});
+
+        if(mod){
+            try{ if(mod.mount) await mod.mount(ctx); }catch(e){console.error("[ERP.ModuleManager] mount",id,e)}
+            try{ if(mod.load) await mod.load(ctx); }catch(e){console.error("[ERP.ModuleManager] load",id,e)}
+            try{ if(mod.render) await mod.render(ctx); }catch(e){console.error("[ERP.ModuleManager] render",id,e)}
+            try{ if(mod.start) await mod.start(ctx); }catch(e){console.error("[ERP.ModuleManager] start",id,e)}
+        }
+
+        ERP.Events.emit("module:opened",{id,previous,ctx});
+    }
+    async close(id=this.active){
+        if(!id) return;
+        const key=String(id);
+        const mod=this.get(key);
+        try{ if(mod?.sleep) await mod.sleep({next:null}); }catch(e){}
+        try{ if(mod?.destroy) await mod.destroy({next:null}); }catch(e){}
+        ERP.Resources.destroy(key);
+        if(this.active===key) this.active=null;
+        ERP.Events.emit("module:closed",{id:key,next:null});
+    }
+}
+ERP.ModuleManager = ERP.ModuleManager || new ERPModuleManager();
+
+/* =========================
+   REGISTRO DOS MÓDULOS ATUAIS
+   Fase 1: somente bridge para a arquitetura existente.
+   ========================= */
+const modules = {
+    home:"telaInicio",
+    coleta:"telaColeta",
+    ci:"telaCI",
+    busca:"telaBusca",
+    ficha:"telaFicha",
+    gerar_ci:"telaGerarCI",
+    planilha_ci:"telaPlanilhaCI",
+    inteligencia:"telaInteligencia",
+    cpp:"telaMonitoramentoCPP",
+    clientes:"telaClientes",
+    admin:"telaAdmin",
+    relatorios:"telaRelatorios"
+};
+
+for(const [id,tela] of Object.entries(modules)){
+    ERP.ModuleManager.register(id,{
+        mount(){
+            if(typeof window.erpMontarTelaV7544==="function"){
+                window.erpMontarTelaV7544(tela);
+            }
+        },
+        sleep(){
+            // O on-demand atual continua responsável pela desmontagem física.
+            if(typeof window.erpSincronizarModulosV7544==="function"){
+                setTimeout(window.erpSincronizarModulosV7544,0);
+            }
+        }
+    });
+}
+
+/* =========================
+   BRIDGE DE NAVEGAÇÃO
+   Apenas informa ao Kernel qual módulo foi aberto.
+   Não substitui os onclicks existentes nesta fase.
+   ========================= */
+function identificarModulo(el){
+    const txt=((el?.dataset?.menu||"")+" "+(el?.getAttribute?.("onclick")||"")+" "+(el?.textContent||"")).toLowerCase();
+
+    if(txt.includes("intelig")) return "inteligencia";
+    if(txt.includes("monitoramentocpp") || /\bcpp\b/.test(txt)) return "cpp";
+    if(txt.includes("cliente")) return "clientes";
+    if(txt.includes("relatorio")) return "relatorios";
+    if(txt.includes("admin")) return "admin";
+    if(txt.includes("coleta")) return "coleta";
+    if(txt.includes("planilha") && txt.includes("ci")) return "planilha_ci";
+    if(txt.includes("gerar") && txt.includes("ci")) return "gerar_ci";
+    if(txt.includes("ficha")) return "ficha";
+    if(txt.includes("consulta") || txt.includes("busca")) return "busca";
+    if(/\bci\b/.test(txt)) return "ci";
+    if(txt.includes("inicio") || txt.includes("home")) return "home";
+    return "";
+}
+
+document.addEventListener("click",function(e){
+    const alvo=e.target.closest?.("[onclick],.menu,[data-menu]");
+    if(!alvo) return;
+    const id=identificarModulo(alvo);
+    if(!id) return;
+
+    // Captura registra intenção; abertura existente continua executando normalmente.
+    setTimeout(()=>{
+        ERP.ModuleManager.open(id,{source:"legacy-click"}).catch(err=>console.error("[ERP Kernel]",err));
+    },0);
+},true);
+
+/* Sincroniza módulo inicial depois do login/layout estabilizar. */
+function detectarInicial(){
+    for(const [id,tela] of Object.entries(modules)){
+        const el=document.getElementById(tela);
+        if(!el) continue;
+        const s=getComputedStyle(el);
+        if(s.display!=="none" && s.visibility!=="hidden") return id;
+    }
+    return "home";
+}
+
+setTimeout(()=>{
+    const inicial=detectarInicial();
+    ERP.ModuleManager.active=inicial;
+    ERP.Events.emit("kernel:ready",{version:"8.0.0",active:inicial});
+    console.info("ERP Kernel V8.0.0 pronto. Módulo ativo:",inicial);
+},2300);
+
+ERP.Kernel={
+    version:"8.0.0",
+    ready:true,
+    modules,
+    stats(){
+        return {
+            active:ERP.ModuleManager.current(),
+            registered:ERP.ModuleManager.registry.size,
+            cacheEntries:ERP.Cache.mem.size,
+            domNodes:document.getElementsByTagName("*").length
+        };
+    }
+};
+
+})();
+</script>
 
 </body>
 </html>
