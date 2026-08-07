@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.1.1: painel de pendências removido da Inteligência -->
+<!-- V8.2.0: salvar observação no Dossiê + ExportManager global O.S./GR/N.C.E. -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -20612,7 +20612,7 @@ function fotososData(v){if(!v)return'';const t=texto(v);const d=new Date(t);if(!
 function fotososIconeProduto(produto){const p=texto(produto).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();if(/GELAD|REFRIG|FREEZER|FRIGOBAR/.test(p))return'🧊';if(/LAVAD|LAVA E SECA|TANQUIN|SECADOR/.test(p))return'🧺';if(/TV|TELEVIS|MONITOR/.test(p))return'📺';if(/CELULAR|SMARTPHONE|TABLET/.test(p))return'📱';if(/NOTEBOOK|COMPUTADOR|IMPRESSORA/.test(p))return'💻';if(/AR COND|CLIMAT/.test(p))return'❄️';if(/FOGAO|MICRO|FORNO|COOKTOP/.test(p))return'🍳';if(/VENTIL|PURIF|BEBED/.test(p))return'💨';return'🔧'}
 function fotososResumoOS(r,origem){const os=normalizarOS(r.os||r.ordem_servico||'');const produto=fotososValor(r,'desc_produto','produto','descricao','descricao_produto');const status=fotososValor(r,'status_da_os','status','situacao_os');const pdv=fotososValor(r,'pdv','loja','loja_origem','filial');const cliente=fotososValor(r,'nome_cliente','cliente');return{os,produto,status,pdv,cliente,origem,raw:r}}
 function fotososCampoDetalhe(rotulo,valor,classe=''){if(!texto(valor))return'';return`<div class="fotosos-detalhes-item ${classe}"><span>${fotososEsc(rotulo)}</span><b>${fotososEsc(valor)}</b></div>`}
-function fotososRenderDetalhes(item){const box=$('fotosos-detalhes-os');if(!box)return;if(!item?.os){box.classList.remove('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando">Selecione uma O.S. para visualizar o dossiê completo do produto.</div>';return}const r=item.raw||{},produto=item.produto||fotososValor(r,'desc_produto','produto','descricao'),cliente=item.origem==='clientes'?(item.cliente||fotososValor(r,'nome_cliente','cliente')||'Não identificado'):'Claudino',status=item.status||fotososValor(r,'status_da_os','status')||'Não informado',situacao=fotososValor(r,'situacao','situacao_os','sit_os','situacao_da_os'),garantia=fotososValor(r,'tipo_garantia','garantia','sit_garantia'),grupo=fotososValor(r,'grupo','gr'),nce=fotososValor(r,'nce','n_c_e','codigo_nce'),tecnico=fotososValor(r,'tecnico','nome_tecnico','tecnico_responsavel'),rack=fotososValor(r,'rack','endereco','posicao'),serie=fotososValor(r,'n_serie','numero_serie','serie'),nf=fotososValor(r,'nf','nota_fiscal','nr_nf','numero_nf'),cor=fotososValor(r,'cor','desc_cor'),codCor=fotososValor(r,'cod_cor','codigo_cor'),marca=fotososValor(r,'marca','fabricante'),modelo=fotososValor(r,'modelo'),dataEntrada=fotososData(fotososValor(r,'data_entrada','dt_entrada','data_abertura','data_os')),dataCompra=fotososData(fotososValor(r,'data_compra','dt_compra')),dataFim=fotososData(fotososValor(r,'data_fechamento','data_saida','dt_saida')),defeito=fotososValor(r,'defeito_reclamado','defeito','reclamacao_cliente','descricao_defeito','defeito_informado'),analise=fotososValor(r,'analise_defeito','analise_do_defeito','analise','diagnostico'),solucao=fotososValor(r,'solucao','reparo_executado','servico_executado','observacao_tecnica'),valor=fotososValor(r,'valor','valor_produto','preco'),alm=fotososValor(r,'alm','almoxarifado','al'),categoria=typeof window.classificarCategoriaProduto==='function'?window.classificarCategoriaProduto(r):fotososValor(r,'categoria');box.classList.add('visivel');box.innerHTML=`<div class="fotosos-detalhes-cabecalho"><div class="fotosos-detalhes-icone">${fotososIconeProduto(produto)}</div><div class="fotosos-detalhes-titulo"><small>Dossiê digital da ordem de serviço</small><strong>O.S. ${fotososEsc(item.os)}</strong><div class="fotosos-detalhes-produto">${fotososEsc(produto||'Produto não informado')}</div></div><div class="fotosos-detalhes-badges"><span class="fotosos-detalhes-badge status">● ${fotososEsc(status)}</span>${garantia?`<span class="fotosos-detalhes-badge garantia">🛡 ${fotososEsc(garantia)}</span>`:''}<span class="fotosos-detalhes-badge origem">${item.origem==='clientes'?'👥 CLIENTES':item.origem==='cpp'?'📊 CPP':'🏢 ILR'}</span></div></div><div class="fotosos-detalhes-resumo"><div><span>Cliente</span><b>${fotososEsc(cliente)}</b></div><div><span>Loja / PDV</span><b>${fotososEsc(item.pdv||fotososValor(r,'pdv','loja','loja_origem')||'Não informado')}</b></div><div><span>Técnico responsável</span><b>${fotososEsc(tecnico||'Não informado')}</b></div><div><span>Rack / Posição</span><b>${fotososEsc(rack||'Não informado')}</b></div></div><div class="fotosos-detalhes-grade">${fotososCampoDetalhe('Grupo',grupo)}${fotososCampoDetalhe('N.C.E.',nce)}${fotososCampoDetalhe('AL / Almoxarifado',alm)}${fotososCampoDetalhe('Categoria',categoria)}${fotososCampoDetalhe('Situação da O.S.',situacao)}${fotososCampoDetalhe('Número de série',serie,'largo')}${fotososCampoDetalhe('Nota fiscal',nf)}${fotososCampoDetalhe('Marca',marca)}${fotososCampoDetalhe('Modelo',modelo)}${fotososCampoDetalhe('Cor',[codCor,cor].filter(Boolean).join(' - '))}${fotososCampoDetalhe('Data de entrada',dataEntrada)}${fotososCampoDetalhe('Data da compra',dataCompra)}${fotososCampoDetalhe('Data de saída',dataFim)}${fotososCampoDetalhe('Valor do produto',valor)}${fotososCampoDetalhe('Defeito informado',defeito,'completo texto-longo')}${fotososCampoDetalhe('Análise / diagnóstico',analise,'completo texto-longo')}${fotososCampoDetalhe('Solução / serviço executado',solucao,'completo texto-longo')}</div><div class="fotosos-detalhes-midias"><div class="fotosos-detalhes-contador">📷 Fotos <strong id="fotosos-detalhes-qtd-fotos">—</strong></div><div class="fotosos-detalhes-contador">📎 Arquivos <strong id="fotosos-detalhes-qtd-arquivos">—</strong></div></div>`}
+function fotososRenderDetalhes(item){const box=$('fotosos-detalhes-os');if(!box)return;if(!item?.os){box.classList.remove('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando">Selecione uma O.S. para visualizar o dossiê completo do produto.</div>';return}const r=item.raw||{},produto=item.produto||fotososValor(r,'desc_produto','produto','descricao'),cliente=item.origem==='clientes'?(item.cliente||fotososValor(r,'nome_cliente','cliente')||'Não identificado'):'Claudino',status=item.status||fotososValor(r,'status_da_os','status')||'Não informado',situacao=fotososValor(r,'situacao','situacao_os','sit_os','situacao_da_os'),garantia=fotososValor(r,'tipo_garantia','garantia','sit_garantia'),grupo=fotososValor(r,'grupo','gr'),nce=fotososValor(r,'nce','n_c_e','codigo_nce'),tecnico=fotososValor(r,'tecnico','nome_tecnico','tecnico_responsavel'),rack=fotososValor(r,'rack','endereco','posicao'),serie=fotososValor(r,'n_serie','numero_serie','serie'),nf=fotososValor(r,'nf','nota_fiscal','nr_nf','numero_nf'),cor=fotososValor(r,'cor','desc_cor'),codCor=fotososValor(r,'cod_cor','codigo_cor'),marca=fotososValor(r,'marca','fabricante'),modelo=fotososValor(r,'modelo'),dataEntrada=fotososData(fotososValor(r,'data_entrada','dt_entrada','data_abertura','data_os')),dataCompra=fotososData(fotososValor(r,'data_compra','dt_compra')),dataFim=fotososData(fotososValor(r,'data_fechamento','data_saida','dt_saida')),defeito=fotososValor(r,'defeito_reclamado','defeito','reclamacao_cliente','descricao_defeito','defeito_informado'),analise=fotososValor(r,'analise_defeito','analise_do_defeito','analise','diagnostico'),solucao=fotososValor(r,'solucao','reparo_executado','servico_executado','observacao_tecnica'),valor=fotososValor(r,'valor','valor_produto','preco'),alm=fotososValor(r,'alm','almoxarifado','al'),categoria=typeof window.classificarCategoriaProduto==='function'?window.classificarCategoriaProduto(r):fotososValor(r,'categoria');box.classList.add('visivel');box.innerHTML=`<div class="fotosos-detalhes-cabecalho"><div class="fotosos-detalhes-icone">${fotososIconeProduto(produto)}</div><div class="fotosos-detalhes-titulo"><small>Dossiê digital da ordem de serviço</small><strong>O.S. ${fotososEsc(item.os)}</strong><div class="fotosos-detalhes-produto">${fotososEsc(produto||'Produto não informado')}</div></div><div class="fotosos-detalhes-badges"><span class="fotosos-detalhes-badge status">● ${fotososEsc(status)}</span>${garantia?`<span class="fotosos-detalhes-badge garantia">🛡 ${fotososEsc(garantia)}</span>`:''}<span class="fotosos-detalhes-badge origem">${item.origem==='clientes'?'👥 CLIENTES':item.origem==='cpp'?'📊 CPP':'🏢 ILR'}</span></div></div><div class="fotosos-detalhes-resumo"><div><span>Cliente</span><b>${fotososEsc(cliente)}</b></div><div><span>Loja / PDV</span><b>${fotososEsc(item.pdv||fotososValor(r,'pdv','loja','loja_origem')||'Não informado')}</b></div><div><span>Técnico responsável</span><b>${fotososEsc(tecnico||'Não informado')}</b></div><div><span>Rack / Posição</span><b>${fotososEsc(rack||'Não informado')}</b></div></div><div class="fotosos-detalhes-grade">${fotososCampoDetalhe('Grupo',grupo)}${fotososCampoDetalhe('N.C.E.',nce)}${fotososCampoDetalhe('AL / Almoxarifado',alm)}${fotososCampoDetalhe('Categoria',categoria)}${fotososCampoDetalhe('Situação da O.S.',situacao)}${fotososCampoDetalhe('Número de série',serie,'largo')}${fotososCampoDetalhe('Nota fiscal',nf)}${fotososCampoDetalhe('Marca',marca)}${fotososCampoDetalhe('Modelo',modelo)}${fotososCampoDetalhe('Cor',[codCor,cor].filter(Boolean).join(' - '))}${fotososCampoDetalhe('Data de entrada',dataEntrada)}${fotososCampoDetalhe('Data da compra',dataCompra)}${fotososCampoDetalhe('Data de saída',dataFim)}${fotososCampoDetalhe('Valor do produto',valor)}${fotososCampoDetalhe('Defeito informado',defeito,'completo texto-longo')}${fotososCampoDetalhe('Análise / diagnóstico',analise,'completo texto-longo')}${fotososCampoDetalhe('Solução / serviço executado',solucao,'completo texto-longo')}</div><div class="fotosos-detalhes-midias"><div class="fotosos-detalhes-contador">📷 Fotos <strong id="fotosos-detalhes-qtd-fotos">—</strong></div><div class="fotosos-detalhes-contador">📎 Arquivos <strong id="fotosos-detalhes-qtd-arquivos">—</strong></div></div><div class="fotosos-obs-v820"><div class="fotosos-obs-topo-v820"><div><span>📝 OBSERVAÇÕES DA O.S.</span><small>Registro compartilhado com data, hora e usuário.</small></div><div id="fotosos-obs-status-v820">Pronto para registrar</div></div><textarea id="fotosos-obs-texto-v820" placeholder="Digite uma observação sobre esta O.S..."></textarea><div class="fotosos-obs-acoes-v820"><button type="button" class="fotosos-btn secundario" onclick="fotososCarregarObservacoesV820()">↻ Recarregar</button><button type="button" id="fotosos-obs-salvar-v820" class="fotosos-btn primario" onclick="fotososSalvarObservacaoV820()">💾 Salvar observação</button></div><div id="fotosos-obs-historico-v820" class="fotosos-obs-historico-v820"><div class="fotosos-vazio">Carregando observações...</div></div></div>`;setTimeout(()=>window.fotososCarregarObservacoesV820?.(item.os),0)}
 async function fotososCarregarDetalhesOS(os,origem){os=normalizarOS(os);if(!os){fotososRenderDetalhes(null);return null}const box=$('fotosos-detalhes-os');box?.classList.add('visivel');if(box)box.innerHTML='<div class="fotosos-detalhes-carregando">🔎 Carregando todas as informações da O.S. '+fotososEsc(os)+'...</div>';try{let supa,tabela;if(origem==='clientes'){supa=obterSupabaseClientes();tabela='rexpedlr_clientes'}else{supa=obterSupabaseClient();tabela='rexpedlr'}let resp=await supa.from(tabela).select('*').eq('os',os).limit(1);if(resp.error||!resp.data?.length)resp=await supa.from(tabela).select('*').ilike('os',os).limit(1);if(resp.error)throw resp.error;const raw=resp.data?.[0];if(!raw)throw new Error('O.S. não localizada na base selecionada.');let item=fotososResumoOS(raw,origem);if(origem==='clientes'){try{const nomes=await supa.from('ratec04_clientes').select('nome_cliente').eq('os',os).limit(1);if(!nomes.error&&nomes.data?.[0])item.cliente=texto(nomes.data[0].nome_cliente)}catch(_){}}fotososRenderDetalhes(item);return item}catch(e){if(box){box.classList.add('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando" style="color:#a62929">Não foi possível carregar os detalhes da O.S.: '+fotososEsc(e.message||e)+'</div>'}return null}}
 
 async function fotososBuscarOS(termo){const chave=normalizarOS(termo);const box=$('fotosos-os-sugestoes');if(!box)return;if(chave.length<2){fotososFecharSugestoes();return}const token=++fotososBuscaToken;box.innerHTML='<div class="fotosos-os-msg">🔎 Procurando O.S...</div>';box.classList.add('aberta');try{const origem=$('fotosos-origem').value;let supa,tabela;if(origem==='clientes'){supa=obterSupabaseClientes();tabela='rexpedlr_clientes'}else{supa=obterSupabaseClient();tabela='rexpedlr'}let resp=await supa.from(tabela).select('*').ilike('os',chave+'%').limit(12);if(resp.error){resp=await supa.from(tabela).select('*').ilike('os','%'+chave+'%').limit(12)}if(token!==fotososBuscaToken)return;if(resp.error)throw resp.error;let itens=(resp.data||[]).map(r=>fotososResumoOS(r,origem));if(origem==='clientes'&&itens.length){try{const oss=itens.map(x=>x.os).filter(Boolean);const nomes=await supa.from('ratec04_clientes').select('os,nome_cliente').in('os',oss);if(!nomes.error){const mapa=new Map((nomes.data||[]).map(x=>[normalizarOS(x.os),texto(x.nome_cliente)]));itens=itens.map(x=>({...x,cliente:mapa.get(x.os)||''}))}}catch(_){}}fotososSugestoes=itens;fotososSugestaoAtiva=-1;if(!itens.length){box.innerHTML='<div class="fotosos-os-msg">Nenhuma O.S. encontrada.</div>';return}box.innerHTML=itens.map((x,i)=>`<button type="button" class="fotosos-os-item" data-i="${i}" role="option"><b>O.S. ${fotososEsc(x.os)}</b><span title="${fotososEsc(x.produto)}">${fotososEsc(x.produto||'Produto não informado')}${x.cliente?' · '+fotososEsc(x.cliente):''}</span><small>${fotososEsc([x.pdv,x.status].filter(Boolean).join(' · '))}</small></button>`).join('')}catch(e){if(token!==fotososBuscaToken)return;box.innerHTML='<div class="fotosos-os-msg">Erro na pesquisa: '+fotososEsc(e.message||e)+'</div>'}}
@@ -20924,7 +20924,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.1.1</div>
+<div id="erpVersionBadgeV7542">ERP V8.2.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21539,7 +21539,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.1.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.2.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -21864,6 +21864,370 @@ if(document.readyState==="loading"){
 }else{
     setTimeout(iniciar,2500);
 }
+})();
+</script>
+
+
+<style id="fotosos-observacoes-v820-style">
+.fotosos-obs-v820{margin:0 20px 20px;padding:16px;border:1px solid #c7d7e8;border-radius:15px;background:#f8fbff}
+.fotosos-obs-topo-v820{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:11px}
+.fotosos-obs-topo-v820 span{display:block;color:#123c67;font-size:13px;font-weight:900;letter-spacing:.04em}
+.fotosos-obs-topo-v820 small{display:block;color:#6a819a;margin-top:3px}
+#fotosos-obs-status-v820{font-size:11px;font-weight:800;color:#617791;background:#e9f1f9;border-radius:999px;padding:6px 10px;white-space:nowrap}
+#fotosos-obs-texto-v820{width:100%;box-sizing:border-box;min-height:96px;resize:vertical;border:1px solid #9fb6ce;border-radius:11px;background:#fff;color:#17324f;padding:11px 12px;font:inherit}
+#fotosos-obs-texto-v820:focus{outline:2px solid #0e65b6;border-color:#0e65b6}
+.fotosos-obs-acoes-v820{display:flex;justify-content:flex-end;gap:8px;margin-top:10px;padding-bottom:12px;border-bottom:1px solid #d7e3ef}
+.fotosos-obs-historico-v820{max-height:270px;overflow:auto;margin-top:12px}
+.fotosos-obs-item-v820{background:#fff;border-left:4px solid #1265b3;border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:0 2px 8px rgba(13,61,105,.06)}
+.fotosos-obs-item-v820 b{display:block;color:#123c67;font-size:12px}
+.fotosos-obs-item-v820 small{display:block;color:#758aa0;font-size:10px;margin:2px 0 7px}
+.fotosos-obs-item-v820 p{margin:0;color:#304c69;white-space:pre-wrap;line-height:1.45}
+body.dark-mode .fotosos-obs-v820{background:#102b49;border-color:#315a80}
+body.dark-mode #fotosos-obs-texto-v820,.dark-mode .fotosos-obs-item-v820{background:#0d223a;color:#eaf2ff;border-color:#315a80}
+body.dark-mode .fotosos-obs-item-v820 b,body.dark-mode .fotosos-obs-item-v820 p{color:#eaf2ff}
+</style>
+
+<script id="fotosos-observacoes-v820">
+(function(){
+"use strict";
+let osObsDossieV820="";
+let obsDossieSalvandoV820=false;
+
+function esc(v){
+    return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function osAtual(){
+    return String(document.getElementById("fotosos-os")?.value||osObsDossieV820||"").replace(/\D/g,"");
+}
+function setStatus(txt,tipo=""){
+    const el=document.getElementById("fotosos-obs-status-v820");
+    if(!el)return;
+    el.textContent=txt;
+    el.style.color=tipo==="erro"?"#a62929":tipo==="ok"?"#08733a":"#617791";
+    el.style.background=tipo==="erro"?"#fff0f0":tipo==="ok"?"#e9fff0":"#e9f1f9";
+}
+async function listar(os){
+    os=String(os||"");
+    if(!os)return [];
+    if(typeof carregarNotasOSSupabaseV38==="function"){
+        try{
+            const remoto=await carregarNotasOSSupabaseV38(os);
+            if(Array.isArray(remoto))return remoto;
+        }catch(e){ console.warn("[Dossiê] Falha ao carregar observações compartilhadas:",e); }
+    }
+    if(typeof carregarNotasOS==="function")return carregarNotasOS(os)||[];
+    return [];
+}
+async function salvarRemotoOuLocal(os,texto){
+    const autor=(window.usuarioLogado&&(usuarioLogado.nome||usuarioLogado.email))||"Usuário";
+
+    if(typeof supabaseOperacionalDisponivelV38==="function" &&
+       typeof obterSupabaseClient==="function" &&
+       typeof ERP_V38_TABELAS!=="undefined"){
+        try{
+            if(await supabaseOperacionalDisponivelV38()){
+                const sb=obterSupabaseClient();
+                const u=typeof usuarioOperacionalV38==="function"
+                    ?usuarioOperacionalV38()
+                    :{id:window.usuarioLogado?.id||null,nome:autor,email:window.usuarioLogado?.email||null};
+                const {error}=await sb.from(ERP_V38_TABELAS.observacoes).insert({
+                    os:String(os),texto,
+                    autor_id:u.id||null,
+                    autor_nome:u.nome||autor,
+                    autor_email:u.email||null
+                });
+                if(error)throw error;
+                return {supabase:true};
+            }
+        }catch(e){
+            console.warn("[Dossiê] Supabase de observações indisponível; usando contingência local.",e);
+        }
+    }
+
+    if(typeof carregarNotasOS==="function" && typeof chaveNotasOS==="function"){
+        const notas=carregarNotasOS(os)||[];
+        notas.unshift({id:Date.now(),texto,data:new Date().toISOString(),autor});
+        localStorage.setItem(chaveNotasOS(os),JSON.stringify(notas.slice(0,200)));
+        return {supabase:false};
+    }
+    throw new Error("Não foi possível localizar o armazenamento de observações.");
+}
+
+window.fotososCarregarObservacoesV820=async function(os){
+    os=String(os||osAtual()).replace(/\D/g,"");
+    osObsDossieV820=os;
+    const box=document.getElementById("fotosos-obs-historico-v820");
+    if(!box||!os)return;
+    setStatus("Carregando...");
+    box.innerHTML='<div class="fotosos-vazio">Carregando observações...</div>';
+    try{
+        const notas=await listar(os);
+        box.innerHTML=notas.length
+          ?notas.map(n=>'<div class="fotosos-obs-item-v820"><b>'+esc(n.autor||"Usuário")+'</b><small>'+
+              (n.data?new Date(n.data).toLocaleString("pt-BR"):"")+'</small><p>'+esc(n.texto||"")+'</p></div>').join("")
+          :'<div class="fotosos-vazio">Nenhuma observação registrada para esta O.S.</div>';
+        setStatus(notas.length?notas.length+" observação(ões)":"Sem observações","ok");
+    }catch(e){
+        box.innerHTML='<div class="fotosos-vazio">Erro ao carregar: '+esc(e.message||e)+'</div>';
+        setStatus("Erro ao carregar","erro");
+    }
+};
+
+window.fotososSalvarObservacaoV820=async function(){
+    if(obsDossieSalvandoV820)return;
+    const os=osAtual();
+    const campo=document.getElementById("fotosos-obs-texto-v820");
+    const btn=document.getElementById("fotosos-obs-salvar-v820");
+    const texto=String(campo?.value||"").trim();
+    if(!os){alert("Selecione uma O.S.");return}
+    if(!texto){alert("Digite uma observação antes de salvar.");campo?.focus();return}
+
+    obsDossieSalvandoV820=true;
+    if(btn){btn.disabled=true;btn.textContent="Salvando...";}
+    if(campo)campo.disabled=true;
+    setStatus("Salvando...");
+    try{
+        const r=await salvarRemotoOuLocal(os,texto);
+        if(campo)campo.value="";
+        setStatus(r.supabase?"✓ Salvo no banco":"✓ Salvo localmente","ok");
+        if(typeof registrarAuditoria==="function"){
+            try{registrarAuditoria("os","Observação adicionada pelo Dossiê à O.S. "+os,{os,sincronizada:!!r.supabase})}catch(_){}
+        }
+        await window.fotososCarregarObservacoesV820(os);
+    }catch(e){
+        setStatus("Erro ao salvar","erro");
+        alert("Não foi possível salvar a observação: "+(e.message||e));
+    }finally{
+        obsDossieSalvandoV820=false;
+        if(btn){btn.disabled=false;btn.textContent="💾 Salvar observação";}
+        if(campo){campo.disabled=false;campo.focus();}
+    }
+};
+
+document.addEventListener("keydown",e=>{
+    if(!(e.ctrlKey||e.metaKey)||String(e.key).toLowerCase()!=="s")return;
+    const campo=document.getElementById("fotosos-obs-texto-v820");
+    if(!campo||document.activeElement!==campo)return;
+    e.preventDefault();
+    window.fotososSalvarObservacaoV820();
+});
+
+document.addEventListener("input",e=>{
+    if(e.target?.id==="fotosos-obs-texto-v820"){
+        setStatus(String(e.target.value||"").trim()?"● Alterações não salvas":"Pronto para registrar");
+    }
+});
+})();
+</script>
+
+
+<script id="erp-export-manager-v820">
+(function(){
+"use strict";
+const ERP=window.ERP=window.ERP||{};
+
+function texto(v){return String(v??"")}
+function norm(v){
+    return texto(v).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+}
+const grupos={
+    os:new Set(["OS","ORDEMDESERVICO","ORDEMSERVICO"]),
+    gr:new Set(["GR","GRUPO"]),
+    nce:new Set(["NCE","NCECODIGO"])
+};
+function grupoColuna(c){
+    const n=norm(c.label||c.titulo||c.key||c.campo||"");
+    if(grupos.os.has(n))return"os";
+    if(grupos.gr.has(n))return"gr";
+    if(grupos.nce.has(n))return"nce";
+    return"";
+}
+function ordenar(colunas){
+    const cols=[...(colunas||[])];
+    const usados=new Set(),saida=[];
+    for(const alvo of ["os","gr","nce"]){
+        const i=cols.findIndex((c,idx)=>!usados.has(idx)&&grupoColuna(c)===alvo);
+        if(i>=0){saida.push(cols[i]);usados.add(i)}
+    }
+    cols.forEach((c,i)=>{if(!usados.has(i))saida.push(c)});
+    return saida;
+}
+function valor(r,c){
+    if(typeof c.value==="function")return c.value(r);
+    const key=c.key||c.campo;
+    return key?r?.[key]:"";
+}
+function download(blob,nome){
+    const url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=nome;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),1200);
+}
+function nomeSeguro(s){
+    return texto(s||"relacao").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]+/g,"_").replace(/^_+|_+$/g,"")||"relacao";
+}
+
+ERP.Export={
+    ordenarColunas:ordenar,
+    exportar({dados=[],colunas=[],nome="relacao",formato="CSV",aba="Relação"}={}){
+        if(!Array.isArray(dados)||!dados.length){alert("Não há dados para exportar.");return}
+        const cols=ordenar(colunas);
+        const f=String(formato||"CSV").toUpperCase();
+        const base=nomeSeguro(nome)+"_"+new Date().toISOString().slice(0,10);
+
+        if(f==="CSV"){
+            const q=v=>'"'+texto(v).replace(/"/g,'""')+'"';
+            const linhas=[cols.map(c=>q(c.label||c.titulo||c.key||c.campo)).join(";")];
+            dados.forEach(r=>linhas.push(cols.map(c=>q(valor(r,c))).join(";")));
+            download(new Blob(["\uFEFF"+linhas.join("\r\n")],{type:"text/csv;charset=utf-8"}),base+".csv");
+            return;
+        }
+
+        if(typeof XLSX==="undefined"){alert("Biblioteca XLSX não carregada.");return}
+        const aoa=[cols.map(c=>c.label||c.titulo||c.key||c.campo)];
+        dados.forEach(r=>aoa.push(cols.map(c=>valor(r,c))));
+        const ws=XLSX.utils.aoa_to_sheet(aoa);
+        ws["!autofilter"]={ref:XLSX.utils.encode_range({r:0,c:0},{r:Math.max(0,aoa.length-1),c:Math.max(0,cols.length-1)})};
+        ws["!cols"]=cols.map((c,i)=>{
+            let max=texto(aoa[0][i]).length;
+            for(let r=1;r<Math.min(aoa.length,300);r++)max=Math.max(max,texto(aoa[r][i]).length);
+            return {wch:Math.min(45,Math.max(10,max+2))};
+        });
+        const wb=XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb,ws,texto(aba).slice(0,31)||"Relação");
+        XLSX.writeFile(wb,base+(f==="XLT"?".xlt":".xls"),{bookType:"biff8"});
+    }
+};
+
+// Padrão principal das relações do REXPEDLR.
+const COL_INTEL=[
+ {label:"O.S.",key:"os"},
+ {label:"GR",key:"grupo"},
+ {label:"N.C.E",key:"nce"},
+ {label:"Produto",key:"desc_produto"},
+ {label:"Rack",key:"rack"},
+ {label:"Status",key:"status"},
+ {label:"Situação da O.S.",key:"status_da_os"},
+ {label:"Técnico",key:"tecnico"},
+ {label:"PDV",key:"pdv"},
+ {label:"NF",key:"nf"},
+ {label:"Data geração",key:"dt_geracao"},
+ {label:"Data expedição",key:"dt_expedicao"}
+];
+
+window.exportarPendenciaIntelCSV=function(chave){
+    if(!window.intelAnalise){alert("A análise ainda não foi carregada.");return}
+    const mapa={
+      rack500Abertas:["rack_500_abertas",intelAnalise.rack500Abertas||[]],
+      prontasAbertas:["prontas_abertas",intelAnalise.prontasAbertas||[]],
+      grupo1314Abertos:["grupos_13_14_abertos",intelAnalise.grupo1314Abertos||[]],
+      grupo52122Abertos:["grupos_5_21_22_abertos",intelAnalise.grupo52122Abertos||[]]
+    };
+    const item=mapa[chave];if(!item){alert("Relação inválida.");return}
+    ERP.Export.exportar({dados:item[1],colunas:COL_INTEL,nome:item[0]});
+};
+
+window.exportarUltimoResultadoIntel=function(){
+    const lista=window.intelAssistenteUltimoResultado||[];
+    ERP.Export.exportar({
+        dados:lista,colunas:COL_INTEL,
+        nome:(typeof normalizarPerguntaIntel==="function"?normalizarPerguntaIntel(window.intelAssistenteUltimoTitulo||"relacao"):"relacao")
+    });
+};
+
+window.exportarCartaoV36=function(indice){
+    const item=typeof obterCartoesV36==="function"?obterCartoesV36()[indice]:null;
+    if(!item){alert("Relação inválida.");return}
+    ERP.Export.exportar({dados:item[1]||[],colunas:COL_INTEL,nome:typeof nomeArquivoV36==="function"?nomeArquivoV36(item[0]):item[0]});
+};
+
+window.exportarConsultaIntelCSV=function(){
+    const lista=window.intelConsultaAtual||[];
+    const cols=[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"PRODUTO",key:"desc_produto"},
+      {label:"CATEGORIA",value:r=>typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):r.categoria},
+      {label:"Rack",key:"rack"},{label:"Status",key:"status"},{label:"Situação da O.S.",key:"status_da_os"},
+      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"},{label:"Garantia",key:"tipo_garantia"},
+      {label:"NF",key:"nf"},{label:"Data geração",key:"dt_geracao"},{label:"Data expedição",key:"dt_expedicao"}
+    ];
+    ERP.Export.exportar({dados:lista,colunas:cols,nome:"consulta_avancada"});
+};
+
+window.exportarPesquisaClientes=function(){
+    const lista=Array.isArray(window.clientesPesquisaAtual)?clientesPesquisaAtual:[];
+    if(!lista.length){alert("Não há resultados para exportar.");return}
+    const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+    if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido. Use CSV, XLS ou XLT.");return}
+    ERP.Export.exportar({
+      dados:lista,formato,nome:"pesquisa_clientes",aba:"Clientes",
+      colunas:[
+        {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+        {label:"PRODUTO",key:"desc_produto"},{label:"CLIENTE",key:"nome_cliente"},
+        {label:"CATEGORIA",value:r=>r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"")},
+        {label:"Nº SÉRIE",key:"n_serie"},{label:"NF",key:"nf"},{label:"TÉCNICO",key:"tecnico"},
+        {label:"PDV",key:"pdv"},{label:"RACK",key:"rack"},{label:"STATUS",key:"status"},
+        {label:"SITUAÇÃO O.S.",key:"status_da_os"},{label:"TIPO GARANTIA",key:"tipo_garantia"}
+      ]
+    });
+};
+
+window.exportarColetaCSV=function(){
+    const itens=typeof itensColetaFiltrados==="function"?itensColetaFiltrados():[];
+    if(!itens.length){typeof coletaMensagem==="function"&&coletaMensagem("Não há dados para exportar.","alerta");return}
+    const cols=[
+      {label:"O.S.",value:i=>coletaTexto(i,["os"])},
+      {label:"GR",value:i=>coletaTexto(i,["grupo"])},
+      {label:"N.C.E.",value:i=>coletaTexto(i,["nce"])},
+      {label:"Data da O.S.",value:i=>coletaTexto(i,["dt_geracao"])}
+    ];
+    if(!(typeof coletaEhEnderecamento==="function"&&coletaEhEnderecamento()))cols.push({label:"Destino",value:i=>coletaDestino(i)});
+    cols.push(
+      {label:"Loja de Origem",value:i=>coletaLoja(i)},{label:"ALM",value:i=>coletaTexto(i,["alm"])},
+      {label:"Descrição do produto",value:i=>coletaTexto(i,["desc_produto"])},{label:"Cód. Cor",value:i=>coletaCodCor(i)},
+      {label:"Cor",value:i=>coletaTexto(i,["cor"])},{label:"Nº de Série",value:i=>coletaTexto(i,["n_serie"])},
+      {label:"Rack",value:i=>coletaRack(i)},{label:"Status",value:i=>coletaTexto(i,["status","status_da_os"])},
+      {label:"Valor",value:i=>coletaValor(i)},{label:"Cubagem",value:i=>coletaCubagem(i)}
+    );
+    ERP.Export.exportar({dados:itens,colunas:cols,nome:"coleta_"+(window.coletaTipoAtual||"os")});
+    typeof coletaMensagem==="function"&&coletaMensagem("Arquivo da coleta gerado com "+itens.length+" O.S.","ok");
+    typeof focarCampoColeta==="function"&&focarCampoColeta();
+};
+
+// Histórico de coleta: altera somente a ordem das colunas.
+const colsHistOriginal=window.colunasColetaHistorico;
+window.colunasColetaHistorico=function(){
+    const cols=typeof colsHistOriginal==="function"?colsHistOriginal():[];
+    const objetos=cols.map(c=>({campo:c[0],label:c[1]}));
+    const ordenados=ordenar(objetos);
+    return ordenados.map(c=>[c.campo,c.label]);
+};
+
+// Rascunhos: conserva todas as colunas personalizadas, só move O.S./GR/N.C.E para o começo.
+const exportarRascunhoOriginal=window.exportarRascunhoCSV;
+window.exportarRascunhoCSV=function(){
+    const aba=typeof rascunhoAtivo==="function"?rascunhoAtivo():null;
+    const itens=aba?.itens||[];
+    if(!itens.length){typeof rascunhoMensagem==="function"&&rascunhoMensagem("Não há linhas para exportar.");return}
+    const atuais=typeof colunasAtuaisRascunho==="function"?colunasAtuaisRascunho(aba):[];
+    const cols=ordenar(atuais.map(c=>({
+        label:c.titulo,campo:c.campo,
+        value:item=>{
+            if(c.campo==="os")return rascunhoTexto(item,["os","OS"]);
+            if(c.campo==="grupo")return rascunhoTexto(item,["grupo","grup"]);
+            if(c.campo==="nce")return rascunhoTexto(item,["nce"]);
+            if(c.campo==="desc_produto")return rascunhoTexto(item,["desc_produto","descricao_produto"]);
+            if(c.campo==="__rascunho_cod_cor")return rascunhoTexto(item,["__rascunho_cod_cor","cod_cor"]);
+            if(c.campo==="n_serie")return rascunhoTexto(item,["n_serie","numero_serie"]);
+            if(c.campo==="__rascunho_rack")return rascunhoTexto(item,["__rascunho_rack","rack"]);
+            if(c.campo==="status")return rascunhoTexto(item,["status","status_da_os"]);
+            return rascunhoTexto(item,[c.campo]);
+        }
+    })));
+    ERP.Export.exportar({dados:itens,colunas:cols,nome:"rascunho_"+String(aba.nome||"planilha")});
+    typeof rascunhoMensagem==="function"&&rascunhoMensagem("CSV exportado no padrão O.S. → GR → N.C.E.");
+};
+
+console.info("ERP.Export V8.2.0 ativo: O.S. → GR → N.C.E. → demais colunas.");
 })();
 </script>
 
