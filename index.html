@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.3.0 FASE 3: Coleta + C.I. + Administração + Históricos + Relatórios no ciclo de vida -->
+<!-- V8.5.0: Coleta CLIENTES igual ILR + Consulta avançada CLIENTES com ações/exportação ILR -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -6225,12 +6225,12 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
                 <select id="cliFiltroGarantia" onchange="filtrarTabelaClientes()"><option value="">Todas as garantias</option></select>
                 <select id="cliFiltroCategoria" onchange="filtrarTabelaClientes()"><option value="">Todas as categorias</option><option value="Linha Branca">Linha Branca</option><option value="Linha Marrom">Linha Marrom</option><option value="Eletroportáteis">Eletroportáteis</option><option value="Informática">Informática</option><option value="Telefonia">Telefonia</option><option value="Não classificado">Não classificado</option></select>
             </div>
-            <div class="intel-consulta-acoes">
+            <div class="intel-consulta-acoes clientes-consulta-acoes-v850">
                 <button onclick="filtrarTabelaClientes()">Aplicar filtros</button>
                 <button class="sec" onclick="limparFiltrosClientes()">Limpar</button>
                 <button class="warn" onclick="salvarConsultaClientes()">Salvar consulta</button>
-                <button class="ok" onclick="exportarPesquisaClientes()">Exportar Excel/CSV</button>
-                <button class="sec" onclick="imprimirPesquisaClientes()">Imprimir</button>
+                <button class="ok" onclick="exportarPesquisaClientesV850()">⇩ Exportar arquivo ▾</button>
+                <button class="sec" onclick="imprimirPesquisaClientes()">🖨 Imprimir</button>
             </div>
             <div class="intel-salvas" id="clientesConsultasSalvas"></div>
             <div id="cliContagemTabela" class="intel-consulta-resumo">Nenhum dado carregado.</div>
@@ -6240,35 +6240,116 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
 </div>
 
 <!-- V7.5.3 - MÓDULOS CLIENTES NO PADRÃO DO ILR -->
+
 <div id="telaClientesColetaPrincipal" style="display:none">
-  <div class="title"><h1>COLETA DE O.S. — CLIENTES</h1><p>Loja de Origem | Base exclusiva de clientes</p><div class="underline"></div></div>
-  <div class="coleta-container">
-    <div class="coleta-card">
-      <div class="coleta-topo-acoes">
-        <button class="btn-voltar" onclick="abrirClientes()">← Voltar para Clientes</button>
-        <button class="btn-buscar" onclick="salvarRascunhoColetaClientes()">💾 Salvar rascunho</button>
-        <button class="btn-buscar" onclick="abrirHistoricoColetaClientesPrincipal()">🕘 Histórico</button>
-      </div>
-      <div class="coleta-form-grid">
-        <div class="ci-campo"><label>Bipar ou digitar O.S.</label><input id="cliColetaOSInput" class="ci-input" placeholder="Ex.: ILR 123456" onkeydown="if(event.key==='Enter'){event.preventDefault();adicionarOSColetaClientesPrincipal();}"></div>
-        <div class="ci-campo"><label>Destino</label><input id="cliColetaDestinoPrincipal" class="ci-input" placeholder="Destino / rota / observação"></div>
-        <div class="ci-campo coleta-btn-campo"><button class="btn-buscar" onclick="adicionarOSColetaClientesPrincipal()">Adicionar O.S.</button></div>
-      </div>
-      <div id="cliColetaMensagemPrincipal" class="ci-msg"></div>
-      <div class="coleta-resumo-grid">
-        <div class="coleta-resumo-box">O.S. na coleta<span id="cliColetaQtdPrincipal">0</span></div>
-        <div class="coleta-resumo-box">Valor total<span id="cliColetaValorPrincipal">R$ 0,00</span></div>
-        <div class="coleta-resumo-box">Cubagem total<span id="cliColetaCubagemPrincipal">0</span></div>
-      </div>
-      <div class="coleta-tabela-wrap">
-        <table class="coleta-tabela">
-          <thead><tr><th>#</th><th>O.S.</th><th>Data da O.S.</th><th>Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Cliente</th><th>Valor</th><th>Cubagem</th><th>Ação</th></tr></thead>
-          <tbody id="cliColetaTabelaCorpoPrincipal"><tr><td colspan="18" class="clientes-vazio">Nenhuma O.S. adicionada.</td></tr></tbody>
-        </table>
-      </div>
-      <div class="coleta-final-acoes"><button class="btn-buscar" onclick="finalizarColetaClientesPrincipal()">✓ Finalizar coleta</button><button class="btn-voltar" onclick="limparColetaClientesPrincipal()">Limpar</button></div>
+    <div class="coleta-shell clientes-coleta-ilr-v850">
+        <section class="coleta-hero">
+            <div>
+                <h1>▣ Coleta de Ordens de Serviço — Clientes</h1>
+                <p>Mesmo fluxo operacional da Coleta de O.S. do ILR, consultando exclusivamente a Base de Clientes.</p>
+                <div class="coleta-ajuda-rack">Bipe, digite ou cole a O.S. para consultar os dados. A coleta permanece em rascunho até ser finalizada.</div>
+                <button class="coleta-voltar-tipos" type="button" onclick="abrirClientes()">← Voltar para Clientes</button>
+            </div>
+            <div class="coleta-status-chip" id="cliColetaStatusConexao">Supabase Clientes conectado</div>
+        </section>
+
+        <div class="coleta-kpis">
+            <div class="coleta-kpi">
+                <small>O.S. coletadas</small>
+                <strong id="cliColetaQtdPrincipal">0</strong>
+                <span>Total desta coleta</span>
+            </div>
+            <div class="coleta-kpi green">
+                <small>Valor total</small>
+                <strong id="cliColetaValorPrincipal">R$ 0,00</strong>
+                <span>Soma dos valores encontrados</span>
+            </div>
+            <div class="coleta-kpi orange">
+                <small>Cubagem total</small>
+                <strong id="cliColetaCubagemPrincipal">0,000</strong>
+                <span>Soma da cubagem cadastrada</span>
+            </div>
+            <div class="coleta-kpi purple">
+                <small>Última leitura</small>
+                <strong id="cliColetaUltimaV850">--</strong>
+                <span id="cliColetaHoraV850">Aguardando bipagem</span>
+            </div>
+        </div>
+
+        <section class="coleta-painel">
+            <div class="coleta-leitura-topo">
+                <div class="coleta-campo-wrap">
+                    <label for="cliColetaOSInput">Bipar ou digitar a O.S.</label>
+                    <div class="coleta-input-linha">
+                        <input id="cliColetaOSInput"
+                               class="coleta-input"
+                               autocomplete="one-time-code"
+                               inputmode="numeric"
+                               name="numero_os_coleta_clientes"
+                               aria-autocomplete="none"
+                               autocapitalize="off"
+                               spellcheck="false"
+                               data-lpignore="true"
+                               data-1p-ignore="true"
+                               data-form-type="other"
+                               placeholder="Bipe uma O.S. ou cole várias de uma vez..."
+                               onkeydown="coletaClientesTeclaV850(event)"
+                               onpaste="coletaClientesColarLoteV850(event)">
+                        <button class="coleta-btn green" type="button" onclick="adicionarOSColetaClientesPrincipal()">Adicionar O.S.</button>
+                    </div>
+                </div>
+                <button class="coleta-btn light" type="button" onclick="document.getElementById('cliColetaOSInput')?.focus()">⌖ Ativar bipador</button>
+            </div>
+
+            <div id="cliColetaMensagemPrincipal" class="coleta-msg">Campo pronto. Faça a leitura da primeira O.S.</div>
+
+            <div class="coleta-toolbar">
+                <input class="coleta-filtro" id="cliColetaFiltroBuscaV850" placeholder="Pesquisar na coleta..." oninput="renderColetaCli()">
+                <select class="coleta-filtro" id="cliColetaFiltroClienteV850" onchange="renderColetaCli()"><option value="">Todos os clientes</option></select>
+                <select class="coleta-filtro" id="cliColetaFiltroStatusV850" onchange="renderColetaCli()"><option value="">Todos os status</option></select>
+                <select class="coleta-filtro" id="cliColetaFiltroRackV850" onchange="renderColetaCli()"><option value="">Todos os racks</option></select>
+            </div>
+
+            <div class="coleta-acoes">
+                <button class="coleta-btn" type="button" onclick="exportarColetaClientesV850()">⇩ Exportar arquivo ▾</button>
+                <button class="coleta-btn sec" type="button" onclick="imprimirColetaClientesV850()">🖨 Imprimir</button>
+                <button class="coleta-btn orange" type="button" onclick="salvarRascunhoColetaClientes()">💾 Salvar coleta</button>
+                <button class="coleta-btn green" type="button" onclick="finalizarColetaClientesPrincipal()">✓ Finalizar coleta</button>
+                <button class="coleta-btn sec" type="button" onclick="abrirHistoricoColetaClientesPrincipal()">🕘 Histórico</button>
+                <button class="coleta-btn red" type="button" onclick="limparColetaClientesPrincipal()">🗑 Limpar</button>
+            </div>
+
+            <div class="coleta-tabela-wrap">
+                <table class="coleta-tabela" id="cliColetaTabelaV850">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>O.S.</th>
+                            <th>Data da O.S.</th>
+                            <th>Destino</th>
+                            <th>Loja de Origem</th>
+                            <th>ALM</th>
+                            <th>GRUPO</th>
+                            <th>N.C.E.</th>
+                            <th>Descrição do produto</th>
+                            <th>Cód. Cor</th>
+                            <th>Cor</th>
+                            <th>Nº de Série</th>
+                            <th>Rack</th>
+                            <th>Status</th>
+                            <th>Cliente</th>
+                            <th>Valor</th>
+                            <th>Cubagem</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cliColetaTabelaCorpoPrincipal">
+                        <tr><td colspan="18" class="coleta-vazio">Nenhuma O.S. coletada.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
     </div>
-  </div>
 </div>
 
 <div id="telaClientesHistoricoColetaPrincipal" style="display:none">
@@ -20756,22 +20837,45 @@ function decorarTabelas(raiz=document){
 }
 function decorarInputs(raiz=document){
   raiz.querySelectorAll?.(SEL_INPUT).forEach(inp=>{
-    if(inp.closest('#fotosos-modal')||inp.dataset.midiasOsDecorado==='1')return;
+    if(inp.closest('#fotosos-modal'))return;
     // Evita campos que apenas contêm as letras "os" em palavras não relacionadas.
     const assinatura=((inp.id||'')+' '+(inp.name||'')+' '+(inp.placeholder||'')+' '+(inp.getAttribute('aria-label')||'')).toLowerCase();
     if(!/(^|[_\-\s])(os|o\.s)([_\-\s]|$)|ordem de servi[cç]o/.test(assinatura)&&!inp.hasAttribute('data-os'))return;
+
+    // V8.4.1: se o módulo foi desmontado e o botão sumiu, recria mesmo que o input
+    // ainda tenha a marca data-midias-os-decorado.
+    let b=inp.nextElementSibling;
+    if(!b?.classList?.contains('midias-os-atalho-v7527')){
+      b=criarBotao(inp.value,inp);
+      b.classList.add('midias-os-input-v7527');
+      inp.insertAdjacentElement('afterend',b);
+    }else{
+      atualizarBotao(b,inp.value);
+    }
+
+    if(inp.dataset.midiasOsListeners!=='1'){
+      inp.dataset.midiasOsListeners='1';
+      const sync=()=>{
+        const atual=inp.nextElementSibling;
+        if(atual?.classList?.contains('midias-os-atalho-v7527'))atualizarBotao(atual,inp.value);
+        else decorarInputs(inp.parentElement||document);
+      };
+      inp.addEventListener('input',sync);
+      inp.addEventListener('change',sync);
+      inp.addEventListener('blur',sync);
+    }
     inp.dataset.midiasOsDecorado='1';
-    const b=criarBotao(inp.value,inp);b.classList.add('midias-os-input-v7527');
-    inp.insertAdjacentElement('afterend',b);
-    const sync=()=>atualizarBotao(b,inp.value);
-    inp.addEventListener('input',sync);inp.addEventListener('change',sync);inp.addEventListener('blur',sync);
   });
 }
 function decorarDataOS(raiz=document){
   raiz.querySelectorAll?.('[data-os],[data-numero-os],[data-ordem-servico]').forEach(el=>{
-    if(el.closest('#fotosos-modal')||el.matches('input,textarea')||el.dataset.midiasOsDecorado==='1')return;
+    if(el.closest('#fotosos-modal')||el.matches('input,textarea'))return;
     const os=normOS(el.dataset.os||el.dataset.numeroOs||el.dataset.ordemServico||el.textContent);
-    if(!os)return;el.dataset.midiasOsDecorado='1';el.appendChild(criarBotao(os,el));
+    if(!os)return;
+    let b=el.querySelector(':scope > .midias-os-atalho-v7527');
+    if(!b){b=criarBotao(os,el);el.appendChild(b)}
+    else atualizarBotao(b,os);
+    el.dataset.midiasOsDecorado='1';
   });
 }
 function decorarTextosRotulados(raiz=document){
@@ -20825,7 +20929,10 @@ function iniciar(){
     }
   },true);
   document.addEventListener('change',e=>{if(e.target?.matches?.(SEL_INPUT))agendar(e.target.parentElement||e.target)},true);
-  console.info('Atalhos globais de mídias O.S. v7.5.41 otimizados.');
+  window.redecorarAtalhosMidiasOS=function(raiz=document){
+    try{decorarTudo(raiz||document)}catch(e){console.warn('[Mídias] Falha ao redecorar atalhos:',e)}
+  };
+  console.info('Atalhos globais de mídias O.S. v8.4.1 persistentes carregados.');
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciar,{once:true});else iniciar();
 })();
@@ -20931,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.3.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.5.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21546,7 +21653,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.3.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.5.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22631,6 +22738,487 @@ if(document.readyState==="loading"){
 }else{
     setTimeout(iniciar,2800);
 }
+})();
+</script>
+
+
+<!-- =========================================================
+     ERP V8.4.0 — FASE 4
+     Dossiê/Mídias + Chat
+     ========================================================= -->
+<script id="erp-v840-dossie-chat">
+(function(){
+"use strict";
+
+function ready(){
+    return !!window.ERP?.ModuleManager;
+}
+function rmChannel(ch){
+    if(!ch)return;
+    try{
+        const sb=(typeof chatSbV57==="function"&&chatSbV57()) ||
+                 (typeof obterSupabaseClient==="function"&&obterSupabaseClient());
+        sb?.removeChannel?.(ch);
+    }catch(e){}
+}
+function limparMidiasDOM(){
+    const galeria=document.getElementById("fotosos-galeria");
+    if(galeria)galeria.innerHTML="";
+    const detalhes=document.getElementById("fotosos-detalhes");
+    if(detalhes)detalhes.innerHTML="";
+    const preview=document.getElementById("fotosos-preview");
+    if(preview)preview.innerHTML="";
+    const hist=document.getElementById("fotosos-obs-historico-v820");
+    if(hist)hist.innerHTML="";
+}
+function limparChatDOM(){
+    const msgs=document.getElementById("chatMensagens");
+    if(msgs)msgs.innerHTML="";
+    const lista=document.getElementById("chatLista");
+    if(lista)lista.innerHTML="";
+    const anexos=document.getElementById("chatAnexosPreview");
+    if(anexos)anexos.innerHTML="";
+}
+
+/* =========================
+   DOSSIÊ / MÍDIAS
+   ========================= */
+ERP.ModuleManager.register("midias",{
+    mount(){
+        // O Dossiê é modal/painel, portanto não troca tela principal.
+    },
+    load(ctx={}){
+        // Só carrega se houver O.S. explicitamente informada.
+        const os=String(ctx.os||document.getElementById("fotosos-os")?.value||"").replace(/\D/g,"");
+        if(os && typeof window.abrirMidiasOS==="function" && ctx.source==="kernel-direct"){
+            return window.abrirMidiasOS(os,ctx.origem||"principal");
+        }
+    },
+    render(){},
+    sleep(){},
+    destroy(){
+        // Para qualquer edição/preview temporário e remove conteúdo pesado.
+        try{
+            if(typeof fotososEditorReset==="function")fotososEditorReset();
+        }catch(e){}
+        try{
+            if(typeof fotososFecharLightbox==="function")fotososFecharLightbox();
+        }catch(e){}
+        limparMidiasDOM();
+
+        const modal=document.getElementById("fotosos-modal");
+        if(modal)modal.style.display="none";
+
+        const arquivo=document.getElementById("fotosos-arquivo");
+        if(arquivo)arquivo.value="";
+        const desc=document.getElementById("fotosos-descricao");
+        if(desc)desc.value="";
+        const obs=document.getElementById("fotosos-obs-texto-v820");
+        if(obs)obs.value="";
+    }
+});
+
+/* =========================
+   CHAT
+   ========================= */
+ERP.ModuleManager.register("chat",{
+    mount(){},
+    async load(){
+        if(typeof inicializarChatV57==="function"){
+            await inicializarChatV57();
+        }
+    },
+    render(){},
+    start(){},
+    sleep(){
+        clearInterval(window.chatPollingV57);
+        try{clearInterval(chatPollingV57)}catch(e){}
+    },
+    destroy(){
+        try{
+            clearInterval(chatPollingV57);
+            chatPollingV57=null;
+        }catch(e){}
+
+        try{
+            if(typeof timerPresencaV725!=="undefined"){
+                clearInterval(timerPresencaV725);
+                timerPresencaV725=null;
+            }
+        }catch(e){}
+
+        try{
+            if(typeof timerPresenca!=="undefined"){
+                clearInterval(timerPresenca);
+                timerPresenca=null;
+            }
+        }catch(e){}
+
+        try{
+            rmChannel(chatRealtimeV57);
+            chatRealtimeV57=null;
+        }catch(e){}
+        try{
+            rmChannel(chatRealtimeResumoV57);
+            chatRealtimeResumoV57=null;
+        }catch(e){}
+
+        try{
+            if(chatMediaRecorderV600?.state==="recording")chatMediaRecorderV600.stop();
+        }catch(e){}
+
+        limparChatDOM();
+
+        const painel=document.getElementById("chatPainel");
+        if(painel) painel.classList.remove("aberto");
+
+        try{chatConversaAtualV57=null}catch(e){}
+        try{chatInicializadoV57=false}catch(e){}
+    }
+});
+
+/* =========================
+   WRAPPERS PÚBLICOS
+   ========================= */
+function wrapMidias(){
+    const original=window.abrirMidiasOS;
+    if(typeof original!=="function"||original.__v840)return;
+    const fn=function(os,origem){
+        const r=original.apply(this,arguments);
+        setTimeout(()=>ERP.ModuleManager.open("midias",{
+            source:"legacy-open",
+            os:String(os||"").replace(/\D/g,""),
+            origem:origem||"principal"
+        }).catch(console.error),0);
+        return r;
+    };
+    fn.__v840=true;
+    window.abrirMidiasOS=fn;
+}
+
+function wrapChat(){
+    const abrir=window.abrirChatV57;
+    if(typeof abrir==="function"&&!abrir.__v840){
+        const fn=function(){
+            const r=abrir.apply(this,arguments);
+            setTimeout(()=>ERP.ModuleManager.open("chat",{source:"legacy-open"}).catch(console.error),0);
+            return r;
+        };
+        fn.__v840=true;
+        window.abrirChatV57=fn;
+    }
+
+    const fechar=window.fecharChatV57;
+    if(typeof fechar==="function"&&!fechar.__v840){
+        const fn=function(){
+            const r=fechar.apply(this,arguments);
+            setTimeout(()=>ERP.ModuleManager.close("chat").catch?.(console.error),0);
+            return r;
+        };
+        fn.__v840=true;
+        window.fecharChatV57=fn;
+    }
+}
+
+/* =========================
+   FECHAR DOSSIÊ -> DESTROY
+   ========================= */
+function instalarFechamentoDossie(){
+    const candidatos=["fotososFechar","fecharFotosOS","fotososFecharModal","fecharMidiasOS"];
+    candidatos.forEach(nome=>{
+        const original=window[nome];
+        if(typeof original!=="function"||original.__v840)return;
+        const fn=function(){
+            const r=original.apply(this,arguments);
+            setTimeout(()=>ERP.ModuleManager.close("midias").catch?.(console.error),0);
+            return r;
+        };
+        fn.__v840=true;
+        window[nome]=fn;
+    });
+}
+
+/* =========================
+   CONTADOR MÍNIMO DO CHAT
+   O contador/notificação pode continuar leve.
+   Conversas/mensagens só carregam ao abrir.
+   ========================= */
+ERP.ChatLight={
+    async refreshUnread(){
+        try{
+            if(typeof carregarResumoChatV57==="function" && !document.getElementById("chatPainel")?.classList.contains("aberto")){
+                // Usa somente a rotina de resumo existente, sem carregar conversa.
+                await carregarResumoChatV57();
+            }
+        }catch(e){}
+    }
+};
+
+function iniciar(){
+    if(!ready()){setTimeout(iniciar,100);return}
+    wrapMidias();
+    wrapChat();
+    instalarFechamentoDossie();
+
+    ERP.Events?.emit?.("phase4:ready",{
+        version:"8.4.0",
+        modules:["midias","chat"]
+    });
+
+    console.info("ERP V8.4.0 Fase 4 pronta: Dossiê/Mídias e Chat no ciclo de vida.");
+}
+
+if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciar,3000),{once:true});
+}else{
+    setTimeout(iniciar,3000);
+}
+})();
+</script>
+
+
+<!-- V8.4.1 - Persistência do atalho 📎 após mount/destroy dos módulos -->
+<script id="erp-v841-media-shortcut-persistence">
+(function(){
+"use strict";
+
+function redecorar(){
+    requestAnimationFrame(()=>{
+        try{window.redecorarAtalhosMidiasOS?.(document)}catch(e){}
+    });
+    setTimeout(()=>{try{window.redecorarAtalhosMidiasOS?.(document)}catch(e){}},120);
+}
+
+function iniciar(){
+    // Após cada abertura/refresh de módulo, as linhas/inputs podem ter sido recriados.
+    window.ERP?.Events?.on?.("module:opened",redecorar);
+    window.ERP?.Events?.on?.("module:refresh",redecorar);
+    window.ERP?.Events?.on?.("module:closed",()=>setTimeout(redecorar,50));
+
+    // Cobre renders legados que não passam pelo ModuleManager.
+    document.addEventListener("click",function(e){
+        if(e.target.closest?.(".menu,[data-menu],[onclick]"))setTimeout(redecorar,80);
+    },true);
+
+    // Primeira garantia depois de todos os módulos terminarem de instalar.
+    redecorar();
+    setTimeout(redecorar,1000);
+    setTimeout(redecorar,3200);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",iniciar,{once:true});
+else iniciar();
+})();
+</script>
+
+
+<style id="clientes-ilr-v850-style">
+.clientes-coleta-ilr-v850{width:min(1500px,96%);margin:24px auto}
+.clientes-consulta-acoes-v850{position:sticky;top:8px;z-index:4;background:rgba(255,255,255,.94);padding:8px;border-radius:12px;backdrop-filter:blur(8px)}
+body.dark-mode .clientes-consulta-acoes-v850{background:rgba(13,34,58,.94)}
+</style>
+
+<script id="clientes-ilr-v850">
+(function(){
+"use strict";
+
+function n(v){return String(v??"").replace(/\D/g,"")}
+function txt(v){return String(v??"").trim()}
+function esc850(v){
+    return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function num850(v){
+    const s=String(v??"").replace(/[^\d,.-]/g,"").replace(/\.(?=\d{3}(?:\D|$))/g,"").replace(",",".");
+    const x=Number(s);return Number.isFinite(x)?x:0;
+}
+function coletaListaV850(){
+    return (typeof coletaCli!=="undefined"&&Array.isArray(coletaCli))?coletaCli:[];
+}
+function filtrosV850(){
+    return {
+        q:txt(document.getElementById("cliColetaFiltroBuscaV850")?.value).toUpperCase(),
+        cliente:txt(document.getElementById("cliColetaFiltroClienteV850")?.value),
+        status:txt(document.getElementById("cliColetaFiltroStatusV850")?.value),
+        rack:txt(document.getElementById("cliColetaFiltroRackV850")?.value)
+    };
+}
+function filtradosV850(){
+    const f=filtrosV850();
+    return coletaListaV850().filter(r=>{
+        const geral=[r.os,r.dt_geracao,r.pdv,r.grupo,r.nce,r.desc_produto,r.n_serie,r.rack,r.status,r.status_da_os,r.nome_cliente].join(" ").toUpperCase();
+        return (!f.q||geral.includes(f.q))
+            &&(!f.cliente||txt(r.nome_cliente)===f.cliente)
+            &&(!f.status||txt(r.status||r.status_da_os)===f.status)
+            &&(!f.rack||txt(r.rack)===f.rack);
+    });
+}
+function preencherSelect(id,valores,label){
+    const el=document.getElementById(id);if(!el)return;
+    const atual=el.value;
+    const unicos=[...new Set(valores.map(txt).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true}));
+    el.innerHTML='<option value="">'+label+'</option>'+unicos.map(v=>'<option value="'+esc850(v)+'">'+esc850(v)+'</option>').join("");
+    if(unicos.includes(atual))el.value=atual;
+}
+function atualizarFiltrosV850(){
+    const dados=coletaListaV850();
+    preencherSelect("cliColetaFiltroClienteV850",dados.map(r=>r.nome_cliente),"Todos os clientes");
+    preencherSelect("cliColetaFiltroStatusV850",dados.map(r=>r.status||r.status_da_os),"Todos os status");
+    preencherSelect("cliColetaFiltroRackV850",dados.map(r=>r.rack),"Todos os racks");
+}
+function destinoV850(){return txt(document.getElementById("cliColetaDestinoPrincipal")?.value)}
+
+window.coletaClientesTeclaV850=function(e){
+    if(e.key==="Enter"){e.preventDefault();window.adicionarOSColetaClientesPrincipal?.()}
+};
+window.coletaClientesColarLoteV850=function(e){
+    const raw=e.clipboardData?.getData("text")||"";
+    const oss=[...new Set(raw.split(/[\s,;|]+/).map(n).filter(Boolean))];
+    if(oss.length<=1)return;
+    e.preventDefault();
+    let i=0;
+    const input=document.getElementById("cliColetaOSInput");
+    const proxima=()=>{
+        if(i>=oss.length){input?.focus();return}
+        if(input)input.value=oss[i++];
+        Promise.resolve(window.adicionarOSColetaClientesPrincipal?.()).finally(()=>setTimeout(proxima,20));
+    };
+    proxima();
+};
+
+const renderOriginal=window.renderColetaCli;
+window.renderColetaCli=function(){
+    const tb=document.getElementById("cliColetaTabelaCorpoPrincipal");if(!tb)return;
+    atualizarFiltrosV850();
+    const todos=coletaListaV850(),lista=filtradosV850();
+
+    const qtd=document.getElementById("cliColetaQtdPrincipal");
+    const val=document.getElementById("cliColetaValorPrincipal");
+    const cub=document.getElementById("cliColetaCubagemPrincipal");
+    if(qtd)qtd.textContent=todos.length.toLocaleString("pt-BR");
+    if(val)val.textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(
+        todos.reduce((a,r)=>a+num850(r.valor_transf||r.valor),0)
+    );
+    if(cub)cub.textContent=todos.reduce((a,r)=>a+num850(r.cubagem),0).toLocaleString("pt-BR",{minimumFractionDigits:3,maximumFractionDigits:3});
+
+    if(!lista.length){
+        tb.innerHTML='<tr><td colspan="18" class="coleta-vazio">'+(todos.length?"Nenhuma O.S. corresponde aos filtros.":"Nenhuma O.S. coletada.")+'</td></tr>';
+        return;
+    }
+    const destino=esc850(destinoV850());
+    tb.innerHTML=lista.map((r,i)=>`<tr>
+        <td>${i+1}</td>
+        <td><b>${esc850(r.os)}</b></td>
+        <td>${esc850(r.dt_geracao||"")}</td>
+        <td>${destino}</td>
+        <td>${esc850(r.pdv||"")}</td>
+        <td>${esc850(r.alm||"")}</td>
+        <td>${esc850(r.grupo||"")}</td>
+        <td>${esc850(r.nce||"")}</td>
+        <td>${esc850(r.desc_produto||"")}</td>
+        <td>${esc850(r.cod_cor||r.codigo_cor||"")}</td>
+        <td>${esc850(r.cor||"")}</td>
+        <td>${esc850(r.n_serie||"")}</td>
+        <td>${esc850(r.rack||"")}</td>
+        <td>${esc850(r.status||r.status_da_os||"")}</td>
+        <td>${esc850(r.nome_cliente||"Não identificado")}</td>
+        <td>${esc850(r.valor_transf||r.valor||"")}</td>
+        <td>${esc850(r.cubagem||"")}</td>
+        <td><button class="usuario-acao danger" onclick="removerOSColetaClientesPrincipal('${esc850(r.os)}')">Excluir</button></td>
+    </tr>`).join("");
+    window.redecorarAtalhosMidiasOS?.(tb);
+};
+
+const adicionarOriginal=window.adicionarOSColetaClientesPrincipal;
+if(typeof adicionarOriginal==="function"){
+    window.adicionarOSColetaClientesPrincipal=function(){
+        const input=document.getElementById("cliColetaOSInput");
+        const osAntes=n(input?.value);
+        const antes=coletaListaV850().length;
+        const r=adicionarOriginal.apply(this,arguments);
+        setTimeout(()=>{
+            const depois=coletaListaV850().length;
+            if(depois>antes){
+                const ultima=document.getElementById("cliColetaUltimaV850");
+                const hora=document.getElementById("cliColetaHoraV850");
+                if(ultima)ultima.textContent=osAntes||"--";
+                if(hora)hora.textContent="Lida às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+            }
+            window.renderColetaCli();
+        },0);
+        return r;
+    };
+}
+
+window.exportarColetaClientesV850=function(){
+    const lista=filtradosV850();
+    if(!lista.length){alert("Não há O.S. para exportar.");return}
+    const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+    if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido.");return}
+    const colunas=[
+        {label:"O.S.",key:"os"},
+        {label:"GR",key:"grupo"},
+        {label:"N.C.E.",key:"nce"},
+        {label:"Data da O.S.",key:"dt_geracao"},
+        {label:"Destino",value:r=>destinoV850()},
+        {label:"Loja de Origem",key:"pdv"},
+        {label:"ALM",key:"alm"},
+        {label:"Descrição do produto",key:"desc_produto"},
+        {label:"Cód. Cor",value:r=>r.cod_cor||r.codigo_cor||""},
+        {label:"Cor",key:"cor"},
+        {label:"Nº de Série",key:"n_serie"},
+        {label:"Rack",key:"rack"},
+        {label:"Status",value:r=>r.status||r.status_da_os||""},
+        {label:"Cliente",key:"nome_cliente"},
+        {label:"Valor",value:r=>r.valor_transf||r.valor||""},
+        {label:"Cubagem",key:"cubagem"}
+    ];
+    if(window.ERP?.Export){
+        ERP.Export.exportar({dados:lista,colunas,nome:"coleta_clientes",formato,aba:"Coleta Clientes"});
+    }else{
+        alert("Gerenciador de exportação não carregado.");
+    }
+};
+
+window.imprimirColetaClientesV850=function(){
+    const lista=filtradosV850();
+    if(!lista.length){alert("Não há O.S. para imprimir.");return}
+    const tabela=document.getElementById("cliColetaTabelaV850")?.outerHTML||"";
+    const w=window.open("","_blank");if(!w)return;
+    w.document.write(`<!doctype html><html><head><meta charset="utf-8"><title>Coleta de O.S. — Clientes</title>
+    <style>body{font-family:Arial;padding:16px;color:#001b3d}h2{margin:0 0 4px}p{margin:0 0 12px}table{width:100%;border-collapse:collapse;font-size:9px}th,td{border:1px solid #555;padding:3px}th{background:#001b3d;color:#fff}</style></head>
+    <body><h2>Coleta de O.S. — Clientes</h2><p>${lista.length} O.S. • ${new Date().toLocaleString("pt-BR")}</p>${tabela}<script>window.onload=()=>window.print()<\/script></body></html>`);
+    w.document.close();
+};
+
+window.exportarPesquisaClientesV850=function(){
+    const lista=Array.isArray(window.clientesPesquisaAtual)?window.clientesPesquisaAtual:[];
+    if(!lista.length){alert("Não há resultados para exportar.");return}
+    const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+    if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido. Use CSV, XLS ou XLT.");return}
+    const colunas=[
+        {label:"O.S.",key:"os"},
+        {label:"GR",key:"grupo"},
+        {label:"N.C.E",key:"nce"},
+        {label:"PRODUTO",key:"desc_produto"},
+        {label:"CLIENTE",key:"nome_cliente"},
+        {label:"CATEGORIA",value:r=>r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"")},
+        {label:"Nº SÉRIE",key:"n_serie"},
+        {label:"NF",key:"nf"},
+        {label:"TÉCNICO",key:"tecnico"},
+        {label:"PDV",key:"pdv"},
+        {label:"RACK",key:"rack"},
+        {label:"STATUS",key:"status"},
+        {label:"SITUAÇÃO O.S.",key:"status_da_os"},
+        {label:"TIPO GARANTIA",key:"tipo_garantia"}
+    ];
+    ERP.Export.exportar({dados:lista,colunas,nome:"consulta_avancada_clientes",formato,aba:"Clientes"});
+};
+
+// Faz o botão legado apontar para a nova exportação.
+window.exportarPesquisaClientes=window.exportarPesquisaClientesV850;
+
+document.addEventListener("input",e=>{
+    if(e.target?.id==="cliColetaDestinoPrincipal")window.renderColetaCli?.();
+});
 })();
 </script>
 
