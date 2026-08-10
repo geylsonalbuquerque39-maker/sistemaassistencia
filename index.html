@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.5.0: Coleta CLIENTES igual ILR + Consulta avançada CLIENTES com ações/exportação ILR -->
+<!-- V8.5.1: corrige exportação/coleta CLIENTES + paginação lazy para reduzir DOM -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.5.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.5.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21653,7 +21653,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.5.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.5.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23221,6 +23221,362 @@ document.addEventListener("input",e=>{
 });
 })();
 </script>
+
+
+<!-- =========================================================
+     ERP V8.5.1 — CLIENTES: ESTADO ESTÁVEL + LAZY DOM
+     ========================================================= -->
+<script id="clientes-v851-fix">
+(function(){
+"use strict";
+
+const PAGE=100;
+let paginaPesquisaV851=0;
+let paginaColetaV851=0;
+let timerPesquisaV851=0;
+
+function txt(v){return String(v??"").trim()}
+function norm(v){return String(v??"").trim().toUpperCase().replace(/^ILR\s*/,"").replace(/\.0$/,"").replace(/\s+/g,"")}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function moneyV851(v){
+  let n=Number(String(v??"").replace(/\./g,"").replace(",","."));
+  return Number.isFinite(n)?n:0;
+}
+function cubV851(v){
+  let n=Number(String(v??"").replace(",","."));
+  return Number.isFinite(n)?n:0;
+}
+function baseClientesV851(){
+  if(Array.isArray(window.clientesDadosCombinados)&&window.clientesDadosCombinados.length)return window.clientesDadosCombinados;
+  try{if(Array.isArray(clientesDadosCombinados))return clientesDadosCombinados}catch(e){}
+  return [];
+}
+function coletaAtualV851(){
+  try{
+    if(Array.isArray(coletaCli))return coletaCli;
+  }catch(e){}
+  window.coletaCliV851=window.coletaCliV851||[];
+  return window.coletaCliV851;
+}
+function setColetaV851(lista){
+  try{coletaCli=lista}catch(e){window.coletaCliV851=lista}
+  window.coletaCliV851=lista;
+  return lista;
+}
+function filtroValor(id){return document.getElementById(id)?.value||""}
+function contem(v,f){
+  f=String(f||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().trim();
+  if(!f)return true;
+  return String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes(f);
+}
+function pesquisaClientesV851(){
+  const f={
+    geral:filtroValor("cliBusca"),nome:filtroValor("cliFiltroNome"),os:filtroValor("cliFiltroOS"),
+    serie:filtroValor("cliFiltroSerie"),nf:filtroValor("cliFiltroNF"),produto:filtroValor("cliFiltroProduto"),
+    grupo:filtroValor("cliFiltroGrupo"),nce:filtroValor("cliFiltroNCE"),status:filtroValor("cliFiltroStatus"),
+    tecnico:filtroValor("cliFiltroTecnico"),pdv:filtroValor("cliFiltroPDV"),rack:filtroValor("cliFiltroRack"),
+    situacao:filtroValor("cliFiltroSituacao"),garantia:filtroValor("cliFiltroGarantia"),categoria:filtroValor("cliFiltroCategoria")
+  };
+  return baseClientesV851().filter(r=>{
+    const cat=r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"");
+    const geral=[r.os,r.nome_cliente,r.n_serie,r.nf,r.desc_produto,r.tecnico,r.pdv,r.status,r.nce,r.grupo,r.rack,r.status_da_os,r.tipo_garantia].join(" ");
+    return contem(geral,f.geral)&&contem(r.nome_cliente,f.nome)&&contem(r.os,f.os)&&contem(r.n_serie,f.serie)&&
+      contem(r.nf,f.nf)&&contem(r.desc_produto,f.produto)&&contem(r.grupo,f.grupo)&&contem(r.nce,f.nce)&&
+      (!f.status||String(r.status||"")===f.status)&&(!f.tecnico||String(r.tecnico||"")===f.tecnico)&&
+      (!f.pdv||String(r.pdv||"")===f.pdv)&&contem(r.rack,f.rack)&&contem(r.status_da_os,f.situacao)&&
+      contem(r.tipo_garantia,f.garantia)&&(!f.categoria||cat===f.categoria);
+  });
+}
+
+function renderPesquisaV851(lista){
+  const area=document.getElementById("cliTabelaPrincipal");
+  const c=document.getElementById("cliContagemTabela");
+  if(!area)return;
+
+  window.clientesPesquisaAtual=lista;
+  try{clientesPesquisaAtual=lista}catch(e){}
+
+  if(c)c.textContent=`Exibindo ${lista.length.toLocaleString("pt-BR")} de ${baseClientesV851().length.toLocaleString("pt-BR")} O.S.`;
+  if(!lista.length){
+    area.innerHTML='<div class="clientes-vazio">Nenhuma O.S. encontrada.</div>';
+    return;
+  }
+
+  const paginas=Math.max(1,Math.ceil(lista.length/PAGE));
+  paginaPesquisaV851=Math.max(0,Math.min(paginas-1,paginaPesquisaV851));
+  const ini=paginaPesquisaV851*PAGE;
+  const fim=Math.min(lista.length,ini+PAGE);
+  const pag=lista.slice(ini,fim);
+
+  const nav=`<div class="clientes-pager-v851">
+    <button ${paginaPesquisaV851===0?"disabled":""} onclick="mudarPaginaPesquisaClientesV851(-1)">‹ Anterior</button>
+    <b>${ini+1}–${fim} de ${lista.length.toLocaleString("pt-BR")}</b>
+    <button ${paginaPesquisaV851>=paginas-1?"disabled":""} onclick="mudarPaginaPesquisaClientesV851(1)">Próxima ›</button>
+  </div>`;
+
+  const linhas=pag.map(r=>`<tr>
+    <td><b>${esc(r.os)}</b></td>
+    <td>${esc(r.nome_cliente||"Não identificado")}</td>
+    <td>${esc(r.pdv)}</td>
+    <td>${esc(r.grupo)}</td>
+    <td>${esc(r.nce)}</td>
+    <td>${esc(r.desc_produto)}</td>
+    <td>${esc(r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):""))}</td>
+    <td>${esc(r.status)}</td>
+    <td>${esc(r.status_da_os)}</td>
+    <td>${esc(r.tecnico)}</td>
+    <td>${esc(r.rack)}</td>
+    <td>${esc(r.dt_geracao)}</td>
+  </tr>`).join("");
+
+  area.innerHTML=nav+`<table class="clientes-table"><thead><tr>
+    <th>O.S.</th><th>Cliente</th><th>PDV</th><th>GR</th><th>N.C.E.</th><th>Produto</th>
+    <th>Categoria</th><th>Status</th><th>Status da O.S.</th><th>Técnico</th><th>Rack</th><th>Data geração</th>
+  </tr></thead><tbody>${linhas}</tbody></table>`+nav;
+
+  window.redecorarAtalhosMidiasOS?.(area);
+}
+
+window.mudarPaginaPesquisaClientesV851=function(delta){
+  paginaPesquisaV851+=Number(delta||0);
+  renderPesquisaV851(window.clientesPesquisaAtual||[]);
+};
+
+window.filtrarTabelaClientes=function(){
+  clearTimeout(timerPesquisaV851);
+  timerPesquisaV851=setTimeout(()=>{
+    paginaPesquisaV851=0;
+    renderPesquisaV851(pesquisaClientesV851());
+  },180);
+};
+
+window.aplicarFiltrosClientesAgoraV851=function(){
+  clearTimeout(timerPesquisaV851);
+  paginaPesquisaV851=0;
+  renderPesquisaV851(pesquisaClientesV851());
+};
+
+// Botões inline existentes continuam chamando filtrarTabelaClientes.
+document.addEventListener("click",e=>{
+  if(e.target?.getAttribute?.("onclick")==="filtrarTabelaClientes()"){
+    e.preventDefault();
+    window.aplicarFiltrosClientesAgoraV851();
+  }
+},true);
+
+function listaExportacaoPesquisaV851(){
+  const atual=Array.isArray(window.clientesPesquisaAtual)?window.clientesPesquisaAtual:[];
+  if(atual.length)return atual;
+  // Se a tabela ainda não foi renderizada, calcula diretamente dos filtros.
+  const calculada=pesquisaClientesV851();
+  window.clientesPesquisaAtual=calculada;
+  try{clientesPesquisaAtual=calculada}catch(e){}
+  return calculada;
+}
+
+window.exportarPesquisaClientesV850=function(){
+  const lista=listaExportacaoPesquisaV851();
+  if(!lista.length){alert("Não há resultados para exportar com os filtros atuais.");return}
+  const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+  if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido. Use CSV, XLS ou XLT.");return}
+  ERP.Export.exportar({
+    dados:lista,formato,nome:"consulta_avancada_clientes",aba:"Clientes",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"PRODUTO",key:"desc_produto"},{label:"CLIENTE",key:"nome_cliente"},
+      {label:"CATEGORIA",value:r=>r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"")},
+      {label:"Nº SÉRIE",key:"n_serie"},{label:"NF",key:"nf"},{label:"TÉCNICO",key:"tecnico"},
+      {label:"PDV",key:"pdv"},{label:"RACK",key:"rack"},{label:"STATUS",key:"status"},
+      {label:"SITUAÇÃO O.S.",key:"status_da_os"},{label:"TIPO GARANTIA",key:"tipo_garantia"}
+    ]
+  });
+};
+window.exportarPesquisaClientes=window.exportarPesquisaClientesV850;
+
+// ---------------- Coleta CLIENTES ----------------
+
+function limparFiltrosColetaV851(){
+  ["cliColetaFiltroBuscaV850","cliColetaFiltroClienteV850","cliColetaFiltroStatusV850","cliColetaFiltroRackV850"].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value="";
+  });
+}
+function filtradosColetaV851(){
+  const f={
+    q:String(filtroValor("cliColetaFiltroBuscaV850")).toUpperCase(),
+    cliente:filtroValor("cliColetaFiltroClienteV850"),
+    status:filtroValor("cliColetaFiltroStatusV850"),
+    rack:filtroValor("cliColetaFiltroRackV850")
+  };
+  return coletaAtualV851().filter(r=>{
+    const geral=[r.os,r.dt_geracao,r.pdv,r.grupo,r.nce,r.desc_produto,r.n_serie,r.rack,r.status,r.status_da_os,r.nome_cliente].join(" ").toUpperCase();
+    return (!f.q||geral.includes(f.q))&&(!f.cliente||txt(r.nome_cliente)===f.cliente)&&
+      (!f.status||txt(r.status||r.status_da_os)===f.status)&&(!f.rack||txt(r.rack)===f.rack);
+  });
+}
+function selectOptions(id,vals,label){
+  const el=document.getElementById(id);if(!el)return;
+  const atual=el.value;
+  const unicos=[...new Set(vals.map(txt).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"pt-BR",{numeric:true}));
+  el.innerHTML='<option value="">'+label+'</option>'+unicos.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if(atual&&unicos.includes(atual))el.value=atual;else el.value="";
+}
+function atualizarFiltrosColetaV851(){
+  const d=coletaAtualV851();
+  selectOptions("cliColetaFiltroClienteV850",d.map(r=>r.nome_cliente),"Todos os clientes");
+  selectOptions("cliColetaFiltroStatusV850",d.map(r=>r.status||r.status_da_os),"Todos os status");
+  selectOptions("cliColetaFiltroRackV850",d.map(r=>r.rack),"Todos os racks");
+}
+function renderColetaV851(){
+  const tb=document.getElementById("cliColetaTabelaCorpoPrincipal");if(!tb)return;
+  const todos=coletaAtualV851();
+  atualizarFiltrosColetaV851();
+  const lista=filtradosColetaV851();
+
+  const q=document.getElementById("cliColetaQtdPrincipal");
+  const v=document.getElementById("cliColetaValorPrincipal");
+  const c=document.getElementById("cliColetaCubagemPrincipal");
+  if(q)q.textContent=todos.length.toLocaleString("pt-BR");
+  if(v)v.textContent=new Intl.NumberFormat("pt-BR",{style:"currency",currency:"BRL"}).format(todos.reduce((a,r)=>a+moneyV851(r.valor_transf||r.valor),0));
+  if(c)c.textContent=todos.reduce((a,r)=>a+cubV851(r.cubagem),0).toLocaleString("pt-BR",{minimumFractionDigits:3,maximumFractionDigits:3});
+
+  if(!lista.length){
+    tb.innerHTML=`<tr><td colspan="18" class="coleta-vazio">${todos.length?"Nenhuma O.S. corresponde aos filtros.":"Nenhuma O.S. coletada."}</td></tr>`;
+    return;
+  }
+
+  const paginas=Math.max(1,Math.ceil(lista.length/PAGE));
+  paginaColetaV851=Math.max(0,Math.min(paginas-1,paginaColetaV851));
+  const ini=paginaColetaV851*PAGE;
+  const fim=Math.min(lista.length,ini+PAGE);
+  const destino=txt(document.getElementById("cliColetaDestinoPrincipal")?.value);
+  const pag=lista.slice(ini,fim);
+
+  tb.innerHTML=pag.map((r,i)=>`<tr>
+    <td>${ini+i+1}</td><td><b>${esc(r.os)}</b></td><td>${esc(r.dt_geracao)}</td><td>${esc(destino)}</td>
+    <td>${esc(r.pdv)}</td><td>${esc(r.alm)}</td><td>${esc(r.grupo)}</td><td>${esc(r.nce)}</td>
+    <td>${esc(r.desc_produto)}</td><td>${esc(r.cod_cor||r.codigo_cor)}</td><td>${esc(r.cor)}</td>
+    <td>${esc(r.n_serie)}</td><td>${esc(r.rack)}</td><td>${esc(r.status||r.status_da_os)}</td>
+    <td>${esc(r.nome_cliente||"Não identificado")}</td><td>${esc(r.valor_transf||r.valor)}</td>
+    <td>${esc(r.cubagem)}</td><td><button class="usuario-acao danger" onclick="removerOSColetaClientesPrincipal('${esc(r.os)}')">Excluir</button></td>
+  </tr>`).join("");
+
+  let nav=document.getElementById("cliColetaPagerV851");
+  const table=tb.closest("table");
+  if(!nav&&table){
+    nav=document.createElement("div");nav.id="cliColetaPagerV851";nav.className="clientes-pager-v851";
+    table.insertAdjacentElement("afterend",nav);
+  }
+  if(nav)nav.innerHTML=`<button ${paginaColetaV851===0?"disabled":""} onclick="mudarPaginaColetaClientesV851(-1)">‹ Anterior</button>
+    <b>${ini+1}–${fim} de ${lista.length.toLocaleString("pt-BR")}</b>
+    <button ${paginaColetaV851>=paginas-1?"disabled":""} onclick="mudarPaginaColetaClientesV851(1)">Próxima ›</button>`;
+
+  window.redecorarAtalhosMidiasOS?.(tb);
+}
+window.renderColetaCli=renderColetaV851;
+window.mudarPaginaColetaClientesV851=function(delta){
+  paginaColetaV851+=Number(delta||0);renderColetaV851();
+};
+
+window.adicionarOSColetaClientesPrincipal=function(){
+  const input=document.getElementById("cliColetaOSInput");
+  const os=norm(input?.value);
+  if(!os)return;
+  const msg=document.getElementById("cliColetaMensagemPrincipal");
+  const r=baseClientesV851().find(x=>norm(x.os)===os);
+  if(!r){if(msg){msg.textContent="O.S. não encontrada na Base de Clientes.";msg.style.color="#b00020"}return}
+  const atual=coletaAtualV851();
+  if(atual.some(x=>norm(x.os)===os)){if(msg){msg.textContent="Esta O.S. já está na coleta.";msg.style.color="#b36b00"}return}
+
+  atual.push({...r});
+  setColetaV851(atual);
+
+  // Evita que filtros antigos escondam as O.S. já bipadas.
+  limparFiltrosColetaV851();
+  paginaColetaV851=Math.max(0,Math.ceil(atual.length/PAGE)-1);
+
+  if(input)input.value="";
+  if(msg){msg.textContent="O.S. adicionada com sucesso. Total: "+atual.length;msg.style.color="#0b7a2a"}
+
+  const ult=document.getElementById("cliColetaUltimaV850");
+  const hora=document.getElementById("cliColetaHoraV850");
+  if(ult)ult.textContent=os;
+  if(hora)hora.textContent="Lida às "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+
+  renderColetaV851();
+  input?.focus();
+};
+
+window.removerOSColetaClientesPrincipal=function(os){
+  setColetaV851(coletaAtualV851().filter(x=>norm(x.os)!==norm(os)));
+  paginaColetaV851=0;
+  renderColetaV851();
+};
+
+window.exportarColetaClientesV850=function(){
+  const lista=filtradosColetaV851().length?filtradosColetaV851():coletaAtualV851();
+  if(!lista.length){alert("Não há O.S. na coleta para exportar.");return}
+  const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+  if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido.");return}
+  ERP.Export.exportar({
+    dados:lista,formato,nome:"coleta_clientes",aba:"Coleta Clientes",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E.",key:"nce"},
+      {label:"Data da O.S.",key:"dt_geracao"},{label:"Destino",value:r=>txt(document.getElementById("cliColetaDestinoPrincipal")?.value)},
+      {label:"Loja de Origem",key:"pdv"},{label:"ALM",key:"alm"},{label:"Descrição do produto",key:"desc_produto"},
+      {label:"Cód. Cor",value:r=>r.cod_cor||r.codigo_cor||""},{label:"Cor",key:"cor"},{label:"Nº de Série",key:"n_serie"},
+      {label:"Rack",key:"rack"},{label:"Status",value:r=>r.status||r.status_da_os||""},{label:"Cliente",key:"nome_cliente"},
+      {label:"Valor",value:r=>r.valor_transf||r.valor||""},{label:"Cubagem",key:"cubagem"}
+    ]
+  });
+};
+
+window.salvarRascunhoColetaClientes=function(){
+  const lista=coletaAtualV851();
+  localStorage.setItem("CLIENTES_COLETA_RASCUNHO_V753",JSON.stringify(lista));
+  const m=document.getElementById("cliColetaMensagemPrincipal");
+  if(m){m.textContent="Rascunho salvo neste computador.";m.style.color="#0b7a2a"}
+};
+
+const abrirColetaOrigV851=window.abrirColetaClientesPrincipal;
+window.abrirColetaClientesPrincipal=async function(){
+  if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesColetaPrincipal");
+  if(typeof window.garantirDadosClientes==="function")await window.garantirDadosClientes();
+
+  if(!coletaAtualV851().length){
+    const salvo=localStorage.getItem("CLIENTES_COLETA_RASCUNHO_V753");
+    if(salvo){
+      try{setColetaV851(JSON.parse(salvo)||[])}catch(e){}
+    }
+  }
+  limparFiltrosColetaV851();
+  paginaColetaV851=0;
+  renderColetaV851();
+  setTimeout(()=>document.getElementById("cliColetaOSInput")?.focus(),60);
+};
+
+// Redução extra de DOM na aba Clientes: não deixa a tabela avançada com milhares de linhas
+// quando o usuário sai da consulta.
+document.addEventListener("click",e=>{
+  const alvo=e.target.closest?.("[onclick],.menu,[data-menu]");
+  if(!alvo)return;
+  const acao=((alvo.getAttribute("onclick")||"")+" "+(alvo.textContent||"")).toLowerCase();
+  if(!acao.includes("cliente")){
+    setTimeout(()=>{
+      const area=document.getElementById("cliTabelaPrincipal");
+      if(area)area.innerHTML="";
+      document.getElementById("cliColetaPagerV851")?.remove();
+    },80);
+  }
+},true);
+
+})();
+</script>
+
+<style id="clientes-v851-style">
+.clientes-pager-v851{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin:10px 0}
+.clientes-pager-v851 button{border:0;border-radius:8px;padding:7px 12px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer}
+.clientes-pager-v851 button:disabled{opacity:.4;cursor:default}
+</style>
 
 </body>
 </html>
