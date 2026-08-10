@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.6.0: CLIENTES com arquitetura Lazy DOM igual ILR -->
+<!-- V8.6.1: CLIENTES com relações lazy + DOM descartável + Coleta corrigida -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.6.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.6.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21664,7 +21664,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.6.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.6.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23913,6 +23913,444 @@ function init(){
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
 else init();
+})();
+</script>
+
+
+<!-- =========================================================
+     ERP V8.6.1 — CLIENTES RELAÇÕES LAZY + DOM DESCARTÁVEL
+     ========================================================= -->
+<style id="clientes-v861-style">
+.clientes-card-relacao-v861{
+  display:flex;flex-direction:column;gap:10px;
+}
+.clientes-card-relacao-v861 .clientes-relacao-total-v861{
+  font-size:28px;font-weight:900;color:#003c7a;line-height:1;
+}
+.clientes-card-relacao-v861 .clientes-relacao-acoes-v861{
+  display:flex;gap:8px;flex-wrap:wrap;
+}
+.clientes-card-relacao-v861 button{
+  border:0;border-radius:9px;padding:8px 12px;font-weight:800;cursor:pointer;
+}
+.clientes-relacao-modal-v861{
+  position:fixed;inset:0;z-index:10040;background:rgba(0,18,38,.72);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.clientes-relacao-modal-v861.aberto{display:flex}
+.clientes-relacao-box-v861{
+  width:min(1400px,96vw);max-height:90vh;overflow:auto;background:#fff;
+  border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.32)
+}
+.clientes-relacao-topo-v861{
+  display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px
+}
+.clientes-relacao-topo-v861 h2{margin:0;color:#003c7a}
+.clientes-relacao-fechar-v861{
+  border:0;border-radius:10px;padding:8px 12px;background:#e9eef4;font-weight:900;cursor:pointer
+}
+.clientes-relacao-pager-v861{
+  display:flex;justify-content:flex-end;align-items:center;gap:10px;margin:10px 0
+}
+.clientes-relacao-pager-v861 button{
+  border:0;border-radius:8px;padding:7px 12px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer
+}
+.clientes-relacao-pager-v861 button:disabled{opacity:.4;cursor:default}
+body.dark-mode .clientes-relacao-box-v861{background:#102b49;color:#eef6ff}
+body.dark-mode .clientes-relacao-topo-v861 h2{color:#eef6ff}
+</style>
+
+<div id="clientesRelacaoModalV861" class="clientes-relacao-modal-v861">
+  <div class="clientes-relacao-box-v861">
+    <div class="clientes-relacao-topo-v861">
+      <div>
+        <h2 id="clientesRelacaoTituloV861">Relação</h2>
+        <small id="clientesRelacaoResumoV861"></small>
+      </div>
+      <button class="clientes-relacao-fechar-v861" onclick="fecharRelacaoClientesV861()">✕ Fechar</button>
+    </div>
+    <div id="clientesRelacaoConteudoV861"></div>
+  </div>
+</div>
+
+<script id="clientes-v861-lazy-relations">
+(function(){
+"use strict";
+
+const PAGE_REL=100;
+let relacaoAtualV861=[];
+let relacaoTituloV861="";
+let relacaoPaginaV861=0;
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function base(){
+  if(Array.isArray(window.clientesDadosCombinados)&&window.clientesDadosCombinados.length)return window.clientesDadosCombinados;
+  try{if(Array.isArray(clientesDadosCombinados))return clientesDadosCombinados}catch(e){}
+  return [];
+}
+function categoria(r){
+  return r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"");
+}
+function conjunto(tipo){
+  const d=base();
+  const t=String(tipo||"");
+  const regras={
+    total:r=>true,
+    identificados:r=>String(r.nome_cliente||"").trim()!=="",
+    semNome:r=>String(r.nome_cliente||"").trim()==="",
+    abertas:r=>String(r.status_da_os||r.status||"").toUpperCase().includes("ABE"),
+    fechadas:r=>String(r.status_da_os||r.status||"").toUpperCase().includes("FEC"),
+    prontas:r=>String(r.status||"").toUpperCase().includes("PRONTA"),
+    semTecnico:r=>!String(r.tecnico||"").trim(),
+    semRack:r=>!String(r.rack||"").trim(),
+    garantia:r=>String(r.tipo_garantia||"").trim()!==""
+  };
+  return d.filter(regras[t]||(()=>false));
+}
+function cols(){
+  return [
+    {label:"O.S.",key:"os"},
+    {label:"GR",key:"grupo"},
+    {label:"N.C.E.",key:"nce"},
+    {label:"Cliente",key:"nome_cliente"},
+    {label:"Produto",key:"desc_produto"},
+    {label:"Categoria",value:categoria},
+    {label:"PDV",key:"pdv"},
+    {label:"Rack",key:"rack"},
+    {label:"Status",key:"status"},
+    {label:"Situação O.S.",key:"status_da_os"},
+    {label:"Técnico",key:"tecnico"},
+    {label:"NF",key:"nf"},
+    {label:"Nº Série",key:"n_serie"}
+  ];
+}
+function renderRelacao(){
+  const modal=document.getElementById("clientesRelacaoModalV861");
+  const box=document.getElementById("clientesRelacaoConteudoV861");
+  const tit=document.getElementById("clientesRelacaoTituloV861");
+  const res=document.getElementById("clientesRelacaoResumoV861");
+  if(!modal||!box)return;
+
+  const total=relacaoAtualV861.length;
+  const pags=Math.max(1,Math.ceil(total/PAGE_REL));
+  relacaoPaginaV861=Math.max(0,Math.min(pags-1,relacaoPaginaV861));
+  const ini=relacaoPaginaV861*PAGE_REL;
+  const fim=Math.min(total,ini+PAGE_REL);
+  const pag=relacaoAtualV861.slice(ini,fim);
+
+  if(tit)tit.textContent=relacaoTituloV861;
+  if(res)res.textContent=total.toLocaleString("pt-BR")+" O.S. — somente "+Math.min(PAGE_REL,total)+" linhas renderizadas por página";
+
+  if(!total){
+    box.innerHTML='<div class="admin-info">Nenhuma O.S. nesta relação.</div>';
+    modal.classList.add("aberto");
+    return;
+  }
+
+  const nav=`<div class="clientes-relacao-pager-v861">
+    <button ${relacaoPaginaV861===0?"disabled":""} onclick="mudarPaginaRelacaoClientesV861(-1)">‹ Anterior</button>
+    <b>${ini+1}–${fim} de ${total.toLocaleString("pt-BR")}</b>
+    <button ${relacaoPaginaV861>=pags-1?"disabled":""} onclick="mudarPaginaRelacaoClientesV861(1)">Próxima ›</button>
+  </div>`;
+
+  const linhas=pag.map(r=>`<tr>
+    <td><b>${esc(r.os)}</b></td>
+    <td>${esc(r.grupo)}</td>
+    <td>${esc(r.nce)}</td>
+    <td>${esc(r.nome_cliente||"Não identificado")}</td>
+    <td>${esc(r.desc_produto)}</td>
+    <td>${esc(categoria(r))}</td>
+    <td>${esc(r.pdv)}</td>
+    <td>${esc(r.rack)}</td>
+    <td>${esc(r.status)}</td>
+    <td>${esc(r.status_da_os)}</td>
+    <td>${esc(r.tecnico)}</td>
+    <td><button class="usuario-acao" onclick="abrirMidiasOS('${esc(r.os)}','clientes')">📎</button></td>
+  </tr>`).join("");
+
+  box.innerHTML=nav+`<div style="overflow:auto"><table class="clientes-table">
+    <thead><tr><th>O.S.</th><th>GR</th><th>N.C.E.</th><th>Cliente</th><th>Produto</th>
+    <th>Categoria</th><th>PDV</th><th>Rack</th><th>Status</th><th>Situação</th><th>Técnico</th><th>Mídia</th></tr></thead>
+    <tbody>${linhas}</tbody></table></div>`+nav;
+
+  modal.classList.add("aberto");
+}
+window.abrirRelacaoClientesV861=function(tipo,titulo){
+  relacaoAtualV861=conjunto(tipo);
+  relacaoTituloV861=titulo||"Relação de Clientes";
+  relacaoPaginaV861=0;
+  renderRelacao();
+};
+window.fecharRelacaoClientesV861=function(){
+  const modal=document.getElementById("clientesRelacaoModalV861");
+  const box=document.getElementById("clientesRelacaoConteudoV861");
+  if(modal)modal.classList.remove("aberto");
+  if(box)box.innerHTML="";
+  relacaoAtualV861=[];
+  relacaoTituloV861="";
+  relacaoPaginaV861=0;
+};
+window.mudarPaginaRelacaoClientesV861=function(delta){
+  relacaoPaginaV861+=Number(delta||0);
+  renderRelacao();
+};
+window.exportarRelacaoClientesV861=function(tipo,titulo){
+  const dados=conjunto(tipo);
+  if(!dados.length){alert("Não há O.S. nesta relação.");return}
+  const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+  if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido.");return}
+  window.ERP?.Export?.exportar?.({dados,colunas:cols(),formato,nome:titulo||tipo,aba:"Clientes"});
+};
+
+/* ---------------------------------------------------------
+   CARTÕES DE CLIENTES: números sempre; relações só sob clique
+   --------------------------------------------------------- */
+window.renderResumoLazyClientesV861=function(){
+  const d=base();
+  if(!d.length)return;
+
+  const identificados=d.filter(r=>String(r.nome_cliente||"").trim()).length;
+  const semNome=d.length-identificados;
+  const abertas=d.filter(r=>String(r.status_da_os||r.status||"").toUpperCase().includes("ABE")).length;
+  const fechadas=d.filter(r=>String(r.status_da_os||r.status||"").toUpperCase().includes("FEC")).length;
+
+  const set=(id,val)=>{const e=document.getElementById(id);if(e)e.textContent=Number(val||0).toLocaleString("pt-BR")};
+  set("cliTotalOS",d.length);
+  set("cliTotalIdentificados",identificados);
+  set("cliSemNome",semNome);
+
+  // Cria uma área leve apenas se existir um container apropriado.
+  let area=document.getElementById("clientesResumoLazyV861");
+  const host=document.getElementById("telaClientesDashboardPrincipal")||document.getElementById("telaClientes");
+  if(!area&&host){
+    area=document.createElement("div");
+    area.id="clientesResumoLazyV861";
+    area.className="intel-grid";
+    const alvo=host.querySelector(".dashboard-grid,.clientes-dashboard-grid")||host;
+    alvo.prepend(area);
+  }
+  if(!area)return;
+
+  const cards=[
+    ["Total de O.S.","total",d.length],
+    ["Clientes identificados","identificados",identificados],
+    ["Sem nome de cliente","semNome",semNome],
+    ["O.S. abertas","abertas",abertas],
+    ["O.S. fechadas","fechadas",fechadas]
+  ];
+  area.innerHTML=cards.map(([titulo,tipo,total])=>`<div class="intel-card clientes-card-relacao-v861">
+    <small>${esc(titulo)}</small>
+    <div class="clientes-relacao-total-v861">${Number(total).toLocaleString("pt-BR")}</div>
+    <div class="clientes-relacao-acoes-v861">
+      <button onclick="abrirRelacaoClientesV861('${tipo}','${esc(titulo)}')">Ver relação</button>
+      <button onclick="exportarRelacaoClientesV861('${tipo}','${esc(titulo)}')">Exportar ▾</button>
+    </div>
+  </div>`).join("");
+};
+
+/* ---------------------------------------------------------
+   COLETA CLIENTES — abertura robusta
+   --------------------------------------------------------- */
+function montarColeta(){
+  // Primeiro tenta o lazy manager de CLIENTES, depois o antigo.
+  let el=window.clientesMontarTelaV860?.("telaClientesColetaPrincipal");
+  if(!el)el=window.erpMontarTelaV7544?.("telaClientesColetaPrincipal");
+  if(!el)el=document.getElementById("telaClientesColetaPrincipal");
+  return el;
+}
+window.abrirColetaClientesPrincipal=function(){
+  const tela=montarColeta();
+  if(!tela){
+    console.error("[CLIENTES] telaClientesColetaPrincipal não encontrada");
+    alert("A tela de Coleta de Clientes não pôde ser montada.");
+    return;
+  }
+
+  // Oculta somente as subtelas de CLIENTES, sem desmontar a própria coleta.
+  ["telaClientes","telaClientesDashboardPrincipal","telaClientesHistoricoColetaPrincipal",
+   "telaClientesInteligenciaPrincipal","telaClientesConsultaPrincipal","telaClientesCIPrincipal"]
+   .forEach(id=>{
+      const el=window.clientesMontarTelaV860?.(id)||document.getElementById(id);
+      if(el)el.style.display="none";
+   });
+
+  tela.style.display="block";
+
+  // Renderiza imediatamente o estado existente.
+  try{window.renderColetaCli?.()}catch(e){console.warn(e)}
+
+  const input=document.getElementById("cliColetaOSInput");
+  const msg=document.getElementById("cliColetaMensagemPrincipal");
+  const status=document.getElementById("cliColetaStatusConexao");
+
+  const d=base();
+  if(d.length){
+    if(status)status.textContent="Supabase Clientes conectado";
+    if(msg){msg.textContent="Base pronta. Bipe ou digite uma O.S.";msg.style.color="#0b7a2a"}
+    if(input){input.disabled=false;setTimeout(()=>input.focus(),40)}
+    window.clientesSincronizarLazyV860?.();
+    return;
+  }
+
+  if(status)status.textContent="Carregando Base de Clientes...";
+  if(msg){msg.textContent="Coleta aberta. Carregando a base em segundo plano...";msg.style.color=""}
+  if(input)input.disabled=true;
+
+  const carregar=window.carregarBaseClientesLeveV852 ||
+    (async()=>{
+      if(typeof window.garantirDadosClientes==="function"){
+        await window.garantirDadosClientes();
+        return base();
+      }
+      return [];
+    });
+
+  Promise.resolve(carregar()).then(dados=>{
+    if(status)status.textContent="Supabase Clientes conectado";
+    if(msg){msg.textContent="Base pronta: "+(dados?.length||base().length).toLocaleString("pt-BR")+" O.S. disponíveis.";msg.style.color="#0b7a2a"}
+    if(input){input.disabled=false;input.focus()}
+    window.renderColetaCli?.();
+    window.clientesSincronizarLazyV860?.();
+  }).catch(e=>{
+    console.error(e);
+    if(status)status.textContent="Erro na Base de Clientes";
+    if(msg){msg.textContent="Erro ao carregar a base: "+(e.message||e);msg.style.color="#b00020"}
+    if(input)input.disabled=false;
+  });
+};
+
+/* ---------------------------------------------------------
+   DOM precisa CAIR quando sai da página
+   --------------------------------------------------------- */
+window.limparDOMClientesCompletoV861=function(){
+  window.fecharRelacaoClientesV861();
+
+  const idsPesados=[
+    "cliTabelaPrincipal","cliTabelaStatus","cliTabelaTecnicos","cliTabelaPDV",
+    "cliContagemTabela","clientesResumoLazyV861"
+  ];
+  idsPesados.forEach(id=>{
+    const el=document.getElementById(id);
+    if(!el)return;
+    if(id==="cliContagemTabela")el.textContent="";
+    else el.innerHTML="";
+  });
+
+  const tb=document.getElementById("cliColetaTabelaCorpoPrincipal");
+  if(tb)tb.innerHTML='<tr><td colspan="18" class="coleta-vazio">Abra a coleta para renderizar as O.S.</td></tr>';
+  document.getElementById("cliColetaPagerV851")?.remove();
+
+  try{
+    if(typeof clientesCharts!=="undefined"&&clientesCharts){
+      Object.keys(clientesCharts).forEach(k=>{
+        try{clientesCharts[k]?.destroy?.()}catch(e){}
+        delete clientesCharts[k];
+      });
+    }
+  }catch(e){}
+
+  // Os dados ficam em cache/memória; só o HTML é destruído.
+};
+
+document.addEventListener("click",e=>{
+  const alvo=e.target.closest?.("[onclick],.menu,[data-menu]");
+  if(!alvo)return;
+  const acao=((alvo.getAttribute("onclick")||"")+" "+(alvo.dataset?.menu||"")+" "+(alvo.textContent||"")).toLowerCase();
+
+  const dentroClientes=
+    acao.includes("cliente") ||
+    alvo.closest?.("#telaClientes,#telaClientesDashboardPrincipal,#telaClientesColetaPrincipal,#telaClientesHistoricoColetaPrincipal,#telaClientesInteligenciaPrincipal,#telaClientesConsultaPrincipal,#telaClientesCIPrincipal");
+
+  if(dentroClientes)return;
+
+  setTimeout(()=>{
+    const algumaVisivel=[
+      "telaClientes","telaClientesDashboardPrincipal","telaClientesColetaPrincipal",
+      "telaClientesHistoricoColetaPrincipal","telaClientesInteligenciaPrincipal",
+      "telaClientesConsultaPrincipal","telaClientesCIPrincipal"
+    ].some(id=>{
+      const el=document.getElementById(id);
+      return el&&el.isConnected&&getComputedStyle(el).display!=="none";
+    });
+
+    if(!algumaVisivel){
+      window.limparDOMClientesCompletoV861();
+      // Estaciona subtelas para o DOM voltar ao nível da página atual.
+      [
+        "telaClientes","telaClientesDashboardPrincipal","telaClientesColetaPrincipal",
+        "telaClientesHistoricoColetaPrincipal","telaClientesInteligenciaPrincipal",
+        "telaClientesConsultaPrincipal","telaClientesCIPrincipal"
+      ].forEach(id=>{
+        try{
+          const el=document.getElementById(id);
+          if(el&&el.isConnected&&getComputedStyle(el).display==="none"){
+            // o lazy manager V8.6.0 fará o estacionamento físico
+            window.clientesSincronizarLazyV860?.();
+          }
+        }catch(e){}
+      });
+    }
+  },120);
+},true);
+
+/* ---------------------------------------------------------
+   Ao entrar no dashboard/Inteligência de CLIENTES:
+   apenas números/cartões leves.
+   --------------------------------------------------------- */
+function instalarWrappers(){
+  const wrap=(nome,fn)=>{
+    const original=window[nome];
+    if(typeof original!=="function"||original.__v861)return;
+    const novo=function(){
+      const r=fn.call(this,original,arguments);
+      return r;
+    };
+    novo.__v861=true;
+    window[nome]=novo;
+  };
+
+  wrap("abrirDashboardClientesModulo",function(original,args){
+    const el=window.clientesMontarTelaV860?.("telaClientesDashboardPrincipal")||document.getElementById("telaClientesDashboardPrincipal");
+    if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesDashboardPrincipal");
+    const d=base();
+    if(d.length){
+      window.renderResumoLazyClientesV861();
+      window.clientesSincronizarLazyV860?.();
+      return;
+    }
+    const carregar=window.carregarBaseClientesLeveV852||window.garantirDadosClientes;
+    return Promise.resolve(carregar?.()).then(()=>{
+      window.renderResumoLazyClientesV861();
+      window.clientesSincronizarLazyV860?.();
+    });
+  });
+
+  wrap("abrirInteligenciaClientesPrincipal",function(original,args){
+    const el=window.clientesMontarTelaV860?.("telaClientesInteligenciaPrincipal")||document.getElementById("telaClientesInteligenciaPrincipal");
+    if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesInteligenciaPrincipal");
+    const d=base();
+    if(d.length){
+      window.renderResumoLazyClientesV861();
+      window.clientesSincronizarLazyV860?.();
+      return;
+    }
+    const carregar=window.carregarBaseClientesLeveV852||window.garantirDadosClientes;
+    return Promise.resolve(carregar?.()).then(()=>{
+      window.renderResumoLazyClientesV861();
+      window.clientesSincronizarLazyV860?.();
+    });
+  });
+}
+
+function init(){
+  instalarWrappers();
+  setTimeout(instalarWrappers,1200);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
+else init();
+
 })();
 </script>
 
