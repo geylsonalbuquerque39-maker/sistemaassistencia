@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.6.1: CLIENTES com relações lazy + DOM descartável + Coleta corrigida -->
+<!-- V8.7.0: CLIENTES realmente Lazy DOM — sem dashboard/consulta pré-renderizados -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.6.1</div>
+<div id="erpVersionBadgeV7542">ERP V8.7.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21664,7 +21664,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.6.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.7.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -24350,6 +24350,509 @@ function init(){
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
 else init();
+
+})();
+</script>
+
+
+<!-- =========================================================
+     ERP V8.7.0 — CLIENTES: MESMO MÉTODO DO ILR
+     - entrar em CLIENTES = só landing + números
+     - dashboard = contagens/cartões
+     - relação = só no clique
+     - consulta = só 100 linhas quando aplicar
+     - sair = DOM gerado destruído e tela estacionada
+     ========================================================= -->
+<style id="clientes-v870-style">
+#clientesDashboardLazyV870{display:none;margin-top:20px}
+#clientesDashboardLazyV870.ativo{display:block}
+#clientesDashboardLazyV870 .clientes-lazy-grid-v870{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px
+}
+#clientesDashboardLazyV870 .clientes-lazy-card-v870{
+  background:#fff;border:1px solid #d9e5f1;border-radius:15px;padding:16px;
+  box-shadow:0 5px 16px rgba(0,37,77,.07)
+}
+#clientesDashboardLazyV870 .clientes-lazy-card-v870 small{display:block;color:#6d8197;font-weight:800}
+#clientesDashboardLazyV870 .clientes-lazy-card-v870 strong{
+  display:block;font-size:30px;line-height:1.1;color:#003c7a;margin:8px 0 12px
+}
+#clientesDashboardLazyV870 .clientes-lazy-card-v870 .acoes{display:flex;gap:7px;flex-wrap:wrap}
+#clientesDashboardLazyV870 button,
+#clientesConsultaLazyV870 button{
+  border:0;border-radius:9px;padding:8px 11px;font-weight:800;cursor:pointer
+}
+#clientesConsultaLazyV870{display:none}
+#clientesConsultaLazyV870.ativo{display:block}
+.clientes-wrap > .clientes-grid{display:none!important}
+.clientes-wrap > .clientes-card:not(#clientesImportadores):not(#clientesConsultaLazyV870){display:none!important}
+body.dark-mode #clientesDashboardLazyV870 .clientes-lazy-card-v870{background:#102b49;border-color:#315a80}
+body.dark-mode #clientesDashboardLazyV870 .clientes-lazy-card-v870 strong{color:#eef6ff}
+</style>
+
+<script id="clientes-v870-core">
+(function(){
+"use strict";
+
+const PAGE=100;
+let basePromise=null;
+let indiceOS=new Map();
+let pesquisaAtual=[];
+let paginaPesquisa=0;
+let relacaoAtual=[];
+let relacaoTitulo="";
+let paginaRelacao=0;
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function osNorm(v){
+  return String(v??"").trim().toUpperCase().replace(/^ILR\s*/,"").replace(/\.0$/,"").replace(/\s+/g,"");
+}
+function dados(){
+  if(Array.isArray(window.clientesDadosCombinados)&&window.clientesDadosCombinados.length)return window.clientesDadosCombinados;
+  try{if(Array.isArray(clientesDadosCombinados)&&clientesDadosCombinados.length)return clientesDadosCombinados}catch(e){}
+  const cache=window.ERP?.Cache?.get?.("clientes:dados");
+  return Array.isArray(cache)?cache:[];
+}
+function setDados(lista){
+  lista=Array.isArray(lista)?lista:[];
+  try{clientesDadosCombinados=lista}catch(e){}
+  window.clientesDadosCombinados=lista;
+  window.ERP?.Cache?.set?.("clientes:dados",lista,300000);
+  indiceOS=new Map(lista.map(r=>[osNorm(r.os),r]).filter(x=>x[0]));
+  return lista;
+}
+function reconstruirIndice(){
+  indiceOS=new Map(dados().map(r=>[osNorm(r.os),r]).filter(x=>x[0]));
+}
+async function carregarBaseLeve(forcar=false){
+  const existente=dados();
+  if(existente.length&&!forcar){
+    if(!indiceOS.size)reconstruirIndice();
+    return existente;
+  }
+  if(basePromise&&!forcar)return basePromise;
+
+  basePromise=(async()=>{
+    const [rex,ratec]=await Promise.all([
+      carregarTabelaCompletaClientes("rexpedlr_clientes","*"),
+      carregarTabelaCompletaClientes("ratec04_clientes","os,nome_cliente")
+    ]);
+    const nomes=new Map((ratec||[]).map(r=>[normalizarOSClientes(r.os),r.nome_cliente]));
+    const combinados=(rex||[]).map(r=>({
+      ...r,
+      nome_cliente:nomes.get(normalizarOSClientes(r.os))||"",
+      categoria:typeof classificarCategoriaProduto==="function"
+        ?classificarCategoriaProduto(r.desc_produto,r.grupo):""
+    }));
+    return setDados(combinados);
+  })();
+
+  try{return await basePromise}
+  finally{basePromise=null}
+}
+window.carregarBaseClientesLeveV870=carregarBaseLeve;
+window.garantirDadosClientes=function(){return carregarBaseLeve(false)};
+
+/* ---------- Estrutura interna leve ---------- */
+function telaClientes(){
+  return window.clientesMontarTelaV860?.("telaClientes")
+      ||window.erpMontarTelaV7544?.("telaClientes")
+      ||document.getElementById("telaClientes");
+}
+function prepararEstrutura(){
+  const tela=telaClientes();
+  if(!tela)return null;
+  const wrap=tela.querySelector(".clientes-wrap");
+  if(!wrap)return tela;
+
+  // Identifica a consulta antiga e transforma em uma seção sob demanda.
+  const consulta=wrap.querySelector(".clientes-card:has(#cliTabelaPrincipal)");
+  if(consulta){
+    consulta.id="clientesConsultaLazyV870";
+    consulta.classList.remove("clientes-card");
+  }
+
+  let dash=document.getElementById("clientesDashboardLazyV870");
+  if(!dash){
+    dash=document.createElement("section");
+    dash.id="clientesDashboardLazyV870";
+    dash.innerHTML=`
+      <div class="clientes-card" style="display:block!important">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px">
+          <div><h2 style="margin:0">📊 Dashboard — Clientes</h2>
+          <small>Somente contagens. Relações são criadas apenas quando você clicar.</small></div>
+          <button class="v2-btn" onclick="carregarDashboardClientes(true)">⟳ Atualizar números</button>
+        </div>
+        <div id="clientesLazyCardsV870" class="clientes-lazy-grid-v870"></div>
+      </div>`;
+    const cards=document.getElementById("clientesFuncoesCards");
+    cards?.insertAdjacentElement("afterend",dash);
+  }
+
+  // Garante que tabela antiga nunca fique carregada ao entrar.
+  const tabela=document.getElementById("cliTabelaPrincipal");
+  if(tabela)tabela.innerHTML="";
+  const cnt=document.getElementById("cliContagemTabela");
+  if(cnt)cnt.textContent="Nenhuma relação renderizada.";
+
+  return tela;
+}
+function ocultarSubsecoes(){
+  document.getElementById("clientesDashboardLazyV870")?.classList.remove("ativo");
+  document.getElementById("clientesConsultaLazyV870")?.classList.remove("ativo");
+  const imp=document.getElementById("clientesImportadores");if(imp)imp.style.display="none";
+}
+function mostrarLanding(){
+  prepararEstrutura();
+  ocultarSubsecoes();
+  const cards=document.getElementById("clientesFuncoesCards");if(cards)cards.style.display="";
+}
+function mostrarSo(id){
+  prepararEstrutura();
+  ocultarSubsecoes();
+  const cards=document.getElementById("clientesFuncoesCards");if(cards)cards.style.display="none";
+  document.getElementById(id)?.classList.add("ativo");
+}
+
+/* ---------- Contagens sem relações ---------- */
+function grupos(){
+  const d=dados();
+  return {
+    total:d,
+    identificados:d.filter(r=>String(r.nome_cliente||"").trim()),
+    semNome:d.filter(r=>!String(r.nome_cliente||"").trim()),
+    abertas:d.filter(r=>String(r.status_da_os||r.status||"").toUpperCase().includes("ABE")),
+    fechadas:d.filter(r=>String(r.status_da_os||r.status||"").toUpperCase().includes("FEC")),
+    prontas:d.filter(r=>/PRONT|CONSERT|CONCLU|FINALIZ/i.test(String(r.status||r.status_da_os||""))),
+    semTecnico:d.filter(r=>!String(r.tecnico||"").trim()),
+    semRack:d.filter(r=>!String(r.rack||"").trim())
+  };
+}
+function atualizarKPIs(){
+  const g=grupos();
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=Number(v||0).toLocaleString("pt-BR")};
+  set("cliTotalOS",g.total.length);
+  set("cliTotalIdentificados",g.identificados.length);
+  set("cliSemNome",g.semNome.length);
+  const st=document.getElementById("cliBancoStatus");if(st)st.textContent="🟢 Cache";
+}
+function renderDashboardLeve(){
+  const g=grupos();
+  const area=document.getElementById("clientesLazyCardsV870");if(!area)return;
+  const cards=[
+    ["Total de O.S.","total",g.total.length],
+    ["Clientes identificados","identificados",g.identificados.length],
+    ["Sem nome de cliente","semNome",g.semNome.length],
+    ["O.S. abertas","abertas",g.abertas.length],
+    ["O.S. fechadas","fechadas",g.fechadas.length],
+    ["O.S. prontas","prontas",g.prontas.length],
+    ["Sem técnico","semTecnico",g.semTecnico.length],
+    ["Sem rack","semRack",g.semRack.length]
+  ];
+  area.innerHTML=cards.map(([titulo,tipo,total])=>`
+    <article class="clientes-lazy-card-v870">
+      <small>${esc(titulo)}</small>
+      <strong>${Number(total).toLocaleString("pt-BR")}</strong>
+      <div class="acoes">
+        <button onclick="abrirRelacaoClientesV870('${tipo}','${esc(titulo)}')">Ver relação</button>
+        <button onclick="exportarRelacaoClientesV870('${tipo}','${esc(titulo)}')">Exportar ▾</button>
+      </div>
+    </article>`).join("");
+}
+
+/* ---------- Relações: só 100 linhas ---------- */
+function colunasExport(){
+  return [
+    {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E.",key:"nce"},
+    {label:"Cliente",key:"nome_cliente"},{label:"Produto",key:"desc_produto"},
+    {label:"PDV",key:"pdv"},{label:"Rack",key:"rack"},{label:"Status",key:"status"},
+    {label:"Situação O.S.",key:"status_da_os"},{label:"Técnico",key:"tecnico"},
+    {label:"NF",key:"nf"},{label:"Nº Série",key:"n_serie"}
+  ];
+}
+function obterGrupo(tipo){
+  return grupos()[tipo]||[];
+}
+function renderRelacao(){
+  const modal=document.getElementById("clientesRelacaoModalV861");
+  const box=document.getElementById("clientesRelacaoConteudoV861");
+  const tit=document.getElementById("clientesRelacaoTituloV861");
+  const res=document.getElementById("clientesRelacaoResumoV861");
+  if(!modal||!box)return;
+
+  const total=relacaoAtual.length,pags=Math.max(1,Math.ceil(total/PAGE));
+  paginaRelacao=Math.max(0,Math.min(pags-1,paginaRelacao));
+  const ini=paginaRelacao*PAGE,fim=Math.min(total,ini+PAGE),pag=relacaoAtual.slice(ini,fim);
+  if(tit)tit.textContent=relacaoTitulo;
+  if(res)res.textContent=`${total.toLocaleString("pt-BR")} O.S. — ${ini+1}-${fim}`;
+
+  const nav=`<div class="clientes-relacao-pager-v861">
+    <button ${paginaRelacao===0?"disabled":""} onclick="mudarPaginaRelacaoClientesV870(-1)">‹ Anterior</button>
+    <b>${ini+1}–${fim} de ${total.toLocaleString("pt-BR")}</b>
+    <button ${paginaRelacao>=pags-1?"disabled":""} onclick="mudarPaginaRelacaoClientesV870(1)">Próxima ›</button>
+  </div>`;
+  const rows=pag.map(r=>`<tr>
+    <td><b>${esc(r.os)}</b></td><td>${esc(r.grupo)}</td><td>${esc(r.nce)}</td>
+    <td>${esc(r.nome_cliente||"Não identificado")}</td><td>${esc(r.desc_produto)}</td>
+    <td>${esc(r.pdv)}</td><td>${esc(r.rack)}</td><td>${esc(r.status)}</td>
+    <td>${esc(r.status_da_os)}</td><td>${esc(r.tecnico)}</td>
+  </tr>`).join("");
+  box.innerHTML=total
+    ?nav+`<div style="overflow:auto"><table class="clientes-table"><thead><tr>
+       <th>O.S.</th><th>GR</th><th>N.C.E.</th><th>Cliente</th><th>Produto</th>
+       <th>PDV</th><th>Rack</th><th>Status</th><th>Situação</th><th>Técnico</th>
+       </tr></thead><tbody>${rows}</tbody></table></div>`+nav
+    :'<div class="admin-info">Nenhuma O.S. nesta relação.</div>';
+  modal.classList.add("aberto");
+  window.redecorarAtalhosMidiasOS?.(box);
+}
+window.abrirRelacaoClientesV870=function(tipo,titulo){
+  relacaoAtual=obterGrupo(tipo);
+  relacaoTitulo=titulo||"Relação";
+  paginaRelacao=0;renderRelacao();
+};
+window.mudarPaginaRelacaoClientesV870=function(d){paginaRelacao+=Number(d||0);renderRelacao()};
+window.exportarRelacaoClientesV870=function(tipo,titulo){
+  const lista=obterGrupo(tipo);
+  if(!lista.length){alert("Não há O.S. nesta relação.");return}
+  const formato=(prompt("Formato do arquivo: CSV, XLS ou XLT","CSV")||"CSV").trim().toUpperCase();
+  if(!["CSV","XLS","XLT"].includes(formato))return;
+  ERP.Export.exportar({dados:lista,colunas:colunasExport(),formato,nome:titulo||tipo,aba:"Clientes"});
+};
+
+/* ---------- Consulta avançada 100 por página ---------- */
+function v(id){return document.getElementById(id)?.value||""}
+function contains(a,b){
+  b=String(b||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().trim();
+  if(!b)return true;
+  return String(a??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().includes(b);
+}
+function calcularPesquisa(){
+  const f={geral:v("cliBusca"),nome:v("cliFiltroNome"),os:v("cliFiltroOS"),serie:v("cliFiltroSerie"),
+    nf:v("cliFiltroNF"),produto:v("cliFiltroProduto"),grupo:v("cliFiltroGrupo"),nce:v("cliFiltroNCE"),
+    status:v("cliFiltroStatus"),tecnico:v("cliFiltroTecnico"),pdv:v("cliFiltroPDV"),rack:v("cliFiltroRack"),
+    situacao:v("cliFiltroSituacao"),garantia:v("cliFiltroGarantia"),categoria:v("cliFiltroCategoria")};
+  return dados().filter(r=>{
+    const cat=r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"");
+    const geral=[r.os,r.nome_cliente,r.n_serie,r.nf,r.desc_produto,r.tecnico,r.pdv,r.status,r.nce,r.grupo,r.rack,r.status_da_os,r.tipo_garantia].join(" ");
+    return contains(geral,f.geral)&&contains(r.nome_cliente,f.nome)&&contains(r.os,f.os)&&contains(r.n_serie,f.serie)&&
+      contains(r.nf,f.nf)&&contains(r.desc_produto,f.produto)&&contains(r.grupo,f.grupo)&&contains(r.nce,f.nce)&&
+      (!f.status||String(r.status||"")===f.status)&&(!f.tecnico||String(r.tecnico||"")===f.tecnico)&&
+      (!f.pdv||String(r.pdv||"")===f.pdv)&&contains(r.rack,f.rack)&&contains(r.status_da_os,f.situacao)&&
+      contains(r.tipo_garantia,f.garantia)&&(!f.categoria||cat===f.categoria);
+  });
+}
+function renderPesquisa(){
+  const area=document.getElementById("cliTabelaPrincipal"),cnt=document.getElementById("cliContagemTabela");
+  if(!area)return;
+  window.clientesPesquisaAtual=pesquisaAtual;
+  try{clientesPesquisaAtual=pesquisaAtual}catch(e){}
+  if(cnt)cnt.textContent=`${pesquisaAtual.length.toLocaleString("pt-BR")} resultado(s)`;
+  if(!pesquisaAtual.length){area.innerHTML='<div class="clientes-vazio">Nenhuma O.S. encontrada.</div>';return}
+  const pags=Math.max(1,Math.ceil(pesquisaAtual.length/PAGE));
+  paginaPesquisa=Math.max(0,Math.min(pags-1,paginaPesquisa));
+  const ini=paginaPesquisa*PAGE,fim=Math.min(pesquisaAtual.length,ini+PAGE),pag=pesquisaAtual.slice(ini,fim);
+  const nav=`<div class="clientes-pager-v851"><button ${paginaPesquisa===0?"disabled":""} onclick="mudarPaginaPesquisaClientesV870(-1)">‹ Anterior</button>
+  <b>${ini+1}–${fim} de ${pesquisaAtual.length.toLocaleString("pt-BR")}</b>
+  <button ${paginaPesquisa>=pags-1?"disabled":""} onclick="mudarPaginaPesquisaClientesV870(1)">Próxima ›</button></div>`;
+  area.innerHTML=nav+`<table class="clientes-table"><thead><tr><th>O.S.</th><th>Cliente</th><th>PDV</th><th>GR</th><th>N.C.E.</th><th>Produto</th><th>Status</th><th>Técnico</th><th>Rack</th></tr></thead>
+  <tbody>${pag.map(r=>`<tr><td><b>${esc(r.os)}</b></td><td>${esc(r.nome_cliente)}</td><td>${esc(r.pdv)}</td><td>${esc(r.grupo)}</td><td>${esc(r.nce)}</td><td>${esc(r.desc_produto)}</td><td>${esc(r.status)}</td><td>${esc(r.tecnico)}</td><td>${esc(r.rack)}</td></tr>`).join("")}</tbody></table>`+nav;
+  window.redecorarAtalhosMidiasOS?.(area);
+}
+window.filtrarTabelaClientes=function(){paginaPesquisa=0;pesquisaAtual=calcularPesquisa();renderPesquisa()};
+window.mudarPaginaPesquisaClientesV870=function(d){paginaPesquisa+=Number(d||0);renderPesquisa()};
+window.limparFiltrosClientes=function(){
+  ["cliBusca","cliFiltroNome","cliFiltroOS","cliFiltroSerie","cliFiltroNF","cliFiltroProduto","cliFiltroGrupo","cliFiltroNCE","cliFiltroStatus","cliFiltroTecnico","cliFiltroPDV","cliFiltroRack","cliFiltroSituacao","cliFiltroGarantia","cliFiltroCategoria"]
+    .forEach(id=>{const e=document.getElementById(id);if(e)e.value=""});
+  pesquisaAtual=[];paginaPesquisa=0;
+  const area=document.getElementById("cliTabelaPrincipal");if(area)area.innerHTML='<div class="admin-info">Use os filtros e clique em Aplicar filtros.</div>';
+  const c=document.getElementById("cliContagemTabela");if(c)c.textContent="Nenhuma relação renderizada.";
+};
+
+/* ---------- Navegação: NÃO chama carregarDashboardClientes antigo ---------- */
+window.abrirClientes=function(){
+  if(typeof esconderTelas==="function")esconderTelas();
+  if(typeof definirMenuAtivo==="function")definirMenuAtivo("clientes");
+  const tela=prepararEstrutura();
+  if(tela)tela.style.display="block";
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+
+  // Destrói qualquer render antigo que tenha sobrevivido.
+  destruirGerado();
+  mostrarLanding();
+
+  const msg=document.getElementById("clientesMensagem");
+  if(dados().length){
+    atualizarKPIs();
+    if(msg){msg.className="dashboard-ok";msg.textContent="Base pronta em memória. Escolha uma função."}
+  }else{
+    if(msg){msg.className="dashboard-loading";msg.textContent="Carregando somente os dados da Base de Clientes..."}
+    carregarBaseLeve(false).then(lista=>{
+      atualizarKPIs();
+      if(msg){msg.className="dashboard-ok";msg.textContent=`Base pronta: ${lista.length.toLocaleString("pt-BR")} O.S. Escolha uma função.`}
+    }).catch(e=>{
+      if(msg){msg.className="dashboard-erro";msg.textContent="Erro ao carregar Base de Clientes: "+(e.message||e)}
+    });
+  }
+  setTimeout(()=>window.clientesSincronizarLazyV860?.(),0);
+};
+
+window.carregarDashboardClientes=async function(forcar){
+  const msg=document.getElementById("clientesMensagem");
+  if(msg){msg.className="dashboard-loading";msg.textContent="Atualizando somente contagens..."}
+  const lista=await carregarBaseLeve(!!forcar);
+  atualizarKPIs();
+  renderDashboardLeve();
+  if(msg){msg.className="dashboard-ok";msg.textContent=`${lista.length.toLocaleString("pt-BR")} O.S. analisadas. Relações só serão renderizadas ao clicar.`}
+  return lista;
+};
+
+window.abrirDashboardClientesModulo=async function(){
+  const tela=prepararEstrutura();if(!tela)return;
+  if(typeof esconderTelas==="function")esconderTelas();
+  tela.style.display="block";
+  mostrarSo("clientesDashboardLazyV870");
+  if(!dados().length)await carregarBaseLeve(false);
+  atualizarKPIs();renderDashboardLeve();
+  setTimeout(()=>window.clientesSincronizarLazyV860?.(),0);
+};
+
+window.abrirConsultaClientesModulo=async function(){
+  const tela=prepararEstrutura();if(!tela)return;
+  if(typeof esconderTelas==="function")esconderTelas();
+  tela.style.display="block";
+  mostrarSo("clientesConsultaLazyV870");
+  if(!dados().length)await carregarBaseLeve(false);
+  window.limparFiltrosClientes();
+  setTimeout(()=>window.clientesSincronizarLazyV860?.(),0);
+};
+
+window.abrirInteligenciaClientesModulo=async function(){
+  let t=window.clientesMontarTelaV860?.("telaClientesInteligenciaPrincipal")
+      ||window.erpMontarTelaV7544?.("telaClientesInteligenciaPrincipal")
+      ||document.getElementById("telaClientesInteligenciaPrincipal");
+  if(!t){alert("Tela de Inteligência de Clientes não encontrada.");return}
+  if(typeof esconderTelas==="function")esconderTelas();
+  t.style.display="block";
+  if(!dados().length)await carregarBaseLeve(false);
+  const g=grupos();
+  const set=(id,x)=>{const e=document.getElementById(id);if(e)e.textContent=Number(x).toLocaleString("pt-BR")};
+  set("cliIntelTotal",g.total.length);set("cliIntelSemTecnico",g.semTecnico.length);
+  set("cliIntelSemCliente",g.semNome.length);set("cliIntelProntas",g.prontas.length);
+  const p=document.getElementById("cliIntelPendencias");
+  if(p)p.innerHTML=[
+    ["Sem técnico","semTecnico",g.semTecnico.length],
+    ["Sem cliente","semNome",g.semNome.length],
+    ["Prontas","prontas",g.prontas.length]
+  ].map(([nome,tipo,q])=>`<div class="cli-pendencia"><b>${esc(nome)}: ${q.toLocaleString("pt-BR")}</b>
+     <span><button onclick="abrirRelacaoClientesV870('${tipo}','${esc(nome)}')">Ver relação</button></span></div>`).join("");
+  const rank=document.getElementById("cliIntelTecnicos");if(rank)rank.innerHTML="";
+  const m=document.getElementById("cliIntelMensagem");if(m){m.className="dashboard-ok";m.textContent="Análise pronta. Relações só são renderizadas ao clicar."}
+  setTimeout(()=>window.clientesSincronizarLazyV860?.(),0);
+};
+
+/* ---------- Coleta: abre sem montar as outras subtelas ---------- */
+window.abrirColetaClientesPrincipal=function(){
+  const t=window.clientesMontarTelaV860?.("telaClientesColetaPrincipal")
+      ||window.erpMontarTelaV7544?.("telaClientesColetaPrincipal")
+      ||document.getElementById("telaClientesColetaPrincipal");
+  if(!t){alert("Tela da Coleta de Clientes não encontrada.");return}
+  if(typeof esconderTelas==="function")esconderTelas();
+  t.style.display="block";
+
+  const input=document.getElementById("cliColetaOSInput");
+  const msg=document.getElementById("cliColetaMensagemPrincipal");
+  if(dados().length){
+    reconstruirIndice();
+    if(input){input.disabled=false;setTimeout(()=>input.focus(),40)}
+    if(msg){msg.textContent="Base pronta. Bipe ou digite uma O.S.";msg.style.color="#0b7a2a"}
+    window.renderColetaCli?.();
+  }else{
+    if(input)input.disabled=true;
+    if(msg){msg.textContent="Coleta aberta. Carregando base em segundo plano...";msg.style.color=""}
+    carregarBaseLeve(false).then(()=>{
+      if(input){input.disabled=false;input.focus()}
+      if(msg){msg.textContent="Base pronta. Pode bipar.";msg.style.color="#0b7a2a"}
+      window.renderColetaCli?.();
+    }).catch(e=>{
+      if(input)input.disabled=false;
+      if(msg){msg.textContent="Erro ao carregar a base: "+(e.message||e);msg.style.color="#b00020"}
+    });
+  }
+  setTimeout(()=>window.clientesSincronizarLazyV860?.(),0);
+};
+
+/* O bip usa índice O(1), não percorre milhares de O.S. */
+const addColetaAnterior=window.adicionarOSColetaClientesPrincipal;
+window.adicionarOSColetaClientesPrincipal=function(){
+  const input=document.getElementById("cliColetaOSInput"),os=osNorm(input?.value);
+  if(!os)return;
+  if(!indiceOS.size)reconstruirIndice();
+  const r=indiceOS.get(os);
+  const msg=document.getElementById("cliColetaMensagemPrincipal");
+  if(!r){if(msg){msg.textContent="O.S. não encontrada na Base de Clientes.";msg.style.color="#b00020"}return}
+
+  // Aproveita estado da V8.5.1 se existir.
+  let lista=[];
+  try{if(Array.isArray(coletaCli))lista=coletaCli}catch(e){}
+  if(!lista.length&&Array.isArray(window.coletaCliV851))lista=window.coletaCliV851;
+  if(lista.some(x=>osNorm(x.os)===os)){if(msg){msg.textContent="Esta O.S. já está na coleta.";msg.style.color="#b36b00"}return}
+  lista.push({...r});
+  try{coletaCli=lista}catch(e){window.coletaCliV851=lista}
+  window.coletaCliV851=lista;
+  if(input)input.value="";
+  if(msg){msg.textContent=`O.S. adicionada. Total: ${lista.length}`;msg.style.color="#0b7a2a"}
+  window.renderColetaCli?.();input?.focus();
+};
+
+/* ---------- Destruição real do DOM ao sair ---------- */
+function destruirGerado(){
+  window.fecharRelacaoClientesV861?.();
+  window.fecharRelacaoClientesV870?.();
+
+  ["cliTabelaPrincipal","cliTabelaStatus","cliTabelaTecnicos","cliTabelaPDV",
+   "cliIntelTecnicos"].forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=""});
+  const cnt=document.getElementById("cliContagemTabela");if(cnt)cnt.textContent="";
+  const area=document.getElementById("clientesLazyCardsV870");if(area)area.innerHTML="";
+
+  try{
+    if(typeof clientesCharts!=="undefined"&&clientesCharts){
+      Object.keys(clientesCharts).forEach(k=>{try{clientesCharts[k]?.destroy?.()}catch(e){} delete clientesCharts[k]});
+    }
+  }catch(e){}
+  pesquisaAtual=[];paginaPesquisa=0;relacaoAtual=[];paginaRelacao=0;
+}
+window.destruirDOMClientesV870=destruirGerado;
+
+document.addEventListener("click",function(e){
+  const alvo=e.target.closest?.("[onclick],.menu,[data-menu]");
+  if(!alvo)return;
+  const acao=((alvo.getAttribute("onclick")||"")+" "+(alvo.dataset?.menu||"")+" "+(alvo.textContent||"")).toLowerCase();
+  const interno=acao.includes("cliente")||
+    !!alvo.closest?.("#telaClientes,#telaClientesColetaPrincipal,#telaClientesHistoricoColetaPrincipal,#telaClientesCIRegiao,#telaClientesInteligenciaPrincipal");
+  if(interno)return;
+
+  setTimeout(()=>{
+    const ids=["telaClientes","telaClientesColetaPrincipal","telaClientesHistoricoColetaPrincipal","telaClientesCIRegiao","telaClientesInteligenciaPrincipal"];
+    const ainda=ids.some(id=>{const el=document.getElementById(id);return el&&el.isConnected&&getComputedStyle(el).display!=="none"});
+    if(!ainda){
+      destruirGerado();
+      window.clientesSincronizarLazyV860?.();
+    }
+  },80);
+},true);
+
+/* Inicialização tardia para vencer todos os wrappers antigos. */
+function instalar(){
+  prepararEstrutura();
+  // Nunca deixe tabela antiga com milhares de linhas já existentes.
+  destruirGerado();
+  console.info("CLIENTES V8.7.0: Lazy DOM real ativo.");
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(instalar,5200),{once:true});
+else setTimeout(instalar,5200);
 
 })();
 </script>
