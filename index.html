@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Assistência Técnica</title>
-<!-- V8.5.1: corrige exportação/coleta CLIENTES + paginação lazy para reduzir DOM -->
+<!-- V8.6.0: CLIENTES com arquitetura Lazy DOM igual ILR -->
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial}
@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.5.1</div>
+<div id="erpVersionBadgeV7542">ERP V8.6.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21612,6 +21612,17 @@ for(const [id,tela] of Object.entries(modules)){
 function identificarModulo(el){
     const txt=((el?.dataset?.menu||"")+" "+(el?.getAttribute?.("onclick")||"")+" "+(el?.textContent||"")).toLowerCase();
 
+    // V8.5.2: ações internas da área CLIENTES controlam suas próprias subtelas.
+    // Não mandar esses cliques de volta para o módulo principal "clientes".
+    if(
+      txt.includes("abrircoletaclientesprincipal") ||
+      txt.includes("abrirhistoricocoletaclientesprincipal") ||
+      txt.includes("abrirciregiaoclientes") ||
+      txt.includes("abririnteligenciaclientesprincipal") ||
+      txt.includes("abrirconsultaclientesmodulo") ||
+      txt.includes("abrirdashboardclientesmodulo")
+    ) return "";
+
     if(txt.includes("intelig")) return "inteligencia";
     if(txt.includes("monitoramentocpp") || /\bcpp\b/.test(txt)) return "cpp";
     if(txt.includes("cliente")) return "clientes";
@@ -21653,7 +21664,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.5.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.6.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -21863,6 +21874,15 @@ function registrarClientes(){
         },
         async load(ctx={}){
             const forcar=!!ctx.force;
+
+            // V8.5.2: se uma subtela de CLIENTES estiver aberta, ela cuida da própria carga.
+            // Evita carregar Dashboard + gráficos + consulta inteira em paralelo com a Coleta.
+            const coletaVisivel=document.getElementById("telaClientesColetaPrincipal");
+            const histVisivel=document.getElementById("telaClientesHistoricoColetaPrincipal");
+            const intelVisivel=document.getElementById("telaClientesInteligenciaPrincipal");
+            const subAberta=[coletaVisivel,histVisivel,intelVisivel].some(el=>el&&getComputedStyle(el).display!=="none");
+            if(subAberta)return;
+
             const cache=ERP.Cache.get("clientes:dados");
 
             if(!forcar && Array.isArray(cache) && cache.length){
@@ -23482,7 +23502,14 @@ window.adicionarOSColetaClientesPrincipal=function(){
   const os=norm(input?.value);
   if(!os)return;
   const msg=document.getElementById("cliColetaMensagemPrincipal");
-  const r=baseClientesV851().find(x=>norm(x.os)===os);
+
+  const base=baseClientesV851();
+  if(!base.length){
+    if(msg){msg.textContent="A Base de Clientes ainda está carregando. Aguarde alguns segundos.";msg.style.color="#b36b00"}
+    return;
+  }
+
+  const r=base.find(x=>norm(x.os)===os);
   if(!r){if(msg){msg.textContent="O.S. não encontrada na Base de Clientes.";msg.style.color="#b00020"}return}
   const atual=coletaAtualV851();
   if(atual.some(x=>norm(x.os)===os)){if(msg){msg.textContent="Esta O.S. já está na coleta.";msg.style.color="#b36b00"}return}
@@ -23537,10 +23564,43 @@ window.salvarRascunhoColetaClientes=function(){
   if(m){m.textContent="Rascunho salvo neste computador.";m.style.color="#0b7a2a"}
 };
 
-const abrirColetaOrigV851=window.abrirColetaClientesPrincipal;
-window.abrirColetaClientesPrincipal=async function(){
+let baseClientesPromiseV852=null;
+
+async function carregarBaseClientesLeveV852(){
+  const pronta=baseClientesV851();
+  if(pronta.length)return pronta;
+  if(baseClientesPromiseV852)return baseClientesPromiseV852;
+
+  baseClientesPromiseV852=(async()=>{
+    const [rex,ratec]=await Promise.all([
+      carregarTabelaCompletaClientes("rexpedlr_clientes","*"),
+      carregarTabelaCompletaClientes("ratec04_clientes","os,nome_cliente")
+    ]);
+
+    const nomes=new Map((ratec||[]).map(r=>[normalizarOSClientes(r.os),r.nome_cliente]));
+    const combinados=(rex||[]).map(r=>({
+      ...r,
+      nome_cliente:nomes.get(normalizarOSClientes(r.os))||"",
+      categoria:typeof classificarCategoriaProduto==="function"
+        ?classificarCategoriaProduto(r.desc_produto,r.grupo)
+        :""
+    }));
+
+    clientesDadosCombinados=combinados;
+    window.clientesDadosCombinados=combinados;
+
+    // Compartilha com o cache V8 sem montar dashboard/gráficos/tabela de clientes.
+    window.ERP?.Cache?.set?.("clientes:dados",combinados,300000);
+    return combinados;
+  })();
+
+  try{return await baseClientesPromiseV852}
+  finally{baseClientesPromiseV852=null}
+}
+
+window.abrirColetaClientesPrincipal=function(){
+  // Abre a tela PRIMEIRO. A base é carregada depois, sem travar a navegação.
   if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesColetaPrincipal");
-  if(typeof window.garantirDadosClientes==="function")await window.garantirDadosClientes();
 
   if(!coletaAtualV851().length){
     const salvo=localStorage.getItem("CLIENTES_COLETA_RASCUNHO_V753");
@@ -23548,10 +23608,37 @@ window.abrirColetaClientesPrincipal=async function(){
       try{setColetaV851(JSON.parse(salvo)||[])}catch(e){}
     }
   }
+
   limparFiltrosColetaV851();
   paginaColetaV851=0;
   renderColetaV851();
-  setTimeout(()=>document.getElementById("cliColetaOSInput")?.focus(),60);
+
+  const input=document.getElementById("cliColetaOSInput");
+  const msg=document.getElementById("cliColetaMensagemPrincipal");
+  const status=document.getElementById("cliColetaStatusConexao");
+
+  if(baseClientesV851().length){
+    if(msg){msg.textContent="Base de Clientes pronta. Bipe ou digite uma O.S.";msg.style.color="#0b7a2a"}
+    if(status)status.textContent="Supabase Clientes conectado";
+    setTimeout(()=>input?.focus(),40);
+    return;
+  }
+
+  if(msg){msg.textContent="Abrindo coleta. Carregando a Base de Clientes em segundo plano...";msg.style.color=""}
+  if(status)status.textContent="Carregando Base de Clientes...";
+  if(input)input.disabled=true;
+
+  carregarBaseClientesLeveV852().then(dados=>{
+    if(status)status.textContent="Supabase Clientes conectado";
+    if(msg){msg.textContent="Base pronta: "+dados.length.toLocaleString("pt-BR")+" O.S. disponíveis. Pode bipar.";msg.style.color="#0b7a2a"}
+    if(input){input.disabled=false;input.focus()}
+    renderColetaV851();
+  }).catch(e=>{
+    console.error("[Coleta Clientes] Falha ao carregar base:",e);
+    if(status)status.textContent="Erro na Base de Clientes";
+    if(msg){msg.textContent="Erro ao carregar Base de Clientes: "+(e.message||e);msg.style.color="#b00020"}
+    if(input)input.disabled=false;
+  });
 };
 
 // Redução extra de DOM na aba Clientes: não deixa a tabela avançada com milhares de linhas
@@ -23577,6 +23664,257 @@ document.addEventListener("click",e=>{
 .clientes-pager-v851 button{border:0;border-radius:8px;padding:7px 12px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer}
 .clientes-pager-v851 button:disabled{opacity:.4;cursor:default}
 </style>
+
+
+<!-- =========================================================
+     ERP V8.6.0 — CLIENTES LAZY DOM
+     Somente a subtela visível permanece montada/renderizada.
+     ========================================================= -->
+<script id="clientes-v860-lazy-dom">
+(function(){
+"use strict";
+
+const TELAS_CLIENTES_V860=[
+  "telaClientes",
+  "telaClientesDashboardPrincipal",
+  "telaClientesColetaPrincipal",
+  "telaClientesHistoricoColetaPrincipal",
+  "telaClientesInteligenciaPrincipal",
+  "telaClientesConsultaPrincipal",
+  "telaClientesCIPrincipal"
+];
+
+const estacionadasV860=new Map();
+let ativaV860="";
+let timerV860=0;
+
+function visivel(el){
+  if(!el||!el.isConnected)return false;
+  const s=getComputedStyle(el);
+  return s.display!=="none"&&s.visibility!=="hidden";
+}
+function acharAtiva(){
+  for(const id of TELAS_CLIENTES_V860){
+    const el=document.getElementById(id);
+    if(visivel(el))return id;
+  }
+  return "";
+}
+function estacionar(id){
+  if(estacionadasV860.has(id))return;
+  const el=document.getElementById(id);
+  if(!el||visivel(el)||!el.parentNode)return;
+  const marker=document.createComment("CLIENTES-V860:"+id);
+  el.parentNode.insertBefore(marker,el);
+  el.remove();
+  estacionadasV860.set(id,{el,marker});
+}
+function montar(id){
+  const g=estacionadasV860.get(id);
+  if(g){
+    g.marker.parentNode?.insertBefore(g.el,g.marker.nextSibling);
+    g.marker.remove();
+    estacionadasV860.delete(id);
+    return g.el;
+  }
+  return document.getElementById(id);
+}
+function destruirCharts(){
+  try{
+    if(typeof clientesCharts!=="undefined"&&clientesCharts){
+      Object.keys(clientesCharts).forEach(id=>{
+        try{clientesCharts[id]?.destroy?.()}catch(e){}
+        delete clientesCharts[id];
+      });
+    }
+  }catch(e){}
+}
+function limparGerado(id){
+  if(id==="telaClientesDashboardPrincipal"){
+    destruirCharts();
+    ["cliTabelaStatus","cliTabelaTecnicos","cliTabelaPDV"].forEach(x=>{
+      const el=document.getElementById(x);if(el)el.innerHTML="";
+    });
+  }
+  if(id==="telaClientesConsultaPrincipal"||id==="telaClientesInteligenciaPrincipal"){
+    const tabela=document.getElementById("cliTabelaPrincipal");
+    if(tabela)tabela.innerHTML="";
+    const cnt=document.getElementById("cliContagemTabela");
+    if(cnt)cnt.textContent="A relação será renderizada somente quando você pesquisar.";
+    try{paginaPesquisaV851=0}catch(e){}
+  }
+  if(id==="telaClientesColetaPrincipal"){
+    const tb=document.getElementById("cliColetaTabelaCorpoPrincipal");
+    if(tb)tb.innerHTML='<tr><td colspan="18" class="coleta-vazio">Abra a coleta para renderizar as O.S.</td></tr>';
+    document.getElementById("cliColetaPagerV851")?.remove();
+    // coletaCli continua em memória: nenhuma O.S. é perdida.
+  }
+  if(id==="telaClientesHistoricoColetaPrincipal"){
+    const root=document.getElementById(id);
+    root?.querySelectorAll("tbody").forEach(tb=>tb.innerHTML="");
+  }
+  if(id==="telaClientesCIPrincipal"){
+    // Preserva estrutura e campos de C.I.; remove somente listas temporárias.
+    document.querySelectorAll("#telaClientesCIPrincipal .resultado-temporario,#telaClientesCIPrincipal .dropdown-menu.aberto")
+      .forEach(el=>el.classList.contains("dropdown-menu")?el.classList.remove("aberto"):el.remove());
+  }
+}
+function sincronizar(){
+  clearTimeout(timerV860);
+  timerV860=setTimeout(()=>{
+    const nova=acharAtiva();
+    if(nova!==ativaV860){
+      if(ativaV860)limparGerado(ativaV860);
+      ativaV860=nova;
+    }
+    TELAS_CLIENTES_V860.forEach(id=>{
+      if(id!==ativaV860)estacionar(id);
+    });
+    if(localStorage.getItem("ERP_DEBUG_PERF")==="1"){
+      console.info("[CLIENTES LAZY] ativa:",ativaV860,
+        "estacionadas:",estacionadasV860.size,
+        "DOM:",document.getElementsByTagName("*").length);
+    }
+  },30);
+}
+
+window.clientesMontarTelaV860=function(id){return montar(id)};
+window.clientesSincronizarLazyV860=sincronizar;
+
+// Bridge da navegação interna de CLIENTES.
+// Monta a subtela ANTES das funções legadas tentarem acessá-la.
+document.addEventListener("click",e=>{
+  const alvo=e.target.closest?.("[onclick],button,.clientes-card");
+  if(!alvo)return;
+  const a=((alvo.getAttribute("onclick")||"")+" "+(alvo.textContent||"")).toLowerCase();
+  if(a.includes("abrircoletaclientesprincipal"))montar("telaClientesColetaPrincipal");
+  if(a.includes("abrirhistoricocoletaclientesprincipal"))montar("telaClientesHistoricoColetaPrincipal");
+  if(a.includes("abririnteligenciaclientesprincipal"))montar("telaClientesInteligenciaPrincipal");
+  if(a.includes("abrirconsultaclientesmodulo")||a.includes("consulta avançada"))montar("telaClientesConsultaPrincipal");
+  if(a.includes("abrirdashboardclientesmodulo")||a.includes("dashboard"))montar("telaClientesDashboardPrincipal");
+  if(a.includes("abrirciregiaoclientes")||a.includes("c.i"))montar("telaClientesCIPrincipal");
+  setTimeout(sincronizar,0);
+},true);
+
+// Wrappers robustos
+function wrap(nome,id){
+  const original=window[nome];
+  if(typeof original!=="function"||original.__v860)return;
+  const fn=function(){
+    montar(id);
+    const r=original.apply(this,arguments);
+    setTimeout(sincronizar,0);
+    return r;
+  };
+  fn.__v860=true;
+  window[nome]=fn;
+}
+function instalar(){
+  wrap("abrirColetaClientesPrincipal","telaClientesColetaPrincipal");
+  wrap("abrirHistoricoColetaClientesPrincipal","telaClientesHistoricoColetaPrincipal");
+  wrap("abrirInteligenciaClientesPrincipal","telaClientesInteligenciaPrincipal");
+  wrap("abrirConsultaClientesModulo","telaClientesConsultaPrincipal");
+  wrap("abrirDashboardClientesModulo","telaClientesDashboardPrincipal");
+  wrap("abrirCIRegiaoClientes","telaClientesCIPrincipal");
+}
+
+// Renderização do dashboard Clientes fica realmente sob demanda.
+// Não cria gráficos/tabelas ao simples clique em CLIENTES.
+const abrirClientesOriginalV860=window.abrirClientes;
+if(typeof abrirClientesOriginalV860==="function"){
+  window.abrirClientes=function(){
+    const r=abrirClientesOriginalV860.apply(this,arguments);
+    // Após abrir a landing CLIENTES, remove conteúdo pesado de subtelas.
+    setTimeout(()=>{
+      TELAS_CLIENTES_V860.forEach(id=>{if(id!=="telaClientes")limparGerado(id)});
+      sincronizar();
+    },0);
+    return r;
+  };
+}
+
+// Dashboard: quando abrir, só então renderiza/carrega.
+const dashOriginalV860=window.abrirDashboardClientesModulo;
+if(typeof dashOriginalV860==="function"){
+  window.abrirDashboardClientesModulo=async function(){
+    montar("telaClientesDashboardPrincipal");
+    if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesDashboardPrincipal");
+
+    const cache=window.ERP?.Cache?.get?.("clientes:dados");
+    if(Array.isArray(cache)&&cache.length){
+      try{clientesDadosCombinados=cache;window.clientesDadosCombinados=cache}catch(e){}
+      if(typeof renderDashboardClientes==="function")renderDashboardClientes();
+      sincronizar();
+      return;
+    }
+
+    if(typeof carregarDashboardClientes==="function")await carregarDashboardClientes(false);
+    sincronizar();
+  };
+}
+
+// Consulta: NÃO renderiza nada até usuário aplicar filtro.
+const consultaOriginalV860=window.abrirConsultaClientesModulo;
+if(typeof consultaOriginalV860==="function"){
+  window.abrirConsultaClientesModulo=function(){
+    montar("telaClientesConsultaPrincipal");
+    if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesConsultaPrincipal");
+    const area=document.getElementById("cliTabelaPrincipal");
+    if(area)area.innerHTML='<div class="admin-info">Use os filtros acima e clique em <b>Aplicar filtros</b>. Nenhuma O.S. será renderizada antes disso.</div>';
+    const c=document.getElementById("cliContagemTabela");
+    if(c)c.textContent=baseClientesV851().length.toLocaleString("pt-BR")+" O.S. disponíveis na base";
+    sincronizar();
+  };
+}
+
+// Inteligência Clientes: landing/indicadores leves; listas somente sob ação.
+const intelOriginalV860=window.abrirInteligenciaClientesPrincipal;
+if(typeof intelOriginalV860==="function"){
+  window.abrirInteligenciaClientesPrincipal=async function(){
+    montar("telaClientesInteligenciaPrincipal");
+    if(typeof abrirTelaCliNova==="function")abrirTelaCliNova("telaClientesInteligenciaPrincipal");
+
+    // Reutiliza base em memória/cache e evita recarregar Dashboard.
+    if(!baseClientesV851().length){
+      try{await carregarBaseClientesLeveV852()}catch(e){console.error(e)}
+    }
+    const area=document.getElementById("cliTabelaPrincipal");
+    if(area)area.innerHTML="";
+    sincronizar();
+  };
+}
+
+// Quando sair completamente da área CLIENTES, desmonta TODAS as subtelas.
+document.addEventListener("click",e=>{
+  const alvo=e.target.closest?.("[onclick],.menu,[data-menu]");
+  if(!alvo)return;
+  const a=((alvo.getAttribute("onclick")||"")+" "+(alvo.dataset?.menu||"")+" "+(alvo.textContent||"")).toLowerCase();
+  const internoCliente=a.includes("cliente");
+  if(internoCliente)return;
+
+  setTimeout(()=>{
+    const telaClientes=document.getElementById("telaClientes");
+    if(!telaClientes||!visivel(telaClientes)){
+      if(ativaV860)limparGerado(ativaV860);
+      ativaV860="";
+      TELAS_CLIENTES_V860.forEach(estacionar);
+    }
+  },80);
+},true);
+
+function init(){
+  instalar();
+  setTimeout(instalar,1000);
+  setTimeout(()=>{
+    ativaV860=acharAtiva();
+    TELAS_CLIENTES_V860.forEach(id=>{if(id!==ativaV860)estacionar(id)});
+    sincronizar();
+  },3500);
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});
+else init();
+})();
+</script>
 
 </body>
 </html>
