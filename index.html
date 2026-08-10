@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.7.0</div>
+<div id="erpVersionBadgeV7542">ERP V8.7.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21664,7 +21664,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.7.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.7.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -24854,6 +24854,121 @@ function instalar(){
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(instalar,5200),{once:true});
 else setTimeout(instalar,5200);
 
+})();
+</script>
+
+
+<!-- =========================================================
+ ERP V8.7.1 — EXPORTAÇÃO CLIENTES = MESMO FLUXO DO ILR
+ ========================================================= -->
+<script id="clientes-exportacao-v871">
+(function(){
+"use strict";
+
+/*
+  O CLIENTES não escolhe formato via prompt.
+  Ele gera exatamente a mesma exportação-base CSV do ILR.
+  O seletor global exportacaoOfficeMenuV720 já existente intercepta
+  o clique e oferece CSV / XLS / XLT, convertendo XLS/XLT para
+  SpreadsheetML compatível com Excel.
+*/
+
+function colsClientesV871(){
+  return [
+    {label:"O.S.",key:"os"},
+    {label:"GR",key:"grupo"},
+    {label:"N.C.E",key:"nce"},
+    {label:"PRODUTO",key:"desc_produto"},
+    {label:"CLIENTE",key:"nome_cliente"},
+    {label:"CATEGORIA",value:r=>r.categoria||(typeof classificarCategoriaProduto==="function"?classificarCategoriaProduto(r.desc_produto,r.grupo):"")},
+    {label:"Nº SÉRIE",key:"n_serie"},
+    {label:"NF",key:"nf"},
+    {label:"TÉCNICO",key:"tecnico"},
+    {label:"PDV",key:"pdv"},
+    {label:"RACK",key:"rack"},
+    {label:"STATUS",key:"status"},
+    {label:"SITUAÇÃO O.S.",key:"status_da_os"},
+    {label:"TIPO GARANTIA",key:"tipo_garantia"}
+  ];
+}
+
+function colsColetaClientesV871(){
+  return [
+    {label:"O.S.",key:"os"},
+    {label:"GR",key:"grupo"},
+    {label:"N.C.E",key:"nce"},
+    {label:"Data da O.S.",key:"dt_geracao"},
+    {label:"Cliente",key:"nome_cliente"},
+    {label:"PDV",key:"pdv"},
+    {label:"Descrição do produto",key:"desc_produto"},
+    {label:"Nº Série",key:"n_serie"},
+    {label:"NF",key:"nf"},
+    {label:"Técnico",key:"tecnico"},
+    {label:"Rack",key:"rack"},
+    {label:"Status",key:"status"},
+    {label:"Situação O.S.",key:"status_da_os"}
+  ];
+}
+
+function exportarCSVBase(dados,colunas,nome,aba){
+  if(!Array.isArray(dados)||!dados.length){
+    alert("Não há dados para exportar.");
+    return;
+  }
+  // CSV é intencional: o menu global do ILR captura esse CSV
+  // e, quando escolhido XLS/XLT, converte para SpreadsheetML.
+  ERP.Export.exportar({
+    dados,
+    colunas,
+    nome,
+    formato:"CSV",
+    aba:aba||"Clientes"
+  });
+}
+
+window.exportarRelacaoClientesV870=function(tipo,titulo){
+  const lista=(typeof grupos==="function" ? (grupos()[tipo]||[]) : []);
+  if(!lista.length){alert("Não há O.S. nesta relação.");return}
+  exportarCSVBase(lista,colsClientesV871(),titulo||tipo,"Clientes");
+};
+
+window.exportarRelacaoClientesV861=function(tipo,titulo){
+  return window.exportarRelacaoClientesV870(tipo,titulo);
+};
+
+window.exportarPesquisaClientes=function(){
+  const lista=Array.isArray(window.clientesPesquisaAtual)?window.clientesPesquisaAtual:[];
+  if(!lista.length){alert("Não há resultados para exportar.");return}
+  exportarCSVBase(lista,colsClientesV871(),"pesquisa_clientes","Clientes");
+};
+
+/* Sobrescreve variantes antigas da Consulta de Clientes que usavam prompt */
+window.exportarConsultaClientesCSV=function(){
+  const lista=
+    (Array.isArray(window.clientesPesquisaAtual)&&window.clientesPesquisaAtual.length)
+      ? window.clientesPesquisaAtual
+      : (typeof clientesPesquisaAtual!=="undefined"&&Array.isArray(clientesPesquisaAtual)?clientesPesquisaAtual:[]);
+  if(!lista.length){alert("Não há resultados para exportar.");return}
+  exportarCSVBase(lista,colsClientesV871(),"consulta_avancada_clientes","Clientes");
+};
+
+window.exportarConsultaClientes=function(){
+  return window.exportarConsultaClientesCSV();
+};
+
+/* Coleta CLIENTES: também passa pelo mesmo seletor do ILR */
+window.exportarColetaClientesCSV=function(){
+  let lista=[];
+  try{if(typeof coletaCli!=="undefined"&&Array.isArray(coletaCli))lista=coletaCli}catch(_){}
+  if(!lista.length&&Array.isArray(window.coletaCliV851))lista=window.coletaCliV851;
+  if(!lista.length){alert("Não há O.S. na coleta para exportar.");return}
+  exportarCSVBase(lista,colsColetaClientesV871(),"coleta_clientes","Coleta Clientes");
+};
+window.exportarColetaClientes=function(){
+  return window.exportarColetaClientesCSV();
+};
+
+console.info("CLIENTES V8.7.1: exportação unificada ao fluxo ILR; prompts removidos.");
 })();
 </script>
 
