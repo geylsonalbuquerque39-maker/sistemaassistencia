@@ -21038,7 +21038,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V8.7.1</div>
+<div id="erpVersionBadgeV7542">ERP V8.7.3</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21664,7 +21664,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"8.7.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"8.7.3",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -24969,6 +24969,174 @@ window.exportarColetaClientes=function(){
 };
 
 console.info("CLIENTES V8.7.1: exportação unificada ao fluxo ILR; prompts removidos.");
+})();
+</script>
+
+
+<!-- =========================================================
+ ERP V8.7.3 — CORREÇÃO EXPORTAÇÕES ILR + CLIENTES
+ - não usa window.* para estados declarados com let
+ - não limpa relações durante escolha CSV/XLS/XLT
+ - mantém menu visual de exportação do ILR
+ ========================================================= -->
+<script id="exportacoes-v873-fix">
+(function(){
+"use strict";
+
+function colsIntelV873(){
+  return [
+    {label:"O.S.",key:"os"},
+    {label:"GR",key:"grupo"},
+    {label:"N.C.E",key:"nce"},
+    {label:"PRODUTO",key:"desc_produto"},
+    {label:"CATEGORIA",value:r=>typeof classificarCategoriaProduto==="function"
+      ?classificarCategoriaProduto(r.desc_produto,r.grupo):(r.categoria||"")},
+    {label:"Rack",key:"rack"},
+    {label:"Status",key:"status"},
+    {label:"Situação da O.S.",key:"status_da_os"},
+    {label:"Técnico",key:"tecnico"},
+    {label:"PDV",key:"pdv"},
+    {label:"Garantia",key:"tipo_garantia"},
+    {label:"NF",key:"nf"},
+    {label:"Data geração",key:"dt_geracao"},
+    {label:"Data expedição",key:"dt_expedicao"}
+  ];
+}
+
+function exportarCSVViaMenuV873(dados,colunas,nome,aba){
+  if(!Array.isArray(dados)||!dados.length){
+    alert("Não há dados para exportar.");
+    return;
+  }
+  ERP.Export.exportar({
+    dados,
+    colunas,
+    nome,
+    formato:"CSV",
+    aba:aba||"Relação"
+  });
+}
+
+/* =========================================================
+   ILR — CONSULTA AVANÇADA
+   intelConsultaAtual é 'let', portanto NÃO existe em window.
+   ========================================================= */
+window.exportarConsultaIntelCSV=function(){
+  let lista=[];
+  try{
+    if(typeof intelConsultaAtual!=="undefined" && Array.isArray(intelConsultaAtual)){
+      lista=intelConsultaAtual;
+    }
+  }catch(_){}
+  if(!lista.length){
+    alert("Não há dados para exportar. Aplique os filtros primeiro.");
+    return;
+  }
+  exportarCSVViaMenuV873(lista,colsIntelV873(),"consulta_avancada","Consulta Avançada");
+};
+
+/* =========================================================
+   ILR — ÚLTIMO RESULTADO / COPILOTO
+   Também é estado global lexical com let.
+   ========================================================= */
+window.exportarUltimoResultadoIntel=function(){
+  let lista=[],titulo="relacao";
+  try{
+    if(typeof intelAssistenteUltimoResultado!=="undefined" && Array.isArray(intelAssistenteUltimoResultado)){
+      lista=intelAssistenteUltimoResultado;
+    }
+    if(typeof intelAssistenteUltimoTitulo!=="undefined"){
+      titulo=intelAssistenteUltimoTitulo||"relacao";
+    }
+  }catch(_){}
+  if(!lista.length){
+    alert("Não há relação para exportar.");
+    return;
+  }
+  const nome=typeof normalizarPerguntaIntel==="function"
+    ?normalizarPerguntaIntel(titulo)
+    :titulo;
+  exportarCSVViaMenuV873(lista,colsIntelV873(),nome,"Inteligência");
+};
+
+/* =========================================================
+   ILR — CARTÕES
+   Usa a fonte real obterCartoesV36(), não cópia em window.
+   ========================================================= */
+window.exportarCartaoV36=function(indice){
+  let item=null;
+  try{
+    item=typeof obterCartoesV36==="function"?obterCartoesV36()[indice]:null;
+  }catch(_){}
+  if(!item || !Array.isArray(item[1]) || !item[1].length){
+    alert("Não há O.S. nessa relação para exportar.");
+    return;
+  }
+  const nome=typeof nomeArquivoV36==="function"?nomeArquivoV36(item[0]):(item[0]||"relacao");
+  exportarCSVViaMenuV873(item[1],colsIntelV873(),nome,"Inteligência");
+};
+
+/* =========================================================
+   ILR — RELAÇÃO ATUAL DO MODAL
+   Útil para botões que exportam a relação já aberta.
+   ========================================================= */
+window.exportarRelacaoIntelAtualV873=function(){
+  let lista=[],titulo="relacao";
+  try{
+    if(typeof intelRelacaoAtualV7547!=="undefined" && Array.isArray(intelRelacaoAtualV7547)){
+      lista=intelRelacaoAtualV7547;
+    }
+    if(typeof intelRelacaoTituloV7547!=="undefined"){
+      titulo=intelRelacaoTituloV7547||"relacao";
+    }
+  }catch(_){}
+  if(!lista.length){alert("Não há O.S. nesta relação para exportar.");return}
+  exportarCSVViaMenuV873(lista,colsIntelV873(),titulo,"Inteligência");
+};
+
+/* =========================================================
+   CLIENTES — preservar as correções V8.7.2
+   ========================================================= */
+function colsClientesV873(){
+  return [
+    {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+    {label:"PRODUTO",key:"desc_produto"},{label:"CLIENTE",key:"nome_cliente"},
+    {label:"CATEGORIA",value:r=>r.categoria||(typeof classificarCategoriaProduto==="function"
+      ?classificarCategoriaProduto(r.desc_produto,r.grupo):"")},
+    {label:"Nº SÉRIE",key:"n_serie"},{label:"NF",key:"nf"},{label:"TÉCNICO",key:"tecnico"},
+    {label:"PDV",key:"pdv"},{label:"RACK",key:"rack"},{label:"STATUS",key:"status"},
+    {label:"SITUAÇÃO O.S.",key:"status_da_os"},{label:"TIPO GARANTIA",key:"tipo_garantia"}
+  ];
+}
+function pesquisaClientesV873(){
+  if(Array.isArray(window.clientesPesquisaAtual)&&window.clientesPesquisaAtual.length)
+    return window.clientesPesquisaAtual;
+  try{
+    if(typeof clientesPesquisaAtual!=="undefined" && Array.isArray(clientesPesquisaAtual) && clientesPesquisaAtual.length)
+      return clientesPesquisaAtual;
+  }catch(_){}
+  return [];
+}
+window.exportarPesquisaClientesV850=function(){
+  const lista=pesquisaClientesV873();
+  if(!lista.length){alert("Não há resultados para exportar.");return}
+  exportarCSVViaMenuV873(lista,colsClientesV873(),"consulta_avancada_clientes","Clientes");
+};
+window.exportarPesquisaClientes=window.exportarPesquisaClientesV850;
+window.exportarConsultaClientesCSV=window.exportarPesquisaClientesV850;
+window.exportarConsultaClientes=window.exportarPesquisaClientesV850;
+
+/*
+  Durante o clique no menu CSV/XLS/XLT, nenhuma limpeza de DOM
+  deve apagar a relação atual antes da captura do arquivo.
+*/
+document.addEventListener("click",function(e){
+  if(!e.target.closest?.("#exportacaoOfficeMenuV720"))return;
+  document.documentElement.dataset.exportacaoEmAndamentoV873="1";
+  setTimeout(()=>delete document.documentElement.dataset.exportacaoEmAndamentoV873,1200);
+},true);
+
+console.info("ERP V8.7.3: exportações ILR/CLIENTES corrigidas.");
 })();
 </script>
 
