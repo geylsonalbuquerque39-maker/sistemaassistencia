@@ -9920,6 +9920,12 @@ if(!alertas.length)alertas.push("<div class='intel-alert green'><b>🟢 Nenhuma 
     document.getElementById("intelRankingPDV").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),10);
     document.getElementById("intelMapa").innerHTML=barrasIntel(a.pdvs.filter(x=>x[0]!=="(vazio)"),12)+"<div class='admin-info' style='font-size:13px'>Distribuição baseada no campo PDV. Quando o cadastro de lojas tiver UF/região, este quadro passará a agrupar geograficamente.</div>";
     if(typeof renderDashboardOperacionalV55==="function")renderDashboardOperacionalV55();
+
+    // V9.2.8: atualiza cartões que dependem da base somente depois
+    // que intelRegistros estiver realmente carregado.
+    window.atualizarAgPedidoPecaV928?.();
+    window.renderMiniDashboardPecasV925?.();
+    window.renderMiniTatPedidoV926?.();
 }
 async function carregarInteligencia(forcar){
     const m=document.getElementById("intelMensagem");
@@ -20031,7 +20037,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.7</div>
+<div id="erpVersionBadgeV7542">ERP V9.2.8</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20643,7 +20649,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.7",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.2.8",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22645,9 +22651,12 @@ function obterLista(){
   return registros().filter(ehAgPedido);
 }
 function atualizar(){
+  const lista=obterLista();
   const el=document.getElementById("intelAgPedidoPecasTotalV924");
-  if(el)el.textContent=obterLista().length.toLocaleString("pt-BR");
+  if(el)el.textContent=lista.length.toLocaleString("pt-BR");
+  return lista.length;
 }
+window.atualizarAgPedidoPecaV928=atualizar;
 function pager(){
   const total=listaV924.length,pags=Math.max(1,Math.ceil(total/PAGE));
   paginaV924=Math.max(0,Math.min(pags-1,paginaV924));
@@ -22682,7 +22691,7 @@ function render(){
   }
   modal.style.display="flex";
 }
-window.abrirAgPedidoPecasV924=function(){listaV924=obterLista();paginaV924=0;render()};
+window.abrirAgPedidoPecasV924=function(){listaV924=obterLista();atualizar();paginaV924=0;render()};
 window.mudarPaginaAgPedidoPecasV924=function(delta){paginaV924+=Number(delta||0);render()};
 window.exportarAgPedidoPecasV924=function(){
   const lista=obterLista();
@@ -22702,8 +22711,25 @@ const abrirBase=window.abrirInteligencia;
 if(typeof abrirBase==="function"){
   window.abrirInteligencia=function(){
     const r=abrirBase.apply(this,arguments);
-    setTimeout(atualizar,0);
-    setTimeout(atualizar,800);
+
+    // Atualiza imediatamente se a base já estiver em memória.
+    atualizar();
+
+    // Se a Inteligência ainda estiver carregando, espera a base ficar pronta.
+    // É uma espera curta e autodestrutiva, não um timer permanente.
+    let tentativas=0;
+    const espera=setInterval(()=>{
+      tentativas++;
+      const total=atualizar();
+      let basePronta=false;
+      try{
+        basePronta=typeof intelRegistros!=="undefined" &&
+                   Array.isArray(intelRegistros) &&
+                   intelRegistros.length>0;
+      }catch(_){}
+      if(basePronta || total>0 || tentativas>=20)clearInterval(espera);
+    },250);
+
     return r;
   };
 }
@@ -22724,8 +22750,7 @@ ERP.Performance.agPedidoPecasAudit=function(){
 };
 
 document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(atualizar,2500);
-  setTimeout(atualizar,5000);
+  setTimeout(atualizar,1000);
 });
 console.info("ERP V9.2.7: cartão AG. PEDIDO DE PECA corrigido.");
 })();
