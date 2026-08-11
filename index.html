@@ -5168,6 +5168,32 @@ body.dark-mode .agpedido-chip-v937{
 @media(max-width:700px){#btnImportarNNV940{margin-left:0;margin-top:8px}}
 </style>
 
+
+<style id="erp-v942-layout-nn-dossie-style">
+.agpedido-meta-v937{gap:9px!important}
+.agpedido-chip-v937{
+  font-size:12px!important;
+  padding:7px 10px!important;
+  border-radius:10px!important;
+  font-weight:900!important;
+}
+.agpedido-chip-v937.nn-v942{
+  font-size:15px!important;
+  padding:8px 13px!important;
+  background:#e6f1ff!important;
+  color:#003f87!important;
+  border:1px solid #a9c9ef!important;
+}
+.fotosos-detalhes-badge.mercadoria-v942{
+  background:#eaf7ff!important;
+  color:#075b9e!important;
+}
+.fotosos-detalhes-item.nn-v942 b{
+  font-size:18px!important;
+  color:#003f87!important;
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -19837,7 +19863,93 @@ function fotososData(v){if(!v)return'';const t=texto(v);const d=new Date(t);if(!
 function fotososIconeProduto(produto){const p=texto(produto).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase();if(/GELAD|REFRIG|FREEZER|FRIGOBAR/.test(p))return'🧊';if(/LAVAD|LAVA E SECA|TANQUIN|SECADOR/.test(p))return'🧺';if(/TV|TELEVIS|MONITOR/.test(p))return'📺';if(/CELULAR|SMARTPHONE|TABLET/.test(p))return'📱';if(/NOTEBOOK|COMPUTADOR|IMPRESSORA/.test(p))return'💻';if(/AR COND|CLIMAT/.test(p))return'❄️';if(/FOGAO|MICRO|FORNO|COOKTOP/.test(p))return'🍳';if(/VENTIL|PURIF|BEBED/.test(p))return'💨';return'🔧'}
 function fotososResumoOS(r,origem){const os=normalizarOS(r.os||r.ordem_servico||'');const produto=fotososValor(r,'desc_produto','produto','descricao','descricao_produto');const status=fotososValor(r,'status_da_os','status','situacao_os');const pdv=fotososValor(r,'pdv','loja','loja_origem','filial');const cliente=fotososValor(r,'nome_cliente','cliente');return{os,produto,status,pdv,cliente,origem,raw:r}}
 function fotososCampoDetalhe(rotulo,valor,classe=''){if(!texto(valor))return'';return`<div class="fotosos-detalhes-item ${classe}"><span>${fotososEsc(rotulo)}</span><b>${fotososEsc(valor)}</b></div>`}
-function fotososRenderDetalhes(item){const box=$('fotosos-detalhes-os');if(!box)return;if(!item?.os){box.classList.remove('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando">Selecione uma O.S. para visualizar o dossiê completo do produto.</div>';return}const r=item.raw||{},produto=item.produto||fotososValor(r,'desc_produto','produto','descricao'),cliente=item.origem==='clientes'?(item.cliente||fotososValor(r,'nome_cliente','cliente')||'Não identificado'):'Claudino',status=item.status||fotososValor(r,'status_da_os','status')||'Não informado',situacao=fotososValor(r,'situacao','situacao_os','sit_os','situacao_da_os'),garantia=fotososValor(r,'tipo_garantia','garantia','sit_garantia'),grupo=fotososValor(r,'grupo','gr'),nce=fotososValor(r,'nce','n_c_e','codigo_nce'),tecnico=fotososValor(r,'tecnico','nome_tecnico','tecnico_responsavel'),rack=fotososValor(r,'rack','endereco','posicao'),serie=fotososValor(r,'n_serie','numero_serie','serie'),nf=fotososValor(r,'nf','nota_fiscal','nr_nf','numero_nf'),cor=fotososValor(r,'cor','desc_cor'),codCor=fotososValor(r,'cod_cor','codigo_cor'),marca=fotososValor(r,'marca','fabricante'),modelo=fotososValor(r,'modelo'),dataEntrada=fotososData(fotososValor(r,'data_entrada','dt_entrada','data_abertura','data_os')),dataCompra=fotososData(fotososValor(r,'data_compra','dt_compra')),dataFim=fotososData(fotososValor(r,'data_fechamento','data_saida','dt_saida')),defeito=fotososValor(r,'defeito_reclamado','defeito','reclamacao_cliente','descricao_defeito','defeito_informado'),analise=fotososValor(r,'analise_defeito','analise_do_defeito','analise','diagnostico'),solucao=fotososValor(r,'solucao','reparo_executado','servico_executado','observacao_tecnica'),valor=fotososValor(r,'valor','valor_produto','preco'),alm=fotososValor(r,'alm','almoxarifado','al'),categoria=typeof window.classificarCategoriaProduto==='function'?window.classificarCategoriaProduto(r):fotososValor(r,'categoria');box.classList.add('visivel');box.innerHTML=`<div class="fotosos-detalhes-cabecalho"><div class="fotosos-detalhes-icone">${fotososIconeProduto(produto)}</div><div class="fotosos-detalhes-titulo"><small>Dossiê digital da ordem de serviço</small><strong>O.S. ${fotososEsc(item.os)}</strong><div class="fotosos-detalhes-produto">${fotososEsc(produto||'Produto não informado')}</div></div><div class="fotosos-detalhes-badges"><span class="fotosos-detalhes-badge status">● ${fotososEsc(status)}</span>${garantia?`<span class="fotosos-detalhes-badge garantia">🛡 ${fotososEsc(garantia)}</span>`:''}<span class="fotosos-detalhes-badge origem">${item.origem==='clientes'?'👥 CLIENTES':'🏢 ILR'}</span></div></div><div class="fotosos-detalhes-resumo"><div><span>Cliente</span><b>${fotososEsc(cliente)}</b></div><div><span>Loja / PDV</span><b>${fotososEsc(item.pdv||fotososValor(r,'pdv','loja','loja_origem')||'Não informado')}</b></div><div><span>Técnico responsável</span><b>${fotososEsc(tecnico||'Não informado')}</b></div><div><span>Rack / Posição</span><b>${fotososEsc(rack||'Não informado')}</b></div></div><div class="fotosos-detalhes-grade">${fotososCampoDetalhe('Grupo',grupo)}${fotososCampoDetalhe('N.C.E.',nce)}${fotososCampoDetalhe('AL / Almoxarifado',alm)}${fotososCampoDetalhe('Categoria',categoria)}${fotososCampoDetalhe('Situação da O.S.',situacao)}${fotososCampoDetalhe('Número de série',serie,'largo')}${fotososCampoDetalhe('Nota fiscal',nf)}${fotososCampoDetalhe('Marca',marca)}${fotososCampoDetalhe('Modelo',modelo)}${fotososCampoDetalhe('Cor',[codCor,cor].filter(Boolean).join(' - '))}${fotososCampoDetalhe('Data de entrada',dataEntrada)}${fotososCampoDetalhe('Data da compra',dataCompra)}${fotososCampoDetalhe('Data de saída',dataFim)}${fotososCampoDetalhe('Valor do produto',valor)}${fotososCampoDetalhe('Defeito informado',defeito,'completo texto-longo')}${fotososCampoDetalhe('Análise / diagnóstico',analise,'completo texto-longo')}${fotososCampoDetalhe('Solução / serviço executado',solucao,'completo texto-longo')}</div><div class="fotosos-detalhes-midias"><div class="fotosos-detalhes-contador">📷 Fotos <strong id="fotosos-detalhes-qtd-fotos">—</strong></div><div class="fotosos-detalhes-contador">📎 Arquivos <strong id="fotosos-detalhes-qtd-arquivos">—</strong></div></div><div class="fotosos-obs-v820"><div class="fotosos-obs-topo-v820"><div><span>📝 OBSERVAÇÕES DA O.S.</span><small>Registro compartilhado com data, hora e usuário.</small></div><div id="fotosos-obs-status-v820">Pronto para registrar</div></div><textarea id="fotosos-obs-texto-v820" placeholder="Digite uma observação sobre esta O.S..."></textarea><div class="fotosos-obs-acoes-v820"><button type="button" class="fotosos-btn secundario" onclick="fotososCarregarObservacoesV820()">↻ Recarregar</button><button type="button" id="fotosos-obs-salvar-v820" class="fotosos-btn primario" onclick="fotososSalvarObservacaoV820()">💾 Salvar observação</button></div><div id="fotosos-obs-historico-v820" class="fotosos-obs-historico-v820"><div class="fotosos-vazio">Carregando observações...</div></div></div>`;setTimeout(()=>window.fotososCarregarObservacoesV820?.(item.os),0)}
+
+/* V9.4.2 — NN + Status da Mercadoria no Dossiê */
+const DOSSIENN_CPP_URL_V942="https://udioyprwpecysjedlznl.supabase.co";
+const DOSSIENN_CPP_KEY_V942="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaW95cHJ3cGVjeXNqZWRsem5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDc4MjIsImV4cCI6MjEwMTQyMzgyMn0.io_nEEnlMpqItmDx1YyZPgS1Ny8KpCi5KT6pX3Phoyo";
+let dossieNNClienteV942=null;
+const dossieNNCacheV942=new Map();
+
+function dossieNCEKeyV942(v){
+  return String(v??"").trim().replace(/\.0$/,"").replace(/\s+/g,"");
+}
+function dossieNNClienteCPPV942(){
+  if(dossieNNClienteV942)return dossieNNClienteV942;
+  if(!window.supabase?.createClient)return null;
+  dossieNNClienteV942=window.supabase.createClient(DOSSIENN_CPP_URL_V942,DOSSIENN_CPP_KEY_V942,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return dossieNNClienteV942;
+}
+function dossieNNExpiradoV942(reg){
+  if(!reg?.data)return true;
+  const p=String(reg.data).slice(0,10).split("-");
+  if(p.length!==3)return true;
+  const d=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+  if(Number.isNaN(d.getTime()))return true;
+  const hoje=new Date();hoje.setHours(0,0,0,0);
+  const limite=new Date(d);limite.setFullYear(limite.getFullYear()+1);
+  return hoje>limite;
+}
+async function dossieBuscarNNV942(nce){
+  const key=dossieNCEKeyV942(nce);
+  if(!key)return {valor:"F/G",data:"",raw:null};
+  if(dossieNNCacheV942.has(key))return dossieNNCacheV942.get(key);
+
+  const cli=dossieNNClienteCPPV942();
+  if(!cli){
+    const r={valor:"F/G",data:"",raw:null};
+    dossieNNCacheV942.set(key,r);
+    return r;
+  }
+
+  let data,error;
+  ({data,error}=await cli
+    .from("nosso_numero_mais_recente")
+    .select("nn,data,nce,desc_mercadoria")
+    .eq("nce",key)
+    .maybeSingle());
+
+  if(error){
+    const fb=await cli
+      .from("nosso_numero")
+      .select("nn,data,nce,desc_mercadoria")
+      .eq("nce",key)
+      .order("data",{ascending:false})
+      .order("nn",{ascending:false})
+      .limit(1)
+      .maybeSingle();
+    data=fb.data;error=fb.error;
+  }
+
+  const valor=(!data?.nn || dossieNNExpiradoV942(data)) ? "F/G" : String(data.nn);
+  const r={valor,data:valor==="F/G"?"":(data?.data||""),raw:data||null};
+  dossieNNCacheV942.set(key,r);
+  return r;
+}
+function dossieStatusMercadoriaV942(r,item){
+  return item?.status ||
+    fotososValor(r,'status','status_mercadoria','status_produto','situacao_mercadoria') ||
+    'Não informado';
+}
+
+function fotososRenderDetalhes(item){const box=$('fotosos-detalhes-os');if(!box)return;if(!item?.os){box.classList.remove('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando">Selecione uma O.S. para visualizar o dossiê completo do produto.</div>';return}const r=item.raw||{},produto=item.produto||fotososValor(r,'desc_produto','produto','descricao'),cliente=item.origem==='clientes'?(item.cliente||fotososValor(r,'nome_cliente','cliente')||'Não identificado'):'Claudino',status=item.status||fotososValor(r,'status_da_os','status')||'Não informado',statusMercadoria=dossieStatusMercadoriaV942(r,item),situacao=fotososValor(r,'situacao','situacao_os','sit_os','situacao_da_os'),garantia=fotososValor(r,'tipo_garantia','garantia','sit_garantia'),grupo=fotososValor(r,'grupo','gr'),nce=fotososValor(r,'nce','n_c_e','codigo_nce'),tecnico=fotososValor(r,'tecnico','nome_tecnico','tecnico_responsavel'),rack=fotososValor(r,'rack','endereco','posicao'),serie=fotososValor(r,'n_serie','numero_serie','serie'),nf=fotososValor(r,'nf','nota_fiscal','nr_nf','numero_nf'),cor=fotososValor(r,'cor','desc_cor'),codCor=fotososValor(r,'cod_cor','codigo_cor'),marca=fotososValor(r,'marca','fabricante'),modelo=fotososValor(r,'modelo'),dataEntrada=fotososData(fotososValor(r,'data_entrada','dt_entrada','data_abertura','data_os')),dataCompra=fotososData(fotososValor(r,'data_compra','dt_compra')),dataFim=fotososData(fotososValor(r,'data_fechamento','data_saida','dt_saida')),defeito=fotososValor(r,'defeito_reclamado','defeito','reclamacao_cliente','descricao_defeito','defeito_informado'),analise=fotososValor(r,'analise_defeito','analise_do_defeito','analise','diagnostico'),solucao=fotososValor(r,'solucao','reparo_executado','servico_executado','observacao_tecnica'),valor=fotososValor(r,'valor','valor_produto','preco'),alm=fotososValor(r,'alm','almoxarifado','al'),categoria=typeof window.classificarCategoriaProduto==='function'?window.classificarCategoriaProduto(r):fotososValor(r,'categoria');box.classList.add('visivel');box.innerHTML=`<div class="fotosos-detalhes-cabecalho"><div class="fotosos-detalhes-icone">${fotososIconeProduto(produto)}</div><div class="fotosos-detalhes-titulo"><small>Dossiê digital da ordem de serviço</small><strong>O.S. ${fotososEsc(item.os)}</strong><div class="fotosos-detalhes-produto">${fotososEsc(produto||'Produto não informado')}</div></div><div class="fotosos-detalhes-badges"><span class="fotosos-detalhes-badge status">● ${fotososEsc(status)}</span><span class="fotosos-detalhes-badge mercadoria-v942">📦 ${fotososEsc(statusMercadoria)}</span>${garantia?`<span class="fotosos-detalhes-badge garantia">🛡 ${fotososEsc(garantia)}</span>`:''}<span class="fotosos-detalhes-badge origem">${item.origem==='clientes'?'👥 CLIENTES':'🏢 ILR'}</span></div></div><div class="fotosos-detalhes-resumo"><div><span>Cliente</span><b>${fotososEsc(cliente)}</b></div><div><span>Loja / PDV</span><b>${fotososEsc(item.pdv||fotososValor(r,'pdv','loja','loja_origem')||'Não informado')}</b></div><div><span>Técnico responsável</span><b>${fotososEsc(tecnico||'Não informado')}</b></div><div><span>Rack / Posição</span><b>${fotososEsc(rack||'Não informado')}</b></div></div><div class="fotosos-detalhes-grade">${fotososCampoDetalhe('Grupo',grupo)}${fotososCampoDetalhe('N.C.E.',nce)}${fotososCampoDetalhe('NN','Carregando...','nn-v942')}${fotososCampoDetalhe('AL / Almoxarifado',alm)}${fotososCampoDetalhe('Categoria',categoria)}${fotososCampoDetalhe('Situação da O.S.',situacao)}${fotososCampoDetalhe('Número de série',serie,'largo')}${fotososCampoDetalhe('Nota fiscal',nf)}${fotososCampoDetalhe('Marca',marca)}${fotososCampoDetalhe('Modelo',modelo)}${fotososCampoDetalhe('Cor',[codCor,cor].filter(Boolean).join(' - '))}${fotososCampoDetalhe('Data de entrada',dataEntrada)}${fotososCampoDetalhe('Data da compra',dataCompra)}${fotososCampoDetalhe('Data de saída',dataFim)}${fotososCampoDetalhe('Valor do produto',valor)}${fotososCampoDetalhe('Defeito informado',defeito,'completo texto-longo')}${fotososCampoDetalhe('Análise / diagnóstico',analise,'completo texto-longo')}${fotososCampoDetalhe('Solução / serviço executado',solucao,'completo texto-longo')}</div><div class="fotosos-detalhes-midias"><div class="fotosos-detalhes-contador">📷 Fotos <strong id="fotosos-detalhes-qtd-fotos">—</strong></div><div class="fotosos-detalhes-contador">📎 Arquivos <strong id="fotosos-detalhes-qtd-arquivos">—</strong></div></div><div class="fotosos-obs-v820"><div class="fotosos-obs-topo-v820"><div><span>📝 OBSERVAÇÕES DA O.S.</span><small>Registro compartilhado com data, hora e usuário.</small></div><div id="fotosos-obs-status-v820">Pronto para registrar</div></div><textarea id="fotosos-obs-texto-v820" placeholder="Digite uma observação sobre esta O.S..."></textarea><div class="fotosos-obs-acoes-v820"><button type="button" class="fotosos-btn secundario" onclick="fotososCarregarObservacoesV820()">↻ Recarregar</button><button type="button" id="fotosos-obs-salvar-v820" class="fotosos-btn primario" onclick="fotososSalvarObservacaoV820()">💾 Salvar observação</button></div><div id="fotosos-obs-historico-v820" class="fotosos-obs-historico-v820"><div class="fotosos-vazio">Carregando observações...</div></div></div>`;setTimeout(()=>window.fotososCarregarObservacoesV820?.(item.os),0);
+setTimeout(async()=>{
+  try{
+    const info=await dossieBuscarNNV942(nce);
+    const box=document.getElementById('fotosos-detalhes-os');
+    if(!box)return;
+    const itens=[...box.querySelectorAll('.fotosos-detalhes-item')];
+    const alvo=itens.find(x=>String(x.querySelector('span')?.textContent||'').trim()==='NN');
+    if(alvo){
+      alvo.classList.add('nn-v942');
+      const b=alvo.querySelector('b');
+      if(b)b.textContent=info.valor||'F/G';
+    }
+  }catch(e){
+    console.warn('[Dossiê NN]',e);
+  }
+},0)}
 async function fotososCarregarDetalhesOS(os,origem){os=normalizarOS(os);if(!os){fotososRenderDetalhes(null);return null}const box=$('fotosos-detalhes-os');box?.classList.add('visivel');if(box)box.innerHTML='<div class="fotosos-detalhes-carregando">🔎 Carregando todas as informações da O.S. '+fotososEsc(os)+'...</div>';try{let supa,tabela;if(origem==='clientes'){supa=obterSupabaseClientes();tabela='rexpedlr_clientes'}else{supa=obterSupabaseClient();tabela='rexpedlr'}let resp=await supa.from(tabela).select('*').eq('os',os).limit(1);if(resp.error||!resp.data?.length)resp=await supa.from(tabela).select('*').ilike('os',os).limit(1);if(resp.error)throw resp.error;const raw=resp.data?.[0];if(!raw)throw new Error('O.S. não localizada na base selecionada.');let item=fotososResumoOS(raw,origem);if(origem==='clientes'){try{const nomes=await supa.from('ratec04_clientes').select('nome_cliente').eq('os',os).limit(1);if(!nomes.error&&nomes.data?.[0])item.cliente=texto(nomes.data[0].nome_cliente)}catch(_){}}fotososRenderDetalhes(item);return item}catch(e){if(box){box.classList.add('visivel');box.innerHTML='<div class="fotosos-detalhes-carregando" style="color:#a62929">Não foi possível carregar os detalhes da O.S.: '+fotososEsc(e.message||e)+'</div>'}return null}}
 
 async function fotososBuscarOS(termo){const chave=normalizarOS(termo);const box=$('fotosos-os-sugestoes');if(!box)return;if(chave.length<2){fotososFecharSugestoes();return}const token=++fotososBuscaToken;box.innerHTML='<div class="fotosos-os-msg">🔎 Procurando O.S...</div>';box.classList.add('aberta');try{const origem=$('fotosos-origem').value;let supa,tabela;if(origem==='clientes'){supa=obterSupabaseClientes();tabela='rexpedlr_clientes'}else{supa=obterSupabaseClient();tabela='rexpedlr'}let resp=await supa.from(tabela).select('*').ilike('os',chave+'%').limit(12);if(resp.error){resp=await supa.from(tabela).select('*').ilike('os','%'+chave+'%').limit(12)}if(token!==fotososBuscaToken)return;if(resp.error)throw resp.error;let itens=(resp.data||[]).map(r=>fotososResumoOS(r,origem));if(origem==='clientes'&&itens.length){try{const oss=itens.map(x=>x.os).filter(Boolean);const nomes=await supa.from('ratec04_clientes').select('os,nome_cliente').in('os',oss);if(!nomes.error){const mapa=new Map((nomes.data||[]).map(x=>[normalizarOS(x.os),texto(x.nome_cliente)]));itens=itens.map(x=>({...x,cliente:mapa.get(x.os)||''}))}}catch(_){}}fotososSugestoes=itens;fotososSugestaoAtiva=-1;if(!itens.length){box.innerHTML='<div class="fotosos-os-msg">Nenhuma O.S. encontrada.</div>';return}box.innerHTML=itens.map((x,i)=>`<button type="button" class="fotosos-os-item" data-i="${i}" role="option"><b>O.S. ${fotososEsc(x.os)}</b><span title="${fotososEsc(x.produto)}">${fotososEsc(x.produto||'Produto não informado')}${x.cliente?' · '+fotososEsc(x.cliente):''}</span><small>${fotososEsc([x.pdv,x.status].filter(Boolean).join(' · '))}</small></button>`).join('')}catch(e){if(token!==fotososBuscaToken)return;box.innerHTML='<div class="fotosos-os-msg">Erro na pesquisa: '+fotososEsc(e.message||e)+'</div>'}}
@@ -20180,7 +20292,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.4.1</div>
+<div id="erpVersionBadgeV7542">ERP V9.4.2</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20792,7 +20904,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.4.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.4.2",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23030,7 +23142,7 @@ function montarLinha(r){
       <div class="agpedido-meta-v937">
         <span class="agpedido-chip-v937">GR: ${esc(r.grupo||"-")}</span>
         <span class="agpedido-chip-v937">N.C.E.: ${esc(r.nce||"-")}</span>
-        <span class="agpedido-chip-v937">NN: ${esc(nnValorV941(r))}</span>
+        <span class="agpedido-chip-v937 nn-v942">NN: ${esc(nnValorV941(r))}</span>
         <span class="agpedido-chip-v937">Rack: ${esc(r.rack||"-")}</span>
         <span class="agpedido-chip-v937">Técnico: ${esc(r.tecnico||"-")}</span>
         <span class="agpedido-chip-v937">PDV: ${esc(r.pdv||"-")}</span>
