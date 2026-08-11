@@ -5909,9 +5909,9 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
         </div>
       </div>
       <div class="intel-kpi alerta" id="intelAgPedidoPecasV924">
-        <small>Ag. Pedido de peças</small>
+        <small>AG. PEDIDO DE PECA</small>
         <strong id="intelAgPedidoPecasTotalV924">0</strong>
-        <span>Status: Ag. Pedido de peças</span>
+        <span>Status: AG. PEDIDO DE PECA</span>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
           <button type="button" onclick="abrirAgPedidoPecasV924()">Ver relação</button>
           <button type="button" onclick="exportarAgPedidoPecasV924()">Exportar ▾</button>
@@ -5942,7 +5942,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
       <article class="intel-mini-pecas-card-v925 alerta">
         <small>Ag. Pedido com Obs. CPP divergente</small>
         <strong id="intelMiniObsDivergenteV925">0</strong>
-        <span>Status = Ag. Pedido de peças e Obs. CPP diferente</span>
+        <span>Status = AG. PEDIDO DE PECA e Obs. CPP diferente</span>
         <div class="intel-mini-pecas-actions-v925">
           <button type="button" onclick="abrirRelacaoMiniPecasV925('divergentes')">Ver relação</button>
           <button type="button" onclick="exportarRelacaoMiniPecasV925('divergentes')">Exportar ▾</button>
@@ -5950,7 +5950,7 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
       </article>
     
       <article class="intel-mini-pecas-card-v925">
-        <small>Saíram de AG. ANALISE TECNICA EM TAT → Ag. Pedido de peças</small>
+        <small>Saíram de AG. ANALISE TECNICA EM TAT → AG. PEDIDO DE PECA</small>
         <strong id="intelMiniTatParaPedidoV926">0</strong>
         <span id="intelMiniTatParaPedidoComparativoV926">Hoje • Ontem: 0</span>
         <div class="intel-mini-pecas-actions-v925">
@@ -20031,7 +20031,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.6</div>
+<div id="erpVersionBadgeV7542">ERP V9.2.7</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20643,7 +20643,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.6",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.2.7",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22618,18 +22618,31 @@ function esc(v){
 }
 function norm(v){
   return String(v??"").trim().toLocaleLowerCase("pt-BR")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
 }
 function registros(){
-  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))return intelRegistros}catch(_){}
-  try{if(Array.isArray(window.rexpedlrDados))return window.rexpedlrDados}catch(_){}
+  try{
+    if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros) && intelRegistros.length)
+      return intelRegistros;
+  }catch(_){}
+  try{
+    if(Array.isArray(window.rexpedlrDados) && window.rexpedlrDados.length)
+      return window.rexpedlrDados;
+  }catch(_){}
+  try{
+    if(Array.isArray(window.dadosRexpedlr) && window.dadosRexpedlr.length)
+      return window.dadosRexpedlr;
+  }catch(_){}
   return [];
 }
+function ehAgPedido(r){
+  const s=norm(r?.status);
+  return s==="ag pedido de peca";
+}
 function obterLista(){
-  return registros().filter(r=>{
-    const s=norm(r.status);
-    return s==="ag. pedido de pecas" || s==="ag pedido de pecas";
-  });
+  return registros().filter(ehAgPedido);
 }
 function atualizar(){
   const el=document.getElementById("intelAgPedidoPecasTotalV924");
@@ -22650,14 +22663,16 @@ function render(){
   const titulo=document.getElementById("intelModalTitulo");
   const area=document.getElementById("intelModalConteudo");
   if(!modal||!titulo||!area)return;
+
   const total=listaV924.length,ini=paginaV924*PAGE,pag=listaV924.slice(ini,ini+PAGE);
-  titulo.textContent="Ag. Pedido de peças ("+total.toLocaleString("pt-BR")+")";
+  titulo.textContent="AG. PEDIDO DE PECA ("+total.toLocaleString("pt-BR")+")";
+
   if(!total){
-    area.innerHTML='<div class="admin-info">Nenhuma O.S. com status Ag. Pedido de peças.</div>';
+    area.innerHTML='<div class="admin-info">Nenhuma O.S. com status AG. PEDIDO DE PECA.</div>';
   }else{
     const nav=pager();
-    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: a relação só é renderizada após o clique e mostra 100 O.S. por página.</div>'+
-      nav+"<div class='intel-list'>"+
+    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: somente 100 O.S. por página.</div>'+nav+
+      "<div class='intel-list'>"+
       pag.map(r=>"<div class='intel-row'><b>"+esc(r.os||"-")+"</b><span>"+
         esc(r.desc_produto||"")+"<br><small>GR: "+esc(r.grupo||"-")+" • N.C.E.: "+esc(r.nce||"-")+
         " • Rack: "+esc(r.rack||"-")+" • Status: "+esc(r.status||"-")+
@@ -22671,9 +22686,9 @@ window.abrirAgPedidoPecasV924=function(){listaV924=obterLista();paginaV924=0;ren
 window.mudarPaginaAgPedidoPecasV924=function(delta){paginaV924+=Number(delta||0);render()};
 window.exportarAgPedidoPecasV924=function(){
   const lista=obterLista();
-  if(!lista.length){alert("Não há O.S. com status Ag. Pedido de peças para exportar.");return}
+  if(!lista.length){alert("Não há O.S. com status AG. PEDIDO DE PECA para exportar.");return}
   ERP.Export.exportar({
-    dados:lista,formato:"CSV",nome:"ag_pedido_de_pecas",aba:"Ag Pedido Pecas",
+    dados:lista,formato:"CSV",nome:"ag_pedido_de_peca",aba:"AG PEDIDO DE PECA",
     colunas:[
       {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
       {label:"Produto",key:"desc_produto"},{label:"Rack",key:"rack"},
@@ -22688,33 +22703,31 @@ if(typeof abrirBase==="function"){
   window.abrirInteligencia=function(){
     const r=abrirBase.apply(this,arguments);
     setTimeout(atualizar,0);
+    setTimeout(atualizar,800);
     return r;
   };
 }
 
-const fecharBase=window.fecharIntelModal;
-window.fecharIntelModal=function(){
-  try{return typeof fecharBase==="function"?fecharBase.apply(this,arguments):undefined}
-  finally{
-    listaV924=[];paginaV924=0;
-    const area=document.getElementById("intelModalConteudo");if(area)area.innerHTML="";
-  }
-};
-
 window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
 ERP.Performance.agPedidoPecasAudit=function(){
+  const base=registros();
   const result={
+    totalBase:base.length,
     quantidade:obterLista().length,
+    statusEncontrados:[...new Set(base.map(r=>String(r?.status??"").trim()).filter(Boolean))].sort(),
     cartaoExiste:!!document.getElementById("intelAgPedidoPecasV924"),
     linhasRenderizadas:document.querySelectorAll("#intelModalConteudo .intel-row").length,
     dom:document.getElementsByTagName("*").length
   };
-  console.info("[AG. PEDIDO DE PEÇAS]",result);return result;
+  console.info("[AG. PEDIDO DE PECA]",result);
+  return result;
 };
 
-document.addEventListener("DOMContentLoaded",()=>setTimeout(atualizar,2500));
-setTimeout(atualizar,4000);
-console.info("ERP V9.2.4: cartão Ag. Pedido de peças ativo com Zero Relation DOM.");
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(atualizar,2500);
+  setTimeout(atualizar,5000);
+});
+console.info("ERP V9.2.7: cartão AG. PEDIDO DE PECA corrigido.");
 })();
 </script>
 
@@ -22783,7 +22796,7 @@ function norm(v){
 }
 function isAgPedido(v){
   const s=norm(v);
-  return s==="ag pedido de pecas" || s==="aguardando pedido de pecas";
+  return s==="ag pedido de peca";
 }
 function isAguardandoPecas(v){
   const s=norm(v);
@@ -23022,7 +23035,7 @@ function isTat(v){
 }
 function isAgPedido(v){
   const s=norm(v);
-  return s==="ag pedido de pecas" || s==="aguardando pedido de pecas";
+  return s==="ag pedido de peca";
 }
 function hojeKey(d=new Date()){
   const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
@@ -23091,8 +23104,8 @@ function esc(v){
 function preparar(){
   const hist=load(),today=hist.dias?.[hojeKey()]||{transicoesOS:[]};
   const atual=registrosAtuais(),m=mapa(atual);
-  relacaoV926=(today.transicoesOS||[]).map(os=>m.get(os)||{os,status:"Ag. Pedido de peças"});
-  tituloV926="AG. ANALISE TECNICA EM TAT → Ag. Pedido de peças";
+  relacaoV926=(today.transicoesOS||[]).map(os=>m.get(os)||{os,status:"AG. PEDIDO DE PECA"});
+  tituloV926="AG. ANALISE TECNICA EM TAT → AG. PEDIDO DE PECA";
   paginaV926=0;
 }
 function pager(){
@@ -23182,7 +23195,7 @@ ERP.Performance.tatPedidoAudit=function(){
 };
 
 document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>window.renderMiniTatPedidoV926?.(),3000));
-console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> Ag. Pedido de peças ativa.");
+console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> AG. PEDIDO DE PECA ativa.");
 })();
 </script>
 
