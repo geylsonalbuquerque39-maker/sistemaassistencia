@@ -5908,6 +5908,16 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
           <button type="button" onclick="exportarEnderecadosSemCPPV922()">Exportar ▾</button>
         </div>
       </div>
+      <div class="intel-kpi alerta" id="intelAgPedidoPecasV924">
+        <small>Ag. Pedido de peças</small>
+        <strong id="intelAgPedidoPecasTotalV924">0</strong>
+        <span>Status: Ag. Pedido de peças</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button type="button" onclick="abrirAgPedidoPecasV924()">Ver relação</button>
+          <button type="button" onclick="exportarAgPedidoPecasV924()">Exportar ▾</button>
+        </div>
+      </div>
+
 </div>
 
     <div class="intel-exec-grid" id="intelExecutivo">
@@ -19967,7 +19977,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.3</div>
+<div id="erpVersionBadgeV7542">ERP V9.2.4</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20579,7 +20589,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.3",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.2.4",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22534,6 +22544,123 @@ ERP.Performance.semCppAudit=function(){
 document.addEventListener("DOMContentLoaded",()=>setTimeout(atualizarQuantidade,2500));
 setTimeout(atualizarQuantidade,4000);
 console.info("ERP V9.2.2: cartão Endereçados S/ CPP fixo no HTML.");
+})();
+</script>
+
+
+<style id="erp-v924-ag-pedido-pecas-style">
+#intelAgPedidoPecasV924{border:2px solid #ffb300!important}
+#intelAgPedidoPecasV924 strong{font-size:30px;font-weight:900;line-height:1;color:#a86100}
+</style>
+<script id="erp-v924-ag-pedido-pecas">
+(function(){
+"use strict";
+const PAGE=100;
+let listaV924=[];
+let paginaV924=0;
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function norm(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+}
+function registros(){
+  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))return intelRegistros}catch(_){}
+  try{if(Array.isArray(window.rexpedlrDados))return window.rexpedlrDados}catch(_){}
+  return [];
+}
+function obterLista(){
+  return registros().filter(r=>{
+    const s=norm(r.status);
+    return s==="ag. pedido de pecas" || s==="ag pedido de pecas";
+  });
+}
+function atualizar(){
+  const el=document.getElementById("intelAgPedidoPecasTotalV924");
+  if(el)el.textContent=obterLista().length.toLocaleString("pt-BR");
+}
+function pager(){
+  const total=listaV924.length,pags=Math.max(1,Math.ceil(total/PAGE));
+  paginaV924=Math.max(0,Math.min(pags-1,paginaV924));
+  const ini=paginaV924*PAGE,fim=Math.min(total,ini+PAGE);
+  return `<div class="erp-perf-pager-v910">
+    <button ${paginaV924===0?"disabled":""} onclick="mudarPaginaAgPedidoPecasV924(-1)">‹ Anterior</button>
+    <b>${total?ini+1:0}–${fim} de ${total.toLocaleString("pt-BR")}</b>
+    <button ${paginaV924>=pags-1?"disabled":""} onclick="mudarPaginaAgPedidoPecasV924(1)">Próxima ›</button>
+  </div>`;
+}
+function render(){
+  const modal=document.getElementById("intelModal");
+  const titulo=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!titulo||!area)return;
+  const total=listaV924.length,ini=paginaV924*PAGE,pag=listaV924.slice(ini,ini+PAGE);
+  titulo.textContent="Ag. Pedido de peças ("+total.toLocaleString("pt-BR")+")";
+  if(!total){
+    area.innerHTML='<div class="admin-info">Nenhuma O.S. com status Ag. Pedido de peças.</div>';
+  }else{
+    const nav=pager();
+    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: a relação só é renderizada após o clique e mostra 100 O.S. por página.</div>'+
+      nav+"<div class='intel-list'>"+
+      pag.map(r=>"<div class='intel-row'><b>"+esc(r.os||"-")+"</b><span>"+
+        esc(r.desc_produto||"")+"<br><small>GR: "+esc(r.grupo||"-")+" • N.C.E.: "+esc(r.nce||"-")+
+        " • Rack: "+esc(r.rack||"-")+" • Status: "+esc(r.status||"-")+
+        "</small></span><span>"+esc(r.tecnico||"Sem técnico")+
+        "</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>"
+      ).join("")+"</div>"+nav;
+  }
+  modal.style.display="flex";
+}
+window.abrirAgPedidoPecasV924=function(){listaV924=obterLista();paginaV924=0;render()};
+window.mudarPaginaAgPedidoPecasV924=function(delta){paginaV924+=Number(delta||0);render()};
+window.exportarAgPedidoPecasV924=function(){
+  const lista=obterLista();
+  if(!lista.length){alert("Não há O.S. com status Ag. Pedido de peças para exportar.");return}
+  ERP.Export.exportar({
+    dados:lista,formato:"CSV",nome:"ag_pedido_de_pecas",aba:"Ag Pedido Pecas",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"Produto",key:"desc_produto"},{label:"Rack",key:"rack"},
+      {label:"Status",key:"status"},{label:"Situação da O.S.",key:"status_da_os"},
+      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"},{label:"NF",key:"nf"}
+    ]
+  });
+};
+
+const abrirBase=window.abrirInteligencia;
+if(typeof abrirBase==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirBase.apply(this,arguments);
+    setTimeout(atualizar,0);
+    return r;
+  };
+}
+
+const fecharBase=window.fecharIntelModal;
+window.fecharIntelModal=function(){
+  try{return typeof fecharBase==="function"?fecharBase.apply(this,arguments):undefined}
+  finally{
+    listaV924=[];paginaV924=0;
+    const area=document.getElementById("intelModalConteudo");if(area)area.innerHTML="";
+  }
+};
+
+window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
+ERP.Performance.agPedidoPecasAudit=function(){
+  const result={
+    quantidade:obterLista().length,
+    cartaoExiste:!!document.getElementById("intelAgPedidoPecasV924"),
+    linhasRenderizadas:document.querySelectorAll("#intelModalConteudo .intel-row").length,
+    dom:document.getElementsByTagName("*").length
+  };
+  console.info("[AG. PEDIDO DE PEÇAS]",result);return result;
+};
+
+document.addEventListener("DOMContentLoaded",()=>setTimeout(atualizar,2500));
+setTimeout(atualizar,4000);
+console.info("ERP V9.2.4: cartão Ag. Pedido de peças ativo com Zero Relation DOM.");
 })();
 </script>
 
