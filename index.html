@@ -20042,7 +20042,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.2</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.3</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20654,7 +20654,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.2",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.3",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22278,6 +22278,7 @@ function telaVisivelV910(id){
     return !!(el&&el.isConnected&&getComputedStyle(el).display!=="none");
 }
 function limparOcultosV910(){
+    if(window.erpHomeCardInteractionV933?.())return;
     // Modal da Inteligência fechado
     const modal=document.getElementById("intelModal");
     if(modal&&getComputedStyle(modal).display==="none"){
@@ -22436,6 +22437,7 @@ function limparChatFechado(){
   }
 }
 function cleanup(){
+  if(window.erpHomeCardInteractionV933?.())return;
   limparHistoricosOcultos();limparChatFechado();
   if(!visivel("telaInteligencia"))limparRelacoesIntel();
   if(!visivel("telaRelatorios"))limpar("relatorioTabela","");
@@ -23471,6 +23473,90 @@ if(document.readyState==="loading"){
 }
 
 console.info("ERP V9.3.2: botão Fotos por O.S. fixado no menu lateral.");
+})();
+</script>
+
+
+<script id="erp-v933-fix-home-cards">
+(function(){
+"use strict";
+
+let homeCardInteractionV933=false;
+let homeCardInteractionTimerV933=null;
+
+function marcarInteracaoHomeV933(){
+  homeCardInteractionV933=true;
+  clearTimeout(homeCardInteractionTimerV933);
+  homeCardInteractionTimerV933=setTimeout(()=>{homeCardInteractionV933=false},900);
+}
+window.erpHomeCardInteractionV933=function(){return homeCardInteractionV933};
+
+/* Marca ANTES dos listeners globais de cleanup executarem */
+document.addEventListener("pointerdown",function(e){
+  const alvo=e.target.closest?.(
+    '#telaInicial .home-integrada-kpi,'+
+    '#telaInicial .home-card,'+
+    '#telaInicial .dashboard-card,'+
+    '#telaInicial [onclick*="abrirListaHome"],'+
+    '#telaInicial [onclick*="abrirListaIntel"],'+
+    '#telaInicial button'
+  );
+  if(alvo)marcarInteracaoHomeV933();
+},true);
+
+document.addEventListener("click",function(e){
+  const alvo=e.target.closest?.(
+    '#telaInicial .home-integrada-kpi,'+
+    '#telaInicial .home-card,'+
+    '#telaInicial .dashboard-card,'+
+    '#telaInicial [onclick*="abrirListaHome"],'+
+    '#telaInicial [onclick*="abrirListaIntel"],'+
+    '#telaInicial button'
+  );
+  if(alvo)marcarInteracaoHomeV933();
+},true);
+
+/* Protege o modal da Inteligência/Home contra limpadores que rodam logo após o clique */
+const modalIntel=document.getElementById("intelModal");
+if(modalIntel){
+  let busy=false;
+  const obs=new MutationObserver(()=>{
+    if(busy||!homeCardInteractionV933)return;
+    busy=true;
+    queueMicrotask(()=>{
+      try{
+        if(homeCardInteractionV933 && modalIntel.style.display==="none"){
+          modalIntel.style.display="flex";
+        }
+      }finally{busy=false}
+    });
+  });
+  obs.observe(modalIntel,{attributes:true,attributeFilter:["style","class"]});
+}
+
+/* Wrapper defensivo para os dois principais abridores da Home */
+["abrirListaHomeV502","abrirListaIntel"].forEach(nome=>{
+  const base=window[nome];
+  if(typeof base!=="function"||base.__v933)return;
+  const fn=function(){
+    marcarInteracaoHomeV933();
+    const r=base.apply(this,arguments);
+    setTimeout(()=>{
+      if(homeCardInteractionV933){
+        const modal=document.getElementById("intelModal");
+        if(modal){
+          modal.style.display="flex";
+          modal.classList.add("aberto");
+        }
+      }
+    },120);
+    return r;
+  };
+  fn.__v933=true;
+  window[nome]=fn;
+});
+
+console.info("ERP V9.3.3: cartões da Home protegidos contra fechamento automático.");
 })();
 </script>
 
