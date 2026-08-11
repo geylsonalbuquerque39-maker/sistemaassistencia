@@ -5162,6 +5162,12 @@ body.dark-mode .agpedido-chip-v937{
 }
 </style>
 
+
+<style id="erp-v940-importar-nn-home-style">
+#btnImportarNNV940{margin-left:8px}
+@media(max-width:700px){#btnImportarNNV940{margin-left:0;margin-top:8px}}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -5243,7 +5249,6 @@ body.dark-mode .agpedido-chip-v937{
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
     <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
-
 <div class="menu" id="menuFotosLoteV932" data-menu="fotos-lote" onclick="abrirFotosLoteV930()">
   📷 ADICIONAR FOTOS POR O.S.
 </div>
@@ -5480,6 +5485,7 @@ body.dark-mode .agpedido-chip-v937{
         <div class="home-integrada-acoes">
             <button class="home-integrada-btn azul" onclick="carregarHomeIntegradaV502(true)">↻ Atualizar indicadores</button>
             <button class="home-integrada-btn verde" onclick="abrirAdminSecao('atualizar')">⇧ Importar REXPEDLR</button>
+<button type="button" id="btnImportarNNV940" class="home-integrada-btn verde" onclick="abrirImportadorNNV939()">🔢 IMPORTAR NN</button>
             <button class="home-integrada-btn" onclick="abrirBusca()">⌕ Consultar O.S.</button>
             <button class="home-integrada-btn" onclick="abrirTelaCI()">↩ Gerar C.I.</button>
             <button class="home-integrada-btn" onclick="abrirInteligencia()">✦ Ver análise completa</button>
@@ -20174,7 +20180,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.7</div>
+<div id="erpVersionBadgeV7542">ERP V9.4.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20786,7 +20792,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.7",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.4.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22769,6 +22775,116 @@ let paginaV924=0;
 let midiaClienteV937=null;
 let fotosPaginaV937={};
 
+let nnClienteV938=null;
+let nnMapaV938={};
+
+const CPP_NN_URL_V938="https://udioyprwpecysjedlznl.supabase.co";
+const CPP_NN_KEY_V938="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaW95cHJ3cGVjeXNqZWRsem5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDc4MjIsImV4cCI6MjEwMTQyMzgyMn0.io_nEEnlMpqItmDx1YyZPgS1Ny8KpCi5KT6pX3Phoyo";
+
+function nceKeyV938(v){
+  return String(v??"").trim().replace(/\.0$/,"").replace(/\s+/g,"");
+}
+function nnClienteCPPV938(){
+  if(nnClienteV938)return nnClienteV938;
+  if(!window.supabase?.createClient)return null;
+  nnClienteV938=window.supabase.createClient(CPP_NN_URL_V938,CPP_NN_KEY_V938,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return nnClienteV938;
+}
+function escolherMaisRecenteV938(atual,novo){
+  if(!atual)return novo;
+  const da=String(atual.data||""),dn=String(novo.data||"");
+  if(dn>da)return novo;
+  if(dn<da)return atual;
+  const na=Number(atual.nn||0),nn=Number(novo.nn||0);
+  if(nn>na)return novo;
+  return atual;
+}
+async function carregarNNV938(registrosAlvo){
+  const nces=[...new Set((registrosAlvo||[]).map(r=>nceKeyV938(r.nce)).filter(Boolean))];
+  if(!nces.length)return;
+
+  const faltantes=nces.filter(n=>!Object.prototype.hasOwnProperty.call(nnMapaV938,n));
+  if(!faltantes.length)return;
+
+  const cli=nnClienteCPPV938();
+  if(!cli)return;
+
+  for(let i=0;i<faltantes.length;i+=150){
+    const lote=faltantes.slice(i,i+150);
+    let data=null,error=null;
+
+    // Preferência: view pronta no CPP.
+    ({data,error}=await cli
+      .from("nosso_numero_mais_recente")
+      .select("nn,data,gr,nce,desc_mercadoria,cod_cor,cor")
+      .in("nce",lote));
+
+    // Fallback caso a view ainda não tenha sido criada.
+    if(error){
+      const fb=await cli
+        .from("nosso_numero")
+        .select("nn,data,gr,nce,desc_mercadoria,cod_cor,cor")
+        .in("nce",lote);
+      if(fb.error){
+        console.warn("[NN CPP]",fb.error.message);
+        lote.forEach(n=>{nnMapaV938[n]=null});
+        continue;
+      }
+      const temp={};
+      (fb.data||[]).forEach(r=>{
+        const k=nceKeyV938(r.nce);
+        temp[k]=escolherMaisRecenteV938(temp[k],r);
+      });
+      lote.forEach(n=>{nnMapaV938[n]=temp[n]||null});
+      continue;
+    }
+
+    const vistos=new Set();
+    (data||[]).forEach(r=>{
+      const k=nceKeyV938(r.nce);
+      nnMapaV938[k]=r;
+      vistos.add(k);
+    });
+    lote.forEach(n=>{if(!vistos.has(n))nnMapaV938[n]=null});
+  }
+}
+function nnRegistroV938(r){
+  return nnMapaV938[nceKeyV938(r?.nce)]||null;
+}
+
+/* V9.4.1:
+   NN válido somente quando existe e a DATA não ultrapassou 1 ano
+   em relação à data atual do computador/navegador.
+   Sem NN ou com mais de 1 ano => F/G. */
+function nnExpiradoV941(reg){
+  if(!reg?.data)return true;
+  const p=String(reg.data).slice(0,10).split("-");
+  if(p.length!==3)return true;
+
+  const data=new Date(Number(p[0]),Number(p[1])-1,Number(p[2]));
+  if(Number.isNaN(data.getTime()))return true;
+
+  const hoje=new Date();
+  hoje.setHours(0,0,0,0);
+
+  const limite=new Date(data);
+  limite.setFullYear(limite.getFullYear()+1);
+
+  return hoje>limite;
+}
+function nnValorV941(r){
+  const reg=nnRegistroV938(r);
+  if(!reg?.nn || nnExpiradoV941(reg))return "F/G";
+  return String(reg.nn);
+}
+function nnDataValidaV941(r){
+  const reg=nnRegistroV938(r);
+  return reg && !nnExpiradoV941(reg) ? (reg.data||"") : "";
+}
+
+
 function esc(v){
   return String(v??"").replace(/[&<>"']/g,m=>({
     "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
@@ -22914,6 +23030,7 @@ function montarLinha(r){
       <div class="agpedido-meta-v937">
         <span class="agpedido-chip-v937">GR: ${esc(r.grupo||"-")}</span>
         <span class="agpedido-chip-v937">N.C.E.: ${esc(r.nce||"-")}</span>
+        <span class="agpedido-chip-v937">NN: ${esc(nnValorV941(r))}</span>
         <span class="agpedido-chip-v937">Rack: ${esc(r.rack||"-")}</span>
         <span class="agpedido-chip-v937">Técnico: ${esc(r.tecnico||"-")}</span>
         <span class="agpedido-chip-v937">PDV: ${esc(r.pdv||"-")}</span>
@@ -22954,7 +23071,7 @@ async function render(){
     '</div>'+
     nav;
 
-  await carregarFotosPagina(pag);
+  await Promise.all([carregarFotosPagina(pag),carregarNNV938(pag)]);
 
   const host=document.getElementById("agPedidoLayoutV937");
   if(host)host.innerHTML=pag.map(montarLinha).join("");
@@ -22988,16 +23105,32 @@ window.mudarPaginaAgPedidoPecasV924=function(delta){
   paginaV924+=Number(delta||0);
   render();
 };
-window.exportarAgPedidoPecasV924=function(){
+window.exportarAgPedidoPecasV924=async function(){
   const lista=obterLista();
   if(!lista.length){alert("Não há O.S. com status AG. PEDIDO DE PECA para exportar.");return}
+
+  await carregarNNV938(lista);
+
   ERP.Export.exportar({
-    dados:lista,formato:"CSV",nome:"ag_pedido_de_peca",aba:"AG PEDIDO DE PECA",
+    dados:lista,
+    formato:"CSV",
+    nome:"ag_pedido_de_peca",
+    aba:"AG PEDIDO DE PECA",
     colunas:[
-      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
-      {label:"Produto",key:"desc_produto"},{label:"Rack",key:"rack"},
-      {label:"Status",key:"status"},{label:"Situação da O.S.",key:"status_da_os"},
-      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"},{label:"NF",key:"nf"}
+      {label:"O.S.",key:"os"},
+      {label:"GR",key:"grupo"},
+      {label:"N.C.E",key:"nce"},
+      {label:"NN",value:r=>nnValorV941(r)},
+      {label:"DESC. MERCADORIA",value:r=>nnRegistroV938(r)?.desc_mercadoria||r.desc_produto||""},
+      {label:"Rack",key:"rack"},
+      {label:"Status",key:"status"},
+      {label:"Situação da O.S.",key:"status_da_os"},
+      {label:"Técnico",key:"tecnico"},
+      {label:"PDV",key:"pdv"},
+      {label:"NF",key:"nf"},
+      {label:"Data NN",value:r=>nnDataValidaV941(r)},
+      {label:"COD. COR",value:r=>nnRegistroV938(r)?.cod_cor||""},
+      {label:"COR",value:r=>nnRegistroV938(r)?.cor||""}
     ]
   });
 };
@@ -23019,6 +23152,7 @@ ERP.Performance.agPedidoFotosAudit=function(){
     pagina:paginaV924+1,
     itensRenderizados:document.querySelectorAll(".agpedido-item-v937").length,
     imagensRenderizadas:document.querySelectorAll(".agpedido-foto-v937").length,
+    nnEmCache:Object.values(nnMapaV938).filter(Boolean).length,
     dom:document.getElementsByTagName("*").length
   };
   console.info("[AG PEDIDO + FOTOS]",result);
@@ -24032,6 +24166,259 @@ function naoForcarMidiasV935(){
 }
 
 console.info("ERP V9.3.5: Abrir volta a abrir somente a ficha da O.S.; mídias permanecem independentes.");
+})();
+</script>
+
+
+<style id="erp-v939-importador-nn-style">
+#modalImportarNNV939{
+  position:fixed;inset:0;z-index:13000;background:rgba(0,18,38,.72);
+  display:none;align-items:center;justify-content:center;padding:18px
+}
+#modalImportarNNV939.aberto{display:flex}
+#importarNNBoxV939{
+  width:min(980px,96vw);max-height:92vh;overflow:auto;background:#fff;
+  border-radius:18px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.35)
+}
+#importarNNBoxV939 h3{margin:0;color:#003c7a}
+#importarNNBoxV939 p{color:#5a7087;font-size:12px}
+#importarNNArquivoV939{width:100%;padding:11px;border:1px solid #9fb4ca;border-radius:9px}
+#importarNNResumoV939{margin:12px 0;padding:10px;border-radius:9px;background:#eef5ff;font-weight:800;font-size:12px}
+#importarNNPreviewV939{max-height:330px;overflow:auto;border:1px solid #d6e0ea;border-radius:10px}
+#importarNNPreviewV939 table{width:100%;border-collapse:collapse;font-size:11px}
+#importarNNPreviewV939 th,#importarNNPreviewV939 td{padding:7px;border-bottom:1px solid #e6edf4;text-align:left}
+#importarNNAcoesV939{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#importarNNAcoesV939 button{border:0;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}
+#btnExecutarImportarNNV939{background:#0046b8;color:#fff}
+#btnExecutarImportarNNV939:disabled{opacity:.5}
+#importarNNMsgV939{margin-top:10px;font-weight:800;font-size:12px}
+</style>
+
+<div id="modalImportarNNV939">
+  <div id="importarNNBoxV939">
+    <h3>🔢 Importar NN — Nosso Número</h3>
+    <p>
+      O arquivo é importado <b>pelo ERP ILR</b>, mas os dados são gravados no
+      <b>Supabase do CPP</b>. Chave: N.C.E. • prioridade: DATA mais recente • empate: maior NN.
+    </p>
+
+    <input id="importarNNArquivoV939" type="file" accept=".xlsx,.xls,.xlt">
+
+    <div id="importarNNResumoV939">Nenhum arquivo selecionado.</div>
+
+    <div id="importarNNPreviewV939">
+      <table>
+        <thead>
+          <tr><th>NN</th><th>DATA</th><th>GR</th><th>N.C.E</th><th>DESC. MERCADORIA</th><th>COD. COR</th><th>COR</th></tr>
+        </thead>
+        <tbody id="importarNNTbodyV939">
+          <tr><td colspan="7">Nenhum arquivo selecionado.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="importarNNAcoesV939">
+      <button onclick="fecharImportadorNNV939()">Cancelar</button>
+      <button id="btnExecutarImportarNNV939" onclick="executarImportacaoNNV939()" disabled>Importar / Atualizar NN</button>
+    </div>
+
+    <div id="importarNNMsgV939"></div>
+  </div>
+</div>
+
+
+<script id="erp-v939-importador-nn-ilr">
+(function(){
+"use strict";
+
+const CPP_NN_URL_V939="https://udioyprwpecysjedlznl.supabase.co";
+const CPP_NN_KEY_V939="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkaW95cHJ3cGVjeXNqZWRsem5sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODU4NDc4MjIsImV4cCI6MjEwMTQyMzgyMn0.io_nEEnlMpqItmDx1YyZPgS1Ny8KpCi5KT6pX3Phoyo";
+
+let nnClienteImportV939=null;
+let nnLinhasImportV939=[];
+
+function clienteCPPV939(){
+  if(nnClienteImportV939)return nnClienteImportV939;
+  if(!window.supabase?.createClient)throw new Error("Biblioteca Supabase não carregada.");
+  nnClienteImportV939=window.supabase.createClient(CPP_NN_URL_V939,CPP_NN_KEY_V939,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return nnClienteImportV939;
+}
+function textoV939(v){return String(v??"").trim()}
+function numTxtV939(v){
+  if(v===null||v===undefined||v==="")return "";
+  if(typeof v==="number"&&Number.isFinite(v))return String(Math.trunc(v));
+  return textoV939(v).replace(/\.0$/,"").replace(/\s+/g,"");
+}
+function dataV939(v){
+  if(v===null||v===undefined||v==="")return "";
+  if(typeof v==="number"&&Number.isFinite(v)){
+    const d=XLSX?.SSF?.parse_date_code?.(v);
+    if(d?.y)return `${String(d.y).padStart(4,"0")}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+  }
+  const s=textoV939(v);
+  let m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m)return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+  m=s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if(m)return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+  return "";
+}
+function escV939(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function brV939(s){
+  const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m?`${m[3]}/${m[2]}/${m[1]}`:s;
+}
+function dedupeV939(rows){
+  const map=new Map();
+  rows.forEach(r=>map.set(`${r.nce}|${r.data}|${r.nn}`,r));
+  return [...map.values()];
+}
+function lerPlanilhaV939(wb){
+  const ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:true,defval:""});
+  const out=[];
+
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i]||[];
+    const nn=numTxtV939(r[0]);       // A
+    const data=dataV939(r[3]);       // D
+    const gr=numTxtV939(r[4]);       // E
+    const nce=numTxtV939(r[5]);      // F
+    const desc=textoV939(r[6]);      // G
+    const codCor=numTxtV939(r[7]);   // H
+    const cor=textoV939(r[8]);       // I
+
+    if(!nn&&!nce&&!desc)continue;
+    if(!nn||!data||!nce)continue;
+
+    out.push({
+      nn:Number(nn),
+      data,
+      gr:gr||null,
+      nce,
+      desc_mercadoria:desc||null,
+      cod_cor:codCor||null,
+      cor:cor||null
+    });
+  }
+  return dedupeV939(out);
+}
+function renderV939(){
+  const resumo=document.getElementById("importarNNResumoV939");
+  const body=document.getElementById("importarNNTbodyV939");
+  const btn=document.getElementById("btnExecutarImportarNNV939");
+  if(!resumo||!body||!btn)return;
+
+  const nces=new Set(nnLinhasImportV939.map(x=>x.nce));
+  resumo.textContent=nnLinhasImportV939.length
+    ? `${nnLinhasImportV939.length.toLocaleString("pt-BR")} registros válidos • ${nces.size.toLocaleString("pt-BR")} N.C.E. únicos`
+    : "Nenhum registro válido.";
+
+  body.innerHTML=nnLinhasImportV939.length
+    ? nnLinhasImportV939.slice(0,15).map(r=>`
+      <tr>
+        <td>${escV939(r.nn)}</td>
+        <td>${escV939(brV939(r.data))}</td>
+        <td>${escV939(r.gr)}</td>
+        <td><b>${escV939(r.nce)}</b></td>
+        <td>${escV939(r.desc_mercadoria)}</td>
+        <td>${escV939(r.cod_cor)}</td>
+        <td>${escV939(r.cor)}</td>
+      </tr>`).join("")
+    : '<tr><td colspan="7">Nenhum registro válido.</td></tr>';
+
+  btn.disabled=!nnLinhasImportV939.length;
+}
+
+window.abrirImportadorNNV939=function(){
+  nnLinhasImportV939=[];
+  const f=document.getElementById("importarNNArquivoV939");
+  if(f)f.value="";
+  const msg=document.getElementById("importarNNMsgV939");
+  if(msg)msg.textContent="";
+  renderV939();
+  document.getElementById("modalImportarNNV939")?.classList.add("aberto");
+};
+window.fecharImportadorNNV939=function(){
+  document.getElementById("modalImportarNNV939")?.classList.remove("aberto");
+};
+
+window.executarImportacaoNNV939=async function(){
+  if(!nnLinhasImportV939.length)return;
+
+  const btn=document.getElementById("btnExecutarImportarNNV939");
+  const msg=document.getElementById("importarNNMsgV939");
+  btn.disabled=true;
+  msg.style.color="#0046b8";
+  msg.textContent="Gravando NN no Supabase CPP...";
+
+  try{
+    const cli=clienteCPPV939();
+    const lote=250;
+    let enviados=0;
+
+    for(let i=0;i<nnLinhasImportV939.length;i+=lote){
+      const parte=nnLinhasImportV939.slice(i,i+lote);
+      const {error}=await cli
+        .from("nosso_numero")
+        .upsert(parte,{onConflict:"nce,data,nn"});
+      if(error)throw error;
+
+      enviados+=parte.length;
+      msg.textContent=`Importando... ${enviados.toLocaleString("pt-BR")} / ${nnLinhasImportV939.length.toLocaleString("pt-BR")}`;
+    }
+
+    // limpa cache do NN usado pela tela AG. PEDIDO, se existir
+    try{
+      if(typeof nnMapaV938!=="undefined"){
+        Object.keys(nnMapaV938).forEach(k=>delete nnMapaV938[k]);
+      }
+    }catch(_){}
+
+    msg.style.color="#0b7a2a";
+    msg.textContent=`NN atualizado com sucesso: ${enviados.toLocaleString("pt-BR")} registros processados no Supabase CPP.`;
+  }catch(e){
+    console.error("[IMPORTAR NN ILR]",e);
+    msg.style.color="#b00020";
+    msg.textContent="Erro ao importar NN: "+(e?.message||e);
+  }finally{
+    btn.disabled=false;
+  }
+};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("importarNNArquivoV939")?.addEventListener("change",async e=>{
+    const file=e.target.files?.[0];
+    nnLinhasImportV939=[];
+    renderV939();
+    if(!file)return;
+
+    const msg=document.getElementById("importarNNMsgV939");
+    try{
+      if(typeof XLSX==="undefined")throw new Error("Biblioteca XLSX não carregada.");
+      msg.style.color="#0046b8";
+      msg.textContent="Lendo planilha NN...";
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:"array",cellDates:false});
+      nnLinhasImportV939=lerPlanilhaV939(wb);
+      renderV939();
+      msg.style.color="#0b7a2a";
+      msg.textContent=nnLinhasImportV939.length
+        ?"Planilha pronta para importar."
+        :"Nenhum registro válido encontrado.";
+    }catch(err){
+      console.error(err);
+      msg.style.color="#b00020";
+      msg.textContent="Erro ao ler planilha: "+(err?.message||err);
+      renderV939();
+    }
+  });
+});
+
+console.info("ERP V9.3.9: importador NN dentro do ILR, gravando no Supabase CPP.");
 })();
 </script>
 
