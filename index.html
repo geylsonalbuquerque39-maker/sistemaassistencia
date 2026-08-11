@@ -5919,6 +5919,50 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
       </div>
 
 </div>
+  <section id="intelMiniDashPecasV925" class="intel-mini-pecas-v925">
+    <div class="intel-mini-pecas-topo-v925">
+      <div>
+        <h3>📈 Progressão diária — Peças</h3>
+        <small id="intelMiniPecasAtualizadoV925">Aguardando atualização do relatório</small>
+      </div>
+      <div class="intel-mini-pecas-legenda-v925">Zero Relation DOM</div>
+    </div>
+
+    <div class="intel-mini-pecas-grid-v925">
+      <article class="intel-mini-pecas-card-v925">
+        <small>Saíram de Ag. Pedido → Aguardando peças</small>
+        <strong id="intelMiniTransicoesV925">0</strong>
+        <span id="intelMiniTransicoesComparativoV925">Hoje • Ontem: 0</span>
+        <div class="intel-mini-pecas-actions-v925">
+          <button type="button" onclick="abrirRelacaoMiniPecasV925('transicoes')">Ver relação</button>
+          <button type="button" onclick="exportarRelacaoMiniPecasV925('transicoes')">Exportar ▾</button>
+        </div>
+      </article>
+
+      <article class="intel-mini-pecas-card-v925 alerta">
+        <small>Ag. Pedido com Obs. CPP divergente</small>
+        <strong id="intelMiniObsDivergenteV925">0</strong>
+        <span>Status = Ag. Pedido de peças e Obs. CPP diferente</span>
+        <div class="intel-mini-pecas-actions-v925">
+          <button type="button" onclick="abrirRelacaoMiniPecasV925('divergentes')">Ver relação</button>
+          <button type="button" onclick="exportarRelacaoMiniPecasV925('divergentes')">Exportar ▾</button>
+        </div>
+      </article>
+    
+      <article class="intel-mini-pecas-card-v925">
+        <small>Saíram de AG. ANALISE TECNICA EM TAT → Ag. Pedido de peças</small>
+        <strong id="intelMiniTatParaPedidoV926">0</strong>
+        <span id="intelMiniTatParaPedidoComparativoV926">Hoje • Ontem: 0</span>
+        <div class="intel-mini-pecas-actions-v925">
+          <button type="button" onclick="abrirRelacaoMiniPecasV926('tatParaPedido')">Ver relação</button>
+          <button type="button" onclick="exportarRelacaoMiniPecasV926('tatParaPedido')">Exportar ▾</button>
+        </div>
+      </article>
+</div>
+
+    <div id="intelMiniPecasUltimosDiasV925" class="intel-mini-pecas-dias-v925"></div>
+  </section>
+
 
     <div class="intel-exec-grid" id="intelExecutivo">
       <div class="intel-exec-box"><small>O.S. abertas</small><strong id="ieAbertas">--</strong><span>Situação ABE</span></div>
@@ -8596,6 +8640,16 @@ async function importarNettermParaSupabase(){
                 data:new Date().toISOString(), usuario:(usuarioLogado && (usuarioLogado.nome || usuarioLogado.email)) || "Usuário"
             });
             await salvarComparacaoImportacao(comparacao);
+            try{
+                window.registrarProgressaoPecasV925?.(baseAntesImportacao, baseDepoisImportacao, {
+                    data:new Date().toISOString(),
+                    arquivo:(document.getElementById("arquivoNetterm") && document.getElementById("arquivoNetterm").files[0]) ? document.getElementById("arquivoNetterm").files[0].name : "arquivo-netterm"
+                });
+                window.registrarProgressaoTatPedidoV926?.(baseAntesImportacao, baseDepoisImportacao, {
+                    data:new Date().toISOString(),
+                    arquivo:(document.getElementById("arquivoNetterm") && document.getElementById("arquivoNetterm").files[0]) ? document.getElementById("arquivoNetterm").files[0].name : "arquivo-netterm"
+                });
+            }catch(e){ console.warn("Mini dashboard de peças não pôde ser atualizado:", e); }
             abrirComparadorImportacao(comparacao);
         }catch(compErro){ console.warn("Importação concluída, mas o comparador não pôde ser gerado:", compErro); }
         carregarDashboardAdmin();
@@ -19977,7 +20031,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.4</div>
+<div id="erpVersionBadgeV7542">ERP V9.2.6</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20589,7 +20643,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.4",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.2.6",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22661,6 +22715,474 @@ ERP.Performance.agPedidoPecasAudit=function(){
 document.addEventListener("DOMContentLoaded",()=>setTimeout(atualizar,2500));
 setTimeout(atualizar,4000);
 console.info("ERP V9.2.4: cartão Ag. Pedido de peças ativo com Zero Relation DOM.");
+})();
+</script>
+
+
+<style id="erp-v925-mini-dashboard-pecas-style">
+.intel-mini-pecas-v925{
+  margin:16px 0 20px;padding:16px;border:1px solid #d5e1ee;border-radius:16px;
+  background:linear-gradient(180deg,#fff,#f8fbff)
+}
+.intel-mini-pecas-topo-v925{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px
+}
+.intel-mini-pecas-topo-v925 h3{margin:0;color:#003c7a}
+.intel-mini-pecas-topo-v925 small{color:#70869d}
+.intel-mini-pecas-legenda-v925{
+  border-radius:999px;padding:6px 10px;background:#eaf4ff;color:#075b9e;font-size:10px;font-weight:900
+}
+.intel-mini-pecas-grid-v925{
+  display:grid;grid-template-columns:repeat(2,minmax(240px,1fr));gap:12px
+}
+.intel-mini-pecas-card-v925{
+  border:1px solid #cbd9e8;border-left:5px solid #0b7a2a;border-radius:13px;
+  background:#fff;padding:14px;box-shadow:0 3px 12px rgba(0,45,90,.06)
+}
+.intel-mini-pecas-card-v925.alerta{border-left-color:#ff9800}
+.intel-mini-pecas-card-v925 small{display:block;color:#526b84;font-weight:800}
+.intel-mini-pecas-card-v925 strong{
+  display:block;font-size:34px;line-height:1.1;color:#003c7a;margin:8px 0 4px
+}
+.intel-mini-pecas-card-v925 span{display:block;color:#71879e;font-size:11px}
+.intel-mini-pecas-actions-v925{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}
+.intel-mini-pecas-actions-v925 button{
+  border:0;border-radius:8px;padding:7px 10px;font-weight:800;cursor:pointer
+}
+.intel-mini-pecas-dias-v925{
+  display:flex;gap:7px;flex-wrap:wrap;margin-top:12px;padding-top:10px;border-top:1px solid #e0e9f2
+}
+.intel-mini-dia-v925{
+  min-width:78px;padding:7px 9px;border-radius:9px;background:#eef5fb;text-align:center
+}
+.intel-mini-dia-v925 b{display:block;color:#003c7a}
+.intel-mini-dia-v925 small{font-size:9px;color:#6f849a}
+@media(max-width:760px){.intel-mini-pecas-grid-v925{grid-template-columns:1fr}}
+body.dark-mode .intel-mini-pecas-v925,
+body.dark-mode .intel-mini-pecas-card-v925{background:#102b49;border-color:#315a80}
+body.dark-mode .intel-mini-pecas-topo-v925 h3,
+body.dark-mode .intel-mini-pecas-card-v925 strong{color:#eaf2ff}
+body.dark-mode .intel-mini-dia-v925{background:#173957}
+</style>
+
+<script id="erp-v925-mini-dashboard-pecas">
+(function(){
+"use strict";
+
+const STORAGE="ERP_PROGRESSAO_PECAS_V925";
+const PAGE=100;
+let relacaoMiniV925=[];
+let tituloMiniV925="";
+let paginaMiniV925=0;
+
+function norm(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function isAgPedido(v){
+  const s=norm(v);
+  return s==="ag pedido de pecas" || s==="aguardando pedido de pecas";
+}
+function isAguardandoPecas(v){
+  const s=norm(v);
+  return s==="aguardando pecas" || s==="ag pecas" || s==="aguardando peca";
+}
+function hojeKey(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function load(){
+  try{return JSON.parse(localStorage.getItem(STORAGE)||'{"dias":{}}')}
+  catch(_){return {dias:{}}}
+}
+function save(x){
+  try{localStorage.setItem(STORAGE,JSON.stringify(x))}catch(_){}
+}
+function registrosAtuais(fallback){
+  if(Array.isArray(fallback)&&fallback.length)return fallback;
+  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))return intelRegistros}catch(_){}
+  try{if(Array.isArray(window.rexpedlrDados))return window.rexpedlrDados}catch(_){}
+  return [];
+}
+function divergentes(lista){
+  return (lista||[]).filter(r=>isAgPedido(r.status)&&norm(r.obs_cpp)!=="ag pedido de pecas");
+}
+function mapaPorOS(lista){
+  return new Map((lista||[]).filter(r=>String(r.os||"").trim()).map(r=>[String(r.os).trim(),r]));
+}
+
+/* ---------------------------------------------------------
+   Registrar uma importação
+   - transições são acumuladas por O.S. única no dia
+   - divergência é fotografia atual, não soma
+   --------------------------------------------------------- */
+window.registrarProgressaoPecasV925=function(antes,depois,meta={}){
+  const a=mapaPorOS(antes),d=mapaPorOS(depois);
+  const mudaram=[];
+
+  d.forEach((novo,os)=>{
+    const antigo=a.get(os);
+    if(!antigo)return;
+    if(isAgPedido(antigo.status)&&isAguardandoPecas(novo.status)){
+      mudaram.push(os);
+    }
+  });
+
+  const key=hojeKey(new Date(meta.data||Date.now()));
+  const hist=load();
+  hist.dias=hist.dias||{};
+  const atual=hist.dias[key]||{transicoesOS:[],divergentesOS:[],atualizadoEm:null};
+
+  const unicos=new Set([...(atual.transicoesOS||[]),...mudaram]);
+  atual.transicoesOS=[...unicos];
+  atual.divergentesOS=divergentes(depois).map(r=>String(r.os||"").trim()).filter(Boolean);
+  atual.atualizadoEm=meta.data||new Date().toISOString();
+  atual.arquivo=meta.arquivo||atual.arquivo||"";
+  hist.dias[key]=atual;
+
+  // mantém 45 dias
+  const keys=Object.keys(hist.dias).sort().reverse();
+  keys.slice(45).forEach(k=>delete hist.dias[k]);
+  save(hist);
+
+  window.renderMiniDashboardPecasV925?.(depois);
+  return atual;
+};
+
+/* ---------------------------------------------------------
+   Render do mini dashboard: só números + 7 dias.
+   Nenhuma O.S. entra no DOM.
+   --------------------------------------------------------- */
+window.renderMiniDashboardPecasV925=function(listaAtual){
+  const hist=load(),key=hojeKey(),today=hist.dias?.[key]||{transicoesOS:[],divergentesOS:[]};
+  const atual=registrosAtuais(listaAtual);
+
+  // Se houver base atual, divergência é recalculada para não ficar stale.
+  const div=atual.length?divergentes(atual):[];
+  const totalDiv=atual.length?div.length:(today.divergentesOS||[]).length;
+
+  const ontem=new Date();ontem.setDate(ontem.getDate()-1);
+  const y=hist.dias?.[hojeKey(ontem)]||{transicoesOS:[]};
+  const hojeQtd=(today.transicoesOS||[]).length;
+  const ontemQtd=(y.transicoesOS||[]).length;
+  const delta=hojeQtd-ontemQtd;
+
+  const a=document.getElementById("intelMiniTransicoesV925");
+  const b=document.getElementById("intelMiniObsDivergenteV925");
+  const c=document.getElementById("intelMiniTransicoesComparativoV925");
+  const u=document.getElementById("intelMiniPecasAtualizadoV925");
+
+  if(a)a.textContent=hojeQtd.toLocaleString("pt-BR");
+  if(b)b.textContent=totalDiv.toLocaleString("pt-BR");
+  if(c)c.textContent=`Hoje • Ontem: ${ontemQtd.toLocaleString("pt-BR")} • ${delta>=0?"+":""}${delta}`;
+  if(u)u.textContent=today.atualizadoEm
+    ?`Última atualização: ${new Date(today.atualizadoEm).toLocaleString("pt-BR")}`
+    :"Aguardando a próxima atualização do relatório";
+
+  const dias=document.getElementById("intelMiniPecasUltimosDiasV925");
+  if(dias){
+    const itens=[];
+    for(let i=6;i>=0;i--){
+      const dt=new Date();dt.setDate(dt.getDate()-i);
+      const k=hojeKey(dt),r=hist.dias?.[k]||{transicoesOS:[]};
+      itens.push(`<div class="intel-mini-dia-v925"><small>${dt.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small><b>${(r.transicoesOS||[]).length}</b><small>transições</small></div>`);
+    }
+    dias.innerHTML=itens.join("");
+  }
+};
+
+/* ---------------------------------------------------------
+   Relações Zero Relation DOM
+   --------------------------------------------------------- */
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function preparar(tipo){
+  const hist=load(),today=hist.dias?.[hojeKey()]||{transicoesOS:[],divergentesOS:[]};
+  const atual=registrosAtuais();
+  const mapa=mapaPorOS(atual);
+
+  if(tipo==="transicoes"){
+    relacaoMiniV925=(today.transicoesOS||[]).map(os=>mapa.get(os)||{os,status:"Aguardando peças"});
+    tituloMiniV925="Saíram de Ag. Pedido → Aguardando peças";
+  }else{
+    relacaoMiniV925=atual.length?divergentes(atual):(today.divergentesOS||[]).map(os=>mapa.get(os)||{os});
+    tituloMiniV925="Ag. Pedido com Obs. CPP divergente";
+  }
+  paginaMiniV925=0;
+}
+function pager(){
+  const total=relacaoMiniV925.length,pags=Math.max(1,Math.ceil(total/PAGE));
+  paginaMiniV925=Math.max(0,Math.min(pags-1,paginaMiniV925));
+  const ini=paginaMiniV925*PAGE,fim=Math.min(total,ini+PAGE);
+  return `<div class="erp-perf-pager-v910">
+    <button ${paginaMiniV925===0?"disabled":""} onclick="mudarPaginaMiniPecasV925(-1)">‹ Anterior</button>
+    <b>${total?ini+1:0}–${fim} de ${total.toLocaleString("pt-BR")}</b>
+    <button ${paginaMiniV925>=pags-1?"disabled":""} onclick="mudarPaginaMiniPecasV925(1)">Próxima ›</button>
+  </div>`;
+}
+function renderRelacao(){
+  const modal=document.getElementById("intelModal"),tit=document.getElementById("intelModalTitulo"),area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+  const total=relacaoMiniV925.length,ini=paginaMiniV925*PAGE,pag=relacaoMiniV925.slice(ini,ini+PAGE);
+  tit.textContent=`${tituloMiniV925} (${total.toLocaleString("pt-BR")})`;
+  if(!total){
+    area.innerHTML='<div class="admin-info">Nenhuma O.S. nesta relação.</div>';
+  }else{
+    const nav=pager();
+    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: somente 100 O.S. são renderizadas por página.</div>'+nav+
+      "<div class='intel-list'>"+
+      pag.map(r=>"<div class='intel-row'><b>"+esc(r.os||"-")+"</b><span>"+esc(r.desc_produto||"")+
+        "<br><small>Status: "+esc(r.status||"-")+" • Obs. CPP: "+esc(r.obs_cpp||"(vazio)")+
+        " • Rack: "+esc(r.rack||"-")+"</small></span><span>"+esc(r.tecnico||"")+
+        "</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>"
+      ).join("")+"</div>"+nav;
+  }
+  modal.style.display="flex";
+}
+window.abrirRelacaoMiniPecasV925=function(tipo){preparar(tipo);renderRelacao()};
+window.mudarPaginaMiniPecasV925=function(delta){paginaMiniV925+=Number(delta||0);renderRelacao()};
+window.exportarRelacaoMiniPecasV925=function(tipo){
+  preparar(tipo);
+  if(!relacaoMiniV925.length){alert("Não há O.S. nesta relação para exportar.");return}
+  ERP.Export.exportar({
+    dados:relacaoMiniV925,formato:"CSV",nome:tipo==="transicoes"?"progressao_ag_pedido_para_aguardando_pecas":"ag_pedido_obs_cpp_divergente",
+    aba:"Progressão Peças",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"Produto",key:"desc_produto"},{label:"Status",key:"status"},
+      {label:"Obs. CPP",key:"obs_cpp"},{label:"Rack",key:"rack"},
+      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"}
+    ]
+  });
+};
+
+/* ---------------------------------------------------------
+   Inteligência: sempre atualiza os números, nunca a relação.
+   --------------------------------------------------------- */
+const abrirIntelBaseV925=window.abrirInteligencia;
+if(typeof abrirIntelBaseV925==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV925.apply(this,arguments);
+    setTimeout(()=>window.renderMiniDashboardPecasV925?.(),0);
+    return r;
+  };
+}
+
+/* Fechar modal destrói relação */
+const fecharBaseV925=window.fecharIntelModal;
+window.fecharIntelModal=function(){
+  try{return typeof fecharBaseV925==="function"?fecharBaseV925.apply(this,arguments):undefined}
+  finally{
+    relacaoMiniV925=[];tituloMiniV925="";paginaMiniV925=0;
+    const area=document.getElementById("intelModalConteudo");if(area)area.innerHTML="";
+  }
+};
+
+window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
+ERP.Performance.pecasAudit=function(){
+  const hist=load(),today=hist.dias?.[hojeKey()]||{transicoesOS:[]};
+  const atual=registrosAtuais();
+  const result={
+    transicoesHoje:(today.transicoesOS||[]).length,
+    divergentesAtual:atual.length?divergentes(atual).length:null,
+    linhasRenderizadas:document.querySelectorAll("#intelModalConteudo .intel-row").length,
+    dom:document.getElementsByTagName("*").length
+  };
+  console.info("[MINI DASH PEÇAS]",result);return result;
+};
+
+document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>window.renderMiniDashboardPecasV925?.(),3000));
+console.info("ERP V9.2.5: mini dashboard diário de peças ativo.");
+})();
+</script>
+
+
+<script id="erp-v926-tat-para-pedido">
+(function(){
+"use strict";
+
+const STORAGE="ERP_PROGRESSAO_PECAS_V926";
+const PAGE=100;
+let relacaoV926=[];
+let tituloV926="";
+let paginaV926=0;
+
+function norm(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function isTat(v){
+  const s=norm(v);
+  return s==="ag analise tecnica em tat" || s==="aguardando analise tecnica em tat";
+}
+function isAgPedido(v){
+  const s=norm(v);
+  return s==="ag pedido de pecas" || s==="aguardando pedido de pecas";
+}
+function hojeKey(d=new Date()){
+  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+function load(){
+  try{return JSON.parse(localStorage.getItem(STORAGE)||'{"dias":{}}')}
+  catch(_){return {dias:{}}}
+}
+function save(x){
+  try{localStorage.setItem(STORAGE,JSON.stringify(x))}catch(_){}
+}
+function mapa(lista){
+  return new Map((lista||[]).filter(r=>String(r.os||"").trim()).map(r=>[String(r.os).trim(),r]));
+}
+function registrosAtuais(){
+  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))return intelRegistros}catch(_){}
+  try{if(Array.isArray(window.rexpedlrDados))return window.rexpedlrDados}catch(_){}
+  return [];
+}
+
+/* Registra transições no mesmo momento em que a importação é atualizada */
+window.registrarProgressaoTatPedidoV926=function(antes,depois,meta={}){
+  const a=mapa(antes),d=mapa(depois),mudaram=[];
+  d.forEach((novo,os)=>{
+    const antigo=a.get(os);
+    if(!antigo)return;
+    if(isTat(antigo.status)&&isAgPedido(novo.status))mudaram.push(os);
+  });
+
+  const key=hojeKey(new Date(meta.data||Date.now()));
+  const hist=load();
+  hist.dias=hist.dias||{};
+  const atual=hist.dias[key]||{transicoesOS:[],atualizadoEm:null};
+  const unicos=new Set([...(atual.transicoesOS||[]),...mudaram]);
+  atual.transicoesOS=[...unicos];
+  atual.atualizadoEm=meta.data||new Date().toISOString();
+  atual.arquivo=meta.arquivo||atual.arquivo||"";
+  hist.dias[key]=atual;
+
+  Object.keys(hist.dias).sort().reverse().slice(45).forEach(k=>delete hist.dias[k]);
+  save(hist);
+  window.renderMiniTatPedidoV926?.();
+  return atual;
+};
+
+window.renderMiniTatPedidoV926=function(){
+  const hist=load();
+  const hoje=hist.dias?.[hojeKey()]||{transicoesOS:[]};
+  const ontem=new Date();ontem.setDate(ontem.getDate()-1);
+  const ant=hist.dias?.[hojeKey(ontem)]||{transicoesOS:[]};
+
+  const h=(hoje.transicoesOS||[]).length;
+  const o=(ant.transicoesOS||[]).length;
+  const delta=h-o;
+
+  const a=document.getElementById("intelMiniTatParaPedidoV926");
+  const b=document.getElementById("intelMiniTatParaPedidoComparativoV926");
+  if(a)a.textContent=h.toLocaleString("pt-BR");
+  if(b)b.textContent=`Hoje • Ontem: ${o.toLocaleString("pt-BR")} • ${delta>=0?"+":""}${delta}`;
+};
+
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function preparar(){
+  const hist=load(),today=hist.dias?.[hojeKey()]||{transicoesOS:[]};
+  const atual=registrosAtuais(),m=mapa(atual);
+  relacaoV926=(today.transicoesOS||[]).map(os=>m.get(os)||{os,status:"Ag. Pedido de peças"});
+  tituloV926="AG. ANALISE TECNICA EM TAT → Ag. Pedido de peças";
+  paginaV926=0;
+}
+function pager(){
+  const total=relacaoV926.length,pags=Math.max(1,Math.ceil(total/PAGE));
+  paginaV926=Math.max(0,Math.min(pags-1,paginaV926));
+  const ini=paginaV926*PAGE,fim=Math.min(total,ini+PAGE);
+  return `<div class="erp-perf-pager-v910">
+    <button ${paginaV926===0?"disabled":""} onclick="mudarPaginaMiniPecasV926(-1)">‹ Anterior</button>
+    <b>${total?ini+1:0}–${fim} de ${total.toLocaleString("pt-BR")}</b>
+    <button ${paginaV926>=pags-1?"disabled":""} onclick="mudarPaginaMiniPecasV926(1)">Próxima ›</button>
+  </div>`;
+}
+function render(){
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+
+  const total=relacaoV926.length,ini=paginaV926*PAGE,pag=relacaoV926.slice(ini,ini+PAGE);
+  tit.textContent=`${tituloV926} (${total.toLocaleString("pt-BR")})`;
+
+  if(!total){
+    area.innerHTML='<div class="admin-info">Nenhuma O.S. fez essa transição hoje.</div>';
+  }else{
+    const nav=pager();
+    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: somente 100 O.S. por página.</div>'+nav+
+      "<div class='intel-list'>"+
+      pag.map(r=>"<div class='intel-row'><b>"+esc(r.os||"-")+"</b><span>"+
+        esc(r.desc_produto||"")+"<br><small>Status atual: "+esc(r.status||"-")+
+        " • Rack: "+esc(r.rack||"-")+" • GR: "+esc(r.grupo||"-")+" • N.C.E.: "+esc(r.nce||"-")+
+        "</small></span><span>"+esc(r.tecnico||"")+
+        "</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>"
+      ).join("")+"</div>"+nav;
+  }
+  modal.style.display="flex";
+}
+
+window.abrirRelacaoMiniPecasV926=function(tipo){
+  if(tipo!=="tatParaPedido")return;
+  preparar();render();
+};
+window.mudarPaginaMiniPecasV926=function(delta){paginaV926+=Number(delta||0);render()};
+window.exportarRelacaoMiniPecasV926=function(tipo){
+  if(tipo!=="tatParaPedido")return;
+  preparar();
+  if(!relacaoV926.length){alert("Não há O.S. nessa transição para exportar.");return}
+  ERP.Export.exportar({
+    dados:relacaoV926,formato:"CSV",
+    nome:"progressao_analise_tat_para_ag_pedido_de_pecas",
+    aba:"Progressão Peças",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"Produto",key:"desc_produto"},{label:"Status atual",key:"status"},
+      {label:"Obs. CPP",key:"obs_cpp"},{label:"Rack",key:"rack"},
+      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"}
+    ]
+  });
+};
+
+const abrirIntelBaseV926=window.abrirInteligencia;
+if(typeof abrirIntelBaseV926==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV926.apply(this,arguments);
+    setTimeout(()=>window.renderMiniTatPedidoV926?.(),0);
+    return r;
+  };
+}
+
+const fecharBaseV926=window.fecharIntelModal;
+window.fecharIntelModal=function(){
+  try{return typeof fecharBaseV926==="function"?fecharBaseV926.apply(this,arguments):undefined}
+  finally{
+    relacaoV926=[];tituloV926="";paginaV926=0;
+  }
+};
+
+window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
+ERP.Performance.tatPedidoAudit=function(){
+  const hist=load(),today=hist.dias?.[hojeKey()]||{transicoesOS:[]};
+  const result={
+    transicoesHoje:(today.transicoesOS||[]).length,
+    linhasRenderizadas:document.querySelectorAll("#intelModalConteudo .intel-row").length,
+    dom:document.getElementsByTagName("*").length
+  };
+  console.info("[TAT -> AG. PEDIDO]",result);
+  return result;
+};
+
+document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>window.renderMiniTatPedidoV926?.(),3000));
+console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> Ag. Pedido de peças ativa.");
 })();
 </script>
 
