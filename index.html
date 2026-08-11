@@ -5194,6 +5194,137 @@ body.dark-mode .agpedido-chip-v937{
 }
 </style>
 
+
+<style id="erp-v945-coleta-card-layout">
+#coletaFotosListaV943{
+  display:grid!important;
+  grid-template-columns:repeat(auto-fit,minmax(360px,1fr))!important;
+  gap:16px!important;
+}
+.coleta-fotos-item-v943{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) 180px!important;
+  gap:16px!important;
+  align-items:stretch!important;
+  min-height:230px!important;
+  padding:16px!important;
+  border:2px solid #24394d!important;
+  border-radius:16px!important;
+  background:#fff!important;
+  box-shadow:0 5px 18px rgba(0,31,63,.08)!important;
+}
+.coleta-fotos-info-v945{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.coleta-fotos-linha-v945{
+  font-size:18px;
+  line-height:1.25;
+  color:#173a5c;
+}
+.coleta-fotos-linha-v945 b{
+  display:inline-block;
+  min-width:92px;
+  color:#001f45;
+  font-size:17px;
+}
+.coleta-fotos-os-v945{
+  font-size:30px!important;
+  line-height:1!important;
+  font-weight:950!important;
+  color:#003c7a!important;
+  margin-bottom:4px!important;
+}
+.coleta-fotos-foto-col-v945{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.coleta-fotos-thumb-v943,
+.coleta-fotos-sem-thumb-v943{
+  width:100%!important;
+  height:150px!important;
+  object-fit:contain!important;
+  background:#eef3f8!important;
+  border-radius:12px!important;
+  border:1px solid #d6e0e9!important;
+}
+.coleta-fotos-add-v945{
+  width:100%;
+  border:0;
+  border-radius:9px;
+  background:#0046b8;
+  color:#fff;
+  font-weight:900;
+  padding:10px 12px;
+  cursor:pointer;
+}
+.coleta-fotos-item-acoes-v943{
+  grid-column:1/-1!important;
+  display:flex!important;
+  gap:8px!important;
+  flex-wrap:wrap!important;
+  justify-content:flex-end!important;
+  margin-top:2px!important;
+}
+.coleta-fotos-item-acoes-v943 button{
+  border:0;
+  border-radius:8px;
+  padding:8px 10px;
+  font-weight:900;
+  cursor:pointer;
+}
+@media(max-width:760px){
+  .coleta-fotos-item-v943{grid-template-columns:1fr!important}
+}
+</style>
+
+
+<style id="erp-v946-coleta-editavel-style">
+.coleta-fotos-edit-v946{
+  display:grid;
+  grid-template-columns:92px minmax(0,1fr);
+  gap:8px;
+  align-items:center;
+}
+.coleta-fotos-edit-v946 label{
+  font-size:17px;
+  font-weight:900;
+  color:#001f45;
+}
+.coleta-fotos-edit-v946 input{
+  width:100%;
+  min-width:0;
+  padding:8px 10px;
+  border:1px solid #a7bbcf;
+  border-radius:8px;
+  background:#fff;
+  color:#173a5c;
+  font-size:16px;
+  font-weight:800;
+}
+.coleta-fotos-edit-v946 input:focus{
+  outline:2px solid rgba(0,70,184,.18);
+  border-color:#0046b8;
+}
+.coleta-fotos-salvo-v946{
+  font-size:10px;
+  color:#0b7a2a;
+  font-weight:900;
+  margin-top:2px;
+  min-height:13px;
+}
+</style>
+
+
+<style id="erp-v947-coleta-multifotos-style">
+.coleta-fotos-galeria-v947{display:flex;gap:6px;overflow-x:auto;padding:4px 0 2px}
+.coleta-fotos-mini-v947{width:54px;height:44px;object-fit:cover;border-radius:7px;border:2px solid transparent;cursor:pointer;flex:0 0 auto}
+.coleta-fotos-mini-v947.ativa{border-color:#0046b8}
+.coleta-fotos-contagem-v947{font-size:10px;font-weight:900;color:#49647f;margin-top:4px}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -20292,7 +20423,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.4.2</div>
+<div id="erpVersionBadgeV7542">ERP V9.4.7</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20904,7 +21035,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.4.2",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.4.7",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -24032,6 +24163,7 @@ window.enviarFotosLoteV930=async function(){
         item.estado="Enviando...";
         if(estado){estado.textContent=item.estado;estado.className="foto-lote-espera-v930"}
         await enviarFoto(item);
+        try{window.registrarOSNaColetaFotosV943?.(item.os,1)}catch(_){}
         ok++;
         item.estado="Enviada ✓";
         if(estado){estado.textContent=item.estado;estado.className="foto-lote-ok-v930"}
@@ -24531,6 +24663,555 @@ document.addEventListener("DOMContentLoaded",()=>{
 });
 
 console.info("ERP V9.3.9: importador NN dentro do ILR, gravando no Supabase CPP.");
+})();
+</script>
+
+
+<style id="erp-v943-coleta-fotos-style">
+#coletaFotosModalV943{
+  position:fixed;inset:0;z-index:14000;background:rgba(0,18,38,.74);
+  display:none;align-items:center;justify-content:center;padding:18px
+}
+#coletaFotosModalV943.aberto{display:flex}
+#coletaFotosBoxV943{
+  width:min(1120px,97vw);max-height:94vh;overflow:auto;background:#fff;
+  border-radius:20px;padding:20px;box-shadow:0 30px 90px rgba(0,0,0,.38)
+}
+.coleta-fotos-topo-v943{display:flex;justify-content:space-between;align-items:flex-start;gap:14px}
+.coleta-fotos-topo-v943 h2{margin:0;color:#003c7a}
+.coleta-fotos-topo-v943 p{margin:5px 0 0;color:#637b92;font-size:12px}
+.coleta-fotos-status-v943{
+  padding:8px 12px;border-radius:999px;background:#eef5fb;color:#47627e;font-weight:900;font-size:11px
+}
+.coleta-fotos-status-v943.ativa{background:#e7faee;color:#08752a}
+.coleta-fotos-acoes-v943{display:flex;gap:8px;flex-wrap:wrap;margin:15px 0}
+.coleta-fotos-acoes-v943 button{
+  border:0;border-radius:9px;padding:9px 13px;font-weight:900;cursor:pointer
+}
+#btnIniciarColetaFotosV943{background:#0b7a2a;color:white}
+#btnFinalizarColetaFotosV943{background:#b34500;color:white}
+.coleta-fotos-resumo-v943{
+  display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;margin:12px 0
+}
+.coleta-fotos-kpi-v943{
+  padding:12px;border:1px solid #d7e2ec;border-radius:12px;background:#f8fbff
+}
+.coleta-fotos-kpi-v943 small{display:block;color:#6c8196;font-weight:800}
+.coleta-fotos-kpi-v943 strong{display:block;font-size:25px;color:#003c7a;margin-top:4px}
+.coleta-fotos-manual-v943{display:flex;gap:8px;margin:12px 0}
+.coleta-fotos-manual-v943 input{
+  flex:1;padding:10px;border:1px solid #9fb4ca;border-radius:9px
+}
+.coleta-fotos-manual-v943 button{
+  border:0;border-radius:9px;background:#0046b8;color:white;font-weight:900;padding:9px 13px
+}
+#coletaFotosListaV943{display:flex;flex-direction:column;gap:10px}
+.coleta-fotos-item-v943{
+  display:grid;grid-template-columns:90px minmax(0,1fr) 190px;gap:12px;align-items:center;
+  border:1px solid #d8e2ec;border-radius:13px;padding:11px;background:#fff
+}
+.coleta-fotos-thumb-v943{
+  width:90px;height:72px;object-fit:contain;background:#edf2f7;border-radius:9px;border:1px solid #d8e2ec
+}
+.coleta-fotos-sem-thumb-v943{
+  width:90px;height:72px;display:flex;align-items:center;justify-content:center;background:#edf2f7;
+  border-radius:9px;color:#71869a;font-size:11px;font-weight:800;text-align:center
+}
+.coleta-fotos-os-v943{font-size:20px;font-weight:900;color:#003c7a}
+.coleta-fotos-prod-v943{font-size:12px;font-weight:800;color:#34516d;margin:3px 0}
+.coleta-fotos-meta-v943{display:flex;gap:6px;flex-wrap:wrap}
+.coleta-fotos-meta-v943 span{
+  padding:4px 7px;border-radius:999px;background:#eef5fb;color:#526d87;font-size:9px;font-weight:900
+}
+.coleta-fotos-item-acoes-v943{display:flex;gap:7px;flex-wrap:wrap;justify-content:flex-end}
+.coleta-fotos-item-acoes-v943 button{
+  border:0;border-radius:8px;padding:7px 9px;font-weight:900;cursor:pointer
+}
+.coleta-fotos-historico-v943{margin-top:18px;border-top:1px solid #e0e8f0;padding-top:14px}
+.coleta-fotos-historico-v943 h3{margin:0 0 8px;color:#23496f}
+.coleta-fotos-hist-item-v943{
+  display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #dce5ee;font-size:11px
+}
+@media(max-width:800px){
+  .coleta-fotos-resumo-v943{grid-template-columns:1fr 1fr}
+  .coleta-fotos-item-v943{grid-template-columns:72px 1fr}
+  .coleta-fotos-item-acoes-v943{grid-column:1/-1;justify-content:flex-start}
+  .coleta-fotos-thumb-v943,.coleta-fotos-sem-thumb-v943{width:72px;height:64px}
+}
+</style>
+
+<div id="coletaFotosModalV943">
+  <div id="coletaFotosBoxV943">
+    <div class="coleta-fotos-topo-v943">
+      <div>
+        <h2>📸 Coleta de Fotos</h2>
+        <p>Inicie uma coleta. Toda O.S. fotografada entra automaticamente nesta lista até a coleta ser finalizada.</p>
+      </div>
+      <div id="coletaFotosStatusV943" class="coleta-fotos-status-v943">Nenhuma coleta ativa</div>
+    </div>
+
+    <div class="coleta-fotos-acoes-v943">
+      <button id="btnIniciarColetaFotosV943" onclick="iniciarColetaFotosV943()">▶ Iniciar coleta</button>
+      <button id="btnFinalizarColetaFotosV943" onclick="finalizarColetaFotosV943()">■ Finalizar coleta</button>
+      <button onclick="fecharColetaFotosV943()">Fechar</button>
+    </div>
+
+    <div class="coleta-fotos-resumo-v943">
+      <div class="coleta-fotos-kpi-v943"><small>O.S. na coleta</small><strong id="coletaFotosQtdOSV943">0</strong></div>
+      <div class="coleta-fotos-kpi-v943"><small>Fotos enviadas</small><strong id="coletaFotosQtdFotosV943">0</strong></div>
+      <div class="coleta-fotos-kpi-v943"><small>Com AG. PEDIDO</small><strong id="coletaFotosQtdAgPedidoV943">0</strong></div>
+      <div class="coleta-fotos-kpi-v943"><small>Iniciada</small><strong id="coletaFotosInicioV943" style="font-size:16px">—</strong></div>
+    </div>
+
+    
+<div id="coletaFotoCapturaV944" style="margin:14px 0;padding:14px;border:1px solid #cddbe8;border-radius:13px;background:#f8fbff">
+  <div style="font-weight:900;color:#003c7a;margin-bottom:8px">📷 Tirar foto e informar O.S.</div>
+  <div style="display:grid;grid-template-columns:minmax(180px,260px) 1fr;gap:8px">
+    <input id="coletaFotoOSV944" inputmode="numeric" autocomplete="off" placeholder="Digite ou bipe a O.S."
+      style="padding:11px;border:1px solid #91abc3;border-radius:9px;font-size:16px;font-weight:900">
+    <button onclick="abrirCameraColetaV944()"
+      style="border:0;border-radius:9px;background:#0046b8;color:white;font-weight:900;padding:10px 14px;cursor:pointer">
+      📷 Tirar foto
+    </button>
+  </div>
+  <input id="coletaFotoCameraV944" type="file" accept="image/*" capture="environment" style="display:none">
+  <div id="coletaFotoMsgV944" style="font-size:11px;font-weight:800;color:#60778d;margin-top:7px">
+    Primeiro informe a O.S.; depois tire a foto. Ela será enviada e a O.S. entrará automaticamente na coleta.
+  </div>
+</div>
+
+<div class="coleta-fotos-manual-v943">
+      <input id="coletaFotosOSManualV943" placeholder="Adicionar O.S. manualmente">
+      <button onclick="adicionarOSManualColetaFotosV943()">+ Adicionar O.S.</button>
+    </div>
+
+    <div id="coletaFotosListaV943">
+      <div class="admin-info">Inicie uma coleta para começar.</div>
+    </div>
+
+    <div class="coleta-fotos-historico-v943">
+      <h3>Últimas coletas finalizadas</h3>
+      <div id="coletaFotosHistoricoV943"></div>
+    </div>
+  </div>
+</div>
+
+
+<script id="erp-v943-coleta-fotos">
+(function(){
+"use strict";
+
+const KEY="ERP_COLETA_FOTOS_V943";
+const HIST_KEY="ERP_COLETA_FOTOS_HIST_V943";
+let fotoCacheV943={};
+
+function load(){
+  try{return JSON.parse(localStorage.getItem(KEY)||"null")}catch(_){return null}
+}
+function save(x){
+  try{localStorage.setItem(KEY,JSON.stringify(x))}catch(_){}
+}
+function histLoad(){
+  try{return JSON.parse(localStorage.getItem(HIST_KEY)||"[]")}catch(_){return []}
+}
+function histSave(x){
+  try{localStorage.setItem(HIST_KEY,JSON.stringify(x.slice(0,30)))}catch(_){}
+}
+function normOS(v){return String(v??"").trim().replace(/^ILR\s*/i,"").replace(/\.0$/,"").replace(/\s+/g,"")}
+function dados(){
+  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros))return intelRegistros}catch(_){}
+  try{if(Array.isArray(window.rexpedlrDados))return window.rexpedlrDados}catch(_){}
+  return [];
+}
+function regOS(os){
+  const n=normOS(os);
+  return dados().find(r=>normOS(r.os)===n)||null;
+}
+function fmt(dt){
+  try{return new Date(dt).toLocaleString("pt-BR")}catch(_){return "—"}
+}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function isAgPedido(r){
+  return String(r?.status??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[.\-_]+/g," ").replace(/\s+/g," ").trim()==="AG PEDIDO DE PECA";
+}
+
+async function fotosOSV947(os){
+  if(Array.isArray(fotoCacheV943[os]))return fotoCacheV943[os];
+  try{
+    const cfg=JSON.parse(localStorage.getItem("ERP_MIDIAS_OS_CONFIG_V1")||"{}");
+    const url=cfg.url||"https://sjututwxmjbhprvdhekl.supabase.co";
+    const key=cfg.key||"";
+    const bucket=cfg.bucket||"midias-os";
+    const tabela=cfg.tabela||"midias_os";
+    if(!window.supabase?.createClient)return [];
+
+    const s=window.supabase.createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
+    const {data,error}=await s.from(tabela)
+      .select("bucket,caminho_arquivo,nome_original,criado_em")
+      .eq("os",String(os))
+      .eq("origem","principal")
+      .eq("tipo_midia","imagem")
+      .order("criado_em",{ascending:false})
+      .limit(8);
+
+    if(error||!Array.isArray(data)){fotoCacheV943[os]=[];return []}
+
+    const fotos=[];
+    for(const r of data){
+      try{
+        const sig=await s.storage.from(r.bucket||bucket).createSignedUrl(r.caminho_arquivo,1800);
+        if(sig?.data?.signedUrl)fotos.push({url:sig.data.signedUrl,nome:r.nome_original||""});
+      }catch(_){}
+    }
+    fotoCacheV943[os]=fotos;
+    return fotos;
+  }catch(_){
+    fotoCacheV943[os]=[];
+    return [];
+  }
+}
+
+window.abrirColetaFotosV943=function(){
+  document.getElementById("coletaFotosModalV943")?.classList.add("aberto");
+  renderColetaFotosV943();
+};
+window.fecharColetaFotosV943=function(){
+  document.getElementById("coletaFotosModalV943")?.classList.remove("aberto");
+};
+
+window.iniciarColetaFotosV943=function(){
+  const atual=load();
+  if(atual?.ativa && atual.itens?.length){
+    if(!confirm("Já existe uma coleta ativa. Deseja continuar nela?"))return;
+    renderColetaFotosV943();return;
+  }
+  const nova={
+    id:Date.now().toString(36),
+    ativa:true,
+    inicio:new Date().toISOString(),
+    fim:null,
+    itens:[]
+  };
+  save(nova);
+  renderColetaFotosV943();
+};
+
+window.registrarOSNaColetaFotosV943=function(os,qtdFotos=1){
+  const c=load();
+  if(!c?.ativa)return false;
+  const n=normOS(os);
+  if(!n)return false;
+  let item=(c.itens||[]).find(x=>x.os===n);
+  if(!item){
+    const base=regOS(n)||{};
+    item={
+      os:n,
+      primeiroRegistro:new Date().toISOString(),
+      ultimoRegistro:new Date().toISOString(),
+      fotos:0,
+      loja:String(base.pdv??base.loja??base.loja_origem??""),
+      deprec:String(base.depreciacao??base.deprec??""),
+      acessorio:String(base.acessorio??base.acessorios??base.obs_acessorio??"")
+    };
+    c.itens.push(item);
+  }
+  item.fotos=Number(item.fotos||0)+Number(qtdFotos||1);
+  item.ultimoRegistro=new Date().toISOString();
+  save(c);
+  delete fotoCacheV943[n];
+  if(document.getElementById("coletaFotosModalV943")?.classList.contains("aberto"))renderColetaFotosV943();
+  return true;
+};
+
+window.adicionarOSManualColetaFotosV943=function(){
+  const inp=document.getElementById("coletaFotosOSManualV943");
+  const os=normOS(inp?.value);
+  if(!os)return;
+  let c=load();
+  if(!c?.ativa){
+    alert("Inicie uma coleta primeiro.");
+    return;
+  }
+  if(!c.itens.find(x=>x.os===os)){
+    const base=regOS(os)||{};
+    c.itens.push({
+      os,
+      primeiroRegistro:new Date().toISOString(),
+      ultimoRegistro:new Date().toISOString(),
+      fotos:0,
+      loja:String(base.pdv??base.loja??base.loja_origem??""),
+      deprec:String(base.depreciacao??base.deprec??""),
+      acessorio:String(base.acessorio??base.acessorios??base.obs_acessorio??"")
+    });
+    save(c);
+  }
+  if(inp)inp.value="";
+  renderColetaFotosV943();
+};
+
+window.removerOSColetaFotosV943=function(os){
+  const c=load();if(!c)return;
+  c.itens=(c.itens||[]).filter(x=>x.os!==String(os));
+  save(c);renderColetaFotosV943();
+};
+
+window.finalizarColetaFotosV943=function(){
+  const c=load();
+  if(!c?.ativa){alert("Não há coleta ativa.");return}
+  if(!confirm(`Finalizar coleta com ${(c.itens||[]).length} O.S.?`))return;
+  c.ativa=false;c.fim=new Date().toISOString();
+  const hist=histLoad();
+  hist.unshift(c);
+  histSave(hist);
+  localStorage.removeItem(KEY);
+  renderColetaFotosV943();
+};
+
+async function renderColetaFotosV943(){
+  const c=load();
+  const st=document.getElementById("coletaFotosStatusV943");
+  const lista=document.getElementById("coletaFotosListaV943");
+  const itens=c?.itens||[];
+  const enriched=itens.map(x=>({item:x,r:regOS(x.os)}));
+
+  if(st){
+    st.textContent=c?.ativa?"Coleta ativa":"Nenhuma coleta ativa";
+    st.classList.toggle("ativa",!!c?.ativa);
+  }
+  document.getElementById("coletaFotosQtdOSV943").textContent=itens.length.toLocaleString("pt-BR");
+  document.getElementById("coletaFotosQtdFotosV943").textContent=itens.reduce((s,x)=>s+Number(x.fotos||0),0).toLocaleString("pt-BR");
+  document.getElementById("coletaFotosQtdAgPedidoV943").textContent=enriched.filter(x=>isAgPedido(x.r)).length.toLocaleString("pt-BR");
+  document.getElementById("coletaFotosInicioV943").textContent=c?.inicio?new Date(c.inicio).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}):"—";
+
+  if(!lista)return;
+  if(!c?.ativa){
+    lista.innerHTML='<div class="admin-info">Nenhuma coleta ativa. Clique em <b>Iniciar coleta</b>.</div>';
+  }else if(!itens.length){
+    lista.innerHTML='<div class="admin-info">Coleta iniciada. As O.S. aparecerão aqui automaticamente conforme as fotos forem enviadas.</div>';
+  }else{
+    lista.innerHTML=enriched.map(({item,r})=>`
+      <article class="coleta-fotos-item-v943" data-os="${esc(item.os)}">
+        <div class="coleta-fotos-info-v945">
+          <div class="coleta-fotos-os-v945">O.S: ${esc(item.os)}</div>
+
+          <div class="coleta-fotos-edit-v946">
+            <label>LOJA:</label>
+            <input
+              value="${esc(item.loja ?? r?.pdv ?? r?.loja ?? r?.loja_origem ?? "")}"
+              oninput="editarCampoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}','loja',this.value)"
+              onblur="mostrarSalvoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}')"
+              placeholder="Informe a loja">
+          </div>
+
+          <div class="coleta-fotos-edit-v946">
+            <label>DEPREC.:</label>
+            <input
+              value="${esc(item.deprec ?? r?.depreciacao ?? r?.deprec ?? "")}"
+              oninput="editarCampoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}','deprec',this.value)"
+              onblur="mostrarSalvoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}')"
+              placeholder="Informe a depreciação">
+          </div>
+
+          <div class="coleta-fotos-edit-v946">
+            <label>ACESSÓRIO:</label>
+            <input
+              value="${esc(item.acessorio ?? r?.acessorio ?? r?.acessorios ?? r?.obs_acessorio ?? "")}"
+              oninput="editarCampoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}','acessorio',this.value)"
+              onblur="mostrarSalvoColetaFotosV946('${String(item.os).replace(/'/g,"\\'")}')"
+              placeholder="Informe o acessório">
+          </div>
+
+          <div id="coletaFotosSalvo_${esc(item.os)}" class="coleta-fotos-salvo-v946"></div>
+        </div>
+        <div class="coleta-fotos-foto-col-v945">
+          <div id="coletaFotoThumb_${esc(item.os)}" class="coleta-fotos-sem-thumb-v943">Carregando<br>foto...</div>
+          <div id="coletaFotoGaleria_${esc(item.os)}" class="coleta-fotos-galeria-v947"></div>
+          <div id="coletaFotoContagem_${esc(item.os)}" class="coleta-fotos-contagem-v947"></div>
+          <button class="coleta-fotos-add-v945" onclick="prepararNovaFotoColetaV945('${String(item.os).replace(/'/g,"\\'")}')">📷 ADD FOTO</button>
+        </div>
+        <div class="coleta-fotos-item-acoes-v943">
+          <button onclick="abrirOSIntel('${String(item.os).replace(/'/g,"\\'")}')">Abrir O.S.</button>
+          <button onclick="abrirMidiasOS?.('${String(item.os).replace(/'/g,"\\'")}')">Mídias</button>
+          <button onclick="removerOSColetaFotosV943('${String(item.os).replace(/'/g,"\\'")}')">Remover</button>
+        </div>
+      </article>`).join("");
+
+    // Fotos carregadas somente para itens visíveis da coleta
+    for(const item of itens.slice(0,60)){
+      fotosOSV947(item.os).then(fotos=>{
+        const host=document.getElementById("coletaFotoThumb_"+item.os);
+        const gal=document.getElementById("coletaFotoGaleria_"+item.os);
+        const cont=document.getElementById("coletaFotoContagem_"+item.os);
+        if(!host)return;
+
+        if(!fotos.length){
+          host.className="coleta-fotos-sem-thumb-v943";
+          host.innerHTML="Sem foto<br>disponível";
+          if(gal)gal.innerHTML="";
+          if(cont)cont.textContent="0 fotos";
+          return;
+        }
+
+        host.outerHTML=`<img id="coletaFotoThumb_${esc(item.os)}" class="coleta-fotos-thumb-v943" src="${esc(fotos[0].url)}" alt="Foto O.S. ${esc(item.os)}">`;
+
+        if(gal){
+          gal.innerHTML=fotos.map((f,i)=>`
+            <img class="coleta-fotos-mini-v947 ${i===0?"ativa":""}"
+              src="${esc(f.url)}"
+              title="${esc(f.nome||"Foto")}"
+              onclick="trocarFotoColetaV947('${String(item.os).replace(/'/g,"\\'")}',this)">
+          `).join("");
+        }
+
+        if(cont)cont.textContent=`${fotos.length} foto(s) cadastrada(s)`;
+      });
+    }
+  }
+
+  const h=document.getElementById("coletaFotosHistoricoV943");
+  if(h){
+    const hist=histLoad().slice(0,8);
+    h.innerHTML=hist.length?hist.map(x=>`
+      <div class="coleta-fotos-hist-item-v943">
+        <span><b>${(x.itens||[]).length} O.S.</b> • ${(x.itens||[]).reduce((s,i)=>s+Number(i.fotos||0),0)} fotos</span>
+        <span>${esc(fmt(x.inicio))} → ${esc(fmt(x.fim))}</span>
+      </div>`).join(""):'<div class="admin-info">Nenhuma coleta finalizada ainda.</div>';
+  }
+}
+
+/* botão fixo ao lado do upload de fotos no menu */
+document.addEventListener("DOMContentLoaded",()=>{
+  const menuFotos=document.getElementById("menuFotosLoteV932");
+  if(menuFotos && !document.getElementById("menuColetaFotosV943")){
+    const m=document.createElement("div");
+    m.className="menu";
+    m.id="menuColetaFotosV943";
+    m.dataset.menu="coleta-fotos";
+    m.textContent="📸 COLETA DE FOTOS";
+    m.onclick=window.abrirColetaFotosV943;
+    menuFotos.insertAdjacentElement("afterend",m);
+  }
+  renderColetaFotosV943();
+});
+
+
+let coletaFotoClienteV944=null;
+function coletaFotoCfgV944(){
+  try{
+    return {
+      url:"https://sjututwxmjbhprvdhekl.supabase.co",
+      key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8",
+      bucket:"midias-os",tabela:"midias_os",
+      ...JSON.parse(localStorage.getItem("ERP_MIDIAS_OS_CONFIG_V1")||"{}")
+    };
+  }catch(_){return {}}
+}
+function coletaFotoClienteV944Fn(){
+  if(coletaFotoClienteV944)return coletaFotoClienteV944;
+  const c=coletaFotoCfgV944();
+  coletaFotoClienteV944=window.supabase.createClient(c.url,c.key,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return coletaFotoClienteV944;
+}
+window.abrirCameraColetaV944=function(){
+  const c=load();
+  if(!c?.ativa){alert("Inicie a coleta primeiro.");return}
+  const os=normOS(document.getElementById("coletaFotoOSV944")?.value);
+  if(!os){alert("Digite ou bipe o número da O.S. antes de tirar a foto.");return}
+  document.getElementById("coletaFotoCameraV944")?.click();
+};
+async function enviarFotoColetaV944(file,os){
+  const c=coletaFotoCfgV944(),s=coletaFotoClienteV944Fn();
+  const ext=(String(file.name||"foto.jpg").split(".").pop()||"jpg").toLowerCase();
+  const nome=`${os}-${Date.now()}.${ext}`;
+  const caminho=`principal/${os}/${crypto.randomUUID?.()||Date.now()}-${nome}`;
+  const up=await s.storage.from(c.bucket).upload(caminho,file,{
+    contentType:file.type||"image/jpeg",cacheControl:"3600",upsert:false
+  });
+  if(up.error)throw up.error;
+  const payload={
+    os:String(os),origem:"principal",tipo_midia:"imagem",categoria:"Outros",
+    descricao:"Foto tirada durante coleta",bucket:c.bucket,caminho_arquivo:caminho,
+    nome_original:`${os}.${ext}`,nome_armazenado:nome,tipo_arquivo:file.type||"image/jpeg",
+    extensao:ext,tamanho_original_bytes:file.size,tamanho_bytes:file.size,
+    usuario_nome:window.usuarioLogado?.nome||window.usuarioAtual?.nome||null,
+    usuario_id:window.usuarioLogado?.id||window.usuarioAtual?.id||null
+  };
+  const ins=await s.from(c.tabela).insert(payload);
+  if(ins.error){
+    await s.storage.from(c.bucket).remove([caminho]);
+    throw ins.error;
+  }
+}
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("coletaFotoCameraV944")?.addEventListener("change",async e=>{
+    const file=e.target.files?.[0]; if(!file)return;
+    const os=normOS(document.getElementById("coletaFotoOSV944")?.value);
+    const msg=document.getElementById("coletaFotoMsgV944");
+    if(!os){msg.textContent="Informe a O.S. antes da foto.";e.target.value="";return}
+    try{
+      msg.style.color="#0046b8";msg.textContent=`Enviando foto para a O.S. ${os}...`;
+      await enviarFotoColetaV944(file,os);
+      window.registrarOSNaColetaFotosV943?.(os,1);
+      delete fotoCacheV943[os];
+      msg.style.color="#0b7a2a";msg.textContent=`✓ Foto salva na O.S. ${os}. Pronto para a próxima.`;
+      const inp=document.getElementById("coletaFotoOSV944");
+      if(inp){inp.value="";inp.focus()}
+      e.target.value="";
+      renderColetaFotosV943();
+    }catch(err){
+      console.error("[COLETA FOTO]",err);
+      msg.style.color="#b00020";msg.textContent="Erro ao enviar foto: "+(err?.message||err);
+      e.target.value="";
+    }
+  });
+});
+
+window.prepararNovaFotoColetaV945=function(os){
+  const campo=document.getElementById("coletaFotoOSV944");
+  if(campo)campo.value=String(os||"");
+  window.abrirCameraColetaV944?.();
+};
+
+window.editarCampoColetaFotosV946=function(os,campo,valor){
+  const permitidos=new Set(["loja","deprec","acessorio"]);
+  if(!permitidos.has(campo))return;
+
+  const c=load();
+  if(!c?.ativa)return;
+
+  const item=(c.itens||[]).find(x=>String(x.os)===String(os));
+  if(!item)return;
+
+  item[campo]=String(valor??"");
+  item.ultimoRegistro=new Date().toISOString();
+  save(c);
+};
+
+window.mostrarSalvoColetaFotosV946=function(os){
+  const el=document.getElementById("coletaFotosSalvo_"+os);
+  if(!el)return;
+  el.textContent="✓ Informações salvas";
+  clearTimeout(el.__timerV946);
+  el.__timerV946=setTimeout(()=>{el.textContent=""},1400);
+};
+
+
+window.trocarFotoColetaV947=function(os,thumb){
+  const main=document.getElementById("coletaFotoThumb_"+os);
+  if(main&&thumb?.src)main.src=thumb.src;
+  thumb?.parentElement?.querySelectorAll(".coleta-fotos-mini-v947").forEach(x=>x.classList.remove("ativa"));
+  thumb?.classList.add("ativa");
+};
+
+console.info("ERP V9.4.7: múltiplas fotos por O.S. com galeria na coleta.");
+
+
+
+
 })();
 </script>
 
