@@ -20042,7 +20042,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.3</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.4</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20654,7 +20654,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.3",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.4",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22278,7 +22278,7 @@ function telaVisivelV910(id){
     return !!(el&&el.isConnected&&getComputedStyle(el).display!=="none");
 }
 function limparOcultosV910(){
-    if(window.erpHomeCardInteractionV933?.())return;
+    if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV934?.())return;
     // Modal da Inteligência fechado
     const modal=document.getElementById("intelModal");
     if(modal&&getComputedStyle(modal).display==="none"){
@@ -22437,7 +22437,7 @@ function limparChatFechado(){
   }
 }
 function cleanup(){
-  if(window.erpHomeCardInteractionV933?.())return;
+  if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV934?.())return;
   limparHistoricosOcultos();limparChatFechado();
   if(!visivel("telaInteligencia"))limparRelacoesIntel();
   if(!visivel("telaRelatorios"))limpar("relatorioTabela","");
@@ -23557,6 +23557,99 @@ if(modalIntel){
 });
 
 console.info("ERP V9.3.3: cartões da Home protegidos contra fechamento automático.");
+})();
+</script>
+
+
+<script id="erp-v934-fix-botao-abrir">
+(function(){
+"use strict";
+
+let abrindoOSV934=false;
+let timerV934=null;
+
+function marcarAberturaOSV934(){
+  abrindoOSV934=true;
+  clearTimeout(timerV934);
+  timerV934=setTimeout(()=>{abrindoOSV934=false},1200);
+}
+window.erpAbrindoOSV934=function(){return abrindoOSV934};
+
+/* O clique em "Abrir" dentro das relações também precisa ser protegido
+   contra os limpadores globais do Zero Relation DOM. */
+document.addEventListener("pointerdown",function(e){
+  const alvo=e.target.closest?.(
+    '#intelModal button,'+
+    '#intelModal [onclick*="abrirOSIntel"],'+
+    '[onclick*="abrirOSIntel"],'+
+    '[onclick*="abrirFicha"],'+
+    '[onclick*="abrirDossie"],'+
+    '[onclick*="abrirMidiasOS"]'
+  );
+  if(alvo)marcarAberturaOSV934();
+},true);
+
+document.addEventListener("click",function(e){
+  const alvo=e.target.closest?.(
+    '#intelModal button,'+
+    '#intelModal [onclick*="abrirOSIntel"],'+
+    '[onclick*="abrirOSIntel"],'+
+    '[onclick*="abrirFicha"],'+
+    '[onclick*="abrirDossie"],'+
+    '[onclick*="abrirMidiasOS"]'
+  );
+  if(alvo)marcarAberturaOSV934();
+},true);
+
+/* Wrappers defensivos das funções que abrem O.S./Dossiê */
+[
+  "abrirOSIntel",
+  "abrirFichaOS",
+  "abrirDossieOS",
+  "abrirMidiasOS",
+  "abrirFotosOS"
+].forEach(nome=>{
+  const base=window[nome];
+  if(typeof base!=="function"||base.__v934)return;
+
+  const fn=function(){
+    marcarAberturaOSV934();
+    const r=base.apply(this,arguments);
+
+    /* Reforça a abertura depois que os cleanups assíncronos terminarem */
+    setTimeout(()=>{
+      if(!abrindoOSV934)return;
+
+      const candidatos=[
+        document.getElementById("fotososModal"),
+        document.getElementById("fotosos-modal"),
+        document.getElementById("modalDossieOS"),
+        document.getElementById("dossieModal"),
+        document.querySelector(".fotosos-modal"),
+        document.querySelector(".dossie-modal")
+      ].filter(Boolean);
+
+      candidatos.forEach(modal=>{
+        if(modal){
+          modal.style.display="flex";
+          modal.classList.add("aberto");
+        }
+      });
+    },150);
+
+    return r;
+  };
+  fn.__v934=true;
+  window[nome]=fn;
+});
+
+/* Protege também contra o cleanup da Home */
+const oldHomeFlag=window.erpHomeCardInteractionV933;
+window.erpHomeCardInteractionV933=function(){
+  return !!(oldHomeFlag?.() || abrindoOSV934);
+};
+
+console.info("ERP V9.3.4: botão Abrir protegido contra fechamento automático.");
 })();
 </script>
 
