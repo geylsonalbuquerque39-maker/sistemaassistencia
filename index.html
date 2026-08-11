@@ -5030,6 +5030,138 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
 #clientesImportadores .clientes-import-actions .v2-btn{pointer-events:auto!important;cursor:pointer!important}
 </style>
 <!-- V9.2.3: remove cards Sem técnico / O.S. sem técnico / Oficina +20 dias -->
+
+<style id="erp-v937-ag-pedido-fotos-style">
+.agpedido-layout-v937{
+  display:flex;flex-direction:column;gap:12px;
+}
+.agpedido-item-v937{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 330px;
+  gap:16px;
+  align-items:center;
+  padding:14px;
+  border:1px solid #d8e2ec;
+  border-radius:14px;
+  background:#fff;
+  box-shadow:0 3px 12px rgba(0,35,75,.06);
+}
+.agpedido-info-v937{
+  min-width:0;
+}
+.agpedido-os-v937{
+  font-size:24px;
+  font-weight:900;
+  color:#003c7a;
+  margin-bottom:5px;
+}
+.agpedido-desc-v937{
+  font-size:15px;
+  font-weight:800;
+  color:#173a5c;
+  line-height:1.35;
+  margin-bottom:10px;
+}
+.agpedido-meta-v937{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+.agpedido-chip-v937{
+  background:#eef5fb;
+  color:#49657e;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:10px;
+  font-weight:800;
+}
+.agpedido-actions-v937{
+  display:flex;
+  gap:8px;
+  margin-top:11px;
+  flex-wrap:wrap;
+}
+.agpedido-actions-v937 button{
+  border:0;
+  border-radius:8px;
+  padding:7px 11px;
+  font-weight:800;
+  cursor:pointer;
+}
+.agpedido-foto-box-v937{
+  min-height:190px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f0f4f8;
+  border:1px solid #d5dfe9;
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+}
+.agpedido-foto-v937{
+  width:100%;
+  height:205px;
+  object-fit:contain;
+  background:#eef2f6;
+  cursor:pointer;
+}
+.agpedido-sem-foto-v937{
+  color:#7a8fa4;
+  font-size:13px;
+  font-weight:800;
+  text-align:center;
+  padding:18px;
+}
+.agpedido-foto-qtd-v937{
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  background:rgba(0,27,61,.82);
+  color:#fff;
+  border-radius:999px;
+  padding:5px 8px;
+  font-size:10px;
+  font-weight:900;
+}
+.agpedido-thumbs-v937{
+  display:flex;
+  gap:6px;
+  margin-top:6px;
+  overflow:auto;
+  padding-bottom:2px;
+}
+.agpedido-thumb-v937{
+  width:58px;
+  height:44px;
+  object-fit:cover;
+  border:2px solid transparent;
+  border-radius:7px;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+.agpedido-thumb-v937.ativo{
+  border-color:#0046b8;
+}
+.agpedido-loading-v937{
+  color:#6a8095;
+  font-size:12px;
+  font-weight:800;
+}
+@media(max-width:900px){
+  .agpedido-item-v937{grid-template-columns:1fr}
+}
+body.dark-mode .agpedido-item-v937{
+  background:#102b49;
+  border-color:#315a80;
+}
+body.dark-mode .agpedido-os-v937,
+body.dark-mode .agpedido-desc-v937{color:#e9f3ff}
+body.dark-mode .agpedido-chip-v937{
+  background:#173957;color:#d5e8fb
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -20042,7 +20174,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.4</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.7</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20654,7 +20786,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.4",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.7",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -22278,7 +22410,7 @@ function telaVisivelV910(id){
     return !!(el&&el.isConnected&&getComputedStyle(el).display!=="none");
 }
 function limparOcultosV910(){
-    if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV934?.())return;
+    if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV935?.())return;
     // Modal da Inteligência fechado
     const modal=document.getElementById("intelModal");
     if(modal&&getComputedStyle(modal).display==="none"){
@@ -22437,7 +22569,7 @@ function limparChatFechado(){
   }
 }
 function cleanup(){
-  if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV934?.())return;
+  if(window.erpHomeCardInteractionV933?.() || window.erpAbrindoOSV935?.())return;
   limparHistoricosOcultos();limparChatFechado();
   if(!visivel("telaInteligencia"))limparRelacoesIntel();
   if(!visivel("telaRelatorios"))limpar("relatorioTabela","");
@@ -22622,12 +22754,25 @@ console.info("ERP V9.2.2: cartão Endereçados S/ CPP fixo no HTML.");
 <script id="erp-v924-ag-pedido-pecas">
 (function(){
 "use strict";
-const PAGE=100;
+
+const PAGE=20;
+const MIDIA_CFG_KEY="ERP_MIDIAS_OS_CONFIG_V1";
+const MIDIA_PADRAO={
+  url:"https://sjututwxmjbhprvdhekl.supabase.co",
+  key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8",
+  bucket:"midias-os",
+  tabela:"midias_os"
+};
+
 let listaV924=[];
 let paginaV924=0;
+let midiaClienteV937=null;
+let fotosPaginaV937={};
 
 function esc(v){
-  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
 }
 function norm(v){
   return String(v??"").trim().toLocaleLowerCase("pt-BR")
@@ -22637,25 +22782,17 @@ function norm(v){
 }
 function registros(){
   try{
-    if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros) && intelRegistros.length)
+    if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros)&&intelRegistros.length)
       return intelRegistros;
   }catch(_){}
   try{
-    if(Array.isArray(window.rexpedlrDados) && window.rexpedlrDados.length)
+    if(Array.isArray(window.rexpedlrDados)&&window.rexpedlrDados.length)
       return window.rexpedlrDados;
-  }catch(_){}
-  try{
-    if(Array.isArray(window.dadosRexpedlr) && window.dadosRexpedlr.length)
-      return window.dadosRexpedlr;
   }catch(_){}
   return [];
 }
-function ehAgPedido(r){
-  const s=norm(r?.status);
-  return s==="ag pedido de peca";
-}
 function obterLista(){
-  return registros().filter(ehAgPedido);
+  return registros().filter(r=>norm(r?.status)==="ag pedido de peca");
 }
 function atualizar(){
   const lista=obterLista();
@@ -22664,6 +22801,68 @@ function atualizar(){
   return lista.length;
 }
 window.atualizarAgPedidoPecaV928=atualizar;
+
+function midiaCfg(){
+  try{return {...MIDIA_PADRAO,...JSON.parse(localStorage.getItem(MIDIA_CFG_KEY)||"{}")}}
+  catch(_){return {...MIDIA_PADRAO}}
+}
+function midiaCliente(){
+  if(midiaClienteV937)return midiaClienteV937;
+  if(!window.supabase?.createClient)return null;
+  const c=midiaCfg();
+  midiaClienteV937=window.supabase.createClient(c.url,c.key,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return midiaClienteV937;
+}
+
+async function carregarFotosPagina(registrosPagina){
+  fotosPaginaV937={};
+  const osList=[...new Set(registrosPagina.map(r=>String(r.os||"").trim()).filter(Boolean))];
+  if(!osList.length)return;
+
+  const s=midiaCliente(),c=midiaCfg();
+  if(!s)return;
+
+  let q=s.from(c.tabela)
+    .select("id,os,bucket,caminho_arquivo,nome_original,criado_em")
+    .in("os",osList)
+    .eq("origem","principal")
+    .eq("tipo_midia","imagem")
+    .order("criado_em",{ascending:false});
+
+  // compatível com tabela que tenha excluido_em
+  try{q=q.is("excluido_em",null)}catch(_){}
+
+  const {data,error}=await q;
+  if(error){
+    console.warn("[AG PEDIDO FOTOS] Falha ao consultar mídias:",error.message);
+    return;
+  }
+
+  const grupos={};
+  (data||[]).forEach(r=>{
+    const os=String(r.os||"").trim();
+    if(!grupos[os])grupos[os]=[];
+    if(grupos[os].length<4)grupos[os].push(r);
+  });
+
+  for(const [os,arr] of Object.entries(grupos)){
+    const resolvidas=[];
+    for(const r of arr){
+      try{
+        const {data:sig,error:sigErr}=await s.storage
+          .from(r.bucket||c.bucket)
+          .createSignedUrl(r.caminho_arquivo,3600);
+        if(!sigErr&&sig?.signedUrl){
+          resolvidas.push({...r,url:sig.signedUrl});
+        }
+      }catch(_){}
+    }
+    fotosPaginaV937[os]=resolvidas;
+  }
+}
+
 function pager(){
   const total=listaV924.length,pags=Math.max(1,Math.ceil(total/PAGE));
   paginaV924=Math.max(0,Math.min(pags-1,paginaV924));
@@ -22674,32 +22873,121 @@ function pager(){
     <button ${paginaV924>=pags-1?"disabled":""} onclick="mudarPaginaAgPedidoPecasV924(1)">Próxima ›</button>
   </div>`;
 }
-function render(){
+
+function blocoFoto(r){
+  const os=String(r.os||"").trim();
+  const fotos=fotosPaginaV937[os]||[];
+  if(!fotos.length){
+    return `<div>
+      <div class="agpedido-foto-box-v937">
+        <div class="agpedido-sem-foto-v937">📷<br>Sem foto cadastrada</div>
+      </div>
+    </div>`;
+  }
+
+  const main=fotos[0];
+  const thumbs=fotos.map((f,i)=>`
+    <img class="agpedido-thumb-v937 ${i===0?"ativo":""}"
+      src="${esc(f.url)}"
+      alt="${esc(f.nome_original||"Foto")}"
+      onclick="trocarFotoAgPedidoV937('${esc(os)}',${i},this)">`
+  ).join("");
+
+  return `<div>
+    <div class="agpedido-foto-box-v937">
+      <img id="agPedidoFotoMain_${esc(os)}"
+        class="agpedido-foto-v937"
+        src="${esc(main.url)}"
+        alt="${esc(main.nome_original||"Foto da O.S.")}"
+        onclick="abrirImagemAgPedidoV937(this.src)">
+      ${fotos.length>1?`<span class="agpedido-foto-qtd-v937">${fotos.length} fotos</span>`:""}
+    </div>
+    ${fotos.length>1?`<div class="agpedido-thumbs-v937">${thumbs}</div>`:""}
+  </div>`;
+}
+
+function montarLinha(r){
+  return `<article class="agpedido-item-v937">
+    <div class="agpedido-info-v937">
+      <div class="agpedido-os-v937">O.S. ${esc(r.os||"-")}</div>
+      <div class="agpedido-desc-v937">${esc(r.desc_produto||"Sem descrição")}</div>
+      <div class="agpedido-meta-v937">
+        <span class="agpedido-chip-v937">GR: ${esc(r.grupo||"-")}</span>
+        <span class="agpedido-chip-v937">N.C.E.: ${esc(r.nce||"-")}</span>
+        <span class="agpedido-chip-v937">Rack: ${esc(r.rack||"-")}</span>
+        <span class="agpedido-chip-v937">Técnico: ${esc(r.tecnico||"-")}</span>
+        <span class="agpedido-chip-v937">PDV: ${esc(r.pdv||"-")}</span>
+      </div>
+      <div class="agpedido-actions-v937">
+        <button onclick="abrirOSIntel('${String(r.os||"").replace(/'/g,"\\'")}')">Abrir O.S.</button>
+        <button onclick="abrirMidiasOS?.('${String(r.os||"").replace(/'/g,"\\'")}')">Mídias</button>
+      </div>
+    </div>
+    ${blocoFoto(r)}
+  </article>`;
+}
+
+async function render(){
   const modal=document.getElementById("intelModal");
   const titulo=document.getElementById("intelModalTitulo");
   const area=document.getElementById("intelModalConteudo");
   if(!modal||!titulo||!area)return;
 
-  const total=listaV924.length,ini=paginaV924*PAGE,pag=listaV924.slice(ini,ini+PAGE);
+  const total=listaV924.length;
+  const ini=paginaV924*PAGE;
+  const pag=listaV924.slice(ini,ini+PAGE);
+
   titulo.textContent="AG. PEDIDO DE PECA ("+total.toLocaleString("pt-BR")+")";
+  modal.style.display="flex";
 
   if(!total){
     area.innerHTML='<div class="admin-info">Nenhuma O.S. com status AG. PEDIDO DE PECA.</div>';
-  }else{
-    const nav=pager();
-    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: somente 100 O.S. por página.</div>'+nav+
-      "<div class='intel-list'>"+
-      pag.map(r=>"<div class='intel-row'><b>"+esc(r.os||"-")+"</b><span>"+
-        esc(r.desc_produto||"")+"<br><small>GR: "+esc(r.grupo||"-")+" • N.C.E.: "+esc(r.nce||"-")+
-        " • Rack: "+esc(r.rack||"-")+" • Status: "+esc(r.status||"-")+
-        "</small></span><span>"+esc(r.tecnico||"Sem técnico")+
-        "</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>"
-      ).join("")+"</div>"+nav;
+    return;
   }
-  modal.style.display="flex";
+
+  const nav=pager();
+  area.innerHTML=
+    '<div class="erp-zero-info-v920">Layout visual: 20 O.S. por página, com fotos carregadas somente nesta relação.</div>'+
+    nav+
+    '<div id="agPedidoLayoutV937" class="agpedido-layout-v937">'+
+      pag.map(r=>`<article class="agpedido-item-v937"><div class="agpedido-info-v937"><div class="agpedido-os-v937">O.S. ${esc(r.os||"-")}</div><div class="agpedido-desc-v937">${esc(r.desc_produto||"Sem descrição")}</div></div><div class="agpedido-foto-box-v937"><span class="agpedido-loading-v937">Carregando foto...</span></div></article>`).join("")+
+    '</div>'+
+    nav;
+
+  await carregarFotosPagina(pag);
+
+  const host=document.getElementById("agPedidoLayoutV937");
+  if(host)host.innerHTML=pag.map(montarLinha).join("");
 }
-window.abrirAgPedidoPecasV924=function(){listaV924=obterLista();atualizar();paginaV924=0;render()};
-window.mudarPaginaAgPedidoPecasV924=function(delta){paginaV924+=Number(delta||0);render()};
+
+window.trocarFotoAgPedidoV937=function(os,idx,thumb){
+  const fotos=fotosPaginaV937[String(os)]||[];
+  const f=fotos[idx];
+  const main=document.getElementById("agPedidoFotoMain_"+os);
+  if(main&&f)main.src=f.url;
+  thumb?.parentElement?.querySelectorAll(".agpedido-thumb-v937").forEach(x=>x.classList.remove("ativo"));
+  thumb?.classList.add("ativo");
+};
+
+window.abrirImagemAgPedidoV937=function(url){
+  if(!url)return;
+  const w=window.open("","_blank");
+  if(w){
+    w.document.write(`<html><head><title>Foto</title></head><body style="margin:0;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh"><img src="${String(url).replace(/"/g,"&quot;")}" style="max-width:96vw;max-height:96vh;object-fit:contain"></body></html>`);
+    w.document.close();
+  }
+};
+
+window.abrirAgPedidoPecasV924=function(){
+  listaV924=obterLista();
+  atualizar();
+  paginaV924=0;
+  render();
+};
+window.mudarPaginaAgPedidoPecasV924=function(delta){
+  paginaV924+=Number(delta||0);
+  render();
+};
 window.exportarAgPedidoPecasV924=function(){
   const lista=obterLista();
   if(!lista.length){alert("Não há O.S. com status AG. PEDIDO DE PECA para exportar.");return}
@@ -22718,48 +23006,26 @@ const abrirBase=window.abrirInteligencia;
 if(typeof abrirBase==="function"){
   window.abrirInteligencia=function(){
     const r=abrirBase.apply(this,arguments);
-
-    // Atualiza imediatamente se a base já estiver em memória.
-    atualizar();
-
-    // Se a Inteligência ainda estiver carregando, espera a base ficar pronta.
-    // É uma espera curta e autodestrutiva, não um timer permanente.
-    let tentativas=0;
-    const espera=setInterval(()=>{
-      tentativas++;
-      const total=atualizar();
-      let basePronta=false;
-      try{
-        basePronta=typeof intelRegistros!=="undefined" &&
-                   Array.isArray(intelRegistros) &&
-                   intelRegistros.length>0;
-      }catch(_){}
-      if(basePronta || total>0 || tentativas>=20)clearInterval(espera);
-    },250);
-
+    setTimeout(atualizar,0);
     return r;
   };
 }
 
-window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
-ERP.Performance.agPedidoPecasAudit=function(){
-  const base=registros();
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.agPedidoFotosAudit=function(){
   const result={
-    totalBase:base.length,
-    quantidade:obterLista().length,
-    statusEncontrados:[...new Set(base.map(r=>String(r?.status??"").trim()).filter(Boolean))].sort(),
-    cartaoExiste:!!document.getElementById("intelAgPedidoPecasV924"),
-    linhasRenderizadas:document.querySelectorAll("#intelModalConteudo .intel-row").length,
+    total:obterLista().length,
+    pagina:paginaV924+1,
+    itensRenderizados:document.querySelectorAll(".agpedido-item-v937").length,
+    imagensRenderizadas:document.querySelectorAll(".agpedido-foto-v937").length,
     dom:document.getElementsByTagName("*").length
   };
-  console.info("[AG. PEDIDO DE PECA]",result);
+  console.info("[AG PEDIDO + FOTOS]",result);
   return result;
 };
 
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(atualizar,1000);
-});
-console.info("ERP V9.2.7: cartão AG. PEDIDO DE PECA corrigido.");
+console.info("ERP V9.3.7: layout AG. PEDIDO DE PECA com fotos grandes por O.S.");
 })();
 </script>
 
@@ -23238,7 +23504,7 @@ console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> AG. PEDIDO D
 #fotoLoteBoxV930 h3{margin:0 0 6px;color:#003c7a}#fotoLoteBoxV930 p{margin:0 0 14px;color:#53687e;font-size:13px}
 #fotoLoteArquivosV930{width:100%;padding:12px;border:1px solid #9fb4ca;border-radius:9px;background:#f8fbff}
 #fotoLoteResumoV930{margin-top:12px;font-size:13px;font-weight:800}#fotoLoteListaV930{margin-top:10px;border:1px solid #d8e1eb;border-radius:10px;max-height:280px;overflow:auto}
-.foto-lote-linha-v930{display:grid;grid-template-columns:1fr 120px 130px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf1f5;font-size:12px}
+.foto-lote-linha-v930{display:grid;grid-template-columns:1fr 105px 155px 145px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf1f5;font-size:12px}
 .foto-lote-ok-v930{color:#08752a;font-weight:800}.foto-lote-erro-v930{color:#b00020;font-weight:800}.foto-lote-espera-v930{color:#596b7d;font-weight:700}
 #fotoLoteAcoesV930{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}#fotoLoteAcoesV930 button{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}
 #btnEnviarFotosLoteV930{background:#0046b8;color:#fff}#btnEnviarFotosLoteV930:disabled{opacity:.55}
@@ -23261,7 +23527,7 @@ const CONFIG_PADRAO={
   tabela:"midias_os"
 };
 
-let itens=[],clienteMidias=null;
+let itens=[],clienteMidias=null,gruposOS={};
 
 function config(){
   try{return {...CONFIG_PADRAO,...JSON.parse(localStorage.getItem(CFG_KEY)||"{}")}}
@@ -23276,10 +23542,17 @@ function cliente(){
   });
   return clienteMidias;
 }
+
+/* 32879.jpg -> 32879
+   32879(1).jpg -> 32879
+   32879 (2).png -> 32879 */
 function osNome(n){
-  const base=String(n||"").replace(/\.[^.]+$/,"").replace(/^ILR[\s_-]*/i,"");
-  const m=base.match(/\d+/);
-  return m?m[0]:"";
+  const base=String(n||"")
+    .replace(/\.[^.]+$/,"")
+    .replace(/^ILR[\s_-]*/i,"")
+    .trim();
+  const m=base.match(/^(\d+)/);
+  return m?m[1]:"";
 }
 function ext(nome){
   const p=String(nome||"").split(".");
@@ -23289,13 +23562,12 @@ function nomeSeguro(nome){
   return String(nome||"")
     .replace(/\.[^.]+$/,"")
     .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-zA-Z0-9_-]+/g,"_")
-    .slice(0,70)||"foto";
+    .replace(/[^a-zA-Z0-9_()\-]+/g,"_")
+    .slice(0,90)||"foto";
 }
 function esc(v){
   return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
 }
-
 async function dimensoesImagem(file){
   try{
     const bmp=await createImageBitmap(file);
@@ -23305,9 +23577,55 @@ async function dimensoesImagem(file){
   }catch(_){return {largura:null,altura:null}}
 }
 
-async function enviarFoto(item){
+async function listarExistentes(os){
   const c=config(),s=cliente();
-  const file=item.file,os=item.os;
+  const {data,error}=await s
+    .from(c.tabela)
+    .select("id,os,bucket,caminho_arquivo,nome_original,tipo_midia,origem")
+    .eq("os",String(os))
+    .eq("origem","principal")
+    .eq("tipo_midia","imagem");
+  if(error)throw new Error("Consulta de mídias: "+error.message);
+  return Array.isArray(data)?data:[];
+}
+
+async function removerExistentes(os){
+  const c=config(),s=cliente();
+  const existentes=await listarExistentes(os);
+  if(!existentes.length)return 0;
+
+  const porBucket={};
+  existentes.forEach(x=>{
+    const b=x.bucket||c.bucket;
+    if(!porBucket[b])porBucket[b]=[];
+    if(x.caminho_arquivo)porBucket[b].push(x.caminho_arquivo);
+  });
+
+  for(const [bucket,paths] of Object.entries(porBucket)){
+    if(paths.length){
+      const {error}=await s.storage.from(bucket).remove(paths);
+      if(error)throw new Error("Erro ao remover foto anterior do Storage: "+error.message);
+    }
+  }
+
+  const ids=existentes.map(x=>x.id).filter(Boolean);
+  if(ids.length){
+    const {error}=await s.from(c.tabela).delete().in("id",ids);
+    if(error)throw new Error("Erro ao remover registro anterior: "+error.message);
+  }else{
+    const {error}=await s.from(c.tabela)
+      .delete()
+      .eq("os",String(os))
+      .eq("origem","principal")
+      .eq("tipo_midia","imagem");
+    if(error)throw new Error("Erro ao remover registro anterior: "+error.message);
+  }
+
+  return existentes.length;
+}
+
+async function enviarFoto(item){
+  const c=config(),s=cliente(),file=item.file,os=item.os;
   const uuid=crypto.randomUUID?.()||Date.now()+"-"+Math.random().toString(36).slice(2);
   const extensao=ext(file.name);
   const caminho=`principal/${os}/${uuid}-${nomeSeguro(file.name)}.${extensao}`;
@@ -23345,27 +23663,82 @@ async function enviarFoto(item){
     await s.storage.from(c.bucket).remove([caminho]);
     throw new Error("Banco midias_os: "+ins.error.message);
   }
-  return {caminho};
 }
+
+function agrupar(){
+  gruposOS={};
+  itens.forEach((x,i)=>{
+    if(!x.os)return;
+    if(!gruposOS[x.os])gruposOS[x.os]={os:x.os,indices:[],existentes:[],acao:"adicionar"};
+    gruposOS[x.os].indices.push(i);
+  });
+}
+
+async function verificarExistentes(){
+  agrupar();
+  const entries=Object.values(gruposOS);
+
+  for(const g of entries){
+    try{
+      g.existentes=await listarExistentes(g.os);
+    }catch(e){
+      g.erroConsulta=e?.message||String(e);
+      g.existentes=[];
+    }
+  }
+  render();
+}
+
+function seletorAcao(g){
+  if(!g.existentes?.length)return '<span class="foto-lote-ok-v930">Sem foto anterior</span>';
+  return `
+    <select id="fotoLoteAcaoOS_${esc(g.os)}" onchange="definirAcaoFotoOSV936('${esc(g.os)}',this.value)"
+      style="padding:5px;border:1px solid #9fb4ca;border-radius:7px;font-size:11px">
+      <option value="adicionar" ${g.acao==="adicionar"?"selected":""}>Adicionar mais</option>
+      <option value="substituir" ${g.acao==="substituir"?"selected":""}>Substituir anterior(es)</option>
+    </select>
+  `;
+}
+window.definirAcaoFotoOSV936=function(os,acao){
+  if(gruposOS[os])gruposOS[os].acao=acao==="substituir"?"substituir":"adicionar";
+};
 
 function render(){
   const lista=document.getElementById("fotoLoteListaV930");
   const resumo=document.getElementById("fotoLoteResumoV930");
   if(!lista||!resumo)return;
+
+  const validos=itens.filter(x=>x.os).length;
+  const osUnicas=Object.keys(gruposOS).length;
   resumo.textContent=itens.length
-    ?`${itens.length} foto(s) • ${itens.filter(x=>x.os).length} O.S. identificada(s)`
+    ? `${itens.length} foto(s) • ${validos} arquivo(s) identificados • ${osUnicas} O.S. única(s)`
     :"Nenhuma foto selecionada.";
 
-  lista.innerHTML=itens.map((x,i)=>`
-    <div class="foto-lote-linha-v930">
-      <span>${esc(x.file.name)}</span>
-      <b>${x.os?"O.S. "+esc(x.os):"Nome inválido"}</b>
-      <span id="fotoLoteEstadoV930_${i}" class="foto-lote-espera-v930">${esc(x.estado||"Aguardando")}</span>
-    </div>`).join("");
+  lista.innerHTML=itens.map((x,i)=>{
+    const g=x.os?gruposOS[x.os]:null;
+    const qtdMesmoOS=g?.indices?.length||0;
+    const existentes=g?.existentes?.length||0;
+    return `
+      <div class="foto-lote-linha-v930" style="grid-template-columns:1fr 105px 155px 145px">
+        <span>
+          ${esc(x.file.name)}
+          ${qtdMesmoOS>1?`<small style="display:block;color:#6f849a">${qtdMesmoOS} fotos novas para esta O.S.</small>`:""}
+        </span>
+        <b>${x.os?"O.S. "+esc(x.os):"Nome inválido"}</b>
+        <span>
+          ${x.os
+            ? (existentes
+                ? `<b style="color:#a86100">${existentes} foto(s) já existente(s)</b><br>${seletorAcao(g)}`
+                : seletorAcao(g))
+            : ""}
+        </span>
+        <span id="fotoLoteEstadoV930_${i}" class="foto-lote-espera-v930">${esc(x.estado||"Aguardando")}</span>
+      </div>`;
+  }).join("");
 }
 
 window.abrirFotosLoteV930=function(){
-  itens=[];
+  itens=[];gruposOS={};
   const f=document.getElementById("fotoLoteArquivosV930");
   if(f)f.value="";
   render();
@@ -23381,35 +23754,63 @@ window.enviarFotosLoteV930=async function(){
   if(btn)btn.disabled=true;
 
   let ok=0,er=0;
-  for(let i=0;i<itens.length;i++){
-    const item=itens[i],estado=document.getElementById("fotoLoteEstadoV930_"+i);
+  const grupos=Object.values(gruposOS);
 
-    if(!item.os){
-      er++;
-      item.estado="Nome inválido";
-      if(estado){estado.textContent=item.estado;estado.className="foto-lote-erro-v930"}
-      continue;
+  for(const g of grupos){
+    /* Se substituir, remove as fotos antigas UMA VEZ por O.S.
+       Depois envia todas as novas fotos daquele número.
+       Ex.: 32879.jpg + 32879(1).jpg -> ambas ficam na O.S. 32879. */
+    if(g.acao==="substituir" && g.existentes?.length){
+      try{
+        await removerExistentes(g.os);
+        g.existentes=[];
+      }catch(e){
+        g.indices.forEach(i=>{
+          const estado=document.getElementById("fotoLoteEstadoV930_"+i);
+          itens[i].estado="Erro";
+          itens[i].erro=e?.message||String(e);
+          er++;
+          if(estado){
+            estado.textContent="Erro ao substituir";
+            estado.className="foto-lote-erro-v930";
+            estado.title=itens[i].erro;
+          }
+        });
+        continue;
+      }
     }
 
-    try{
-      item.estado="Enviando...";
-      if(estado){estado.textContent=item.estado;estado.className="foto-lote-espera-v930"}
-      await enviarFoto(item);
-      ok++;
-      item.estado="Enviada ✓";
-      if(estado){estado.textContent=item.estado;estado.className="foto-lote-ok-v930"}
-    }catch(e){
-      er++;
-      item.estado="Erro";
-      item.erro=e?.message||String(e);
-      console.error("[FOTO LOTE] O.S.",item.os,item.erro,e);
-      if(estado){
-        estado.textContent="Erro — passe o mouse";
-        estado.className="foto-lote-erro-v930";
-        estado.title=item.erro;
+    for(const i of g.indices){
+      const item=itens[i],estado=document.getElementById("fotoLoteEstadoV930_"+i);
+      try{
+        item.estado="Enviando...";
+        if(estado){estado.textContent=item.estado;estado.className="foto-lote-espera-v930"}
+        await enviarFoto(item);
+        ok++;
+        item.estado="Enviada ✓";
+        if(estado){estado.textContent=item.estado;estado.className="foto-lote-ok-v930"}
+      }catch(e){
+        er++;
+        item.estado="Erro";
+        item.erro=e?.message||String(e);
+        console.error("[FOTO LOTE] O.S.",item.os,item.erro,e);
+        if(estado){
+          estado.textContent="Erro — passe o mouse";
+          estado.className="foto-lote-erro-v930";
+          estado.title=item.erro;
+        }
       }
     }
   }
+
+  /* arquivos sem O.S. */
+  itens.forEach((item,i)=>{
+    if(item.os)return;
+    const estado=document.getElementById("fotoLoteEstadoV930_"+i);
+    er++;
+    item.estado="Nome inválido";
+    if(estado){estado.textContent=item.estado;estado.className="foto-lote-erro-v930"}
+  });
 
   const resumo=document.getElementById("fotoLoteResumoV930");
   if(resumo)resumo.textContent=`Concluído: ${ok} enviada(s) • ${er} com erro`;
@@ -23420,22 +23821,38 @@ window.enviarFotosLoteV930=async function(){
 
 document.addEventListener("DOMContentLoaded",()=>{
   const f=document.getElementById("fotoLoteArquivosV930");
-  f?.addEventListener("change",()=>{
-    itens=[...(f.files||[])].map(file=>({file,os:osNome(file.name),estado:"Aguardando"}));
+  f?.addEventListener("change",async()=>{
+    itens=[...(f.files||[])].map(file=>({
+      file,
+      os:osNome(file.name),
+      estado:"Verificando..."
+    }));
+    agrupar();
+    render();
+    await verificarExistentes();
+    itens.forEach(x=>{if(x.estado==="Verificando...")x.estado="Aguardando"});
     render();
   });
 });
 
 window.ERP=window.ERP||{};
 ERP.Performance=ERP.Performance||{};
-ERP.Performance.fotoLoteConfig=function(){
-  const c=config();
-  const r={bucket:c.bucket,tabela:c.tabela,url:c.url,itens:itens.length};
-  console.info("[FOTO LOTE CONFIG]",r);
+ERP.Performance.fotoLoteAudit=function(){
+  const r={
+    arquivos:itens.length,
+    osUnicas:Object.keys(gruposOS).length,
+    grupos:Object.values(gruposOS).map(g=>({
+      os:g.os,
+      novas:g.indices.length,
+      existentes:g.existentes?.length||0,
+      acao:g.acao
+    }))
+  };
+  console.table(r.grupos);
   return r;
 };
 
-console.info("ERP V9.3.1: upload em lote usando exatamente bucket midias-os e tabela midias_os do Dossiê.");
+console.info("ERP V9.3.6: fotos duplicadas por O.S. com opção Adicionar mais ou Substituir.");
 })();
 </script>
 
@@ -23560,96 +23977,61 @@ console.info("ERP V9.3.3: cartões da Home protegidos contra fechamento automát
 })();
 </script>
 
-
-<script id="erp-v934-fix-botao-abrir">
+<script id="erp-v935-fix-abrir-os-correto">
 (function(){
 "use strict";
 
-let abrindoOSV934=false;
-let timerV934=null;
+let abrindoOSV935=false;
+let timerV935=null;
 
-function marcarAberturaOSV934(){
-  abrindoOSV934=true;
-  clearTimeout(timerV934);
-  timerV934=setTimeout(()=>{abrindoOSV934=false},1200);
+function marcarV935(){
+  abrindoOSV935=true;
+  clearTimeout(timerV935);
+  timerV935=setTimeout(()=>{abrindoOSV935=false},900);
 }
-window.erpAbrindoOSV934=function(){return abrindoOSV934};
+window.erpAbrindoOSV935=()=>abrindoOSV935;
 
-/* O clique em "Abrir" dentro das relações também precisa ser protegido
-   contra os limpadores globais do Zero Relation DOM. */
+/* Protege somente o clique que abre a ficha da O.S.
+   Não abre Dossiê, Mídias ou Fotos automaticamente. */
 document.addEventListener("pointerdown",function(e){
-  const alvo=e.target.closest?.(
-    '#intelModal button,'+
-    '#intelModal [onclick*="abrirOSIntel"],'+
-    '[onclick*="abrirOSIntel"],'+
-    '[onclick*="abrirFicha"],'+
-    '[onclick*="abrirDossie"],'+
-    '[onclick*="abrirMidiasOS"]'
-  );
-  if(alvo)marcarAberturaOSV934();
+  const alvo=e.target.closest?.('[onclick*="abrirOSIntel"]');
+  if(alvo)marcarV935();
 },true);
 
 document.addEventListener("click",function(e){
-  const alvo=e.target.closest?.(
-    '#intelModal button,'+
-    '#intelModal [onclick*="abrirOSIntel"],'+
-    '[onclick*="abrirOSIntel"],'+
-    '[onclick*="abrirFicha"],'+
-    '[onclick*="abrirDossie"],'+
-    '[onclick*="abrirMidiasOS"]'
-  );
-  if(alvo)marcarAberturaOSV934();
+  const alvo=e.target.closest?.('[onclick*="abrirOSIntel"]');
+  if(alvo)marcarV935();
 },true);
 
-/* Wrappers defensivos das funções que abrem O.S./Dossiê */
-[
-  "abrirOSIntel",
-  "abrirFichaOS",
-  "abrirDossieOS",
-  "abrirMidiasOS",
-  "abrirFotosOS"
-].forEach(nome=>{
-  const base=window[nome];
-  if(typeof base!=="function"||base.__v934)return;
+/* Wrapper apenas para manter a ficha da O.S. aberta.
+   A função original abrirOSIntel continua responsável por renderizar a O.S.
+   no intelModal. */
+const abrirOSIntelBaseV935=window.abrirOSIntel;
+if(typeof abrirOSIntelBaseV935==="function"){
+  window.abrirOSIntel=function(os){
+    marcarV935();
+    const r=abrirOSIntelBaseV935.call(this,os);
 
-  const fn=function(){
-    marcarAberturaOSV934();
-    const r=base.apply(this,arguments);
-
-    /* Reforça a abertura depois que os cleanups assíncronos terminarem */
     setTimeout(()=>{
-      if(!abrindoOSV934)return;
-
-      const candidatos=[
-        document.getElementById("fotososModal"),
-        document.getElementById("fotosos-modal"),
-        document.getElementById("modalDossieOS"),
-        document.getElementById("dossieModal"),
-        document.querySelector(".fotosos-modal"),
-        document.querySelector(".dossie-modal")
-      ].filter(Boolean);
-
-      candidatos.forEach(modal=>{
-        if(modal){
-          modal.style.display="flex";
-          modal.classList.add("aberto");
-        }
-      });
-    },150);
+      if(!abrindoOSV935)return;
+      const modal=document.getElementById("intelModal");
+      if(modal){
+        modal.style.display="flex";
+        modal.classList.add("aberto");
+      }
+    },100);
 
     return r;
   };
-  fn.__v934=true;
-  window[nome]=fn;
-});
+}
 
-/* Protege também contra o cleanup da Home */
-const oldHomeFlag=window.erpHomeCardInteractionV933;
-window.erpHomeCardInteractionV933=function(){
-  return !!(oldHomeFlag?.() || abrindoOSV934);
-};
+/* Se algum modal de mídia tiver sido aberto pela correção anterior,
+   garante que esta versão não o force mais. */
+function naoForcarMidiasV935(){
+  // propositalmente vazio: mídias só abrem pelo botão de mídia.
+}
 
-console.info("ERP V9.3.4: botão Abrir protegido contra fechamento automático.");
+console.info("ERP V9.3.5: Abrir volta a abrir somente a ficha da O.S.; mídias permanecem independentes.");
 })();
 </script>
 
