@@ -20037,7 +20037,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.8</div>
+<div id="erpVersionBadgeV7542">ERP V9.2.9</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20649,7 +20649,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.8",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.2.9",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23221,6 +23221,146 @@ ERP.Performance.tatPedidoAudit=function(){
 
 document.addEventListener("DOMContentLoaded",()=>setTimeout(()=>window.renderMiniTatPedidoV926?.(),3000));
 console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> AG. PEDIDO DE PECA ativa.");
+})();
+</script>
+
+
+<style id="erp-v929-upload-foto-style">
+#fotoRapidaModalV929{position:fixed;inset:0;z-index:12000;background:rgba(0,18,38,.72);display:none;align-items:center;justify-content:center;padding:18px}
+#fotoRapidaModalV929.aberto{display:flex}
+#fotoRapidaBoxV929{width:min(560px,96vw);background:#fff;border-radius:18px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.35)}
+#fotoRapidaBoxV929 h3{margin:0 0 12px;color:#003c7a}
+#fotoRapidaBoxV929 label{display:block;font-weight:800;margin:10px 0 6px}
+#fotoRapidaBoxV929 input[type="text"],#fotoRapidaBoxV929 input[type="file"]{width:100%;padding:11px;border:1px solid #9fb4ca;border-radius:9px}
+#fotoRapidaAcoesV929{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+#fotoRapidaAcoesV929 button{border:0;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}
+#fotoRapidaStatusV929{margin-top:10px;font-size:12px;font-weight:700}
+</style>
+
+<div id="fotoRapidaModalV929">
+  <div id="fotoRapidaBoxV929">
+    <h3>📷 Adicionar foto direto na O.S.</h3>
+    <label>Número da O.S.</label>
+    <input id="fotoRapidaOSV929" type="text" inputmode="numeric" autocomplete="off" placeholder="Digite a O.S.">
+    <label>Foto</label>
+    <input id="fotoRapidaArquivoV929" type="file" accept="image/*">
+    <div id="fotoRapidaStatusV929"></div>
+    <div id="fotoRapidaAcoesV929">
+      <button onclick="fecharFotoRapidaV929()">Cancelar</button>
+      <button onclick="enviarFotoRapidaV929()">Enviar foto</button>
+    </div>
+  </div>
+</div>
+
+<script id="erp-v929-upload-foto">
+(function(){
+"use strict";
+
+function normOS(v){return String(v??"").trim().toUpperCase().replace(/^ILR\s*/,"").replace(/\.0$/,"").replace(/\s+/g,"")}
+function status(msg,cor){
+  const el=document.getElementById("fotoRapidaStatusV929");
+  if(el){el.textContent=msg;el.style.color=cor||""}
+}
+
+function resolverUploader(){
+  const candidatos=["salvarMidiaOS","uploadMidiaOS","enviarMidiaOS","salvarFotoOS","uploadFotoOS","fotososEnviarArquivo","fotososUploadArquivo","fotososSalvarMidia"];
+  for(const nome of candidatos){
+    if(typeof window[nome]==="function")return {nome,fn:window[nome]};
+  }
+  return null;
+}
+
+async function fallbackDireto(os,file){
+  const sb = typeof obterSupabaseClient==="function" ? obterSupabaseClient() : (window.supabaseClient || null);
+  if(!sb || !sb.storage) throw new Error("Cliente Supabase não disponível.");
+
+  const buckets=["os-midias","midias-os","fotos-os","os_fotos","fotosos","midias"];
+  let lastErr=null;
+  for(const bucket of buckets){
+    try{
+      const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
+      const nome=`${os}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const {data,error}=await sb.storage.from(bucket).upload(nome,file,{upsert:false,contentType:file.type||undefined});
+      if(error){lastErr=error;continue}
+
+      const tabelas=["os_midias","midias_os","fotos_os","dossie_midias"];
+      for(const tabela of tabelas){
+        try{
+          const payload={os,path:data.path,nome_arquivo:file.name,tipo:file.type||"image/jpeg"};
+          const {error:dbErr}=await sb.from(tabela).insert(payload);
+          if(!dbErr)return {bucket,path:data.path,tabela};
+        }catch(_){}
+      }
+      return {bucket,path:data.path,tabela:null};
+    }catch(e){lastErr=e}
+  }
+  throw lastErr||new Error("Não foi possível localizar o bucket de mídias do Dossiê.");
+}
+
+window.abrirFotoRapidaV929=function(){
+  document.getElementById("fotoRapidaModalV929")?.classList.add("aberto");
+  const os=document.getElementById("fotoRapidaOSV929");
+  const arq=document.getElementById("fotoRapidaArquivoV929");
+  if(os)os.value="";
+  if(arq)arq.value="";
+  status("");
+  setTimeout(()=>os?.focus(),50);
+};
+
+window.fecharFotoRapidaV929=function(){
+  document.getElementById("fotoRapidaModalV929")?.classList.remove("aberto");
+};
+
+window.enviarFotoRapidaV929=async function(){
+  const os=normOS(document.getElementById("fotoRapidaOSV929")?.value);
+  const file=document.getElementById("fotoRapidaArquivoV929")?.files?.[0];
+
+  if(!os){status("Digite o número da O.S.","#b00020");return}
+  if(!file){status("Selecione uma foto.","#b00020");return}
+  if(!file.type.startsWith("image/")){status("Selecione um arquivo de imagem.","#b00020");return}
+
+  status("Enviando foto...","#0046b8");
+
+  try{
+    const uploader=resolverUploader();
+    if(uploader){
+      let ok=false,lastErr=null;
+      for(const args of [[os,file],[file,os],[{os,file}],[{os,arquivo:file}]]){
+        try{await uploader.fn.apply(window,args);ok=true;break}catch(e){lastErr=e}
+      }
+      if(!ok&&lastErr)throw lastErr;
+    }else{
+      await fallbackDireto(os,file);
+    }
+
+    status("Foto adicionada à O.S. "+os+" com sucesso.","#0b7a2a");
+    setTimeout(()=>{
+      const osi=document.getElementById("fotoRapidaOSV929");
+      const ari=document.getElementById("fotoRapidaArquivoV929");
+      if(osi)osi.value="";
+      if(ari)ari.value="";
+      osi?.focus();
+    },700);
+  }catch(e){
+    console.error("[FOTO RÁPIDA]",e);
+    status("Erro ao enviar foto: "+(e?.message||e),"#b00020");
+  }
+};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  const host=document.querySelector(".sidebar") || document.querySelector("#telaInicial .home-grid") || document.body;
+  if(!document.getElementById("btnFotoRapidaV929")){
+    const btn=document.createElement("button");
+    btn.id="btnFotoRapidaV929";
+    btn.type="button";
+    btn.textContent="📷 Adicionar foto por O.S.";
+    btn.onclick=window.abrirFotoRapidaV929;
+    btn.style.cssText="margin:8px;padding:10px 12px;border:0;border-radius:9px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer";
+    host.prepend(btn);
+  }
+});
+
+console.info("ERP V9.2.9: upload rápido de foto por O.S. ativo.");
 })();
 </script>
 
