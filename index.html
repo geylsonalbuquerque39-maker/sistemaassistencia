@@ -20037,7 +20037,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.0</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20649,7 +20649,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23245,43 +23245,190 @@ console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> AG. PEDIDO D
 </div></div>
 <script id="erp-v930-upload-foto-lote">
 (function(){"use strict";
-let itens=[];
-function osNome(n){const b=String(n||"").replace(/\.[^.]+$/,"").replace(/^ILR[\s_-]*/i,"");const m=b.match(/\d+/);return m?m[0]:""}
-function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
-function uploader(){for(const n of ["salvarMidiaOS","uploadMidiaOS","enviarMidiaOS","salvarFotoOS","uploadFotoOS","fotososEnviarArquivo","fotososUploadArquivo","fotososSalvarMidia"])if(typeof window[n]==="function")return window[n];return null}
-async function fallback(os,file){
- const sb=typeof obterSupabaseClient==="function"?obterSupabaseClient():(window.supabaseClient||null);if(!sb?.storage)throw Error("Cliente Supabase não disponível.");
- let last;for(const bucket of ["os-midias","midias-os","fotos-os","os_fotos","fotosos","midias"]){try{
-  const ext=(file.name.split(".").pop()||"jpg").toLowerCase(), nome=`${os}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-  const {data,error}=await sb.storage.from(bucket).upload(nome,file,{upsert:false,contentType:file.type||undefined});if(error){last=error;continue}
-  for(const tabela of ["os_midias","midias_os","fotos_os","dossie_midias"]){try{const {error:e}=await sb.from(tabela).insert({os,path:data.path,nome_arquivo:file.name,tipo:file.type||"image/jpeg"});if(!e)return}catch(_){}}
-  return
- }catch(e){last=e}}throw last||Error("Armazenamento de mídias não localizado.")
-}
-async function envia(x){
- const fn=uploader();if(!fn)return fallback(x.os,x.file);
- let err;for(const a of [[x.os,x.file],[x.file,x.os],[{os:x.os,file:x.file}],[{os:x.os,arquivo:x.file}]]){try{await fn.apply(window,a);return}catch(e){err=e}}throw err
-}
-function render(){
- const l=document.getElementById("fotoLoteListaV930"),r=document.getElementById("fotoLoteResumoV930");if(!l||!r)return;
- r.textContent=itens.length?`${itens.length} foto(s) • ${itens.filter(x=>x.os).length} O.S. identificada(s)`:"Nenhuma foto selecionada.";
- l.innerHTML=itens.map((x,i)=>`<div class="foto-lote-linha-v930"><span>${esc(x.file.name)}</span><b>${x.os?"O.S. "+esc(x.os):"Nome inválido"}</b><span id="fotoLoteEstadoV930_${i}" class="foto-lote-espera-v930">Aguardando</span></div>`).join("")
-}
-window.abrirFotosLoteV930=()=>{itens=[];const f=document.getElementById("fotoLoteArquivosV930");if(f)f.value="";render();document.getElementById("fotoLoteModalV930")?.classList.add("aberto")};
-window.fecharFotosLoteV930=()=>document.getElementById("fotoLoteModalV930")?.classList.remove("aberto");
-window.enviarFotosLoteV930=async()=>{
- if(!itens.some(x=>x.os)){alert("Nenhuma O.S. identificada nos nomes.");return}const b=document.getElementById("btnEnviarFotosLoteV930");if(b)b.disabled=true;let ok=0,er=0;
- for(let i=0;i<itens.length;i++){const x=itens[i],e=document.getElementById("fotoLoteEstadoV930_"+i);if(!x.os){er++;if(e){e.textContent="Nome inválido";e.className="foto-lote-erro-v930"}continue}
-  try{if(e)e.textContent="Enviando...";await envia(x);ok++;if(e){e.textContent="Enviada ✓";e.className="foto-lote-ok-v930"}}catch(z){er++;console.error("[FOTO LOTE]",x.os,z);if(e){e.textContent="Erro";e.className="foto-lote-erro-v930";e.title=z?.message||String(z)}}}
- document.getElementById("fotoLoteResumoV930").textContent=`Concluído: ${ok} enviada(s) • ${er} com erro`;if(b)b.disabled=false
+
+const CFG_KEY="ERP_MIDIAS_OS_CONFIG_V1";
+const CONFIG_PADRAO={
+  url:"https://sjututwxmjbhprvdhekl.supabase.co",
+  key:"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8",
+  bucket:"midias-os",
+  tabela:"midias_os"
 };
+
+let itens=[],clienteMidias=null;
+
+function config(){
+  try{return {...CONFIG_PADRAO,...JSON.parse(localStorage.getItem(CFG_KEY)||"{}")}}
+  catch(_){return {...CONFIG_PADRAO}}
+}
+function cliente(){
+  if(clienteMidias)return clienteMidias;
+  if(!window.supabase?.createClient)throw new Error("Biblioteca Supabase não carregada.");
+  const c=config();
+  clienteMidias=window.supabase.createClient(c.url,c.key,{
+    auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+  });
+  return clienteMidias;
+}
+function osNome(n){
+  const base=String(n||"").replace(/\.[^.]+$/,"").replace(/^ILR[\s_-]*/i,"");
+  const m=base.match(/\d+/);
+  return m?m[0]:"";
+}
+function ext(nome){
+  const p=String(nome||"").split(".");
+  return p.length>1?p.pop().toLowerCase():"jpg";
+}
+function nomeSeguro(nome){
+  return String(nome||"")
+    .replace(/\.[^.]+$/,"")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-zA-Z0-9_-]+/g,"_")
+    .slice(0,70)||"foto";
+}
+function esc(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+
+async function dimensoesImagem(file){
+  try{
+    const bmp=await createImageBitmap(file);
+    const r={largura:bmp.width,altura:bmp.height};
+    bmp.close?.();
+    return r;
+  }catch(_){return {largura:null,altura:null}}
+}
+
+async function enviarFoto(item){
+  const c=config(),s=cliente();
+  const file=item.file,os=item.os;
+  const uuid=crypto.randomUUID?.()||Date.now()+"-"+Math.random().toString(36).slice(2);
+  const extensao=ext(file.name);
+  const caminho=`principal/${os}/${uuid}-${nomeSeguro(file.name)}.${extensao}`;
+  const dims=await dimensoesImagem(file);
+
+  const up=await s.storage.from(c.bucket).upload(caminho,file,{
+    contentType:file.type||"image/jpeg",
+    cacheControl:"3600",
+    upsert:false
+  });
+  if(up.error)throw new Error("Storage: "+up.error.message);
+
+  const payload={
+    os,
+    origem:"principal",
+    tipo_midia:"imagem",
+    categoria:"Outros",
+    descricao:"Upload em lote pelo nome da O.S.",
+    bucket:c.bucket,
+    caminho_arquivo:caminho,
+    nome_original:file.name,
+    nome_armazenado:file.name,
+    tipo_arquivo:file.type||"image/jpeg",
+    extensao,
+    tamanho_original_bytes:file.size,
+    tamanho_bytes:file.size,
+    largura:dims.largura,
+    altura:dims.altura,
+    usuario_nome:window.usuarioLogado?.nome||window.usuarioAtual?.nome||null,
+    usuario_id:window.usuarioLogado?.id||window.usuarioAtual?.id||null
+  };
+
+  const ins=await s.from(c.tabela).insert(payload);
+  if(ins.error){
+    await s.storage.from(c.bucket).remove([caminho]);
+    throw new Error("Banco midias_os: "+ins.error.message);
+  }
+  return {caminho};
+}
+
+function render(){
+  const lista=document.getElementById("fotoLoteListaV930");
+  const resumo=document.getElementById("fotoLoteResumoV930");
+  if(!lista||!resumo)return;
+  resumo.textContent=itens.length
+    ?`${itens.length} foto(s) • ${itens.filter(x=>x.os).length} O.S. identificada(s)`
+    :"Nenhuma foto selecionada.";
+
+  lista.innerHTML=itens.map((x,i)=>`
+    <div class="foto-lote-linha-v930">
+      <span>${esc(x.file.name)}</span>
+      <b>${x.os?"O.S. "+esc(x.os):"Nome inválido"}</b>
+      <span id="fotoLoteEstadoV930_${i}" class="foto-lote-espera-v930">${esc(x.estado||"Aguardando")}</span>
+    </div>`).join("");
+}
+
+window.abrirFotosLoteV930=function(){
+  itens=[];
+  const f=document.getElementById("fotoLoteArquivosV930");
+  if(f)f.value="";
+  render();
+  document.getElementById("fotoLoteModalV930")?.classList.add("aberto");
+};
+window.fecharFotosLoteV930=function(){
+  document.getElementById("fotoLoteModalV930")?.classList.remove("aberto");
+};
+
+window.enviarFotosLoteV930=async function(){
+  if(!itens.some(x=>x.os)){alert("Nenhuma O.S. identificada nos nomes.");return}
+  const btn=document.getElementById("btnEnviarFotosLoteV930");
+  if(btn)btn.disabled=true;
+
+  let ok=0,er=0;
+  for(let i=0;i<itens.length;i++){
+    const item=itens[i],estado=document.getElementById("fotoLoteEstadoV930_"+i);
+
+    if(!item.os){
+      er++;
+      item.estado="Nome inválido";
+      if(estado){estado.textContent=item.estado;estado.className="foto-lote-erro-v930"}
+      continue;
+    }
+
+    try{
+      item.estado="Enviando...";
+      if(estado){estado.textContent=item.estado;estado.className="foto-lote-espera-v930"}
+      await enviarFoto(item);
+      ok++;
+      item.estado="Enviada ✓";
+      if(estado){estado.textContent=item.estado;estado.className="foto-lote-ok-v930"}
+    }catch(e){
+      er++;
+      item.estado="Erro";
+      item.erro=e?.message||String(e);
+      console.error("[FOTO LOTE] O.S.",item.os,item.erro,e);
+      if(estado){
+        estado.textContent="Erro — passe o mouse";
+        estado.className="foto-lote-erro-v930";
+        estado.title=item.erro;
+      }
+    }
+  }
+
+  const resumo=document.getElementById("fotoLoteResumoV930");
+  if(resumo)resumo.textContent=`Concluído: ${ok} enviada(s) • ${er} com erro`;
+  if(btn)btn.disabled=false;
+
+  try{window.redecorarAtalhosMidiasOS?.()}catch(_){}
+};
+
 document.addEventListener("DOMContentLoaded",()=>{
- const f=document.getElementById("fotoLoteArquivosV930");f?.addEventListener("change",()=>{itens=[...(f.files||[])].map(file=>({file,os:osNome(file.name)}));render()});
- document.getElementById("btnFotoRapidaV929")?.remove();
- const host=document.querySelector(".sidebar")||document.querySelector("#telaInicial .home-grid")||document.body;
- if(!document.getElementById("btnFotosLoteV930")){const b=document.createElement("button");b.id="btnFotosLoteV930";b.type="button";b.textContent="📷 Adicionar fotos por O.S.";b.onclick=window.abrirFotosLoteV930;b.style.cssText="margin:8px;padding:10px 12px;border:0;border-radius:9px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer";host.prepend(b)}
+  const f=document.getElementById("fotoLoteArquivosV930");
+  f?.addEventListener("change",()=>{
+    itens=[...(f.files||[])].map(file=>({file,os:osNome(file.name),estado:"Aguardando"}));
+    render();
+  });
 });
-console.info("ERP V9.3.0: upload em lote por nome da O.S. ativo.");
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.fotoLoteConfig=function(){
+  const c=config();
+  const r={bucket:c.bucket,tabela:c.tabela,url:c.url,itens:itens.length};
+  console.info("[FOTO LOTE CONFIG]",r);
+  return r;
+};
+
+console.info("ERP V9.3.1: upload em lote usando exatamente bucket midias-os e tabela midias_os do Dossiê.");
 })();
 </script>
 
