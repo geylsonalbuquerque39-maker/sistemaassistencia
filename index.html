@@ -20037,7 +20037,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.2.9</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.0</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20649,7 +20649,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.2.9",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.0",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23225,142 +23225,63 @@ console.info("ERP V9.2.6: progressão AG. ANALISE TECNICA EM TAT -> AG. PEDIDO D
 </script>
 
 
-<style id="erp-v929-upload-foto-style">
-#fotoRapidaModalV929{position:fixed;inset:0;z-index:12000;background:rgba(0,18,38,.72);display:none;align-items:center;justify-content:center;padding:18px}
-#fotoRapidaModalV929.aberto{display:flex}
-#fotoRapidaBoxV929{width:min(560px,96vw);background:#fff;border-radius:18px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.35)}
-#fotoRapidaBoxV929 h3{margin:0 0 12px;color:#003c7a}
-#fotoRapidaBoxV929 label{display:block;font-weight:800;margin:10px 0 6px}
-#fotoRapidaBoxV929 input[type="text"],#fotoRapidaBoxV929 input[type="file"]{width:100%;padding:11px;border:1px solid #9fb4ca;border-radius:9px}
-#fotoRapidaAcoesV929{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
-#fotoRapidaAcoesV929 button{border:0;border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}
-#fotoRapidaStatusV929{margin-top:10px;font-size:12px;font-weight:700}
+<style id="erp-v930-upload-foto-style">
+#fotoLoteModalV930{position:fixed;inset:0;z-index:12000;background:rgba(0,18,38,.72);display:none;align-items:center;justify-content:center;padding:18px}
+#fotoLoteModalV930.aberto{display:flex}#fotoLoteBoxV930{width:min(720px,96vw);max-height:90vh;overflow:auto;background:#fff;border-radius:18px;padding:20px;box-shadow:0 28px 80px rgba(0,0,0,.35)}
+#fotoLoteBoxV930 h3{margin:0 0 6px;color:#003c7a}#fotoLoteBoxV930 p{margin:0 0 14px;color:#53687e;font-size:13px}
+#fotoLoteArquivosV930{width:100%;padding:12px;border:1px solid #9fb4ca;border-radius:9px;background:#f8fbff}
+#fotoLoteResumoV930{margin-top:12px;font-size:13px;font-weight:800}#fotoLoteListaV930{margin-top:10px;border:1px solid #d8e1eb;border-radius:10px;max-height:280px;overflow:auto}
+.foto-lote-linha-v930{display:grid;grid-template-columns:1fr 120px 130px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid #edf1f5;font-size:12px}
+.foto-lote-ok-v930{color:#08752a;font-weight:800}.foto-lote-erro-v930{color:#b00020;font-weight:800}.foto-lote-espera-v930{color:#596b7d;font-weight:700}
+#fotoLoteAcoesV930{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}#fotoLoteAcoesV930 button{border:0;border-radius:9px;padding:10px 14px;font-weight:800;cursor:pointer}
+#btnEnviarFotosLoteV930{background:#0046b8;color:#fff}#btnEnviarFotosLoteV930:disabled{opacity:.55}
 </style>
-
-<div id="fotoRapidaModalV929">
-  <div id="fotoRapidaBoxV929">
-    <h3>📷 Adicionar foto direto na O.S.</h3>
-    <label>Número da O.S.</label>
-    <input id="fotoRapidaOSV929" type="text" inputmode="numeric" autocomplete="off" placeholder="Digite a O.S.">
-    <label>Foto</label>
-    <input id="fotoRapidaArquivoV929" type="file" accept="image/*">
-    <div id="fotoRapidaStatusV929"></div>
-    <div id="fotoRapidaAcoesV929">
-      <button onclick="fecharFotoRapidaV929()">Cancelar</button>
-      <button onclick="enviarFotoRapidaV929()">Enviar foto</button>
-    </div>
-  </div>
-</div>
-
-<script id="erp-v929-upload-foto">
-(function(){
-"use strict";
-
-function normOS(v){return String(v??"").trim().toUpperCase().replace(/^ILR\s*/,"").replace(/\.0$/,"").replace(/\s+/g,"")}
-function status(msg,cor){
-  const el=document.getElementById("fotoRapidaStatusV929");
-  if(el){el.textContent=msg;el.style.color=cor||""}
+<div id="fotoLoteModalV930"><div id="fotoLoteBoxV930">
+<h3>📷 Adicionar fotos por O.S.</h3>
+<p>O número da O.S. é lido automaticamente do nome do arquivo. Ex.: <b>32524.jpg → O.S. 32524</b>. Selecione várias fotos de uma vez.</p>
+<input id="fotoLoteArquivosV930" type="file" accept="image/*" multiple>
+<div id="fotoLoteResumoV930">Nenhuma foto selecionada.</div><div id="fotoLoteListaV930"></div>
+<div id="fotoLoteAcoesV930"><button onclick="fecharFotosLoteV930()">Cancelar</button><button id="btnEnviarFotosLoteV930" onclick="enviarFotosLoteV930()">Enviar fotos</button></div>
+</div></div>
+<script id="erp-v930-upload-foto-lote">
+(function(){"use strict";
+let itens=[];
+function osNome(n){const b=String(n||"").replace(/\.[^.]+$/,"").replace(/^ILR[\s_-]*/i,"");const m=b.match(/\d+/);return m?m[0]:""}
+function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]))}
+function uploader(){for(const n of ["salvarMidiaOS","uploadMidiaOS","enviarMidiaOS","salvarFotoOS","uploadFotoOS","fotososEnviarArquivo","fotososUploadArquivo","fotososSalvarMidia"])if(typeof window[n]==="function")return window[n];return null}
+async function fallback(os,file){
+ const sb=typeof obterSupabaseClient==="function"?obterSupabaseClient():(window.supabaseClient||null);if(!sb?.storage)throw Error("Cliente Supabase não disponível.");
+ let last;for(const bucket of ["os-midias","midias-os","fotos-os","os_fotos","fotosos","midias"]){try{
+  const ext=(file.name.split(".").pop()||"jpg").toLowerCase(), nome=`${os}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const {data,error}=await sb.storage.from(bucket).upload(nome,file,{upsert:false,contentType:file.type||undefined});if(error){last=error;continue}
+  for(const tabela of ["os_midias","midias_os","fotos_os","dossie_midias"]){try{const {error:e}=await sb.from(tabela).insert({os,path:data.path,nome_arquivo:file.name,tipo:file.type||"image/jpeg"});if(!e)return}catch(_){}}
+  return
+ }catch(e){last=e}}throw last||Error("Armazenamento de mídias não localizado.")
 }
-
-function resolverUploader(){
-  const candidatos=["salvarMidiaOS","uploadMidiaOS","enviarMidiaOS","salvarFotoOS","uploadFotoOS","fotososEnviarArquivo","fotososUploadArquivo","fotososSalvarMidia"];
-  for(const nome of candidatos){
-    if(typeof window[nome]==="function")return {nome,fn:window[nome]};
-  }
-  return null;
+async function envia(x){
+ const fn=uploader();if(!fn)return fallback(x.os,x.file);
+ let err;for(const a of [[x.os,x.file],[x.file,x.os],[{os:x.os,file:x.file}],[{os:x.os,arquivo:x.file}]]){try{await fn.apply(window,a);return}catch(e){err=e}}throw err
 }
-
-async function fallbackDireto(os,file){
-  const sb = typeof obterSupabaseClient==="function" ? obterSupabaseClient() : (window.supabaseClient || null);
-  if(!sb || !sb.storage) throw new Error("Cliente Supabase não disponível.");
-
-  const buckets=["os-midias","midias-os","fotos-os","os_fotos","fotosos","midias"];
-  let lastErr=null;
-  for(const bucket of buckets){
-    try{
-      const ext=(file.name.split(".").pop()||"jpg").toLowerCase();
-      const nome=`${os}/${Date.now()}_${Math.random().toString(36).slice(2,8)}.${ext}`;
-      const {data,error}=await sb.storage.from(bucket).upload(nome,file,{upsert:false,contentType:file.type||undefined});
-      if(error){lastErr=error;continue}
-
-      const tabelas=["os_midias","midias_os","fotos_os","dossie_midias"];
-      for(const tabela of tabelas){
-        try{
-          const payload={os,path:data.path,nome_arquivo:file.name,tipo:file.type||"image/jpeg"};
-          const {error:dbErr}=await sb.from(tabela).insert(payload);
-          if(!dbErr)return {bucket,path:data.path,tabela};
-        }catch(_){}
-      }
-      return {bucket,path:data.path,tabela:null};
-    }catch(e){lastErr=e}
-  }
-  throw lastErr||new Error("Não foi possível localizar o bucket de mídias do Dossiê.");
+function render(){
+ const l=document.getElementById("fotoLoteListaV930"),r=document.getElementById("fotoLoteResumoV930");if(!l||!r)return;
+ r.textContent=itens.length?`${itens.length} foto(s) • ${itens.filter(x=>x.os).length} O.S. identificada(s)`:"Nenhuma foto selecionada.";
+ l.innerHTML=itens.map((x,i)=>`<div class="foto-lote-linha-v930"><span>${esc(x.file.name)}</span><b>${x.os?"O.S. "+esc(x.os):"Nome inválido"}</b><span id="fotoLoteEstadoV930_${i}" class="foto-lote-espera-v930">Aguardando</span></div>`).join("")
 }
-
-window.abrirFotoRapidaV929=function(){
-  document.getElementById("fotoRapidaModalV929")?.classList.add("aberto");
-  const os=document.getElementById("fotoRapidaOSV929");
-  const arq=document.getElementById("fotoRapidaArquivoV929");
-  if(os)os.value="";
-  if(arq)arq.value="";
-  status("");
-  setTimeout(()=>os?.focus(),50);
+window.abrirFotosLoteV930=()=>{itens=[];const f=document.getElementById("fotoLoteArquivosV930");if(f)f.value="";render();document.getElementById("fotoLoteModalV930")?.classList.add("aberto")};
+window.fecharFotosLoteV930=()=>document.getElementById("fotoLoteModalV930")?.classList.remove("aberto");
+window.enviarFotosLoteV930=async()=>{
+ if(!itens.some(x=>x.os)){alert("Nenhuma O.S. identificada nos nomes.");return}const b=document.getElementById("btnEnviarFotosLoteV930");if(b)b.disabled=true;let ok=0,er=0;
+ for(let i=0;i<itens.length;i++){const x=itens[i],e=document.getElementById("fotoLoteEstadoV930_"+i);if(!x.os){er++;if(e){e.textContent="Nome inválido";e.className="foto-lote-erro-v930"}continue}
+  try{if(e)e.textContent="Enviando...";await envia(x);ok++;if(e){e.textContent="Enviada ✓";e.className="foto-lote-ok-v930"}}catch(z){er++;console.error("[FOTO LOTE]",x.os,z);if(e){e.textContent="Erro";e.className="foto-lote-erro-v930";e.title=z?.message||String(z)}}}
+ document.getElementById("fotoLoteResumoV930").textContent=`Concluído: ${ok} enviada(s) • ${er} com erro`;if(b)b.disabled=false
 };
-
-window.fecharFotoRapidaV929=function(){
-  document.getElementById("fotoRapidaModalV929")?.classList.remove("aberto");
-};
-
-window.enviarFotoRapidaV929=async function(){
-  const os=normOS(document.getElementById("fotoRapidaOSV929")?.value);
-  const file=document.getElementById("fotoRapidaArquivoV929")?.files?.[0];
-
-  if(!os){status("Digite o número da O.S.","#b00020");return}
-  if(!file){status("Selecione uma foto.","#b00020");return}
-  if(!file.type.startsWith("image/")){status("Selecione um arquivo de imagem.","#b00020");return}
-
-  status("Enviando foto...","#0046b8");
-
-  try{
-    const uploader=resolverUploader();
-    if(uploader){
-      let ok=false,lastErr=null;
-      for(const args of [[os,file],[file,os],[{os,file}],[{os,arquivo:file}]]){
-        try{await uploader.fn.apply(window,args);ok=true;break}catch(e){lastErr=e}
-      }
-      if(!ok&&lastErr)throw lastErr;
-    }else{
-      await fallbackDireto(os,file);
-    }
-
-    status("Foto adicionada à O.S. "+os+" com sucesso.","#0b7a2a");
-    setTimeout(()=>{
-      const osi=document.getElementById("fotoRapidaOSV929");
-      const ari=document.getElementById("fotoRapidaArquivoV929");
-      if(osi)osi.value="";
-      if(ari)ari.value="";
-      osi?.focus();
-    },700);
-  }catch(e){
-    console.error("[FOTO RÁPIDA]",e);
-    status("Erro ao enviar foto: "+(e?.message||e),"#b00020");
-  }
-};
-
 document.addEventListener("DOMContentLoaded",()=>{
-  const host=document.querySelector(".sidebar") || document.querySelector("#telaInicial .home-grid") || document.body;
-  if(!document.getElementById("btnFotoRapidaV929")){
-    const btn=document.createElement("button");
-    btn.id="btnFotoRapidaV929";
-    btn.type="button";
-    btn.textContent="📷 Adicionar foto por O.S.";
-    btn.onclick=window.abrirFotoRapidaV929;
-    btn.style.cssText="margin:8px;padding:10px 12px;border:0;border-radius:9px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer";
-    host.prepend(btn);
-  }
+ const f=document.getElementById("fotoLoteArquivosV930");f?.addEventListener("change",()=>{itens=[...(f.files||[])].map(file=>({file,os:osNome(file.name)}));render()});
+ document.getElementById("btnFotoRapidaV929")?.remove();
+ const host=document.querySelector(".sidebar")||document.querySelector("#telaInicial .home-grid")||document.body;
+ if(!document.getElementById("btnFotosLoteV930")){const b=document.createElement("button");b.id="btnFotosLoteV930";b.type="button";b.textContent="📷 Adicionar fotos por O.S.";b.onclick=window.abrirFotosLoteV930;b.style.cssText="margin:8px;padding:10px 12px;border:0;border-radius:9px;background:#0046b8;color:#fff;font-weight:800;cursor:pointer";host.prepend(b)}
 });
-
-console.info("ERP V9.2.9: upload rápido de foto por O.S. ativo.");
+console.info("ERP V9.3.0: upload em lote por nome da O.S. ativo.");
 })();
 </script>
 
