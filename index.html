@@ -5111,6 +5111,11 @@ body.ci-regiao-clientes #planilhaCI .jexcel td{overflow:hidden!important;text-ov
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
     <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
+
+<div class="menu" id="menuFotosLoteV932" data-menu="fotos-lote" onclick="abrirFotosLoteV930()">
+  📷 ADICIONAR FOTOS POR O.S.
+</div>
+
 <div class="menu" data-menu="admin" onclick="abrirAdmin()">⚙ Administração</div>
 </div>
 
@@ -20037,7 +20042,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.3.1</div>
+<div id="erpVersionBadgeV7542">ERP V9.3.2</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -20649,7 +20654,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.3.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.3.2",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23429,6 +23434,43 @@ ERP.Performance.fotoLoteConfig=function(){
 };
 
 console.info("ERP V9.3.1: upload em lote usando exatamente bucket midias-os e tabela midias_os do Dossiê.");
+})();
+</script>
+
+
+<style id="erp-v932-botao-fotos-menu-style">
+#menuFotosLoteV932{
+  border-left:3px solid #3ea6ff;
+  font-weight:900;
+}
+</style>
+<script id="erp-v932-botao-fotos-menu-fix">
+(function(){
+"use strict";
+
+function fixarBotaoFotosV932(){
+  // Remove o botão flutuante/dinâmico criado por versões anteriores.
+  document.getElementById("btnFotosLoteV930")?.remove();
+  document.getElementById("btnFotoRapidaV929")?.remove();
+
+  const menu=document.getElementById("menuFotosLoteV932");
+  if(menu){
+    menu.style.display="";
+    menu.onclick=()=>window.abrirFotosLoteV930?.();
+  }
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>{
+    fixarBotaoFotosV932();
+    setTimeout(fixarBotaoFotosV932,1200);
+  },{once:true});
+}else{
+  fixarBotaoFotosV932();
+  setTimeout(fixarBotaoFotosV932,1200);
+}
+
+console.info("ERP V9.3.2: botão Fotos por O.S. fixado no menu lateral.");
 })();
 </script>
 
