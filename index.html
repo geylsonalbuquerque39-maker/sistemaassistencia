@@ -5545,6 +5545,19 @@ body.dark-mode .agpedido-chip-v937{
 }
 </style>
 
+
+<style id="erp-v963-coleta-close-style">
+#btnFecharColetaFotosV963{
+  flex:0 0 auto;
+}
+#coletaFotosModalV943{
+  cursor:default;
+}
+#coletaFotosBoxV943{
+  position:relative;
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -5843,6 +5856,149 @@ body.dark-mode .agpedido-chip-v937{
         </div>
     </div>
 </div>
+
+<div id="telaAdmin">
+    <div class="title">
+        <h1>PAINEL ADMINISTRATIVO</h1>
+        <p>Gestão do banco de dados e configurações do sistema</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="v2-toolbar">
+        <button class="v2-btn" onclick="carregarDashboardAdmin()">⟳ Atualizar Dashboard</button>
+        <button class="v2-btn" onclick="abrirRelatorios()">▥ Abrir Relatórios</button>
+        <button class="v2-btn" onclick="alternarModoEscuro()">🌙 Modo Escuro</button>
+    </div>
+
+    <div class="dashboard-area">
+        <div id="dashboardMensagem" class="dashboard-loading">Carregando dashboard...</div>
+
+        <section class="operacao-agora">
+            <div class="operacao-agora-topo">
+                <div>
+                    <h2>⚡ Operação agora</h2>
+                    <p>Indicadores operacionais calculados sobre toda a base REXPEDLR.</p>
+                </div>
+                <span id="operacaoAtualizacaoAutomatica" class="dashboard-atualizacao-automatica">Atualização automática ativa</span>
+                <button class="operacao-atualizar" onclick="atualizarDashboardOperacional(true)">⟳ Atualizar agora</button>
+            </div>
+            <div class="operacao-cards">
+                <button class="operacao-card alerta" onclick="abrirListaIntel('rack500Abertas')">
+                    <span class="op-icone">🔴</span><span class="op-valor" id="opRack500">--</span>
+                    <span class="op-label">Rack 500 em aberto</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+                <button class="operacao-card atencao" onclick="abrirListaIntel('prontasAbertas')">
+                    <span class="op-icone">🟡</span><span class="op-valor" id="opProntas">--</span>
+                    <span class="op-label">Prontas aguardando expedição</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+                <button class="operacao-card sucesso" onclick="abrirListaIntel('expHoje')">
+                    <span class="op-icone">🟢</span><span class="op-valor" id="opExpedidasHoje">--</span>
+                    <span class="op-label">Expedidas hoje</span><span class="op-dica">Clique para abrir a relação</span>
+                </button>
+</div>
+        </section>
+
+        <section class="central-pendencias-dashboard">
+            <div class="central-pendencias-topo">
+                <div><h2>⚠ Central de Pendências</h2><small>O sistema destaca automaticamente o que exige atenção.</small></div>
+                <small id="pendenciasDashboardHora">Aguardando análise...</small>
+            </div>
+            <div id="pendenciasDashboardLista" class="central-pendencias-lista">
+                <div class="dashboard-loading">Calculando pendências operacionais...</div>
+            </div>
+        </section>
+
+        <div class="dashboard-top">
+            <div class="dashboard-box interativo" onclick="abrirListaDashboardV55('todas')"><h3>Total de O.S no banco</h3><div class="valor" id="dashTotalOS">--</div><div class="sub">Registros disponíveis no Supabase</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('pdv')"><h3>PDVs diferentes</h3><div class="valor" id="dashTotalPDV">--</div><div class="sub">Lojas/PDVs encontrados</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('tecnico')"><h3>Técnicos diferentes</h3><div class="valor" id="dashTotalTecnicos">--</div><div class="sub">Técnicos encontrados</div></div>
+            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('status')"><h3>Status diferentes</h3><div class="valor" id="dashTotalStatus">--</div><div class="sub">Situações no banco</div></div>
+            <div class="dashboard-box"><h3>Última importação</h3><div class="valor" id="dashUltimaImportacao" style="font-size:22px">--</div><div class="sub">Registrada neste computador</div></div>
+            <div class="dashboard-box"><h3>O.S importadas</h3><div class="valor" id="dashUltimaQtd">--</div><div class="sub">Última carga realizada</div></div>
+            <div class="dashboard-box"><h3>Duplicadas removidas</h3><div class="valor" id="dashDuplicadas">--</div><div class="sub">Removidas na importação</div></div>
+            <div class="dashboard-box"><h3>Banco</h3><div class="valor" id="dashBancoStatus" style="font-size:24px">--</div><div class="sub">Status da conexão</div></div>
+        </div>
+        <div class="dashboard-linha">
+            <div class="dashboard-card">
+                <h2>📊 O.S por Status</h2>
+                <div class="grafico-area"><canvas id="chartStatus"></canvas></div>
+                <div id="dashTabelaStatus">Aguardando dados...</div>
+            </div>
+            <div class="dashboard-card">
+                <h2>👨‍🔧 O.S por Técnico</h2>
+                <div class="grafico-area"><canvas id="chartTecnicos"></canvas></div>
+                <div id="dashTabelaTecnicos">Aguardando dados...</div>
+            </div>
+        </div>
+        <div class="dashboard-linha">
+            <div class="dashboard-card">
+                <h2>🏪 O.S por PDV</h2>
+                <div class="grafico-area"><canvas id="chartPDV"></canvas></div>
+                <div id="dashTabelaPDV">Aguardando dados...</div>
+            </div>
+            <div class="dashboard-card">
+                <h2>🕘 Últimas O.S carregadas</h2>
+                <div id="dashTabelaRecentes">Aguardando dados...</div>
+            </div>
+        </div>
+        <div class="dashboard-linha">
+            <div class="dashboard-card" style="grid-column:1 / -1">
+                <h2>📥 Últimas Importações</h2>
+                <div id="dashHistoricoImportacoes">Aguardando histórico...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="admin-grid">
+        <div class="admin-card" onclick="abrirAdminSecao('atualizar')">
+            <h2>📥 Atualizar Banco de O.S.</h2>
+            <p>Importar o arquivo gerado pelo NetTerm e preparar os dados para o Supabase.</p>
+            <span class="admin-badge">Primeira etapa</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('presenca')">
+            <h2>🟢 Usuários Online</h2>
+            <p>Presença, última atividade e tela atual em tempo real.</p>
+            <span class="admin-badge">Novo</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('usuarios')">
+            <h2>👤 Usuários</h2>
+            <p>Cadastrar, editar, ativar/desativar e controlar perfis de acesso.</p>
+            <span class="admin-badge">Ativo</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('lojas')">
+            <h2>🏪 Lojas</h2>
+            <p>Cadastro de lojas, PDV, região e destinos usados nas C.I.</p>
+            <span class="admin-badge">Em preparação</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('historico')">
+            <h2>📥 Histórico de Importações</h2>
+            <p>Consultar as últimas atualizações da base REXPEDLR, arquivo usado, registros lidos e importados.</p>
+            <span class="admin-badge">Ativo</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('historico_ci')">
+            <h2>🗂 Histórico de C.I.</h2>
+            <p>Consulte, visualize, reimprima e duplique C.I. emitidas.</p>
+            <span class="admin-badge">Versão 3.4.1</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('auditoria')">
+            <h2>📋 Auditoria</h2>
+            <p>Ver logs de login, logout, importações, emissão de C.I. e alterações de usuários.</p>
+            <span class="admin-badge">Novo v3.3</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('config')">
+            <h2>⚙ Configurações</h2>
+            <p>Chaves do Supabase, preferências do sistema, assinaturas e parâmetros.</p>
+            <span class="admin-badge">Configurar depois</span>
+        </div>
+        <div class="admin-card" onclick="abrirAdminSecao('backup')">
+            <h2>💾 Backup</h2>
+            <p>Área para exportar dados, restaurar informações e conferir segurança.</p>
+            <span class="admin-badge">Em preparação</span>
+        </div>
+    </div>
+</div>
+
+
 
 <div id="telaInicio">
 
@@ -6548,147 +6704,6 @@ body.dark-mode .agpedido-chip-v937{
 
 <div id="intelModal" class="intel-modal" onclick="if(event.target===this)fecharIntelModal()"><div class="intel-modal-box"><button class="intel-close" onclick="fecharIntelModal()">Fechar</button><h2 id="intelModalTitulo">Detalhes</h2><div id="intelModalConteudo"></div></div></div>
 
-
-<div id="telaAdmin">
-    <div class="title">
-        <h1>PAINEL ADMINISTRATIVO</h1>
-        <p>Gestão do banco de dados e configurações do sistema</p>
-        <div class="underline"></div>
-    </div>
-
-    <div class="v2-toolbar">
-        <button class="v2-btn" onclick="carregarDashboardAdmin()">⟳ Atualizar Dashboard</button>
-        <button class="v2-btn" onclick="abrirRelatorios()">▥ Abrir Relatórios</button>
-        <button class="v2-btn" onclick="alternarModoEscuro()">🌙 Modo Escuro</button>
-    </div>
-
-    <div class="dashboard-area">
-        <div id="dashboardMensagem" class="dashboard-loading">Carregando dashboard...</div>
-
-        <section class="operacao-agora">
-            <div class="operacao-agora-topo">
-                <div>
-                    <h2>⚡ Operação agora</h2>
-                    <p>Indicadores operacionais calculados sobre toda a base REXPEDLR.</p>
-                </div>
-                <span id="operacaoAtualizacaoAutomatica" class="dashboard-atualizacao-automatica">Atualização automática ativa</span>
-                <button class="operacao-atualizar" onclick="atualizarDashboardOperacional(true)">⟳ Atualizar agora</button>
-            </div>
-            <div class="operacao-cards">
-                <button class="operacao-card alerta" onclick="abrirListaIntel('rack500Abertas')">
-                    <span class="op-icone">🔴</span><span class="op-valor" id="opRack500">--</span>
-                    <span class="op-label">Rack 500 em aberto</span><span class="op-dica">Clique para abrir a relação</span>
-                </button>
-                <button class="operacao-card atencao" onclick="abrirListaIntel('prontasAbertas')">
-                    <span class="op-icone">🟡</span><span class="op-valor" id="opProntas">--</span>
-                    <span class="op-label">Prontas aguardando expedição</span><span class="op-dica">Clique para abrir a relação</span>
-                </button>
-                <button class="operacao-card sucesso" onclick="abrirListaIntel('expHoje')">
-                    <span class="op-icone">🟢</span><span class="op-valor" id="opExpedidasHoje">--</span>
-                    <span class="op-label">Expedidas hoje</span><span class="op-dica">Clique para abrir a relação</span>
-                </button>
-</div>
-        </section>
-
-        <section class="central-pendencias-dashboard">
-            <div class="central-pendencias-topo">
-                <div><h2>⚠ Central de Pendências</h2><small>O sistema destaca automaticamente o que exige atenção.</small></div>
-                <small id="pendenciasDashboardHora">Aguardando análise...</small>
-            </div>
-            <div id="pendenciasDashboardLista" class="central-pendencias-lista">
-                <div class="dashboard-loading">Calculando pendências operacionais...</div>
-            </div>
-        </section>
-
-        <div class="dashboard-top">
-            <div class="dashboard-box interativo" onclick="abrirListaDashboardV55('todas')"><h3>Total de O.S no banco</h3><div class="valor" id="dashTotalOS">--</div><div class="sub">Registros disponíveis no Supabase</div></div>
-            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('pdv')"><h3>PDVs diferentes</h3><div class="valor" id="dashTotalPDV">--</div><div class="sub">Lojas/PDVs encontrados</div></div>
-            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('tecnico')"><h3>Técnicos diferentes</h3><div class="valor" id="dashTotalTecnicos">--</div><div class="sub">Técnicos encontrados</div></div>
-            <div class="dashboard-box interativo" onclick="abrirRankingDashboardV55('status')"><h3>Status diferentes</h3><div class="valor" id="dashTotalStatus">--</div><div class="sub">Situações no banco</div></div>
-            <div class="dashboard-box"><h3>Última importação</h3><div class="valor" id="dashUltimaImportacao" style="font-size:22px">--</div><div class="sub">Registrada neste computador</div></div>
-            <div class="dashboard-box"><h3>O.S importadas</h3><div class="valor" id="dashUltimaQtd">--</div><div class="sub">Última carga realizada</div></div>
-            <div class="dashboard-box"><h3>Duplicadas removidas</h3><div class="valor" id="dashDuplicadas">--</div><div class="sub">Removidas na importação</div></div>
-            <div class="dashboard-box"><h3>Banco</h3><div class="valor" id="dashBancoStatus" style="font-size:24px">--</div><div class="sub">Status da conexão</div></div>
-        </div>
-        <div class="dashboard-linha">
-            <div class="dashboard-card">
-                <h2>📊 O.S por Status</h2>
-                <div class="grafico-area"><canvas id="chartStatus"></canvas></div>
-                <div id="dashTabelaStatus">Aguardando dados...</div>
-            </div>
-            <div class="dashboard-card">
-                <h2>👨‍🔧 O.S por Técnico</h2>
-                <div class="grafico-area"><canvas id="chartTecnicos"></canvas></div>
-                <div id="dashTabelaTecnicos">Aguardando dados...</div>
-            </div>
-        </div>
-        <div class="dashboard-linha">
-            <div class="dashboard-card">
-                <h2>🏪 O.S por PDV</h2>
-                <div class="grafico-area"><canvas id="chartPDV"></canvas></div>
-                <div id="dashTabelaPDV">Aguardando dados...</div>
-            </div>
-            <div class="dashboard-card">
-                <h2>🕘 Últimas O.S carregadas</h2>
-                <div id="dashTabelaRecentes">Aguardando dados...</div>
-            </div>
-        </div>
-        <div class="dashboard-linha">
-            <div class="dashboard-card" style="grid-column:1 / -1">
-                <h2>📥 Últimas Importações</h2>
-                <div id="dashHistoricoImportacoes">Aguardando histórico...</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="admin-grid">
-        <div class="admin-card" onclick="abrirAdminSecao('atualizar')">
-            <h2>📥 Atualizar Banco de O.S.</h2>
-            <p>Importar o arquivo gerado pelo NetTerm e preparar os dados para o Supabase.</p>
-            <span class="admin-badge">Primeira etapa</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('presenca')">
-            <h2>🟢 Usuários Online</h2>
-            <p>Presença, última atividade e tela atual em tempo real.</p>
-            <span class="admin-badge">Novo</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('usuarios')">
-            <h2>👤 Usuários</h2>
-            <p>Cadastrar, editar, ativar/desativar e controlar perfis de acesso.</p>
-            <span class="admin-badge">Ativo</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('lojas')">
-            <h2>🏪 Lojas</h2>
-            <p>Cadastro de lojas, PDV, região e destinos usados nas C.I.</p>
-            <span class="admin-badge">Em preparação</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('historico')">
-            <h2>📥 Histórico de Importações</h2>
-            <p>Consultar as últimas atualizações da base REXPEDLR, arquivo usado, registros lidos e importados.</p>
-            <span class="admin-badge">Ativo</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('historico_ci')">
-            <h2>🗂 Histórico de C.I.</h2>
-            <p>Consulte, visualize, reimprima e duplique C.I. emitidas.</p>
-            <span class="admin-badge">Versão 3.4.1</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('auditoria')">
-            <h2>📋 Auditoria</h2>
-            <p>Ver logs de login, logout, importações, emissão de C.I. e alterações de usuários.</p>
-            <span class="admin-badge">Novo v3.3</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('config')">
-            <h2>⚙ Configurações</h2>
-            <p>Chaves do Supabase, preferências do sistema, assinaturas e parâmetros.</p>
-            <span class="admin-badge">Configurar depois</span>
-        </div>
-        <div class="admin-card" onclick="abrirAdminSecao('backup')">
-            <h2>💾 Backup</h2>
-            <p>Área para exportar dados, restaurar informações e conferir segurança.</p>
-            <span class="admin-badge">Em preparação</span>
-        </div>
-    </div>
-</div>
 
 <div id="telaAdminAtualizar">
     <div class="title">
@@ -20688,7 +20703,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.6.2</div>
+<div id="erpVersionBadgeV7542">ERP V9.6.6</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21300,7 +21315,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.6.2",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.6.6",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -25034,7 +25049,13 @@ console.info("ERP V9.3.9: importador NN dentro do ILR, gravando no Supabase CPP.
         <h2>📸 Coleta de Fotos</h2>
         <p>Inicie uma coleta. Toda O.S. fotografada entra automaticamente nesta lista até a coleta ser finalizada.</p>
       </div>
-      <div id="coletaFotosStatusV943" class="coleta-fotos-status-v943">Nenhuma coleta ativa</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div id="coletaFotosStatusV943" class="coleta-fotos-status-v943">Nenhuma coleta ativa</div>
+        <button type="button" id="btnFecharColetaFotosV963" onclick="fecharColetaFotosV943()"
+          style="border:0;border-radius:9px;padding:8px 11px;font-weight:900;cursor:pointer;background:#e8eef5;color:#173a5c">
+          ✕ Fechar
+        </button>
+      </div>
     </div>
 
     <div class="coleta-fotos-acoes-v943">
@@ -25873,519 +25894,6 @@ setTimeout(removerDivergenteV954,1200);
 console.info("ERP V9.5.4: cartão Ag. Pedido com Obs. CPP divergente removido.");
 })();
 </script>
-
-
-<script id="erp-v955-progressao-backfill-comparador">
-(function(){
-"use strict";
-
-function normV955(v){
-  return String(v??"").trim().toLocaleLowerCase("pt-BR")
-    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
-    .replace(/[.\-_/]+/g," ")
-    .replace(/\s+/g," ").trim();
-}
-function agPedidoV955(v){
-  const s=normV955(v);
-  return s==="ag pedido de peca" || s==="ag pedido de pecas";
-}
-function aguardandoV955(v){
-  const s=normV955(v);
-  return s==="aguardando peca" || s==="aguardando pecas" ||
-         s==="ag peca" || s==="ag pecas";
-}
-function keyDiaV955(v){
-  const d=new Date(v);
-  if(Number.isNaN(d.getTime()))return "";
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-function hojeV955(offset=0){
-  const d=new Date();
-  d.setDate(d.getDate()+offset);
-  return keyDiaV955(d);
-}
-
-/* Lê o comparador que o ERP JÁ salva em IndexedDB.
-   Isso também recupera importações que ocorreram antes das correções recentes. */
-async function construirHistoricoV955(){
-  if(typeof listarComparacoesImportacao!=="function")return {dias:{},linhasPorDia:{}};
-
-  const comps=await listarComparacoesImportacao();
-  const dias={};
-  const linhasPorDia={};
-
-  for(const comp of comps||[]){
-    const dia=keyDiaV955(comp?.data);
-    if(!dia)continue;
-
-    const alteracoes=Array.isArray(comp?.status)
-      ? comp.status
-      : (Array.isArray(comp?.mudancas)?comp.mudancas:[]);
-
-    for(const x of alteracoes){
-      const campo=String(x?.campoChave||"").trim().toLowerCase();
-      if(campo!=="status")continue;
-
-      if(agPedidoV955(x?.antes) && aguardandoV955(x?.depois)){
-        const os=String(x?.os||"").trim();
-        if(!os)continue;
-
-        if(!dias[dia])dias[dia]=new Set();
-        dias[dia].add(os);
-
-        if(!linhasPorDia[dia])linhasPorDia[dia]=new Map();
-        linhasPorDia[dia].set(os,{
-          os,
-          produto:x?.produto||x?.registro?.desc_produto||"",
-          antes:x?.antes||"",
-          depois:x?.depois||"",
-          registro:x?.registro||{},
-          data:comp.data,
-          arquivo:comp.arquivo||""
-        });
-      }
-    }
-  }
-  return {dias,linhasPorDia};
-}
-
-async function sincronizarProgressaoV955(){
-  try{
-    const hist=await construirHistoricoV955();
-    const hoje=hojeV955(0);
-    const ontem=hojeV955(-1);
-
-    const hojeQtd=hist.dias[hoje]?.size||0;
-    const ontemQtd=hist.dias[ontem]?.size||0;
-    const delta=hojeQtd-ontemQtd;
-
-    const card=document.getElementById("intelMiniTransicoesV925");
-    const comp=document.getElementById("intelMiniTransicoesComparativoV925");
-    const upd=document.getElementById("intelMiniPecasAtualizadoV925");
-
-    if(card)card.textContent=hojeQtd.toLocaleString("pt-BR");
-    if(comp)comp.textContent=`Hoje • Ontem: ${ontemQtd.toLocaleString("pt-BR")} • ${delta>=0?"+":""}${delta}`;
-    if(upd)upd.textContent=`Atualizado pelo histórico de importações às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
-
-    const diasEl=document.getElementById("intelMiniPecasUltimosDiasV925");
-    if(diasEl){
-      const arr=[];
-      for(let i=6;i>=0;i--){
-        const d=new Date();d.setDate(d.getDate()-i);
-        const k=keyDiaV955(d);
-        arr.push(`<div class="intel-mini-dia-v925">
-          <small>${d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
-          <b>${(hist.dias[k]?.size||0).toLocaleString("pt-BR")}</b>
-          <small>transições</small>
-        </div>`);
-      }
-      diasEl.innerHTML=arr.join("");
-    }
-
-    /* Também alimenta o storage original V925 para compatibilidade com o resto do ERP. */
-    try{
-      const KEY="ERP_PROGRESSAO_PECAS_V925";
-      let local={dias:{}};
-      try{local=JSON.parse(localStorage.getItem(KEY)||'{"dias":{}}')}catch(_){}
-      local.dias=local.dias||{};
-      for(const [dia,setOS] of Object.entries(hist.dias)){
-        const atual=local.dias[dia]||{};
-        atual.transicoesOS=[...setOS];
-        atual.atualizadoEm=new Date().toISOString();
-        local.dias[dia]=atual;
-      }
-      localStorage.setItem(KEY,JSON.stringify(local));
-    }catch(_){}
-
-    window.__progressaoLinhasV955=hist.linhasPorDia;
-    return hojeQtd;
-  }catch(e){
-    console.error("[V9.5.5 Progressão peças]",e);
-    return 0;
-  }
-}
-window.sincronizarProgressaoV955=sincronizarProgressaoV955;
-
-/* Relação usa exatamente as linhas do mesmo cálculo do cartão */
-const abrirOriginalV955=window.abrirRelacaoMiniPecasV925;
-window.abrirRelacaoMiniPecasV925=async function(tipo){
-  if(tipo!=="transicoes"){
-    return typeof abrirOriginalV955==="function"
-      ? abrirOriginalV955.apply(this,arguments)
-      : undefined;
-  }
-
-  await sincronizarProgressaoV955();
-  const dia=hojeV955(0);
-  const mapa=window.__progressaoLinhasV955?.[dia]||new Map();
-  const lista=[...mapa.values()];
-
-  const modal=document.getElementById("intelModal");
-  const titulo=document.getElementById("intelModalTitulo");
-  const area=document.getElementById("intelModalConteudo");
-  if(!modal||!titulo||!area)return;
-
-  titulo.textContent=`Saíram de Ag. Pedido → Aguardando peças (${lista.length.toLocaleString("pt-BR")})`;
-
-  if(!lista.length){
-    area.innerHTML='<div class="admin-info">Nenhuma O.S. fez essa transição nas importações de hoje.</div>';
-  }else{
-    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: histórico carregado somente ao clicar.</div>'+
-      "<div class='intel-list'>"+
-      lista.slice(0,100).map(x=>{
-        const r=x.registro||{};
-        return "<div class='intel-row'><b>"+String(x.os||"-")+"</b><span>"+
-          String(x.produto||"")+
-          "<br><small>"+String(x.antes||"-")+" → "+String(x.depois||"-")+
-          " • "+new Date(x.data).toLocaleString("pt-BR")+
-          "</small></span><span>"+String(r.tecnico||"")+
-          "</span><button onclick=\"abrirOSIntel('"+String(x.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>";
-      }).join("")+
-      "</div>";
-  }
-
-  modal.style.display="flex";
-};
-
-/* Toda vez que abrir Inteligência, recalcula do IndexedDB */
-const abrirIntelV955=window.abrirInteligencia;
-if(typeof abrirIntelV955==="function"){
-  window.abrirInteligencia=function(){
-    const r=abrirIntelV955.apply(this,arguments);
-    setTimeout(()=>sincronizarProgressaoV955(),100);
-    return r;
-  };
-}
-
-/* Toda vez que uma comparação for salva após importar, atualiza o cartão */
-if(typeof window.salvarComparacaoImportacao==="function"){
-  const salvarBaseV955=window.salvarComparacaoImportacao;
-  window.salvarComparacaoImportacao=async function(){
-    const r=await salvarBaseV955.apply(this,arguments);
-    setTimeout(()=>sincronizarProgressaoV955(),0);
-    return r;
-  };
-}
-
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>sincronizarProgressaoV955(),1200);
-});
-
-window.ERP=window.ERP||{};
-ERP.Performance=ERP.Performance||{};
-ERP.Performance.progressaoV955Audit=async function(){
-  const hist=await construirHistoricoV955();
-  const hoje=hojeV955(0);
-  const r={
-    hoje:hist.dias[hoje]?.size||0,
-    linhasHoje:[...(hist.linhasPorDia[hoje]?.values?.()||[])],
-    totalDias:Object.keys(hist.dias).length
-  };
-  console.info("[V9.5.5 PROGRESSÃO]",r);
-  return r;
-};
-
-console.info("ERP V9.5.5: progressão Ag. Pedido -> Aguardando peças reconstruída do comparador salvo.");
-})();
-</script>
-
-
-<script id="erp-v956-progressao-abre-instantaneo">
-(function(){
-"use strict";
-
-let cacheProgressaoV956=[];
-let cacheDiaV956="";
-let cacheProntoV956=false;
-
-function diaKeyV956(d=new Date()){
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
-}
-
-async function prepararCacheProgressaoV956(){
-  try{
-    if(typeof construirHistoricoV955!=="function")return;
-    const hist=await construirHistoricoV955();
-    const hoje=diaKeyV956();
-    const mapa=hist.linhasPorDia?.[hoje]||new Map();
-    cacheProgressaoV956=[...mapa.values()];
-    cacheDiaV956=hoje;
-    cacheProntoV956=true;
-  }catch(e){
-    console.warn("[V9.5.6 cache progressão]",e);
-  }
-}
-window.prepararCacheProgressaoV956=prepararCacheProgressaoV956;
-
-/* Pré-carrega a RELAÇÃO em memória quando a Inteligência abre.
-   Não renderiza as O.S.; apenas prepara os dados para o clique ser instantâneo. */
-const abrirIntelBaseV956=window.abrirInteligencia;
-if(typeof abrirIntelBaseV956==="function"){
-  window.abrirInteligencia=function(){
-    const r=abrirIntelBaseV956.apply(this,arguments);
-    setTimeout(()=>prepararCacheProgressaoV956(),0);
-    return r;
-  };
-}
-
-/* Atualiza cache sempre que a comparação/importação mudar */
-if(typeof window.salvarComparacaoImportacao==="function"){
-  const salvarBaseV956=window.salvarComparacaoImportacao;
-  window.salvarComparacaoImportacao=async function(){
-    const r=await salvarBaseV956.apply(this,arguments);
-    setTimeout(()=>prepararCacheProgressaoV956(),0);
-    return r;
-  };
-}
-
-/* Abrir instantâneo: usa cache já pronto e só renderiza no clique */
-const abrirRelacaoBaseV956=window.abrirRelacaoMiniPecasV925;
-window.abrirRelacaoMiniPecasV925=function(tipo){
-  if(tipo!=="transicoes"){
-    return typeof abrirRelacaoBaseV956==="function"
-      ? abrirRelacaoBaseV956.apply(this,arguments)
-      : undefined;
-  }
-
-  const hoje=diaKeyV956();
-
-  /* Se cache ainda não estiver pronto, abre modal imediatamente com loading
-     e termina a preparação sem deixar o clique "morto". */
-  if(!cacheProntoV956 || cacheDiaV956!==hoje){
-    const modal=document.getElementById("intelModal");
-    const titulo=document.getElementById("intelModalTitulo");
-    const area=document.getElementById("intelModalConteudo");
-    if(modal&&titulo&&area){
-      titulo.textContent="Saíram de Ag. Pedido → Aguardando peças";
-      area.innerHTML='<div class="dashboard-loading">Carregando relação...</div>';
-      modal.style.display="flex";
-    }
-
-    prepararCacheProgressaoV956().then(()=>renderProgressaoCacheV956());
-    return;
-  }
-
-  renderProgressaoCacheV956();
-};
-
-function renderProgressaoCacheV956(){
-  const lista=cacheProgressaoV956||[];
-  const modal=document.getElementById("intelModal");
-  const titulo=document.getElementById("intelModalTitulo");
-  const area=document.getElementById("intelModalConteudo");
-  if(!modal||!titulo||!area)return;
-
-  titulo.textContent=`Saíram de Ag. Pedido → Aguardando peças (${lista.length.toLocaleString("pt-BR")})`;
-
-  if(!lista.length){
-    area.innerHTML='<div class="admin-info">Nenhuma O.S. fez essa transição nas importações de hoje.</div>';
-  }else{
-    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: relação preparada em memória e renderizada somente ao clicar.</div>'+
-      "<div class='intel-list'>"+
-      lista.slice(0,100).map(x=>{
-        const r=x.registro||{};
-        return "<div class='intel-row'><b>"+String(x.os||"-")+"</b><span>"+
-          String(x.produto||"")+
-          "<br><small>"+String(x.antes||"-")+" → "+String(x.depois||"-")+
-          " • "+new Date(x.data).toLocaleString("pt-BR")+
-          "</small></span><span>"+String(r.tecnico||"")+
-          "</span><button onclick=\"abrirOSIntel('"+String(x.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>";
-      }).join("")+
-      "</div>";
-  }
-
-  modal.style.display="flex";
-}
-
-/* Primeira preparação sem bloquear nada */
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>prepararCacheProgressaoV956(),1200);
-});
-
-console.info("ERP V9.5.6: relação de progressão pré-carregada para abertura instantânea.");
-})();
-</script>
-
-<script id="erp-v958-integridade-cartao-progressao">
-(function(){
-"use strict";
-function garantirV958(){
-  const card=document.getElementById("intelMiniCardTransicoesV925");
-  if(card)card.style.display="";
-  try{window.sincronizarProgressaoV955?.()}catch(_){}
-  try{window.prepararCacheProgressaoV956?.()}catch(_){}
-}
-document.addEventListener("DOMContentLoaded",()=>setTimeout(garantirV958,300));
-console.info("ERP V9.5.8: cartão Saíram de Ag. Pedido → Aguardando peças restaurado no HTML estático.");
-})();
-</script>
-
-
-<script id="erp-v959-audit-ag-pedido">
-window.ERP=window.ERP||{};
-ERP.Performance=ERP.Performance||{};
-ERP.Performance.agPedidoV959Audit=function(){
-  let analise=[];
-  try{analise=intelAnalise?.status||[]}catch(_){}
-  const r={
-    statusAgregados:analise,
-    card:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
-    relacao:typeof window.abrirAgPedidoPecasV924==="function"
-  };
-  console.info("[V9.5.9 AG PEDIDO]",r);
-  return r;
-};
-console.info("ERP V9.5.9: AG. PEDIDO agora é cartão da Progressão e usa intelAnalise.status.");
-</script>
-
-
-<script id="erp-v960-ag-pedido-preload">
-(function(){
-"use strict";
-
-const STATUS_VARIANTES_V960 = [
-  "AG. PEDIDO DE PECA",
-  "AG. PEDIDO DE PECAS",
-  "AG. PEDIDO DE PEÇA",
-  "AG. PEDIDO DE PEÇAS",
-  "AG PEDIDO DE PECA",
-  "AG PEDIDO DE PECAS",
-  "AG PEDIDO DE PEÇA",
-  "AG PEDIDO DE PEÇAS"
-];
-
-let agPedidoQtdCacheV960 = null;
-let agPedidoAtualizandoV960 = null;
-let agPedidoUltimaAtualizacaoV960 = 0;
-
-function escreverCardV960(qtd){
-  const el=document.getElementById("intelAgPedidoPecasTotalV924");
-  const resumo=document.getElementById("intelAgPedidoPecasResumoV959");
-  if(el) el.textContent=Number(qtd||0).toLocaleString("pt-BR");
-  if(resumo) resumo.textContent=`${Number(qtd||0).toLocaleString("pt-BR")} O.S. no relatório atual`;
-}
-
-async function contarDiretoV960(){
-  const sb=obterSupabaseClient();
-  let total=0;
-
-  /* Faz contagem exata por variante. Como são strings distintas,
-     não existe risco de somar a mesma linha duas vezes. */
-  for(const status of STATUS_VARIANTES_V960){
-    const {count,error}=await sb
-      .from("rexpedlr")
-      .select("os",{count:"exact",head:true})
-      .eq("status",status);
-
-    if(error) throw error;
-    total += Number(count||0);
-  }
-
-  return total;
-}
-
-async function carregarContadorAgPedidoV960(forcar=false){
-  const agora=Date.now();
-
-  if(!forcar && agPedidoQtdCacheV960!==null && (agora-agPedidoUltimaAtualizacaoV960)<30000){
-    escreverCardV960(agPedidoQtdCacheV960);
-    return agPedidoQtdCacheV960;
-  }
-
-  if(agPedidoAtualizandoV960) return agPedidoAtualizandoV960;
-
-  agPedidoAtualizandoV960=(async()=>{
-    try{
-      const qtd=await contarDiretoV960();
-      agPedidoQtdCacheV960=qtd;
-      agPedidoUltimaAtualizacaoV960=Date.now();
-      escreverCardV960(qtd);
-      return qtd;
-    }catch(e){
-      console.warn("[V9.6.0 AG PEDIDO] Falha na contagem direta:",e);
-
-      /* Fallback: se a Inteligência já tiver base carregada, usa a mesma lista
-         do Ver relação, sem abrir/renderizar a relação. */
-      try{
-        if(typeof window.atualizarAgPedidoPecaV928==="function"){
-          const qtd=Number(window.atualizarAgPedidoPecaV928()||0);
-          agPedidoQtdCacheV960=qtd;
-          agPedidoUltimaAtualizacaoV960=Date.now();
-          escreverCardV960(qtd);
-          return qtd;
-        }
-      }catch(_){}
-
-      return 0;
-    }finally{
-      agPedidoAtualizandoV960=null;
-    }
-  })();
-
-  return agPedidoAtualizandoV960;
-}
-
-window.carregarContadorAgPedidoV960=carregarContadorAgPedidoV960;
-
-/* IMPORTANTE:
-   O contador é carregado SEM clicar no cartão e SEM renderizar a relação. */
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>carregarContadorAgPedidoV960(true),500);
-  setTimeout(()=>carregarContadorAgPedidoV960(true),1800);
-});
-
-/* Se o usuário entra na Inteligência, o número já é buscado imediatamente. */
-const abrirIntelBaseV960=window.abrirInteligencia;
-if(typeof abrirIntelBaseV960==="function"){
-  window.abrirInteligencia=function(){
-    const r=abrirIntelBaseV960.apply(this,arguments);
-    carregarContadorAgPedidoV960(true);
-    return r;
-  };
-}
-
-/* Ao voltar para a aba/janela, refresca sem exigir clique no cartão. */
-document.addEventListener("visibilitychange",()=>{
-  if(!document.hidden) carregarContadorAgPedidoV960(true);
-});
-
-/* Depois de salvar comparação/importação, invalida cache e recarrega. */
-if(typeof window.salvarComparacaoImportacao==="function"){
-  const salvarBaseV960=window.salvarComparacaoImportacao;
-  window.salvarComparacaoImportacao=async function(){
-    const r=await salvarBaseV960.apply(this,arguments);
-    agPedidoQtdCacheV960=null;
-    setTimeout(()=>carregarContadorAgPedidoV960(true),150);
-    return r;
-  };
-}
-
-/* A cada 60s, se a Inteligência estiver visível, atualiza silenciosamente. */
-setInterval(()=>{
-  const tela=document.getElementById("telaInteligencia");
-  if(tela && tela.style.display!=="none"){
-    carregarContadorAgPedidoV960(true);
-  }
-},60000);
-
-window.ERP=window.ERP||{};
-ERP.Performance=ERP.Performance||{};
-ERP.Performance.agPedidoV960Audit=async function(){
-  const qtd=await carregarContadorAgPedidoV960(true);
-  const r={
-    qtdDiretoBanco:qtd,
-    card:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
-    cache:agPedidoQtdCacheV960
-  };
-  console.info("[V9.6.0 AG PEDIDO]",r);
-  return r;
-};
-
-console.info("ERP V9.6.0: AG. PEDIDO pré-carrega a quantidade sem clicar no cartão.");
-})();
-</script>
-
-
 <div id="coletaFotosHistoricoModalV961">
   <div id="coletaFotosHistoricoBoxV961">
     <div class="coleta-hist-topo-v961">
@@ -26419,6 +25927,318 @@ console.info("ERP V9.6.1: histórico de coletas finalizadas visível, clicável 
 
 <script id="erp-v962-historico-fotos-fix">
 console.info("ERP V9.6.2: histórico da coleta usa a mesma configuração do módulo Mídias e permite remover coletas finalizadas.");
+</script>
+<script id="erp-v963-coleta-close-fix">
+(function(){
+"use strict";
+
+function fecharColetaV963(){
+  try{window.fecharColetaFotosV943?.()}catch(_){}
+}
+
+document.addEventListener("click",function(e){
+  const modal=document.getElementById("coletaFotosModalV943");
+  if(!modal)return;
+
+  /* Clicou no fundo escuro, fora da caixa branca */
+  if(e.target===modal){
+    fecharColetaV963();
+  }
+},true);
+
+document.addEventListener("keydown",function(e){
+  if(e.key==="Escape"){
+    const modal=document.getElementById("coletaFotosModalV943");
+    if(modal?.classList.contains("aberto")){
+      fecharColetaV963();
+    }
+
+    const hist=document.getElementById("coletaFotosHistoricoModalV961");
+    if(hist?.classList.contains("aberto")){
+      window.fecharHistoricoColetaFotosV961?.();
+    }
+  }
+});
+
+console.info("ERP V9.6.3: Coleta de Fotos com Fechar, clique fora e ESC.");
+})();
+</script>
+<script id="erp-v965-pecas-clean">
+(function(){
+"use strict";
+
+/* ==========================================================
+   V9.6.5 — LIMPEZA DOS CARTÕES DE PEÇAS
+   - Sem consulta periódica ao Supabase.
+   - Sem reconstrução assíncrona no clique.
+   - Sem pré-render de relações.
+   - Apenas números ficam no DOM.
+   ========================================================== */
+
+function normV965(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function ehAgPedidoV965(v){
+  const s=normV965(v);
+  return s==="ag pedido de peca" || s==="ag pedido de pecas";
+}
+function ehAguardandoV965(v){
+  const s=normV965(v);
+  return s==="aguardando peca" || s==="aguardando pecas" ||
+         s==="ag peca" || s==="ag pecas";
+}
+function baseAtualV965(){
+  try{
+    if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros))
+      return intelRegistros;
+  }catch(_){}
+  return [];
+}
+
+/* ---------- AG. PEDIDO: contador leve em memória ---------- */
+function atualizarAgPedidoV965(){
+  const base=baseAtualV965();
+  if(!base.length)return 0;
+
+  const qtd=base.reduce((n,r)=>n+(ehAgPedidoV965(r?.status)?1:0),0);
+  const el=document.getElementById("intelAgPedidoPecasTotalV924");
+  const resumo=document.getElementById("intelAgPedidoPecasResumoV959");
+
+  if(el)el.textContent=qtd.toLocaleString("pt-BR");
+  if(resumo)resumo.textContent=`${qtd.toLocaleString("pt-BR")} O.S. no relatório atual`;
+
+  return qtd;
+}
+window.atualizarAgPedidoV965=atualizarAgPedidoV965;
+window.atualizarAgPedidoPecaV928=atualizarAgPedidoV965;
+
+/* Não cria elementos, não consulta banco e não usa intervalo.
+   Só atualiza o texto do cartão quando a Inteligência efetivamente renderiza. */
+const renderIntelBaseV965=window.renderIntel;
+if(typeof renderIntelBaseV965==="function"){
+  window.renderIntel=function(){
+    const r=renderIntelBaseV965.apply(this,arguments);
+    atualizarAgPedidoV965();
+    return r;
+  };
+}
+
+/* Ao abrir Inteligência, espera somente a base em memória ficar disponível.
+   Máximo de ~2 segundos; depois para. Nenhum setInterval permanente. */
+const abrirIntelBaseV965=window.abrirInteligencia;
+if(typeof abrirIntelBaseV965==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV965.apply(this,arguments);
+
+    let tent=0;
+    const timer=setInterval(()=>{
+      tent++;
+      if(baseAtualV965().length){
+        atualizarAgPedidoV965();
+        clearInterval(timer);
+      }else if(tent>=10){
+        clearInterval(timer);
+      }
+    },200);
+
+    return r;
+  };
+}
+
+/* ---------- PROGRESSÃO: abrir instantaneamente do storage ----------
+   O número já é mantido pelo módulo original V925 no localStorage.
+   Aqui só restauramos o clique de forma síncrona e simples. */
+function lerHistV965(){
+  try{
+    return JSON.parse(localStorage.getItem("ERP_PROGRESSAO_PECAS_V925")||'{"dias":{}}');
+  }catch(_){
+    return {dias:{}};
+  }
+}
+function hojeKeyV965(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function mapaOSV965(){
+  const m=new Map();
+  for(const r of baseAtualV965()){
+    const os=String(r?.os||"").trim();
+    if(os)m.set(os,r);
+  }
+  return m;
+}
+function escV965(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+window.abrirRelacaoMiniPecasV925=function(tipo){
+  if(tipo!=="transicoes")return;
+
+  const hist=lerHistV965();
+  const ids=hist?.dias?.[hojeKeyV965()]?.transicoesOS||[];
+  const mapa=mapaOSV965();
+
+  const lista=[...new Set(ids.map(x=>String(x||"").trim()).filter(Boolean))]
+    .map(os=>mapa.get(os)||{os,status:"AGUARDANDO PECAS"});
+
+  const modal=document.getElementById("intelModal");
+  const titulo=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!titulo||!area)return;
+
+  titulo.textContent=`Saíram de Ag. Pedido → Aguardando peças (${lista.length.toLocaleString("pt-BR")})`;
+
+  if(!lista.length){
+    area.innerHTML='<div class="admin-info">Nenhuma O.S. fez essa transição nas atualizações de hoje.</div>';
+  }else{
+    /* Zero Relation DOM: no máximo 100 registros no modal. */
+    area.innerHTML=
+      '<div class="erp-zero-info-v920">Zero Relation DOM: somente até 100 O.S. são renderizadas ao abrir.</div>'+
+      "<div class='intel-list'>"+
+      lista.slice(0,100).map(r=>
+        "<div class='intel-row'>"+
+          "<b>"+escV965(r.os||"-")+"</b>"+
+          "<span>"+escV965(r.desc_produto||"")+
+            "<br><small>Status: "+escV965(r.status||"-")+
+            " • Rack: "+escV965(r.rack||"-")+
+            " • N.C.E.: "+escV965(r.nce||"-")+
+            "</small></span>"+
+          "<span>"+escV965(r.tecnico||"")+"</span>"+
+          "<button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button>"+
+        "</div>"
+      ).join("")+
+      "</div>";
+  }
+
+  modal.style.display="flex";
+};
+
+/* Exportação da progressão usa a mesma fonte, mas não renderiza nada. */
+window.exportarRelacaoMiniPecasV925=function(tipo){
+  if(tipo!=="transicoes")return;
+
+  const hist=lerHistV965();
+  const ids=hist?.dias?.[hojeKeyV965()]?.transicoesOS||[];
+  const mapa=mapaOSV965();
+
+  const lista=[...new Set(ids.map(x=>String(x||"").trim()).filter(Boolean))]
+    .map(os=>mapa.get(os)||{os,status:"AGUARDANDO PECAS"});
+
+  if(!lista.length){
+    alert("Não há O.S. nesta relação para exportar.");
+    return;
+  }
+
+  ERP.Export.exportar({
+    dados:lista,
+    formato:"CSV",
+    nome:"progressao_ag_pedido_para_aguardando_pecas",
+    aba:"Progressão Peças",
+    colunas:[
+      {label:"O.S.",key:"os"},
+      {label:"GR",key:"grupo"},
+      {label:"N.C.E",key:"nce"},
+      {label:"Produto",key:"desc_produto"},
+      {label:"Status",key:"status"},
+      {label:"Rack",key:"rack"},
+      {label:"Técnico",key:"tecnico"},
+      {label:"PDV",key:"pdv"}
+    ]
+  });
+};
+
+/* Fechar o modal limpa a relação para devolver o DOM ao estado leve. */
+const fecharIntelBaseV965=window.fecharIntelModal;
+window.fecharIntelModal=function(){
+  try{
+    return typeof fecharIntelBaseV965==="function"
+      ? fecharIntelBaseV965.apply(this,arguments)
+      : undefined;
+  }finally{
+    const area=document.getElementById("intelModalConteudo");
+    if(area)area.innerHTML="";
+  }
+};
+
+/* Auditoria de DOM e contadores. */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance.pecasV965Audit=function(){
+  const r={
+    agPedido:atualizarAgPedidoV965(),
+    cardAgPedido:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
+    progressao:document.getElementById("intelMiniTransicoesV925")?.textContent||null,
+    itensModal:document.querySelectorAll("#intelModalConteudo .intel-row").length,
+    domTotal:document.getElementsByTagName("*").length
+  };
+  console.info("[V9.6.5 PEÇAS]",r);
+  return r;
+};
+
+console.info("ERP V9.6.5: cartões de peças limpos, sem polling e sem pré-render de relações.");
+})();
+</script>
+
+
+<script id="erp-v966-admin-estrutural">
+(function(){
+"use strict";
+
+function instalarAdminV966(){
+  const base=window.abrirAdmin;
+  if(typeof base!=="function" || base.__v966)return;
+
+  const fn=function(){
+    /* Se estiver estacionada pelo Zero Relation DOM, monta primeiro.
+       Agora o marcador dela está no TOPO, porque o HTML foi movido estruturalmente. */
+    window.erpMontarTelaV7544?.("telaAdmin");
+
+    const r=base.apply(this,arguments);
+
+    const tela=document.getElementById("telaAdmin");
+    if(tela)tela.style.display="block";
+
+    /* Volta a viewport para o início da área principal. */
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+
+    setTimeout(()=>window.erpSincronizarModulosV7544?.(),0);
+    return r;
+  };
+
+  fn.__v966=true;
+  window.abrirAdmin=fn;
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(instalarAdminV966,3500);
+  },{once:true});
+}else{
+  setTimeout(instalarAdminV966,3500);
+}
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.adminV966Audit=function(){
+  const tela=document.getElementById("telaAdmin");
+  const inicio=document.getElementById("telaInicio");
+  const r={
+    adminExiste:!!tela,
+    adminAntesInicio:!!(tela&&inicio&&(tela.compareDocumentPosition(inicio)&Node.DOCUMENT_POSITION_FOLLOWING)),
+    adminTop:tela?.getBoundingClientRect?.().top??null,
+    scrollY:window.scrollY,
+    display:tela?getComputedStyle(tela).display:null
+  };
+  console.info("[V9.6.6 ADMIN ESTRUTURAL]",r);
+  return r;
+};
+
+console.info("ERP V9.6.6: Administração movida estruturalmente para o topo da área principal.");
+})();
 </script>
 
 </body>
