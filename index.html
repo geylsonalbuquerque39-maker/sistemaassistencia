@@ -20423,7 +20423,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.5.0</div>
+<div id="erpVersionBadgeV7542">ERP V9.5.2</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21035,7 +21035,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.5.0",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.5.2",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23475,7 +23475,7 @@ function isAgPedido(v){
 }
 function isAguardandoPecas(v){
   const s=norm(v);
-  return s==="aguardando pecas" || s==="ag pecas" || s==="aguardando peca";
+  return s==="aguardando peca" || s==="aguardando pecas" || s==="ag peca" || s==="ag pecas";
 }
 function hojeKey(d=new Date()){
   const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),day=String(d.getDate()).padStart(2,"0");
@@ -25227,7 +25227,7 @@ function normV948(v){
     .replace(/\s+/g," ").trim();
 }
 function ehAgPedidoV948(v){
-  return normV948(v)==="ag pedido de peca";
+  const s=normV948(v); return s==="ag pedido de peca" || s==="ag pedido de pecas";
 }
 function ehAguardandoPecasV948(v){
   const s=normV948(v);
@@ -25440,11 +25440,11 @@ function normV950(v){
     .replace(/\s+/g," ").trim();
 }
 function isAgPedidoV950(v){
-  return normV950(v)==="ag pedido de peca";
+  const s=normV950(v); return s==="ag pedido de peca" || s==="ag pedido de pecas";
 }
 function isAguardandoV950(v){
   const s=normV950(v);
-  return s==="aguardando pecas" || s==="ag pecas" || s==="aguardando peca";
+  return s==="aguardando peca" || s==="aguardando pecas" || s==="ag peca" || s==="ag pecas";
 }
 function inicioDiaISO(d=new Date()){
   const x=new Date(d);
@@ -25665,6 +25665,248 @@ ERP.Performance.pecasSupabaseAudit=async function(){
 
 console.info("ERP V9.5.0: indicadores de peças passam a consultar Supabase diretamente.");
 })();
+</script>
+
+
+<script id="erp-v951-fix-definitivo-pecas">
+(function(){
+"use strict";
+
+/* =========================================================
+   V9.5.1
+   Usa EXATAMENTE as fontes que já funcionam no ERP:
+   - AG. PEDIDO: intelRegistros, a mesma lista que "Ver relação" usa.
+   - Progressão: comparações de importação já gravadas pelo comparador.
+   Nenhum dos dois depende de clicar na relação.
+   ========================================================= */
+
+function norm951(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function isAgPedido951(v){
+  const s=norm951(v);
+  return s==="ag pedido de peca" || s==="ag pedido de pecas";
+}
+function isAguardando951(v){
+  const s=norm951(v);
+  return s==="aguardando peca" ||
+         s==="aguardando pecas" ||
+         s==="ag peca" ||
+         s==="ag pecas";
+}
+function base951(){
+  try{
+    if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros))
+      return intelRegistros;
+  }catch(_){}
+  return [];
+}
+function hojeKey951(d=new Date()){
+  const y=d.getFullYear();
+  const m=String(d.getMonth()+1).padStart(2,"0");
+  const day=String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+
+/* ---------- AG. PEDIDO: mesma base da relação ---------- */
+function atualizarAgPedido951(){
+  const lista=base951();
+  if(!lista.length)return 0;
+
+  const qtd=lista.filter(r=>isAgPedido951(r?.status)).length;
+  const el=document.getElementById("intelAgPedidoPecasTotalV924");
+  if(el)el.textContent=qtd.toLocaleString("pt-BR");
+  return qtd;
+}
+
+/* Substitui todas as versões anteriores pelo método simples que já funciona */
+window.atualizarAgPedidoPecaV928=atualizarAgPedido951;
+window.atualizarAgPedidoPecaV949=atualizarAgPedido951;
+
+/* ---------- Progressão: histórico REAL do comparador ---------- */
+async function transicoesComparador951(){
+  if(typeof listarComparacoesImportacao!=="function")return [];
+
+  let comps=[];
+  try{comps=await listarComparacoesImportacao()}catch(e){
+    console.warn("[V9.5.1] Não foi possível ler comparações:",e);
+    return [];
+  }
+
+  const hoje=hojeKey951();
+  const mapa=new Map();
+
+  for(const comp of comps||[]){
+    const dataComp=new Date(comp?.data||0);
+    if(Number.isNaN(dataComp.getTime()) || hojeKey951(dataComp)!==hoje)continue;
+
+    const alteracoes=Array.isArray(comp?.todas)?comp.todas:
+                    Array.isArray(comp?.status)?comp.status:[];
+
+    for(const x of alteracoes){
+      const chave=String(x?.campoChave||"").trim().toLowerCase();
+      if(chave!=="status")continue;
+
+      if(isAgPedido951(x?.antes) && isAguardando951(x?.depois)){
+        const os=String(x?.os||"").trim();
+        if(os)mapa.set(os,{
+          os,
+          produto:x?.produto||x?.registro?.desc_produto||"",
+          antes:x?.antes||"",
+          depois:x?.depois||"",
+          registro:x?.registro||{},
+          data:comp.data,
+          arquivo:comp.arquivo||""
+        });
+      }
+    }
+  }
+  return [...mapa.values()];
+}
+
+async function transicoesOntem951(){
+  if(typeof listarComparacoesImportacao!=="function")return 0;
+  let comps=[];
+  try{comps=await listarComparacoesImportacao()}catch(_){return 0}
+
+  const d=new Date();d.setDate(d.getDate()-1);
+  const key=hojeKey951(d);
+  const osSet=new Set();
+
+  for(const comp of comps||[]){
+    const dc=new Date(comp?.data||0);
+    if(Number.isNaN(dc.getTime()) || hojeKey951(dc)!==key)continue;
+    const alt=Array.isArray(comp?.todas)?comp.todas:(comp?.status||[]);
+    for(const x of alt){
+      if(String(x?.campoChave||"").toLowerCase()==="status" &&
+         isAgPedido951(x?.antes) && isAguardando951(x?.depois)){
+        const os=String(x?.os||"").trim();
+        if(os)osSet.add(os);
+      }
+    }
+  }
+  return osSet.size;
+}
+
+async function atualizarProgressao951(){
+  const lista=await transicoesComparador951();
+  const ontem=await transicoesOntem951();
+  const hoje=lista.length;
+  const delta=hoje-ontem;
+
+  const el=document.getElementById("intelMiniTransicoesV925");
+  const comp=document.getElementById("intelMiniTransicoesComparativoV925");
+  const atualizado=document.getElementById("intelMiniPecasAtualizadoV925");
+
+  if(el)el.textContent=hoje.toLocaleString("pt-BR");
+  if(comp)comp.textContent=`Hoje • Ontem: ${ontem.toLocaleString("pt-BR")} • ${delta>=0?"+":""}${delta}`;
+  if(atualizado)atualizado.textContent=`Atualizado pelas comparações de importação às ${new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"})}`;
+
+  return lista;
+}
+
+/* Mantém o cartão divergente da versão original e corrige só a progressão */
+const renderMiniOriginal951=window.renderMiniDashboardPecasV925;
+window.renderMiniDashboardPecasV925=function(listaAtual){
+  try{
+    if(typeof renderMiniOriginal951==="function"){
+      renderMiniOriginal951.call(this,listaAtual);
+    }
+  }catch(e){
+    console.warn("[V9.5.1] render original:",e);
+  }
+  atualizarProgressao951();
+};
+
+/* Relação de transições usa a mesma fonte do número mostrado */
+const abrirRelacaoOriginal951=window.abrirRelacaoMiniPecasV925;
+window.abrirRelacaoMiniPecasV925=async function(tipo){
+  if(tipo!=="transicoes"){
+    return typeof abrirRelacaoOriginal951==="function"
+      ? abrirRelacaoOriginal951.apply(this,arguments)
+      : undefined;
+  }
+
+  const lista=await transicoesComparador951();
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+
+  tit.textContent=`Saíram de Ag. Pedido → Aguardando peças (${lista.length.toLocaleString("pt-BR")})`;
+
+  if(!lista.length){
+    area.innerHTML='<div class="admin-info">Nenhuma transição AG. PEDIDO DE PECA → AGUARDANDO PEÇAS registrada nas importações de hoje.</div>';
+  }else{
+    area.innerHTML='<div class="erp-zero-info-v920">Zero Relation DOM: dados carregados somente ao clicar.</div>'+
+      "<div class='intel-list'>"+
+      lista.slice(0,100).map(x=>{
+        const r=x.registro||{};
+        return "<div class='intel-row'><b>"+String(x.os||"-")+"</b><span>"+
+          String(x.produto||"")+
+          "<br><small>"+String(x.antes||"-")+" → "+String(x.depois||"-")+
+          " • "+new Date(x.data).toLocaleString("pt-BR")+
+          "</small></span><span>"+String(r.tecnico||"")+
+          "</span><button onclick=\"abrirOSIntel('"+String(x.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>";
+      }).join("")+
+      "</div>";
+  }
+  modal.style.display="flex";
+};
+
+/* Atualizador único chamado no MESMO MOMENTO dos cartões que já funcionam */
+window.atualizarIndicadoresPecasV951=async function(){
+  const ag=atualizarAgPedido951();
+  const trans=await atualizarProgressao951();
+  return {agPedido:ag,transicoes:trans.length};
+};
+
+/* Abrir inteligência */
+const abrirIntel951=window.abrirInteligencia;
+if(typeof abrirIntel951==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntel951.apply(this,arguments);
+    setTimeout(()=>window.atualizarIndicadoresPecasV951?.(),0);
+    setTimeout(()=>window.atualizarIndicadoresPecasV951?.(),350);
+    return r;
+  };
+}
+
+/* Reanalisar / carregar também termina chamando renderIntel, que já chama
+   atualizarAgPedidoPecaV928 e renderMiniDashboardPecasV925. */
+
+/* Auditoria objetiva: o número aqui deve ser o MESMO do título da relação */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.pecasV951Audit=async function(){
+  const base=base951();
+  const ag=base.filter(r=>isAgPedido951(r?.status)).length;
+  const trans=await transicoesComparador951();
+  const r={
+    base:base.length,
+    agPedido:ag,
+    contadorTela:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
+    transicoesHoje:trans.length,
+    contadorTransicoesTela:document.getElementById("intelMiniTransicoesV925")?.textContent||null
+  };
+  console.info("[V9.5.1 PEÇAS]",r);
+  return r;
+};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>window.atualizarIndicadoresPecasV951?.(),1800);
+});
+
+console.info("ERP V9.5.1: contadores de peças corrigidos usando as mesmas fontes já funcionais do ERP.");
+})();
+</script>
+
+
+<script id="erp-v952-peça-pecas-audit">
+console.info("ERP V9.5.2: PECA/PECAS e PEÇA/PEÇAS tratados como equivalentes nos indicadores de peças.");
 </script>
 
 </body>
