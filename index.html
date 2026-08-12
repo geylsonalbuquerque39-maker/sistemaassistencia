@@ -20688,7 +20688,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.6.1</div>
+<div id="erpVersionBadgeV7542">ERP V9.6.2</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21300,7 +21300,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.6.1",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.6.2",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -25127,34 +25127,75 @@ function isAgPedido(r){
 async function fotosOSV947(os){
   if(Array.isArray(fotoCacheV943[os]))return fotoCacheV943[os];
   try{
-    const cfg=JSON.parse(localStorage.getItem("ERP_MIDIAS_OS_CONFIG_V1")||"{}");
-    const url=cfg.url||"https://sjututwxmjbhprvdhekl.supabase.co";
-    const key=cfg.key||"";
-    const bucket=cfg.bucket||"midias-os";
-    const tabela=cfg.tabela||"midias_os";
+    const cfgLocal=JSON.parse(localStorage.getItem("ERP_MIDIAS_OS_CONFIG_V1")||"{}");
+
+    /* Mesmos padrões do módulo oficial de Mídias da O.S. */
+    const url=cfgLocal.url||"https://sjututwxmjbhprvdhekl.supabase.co";
+    const key=cfgLocal.key||"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8";
+    const bucket=cfgLocal.bucket||"midias-os";
+    const tabela=cfgLocal.tabela||"midias_os";
+
     if(!window.supabase?.createClient)return [];
 
-    const s=window.supabase.createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});
-    const {data,error}=await s.from(tabela)
-      .select("bucket,caminho_arquivo,nome_original,criado_em")
+    const s=window.supabase.createClient(url,key,{
+      auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
+    });
+
+    let q=s.from(tabela)
+      .select("id,os,bucket,caminho_arquivo,nome_original,criado_em,tipo_midia,origem")
       .eq("os",String(os))
       .eq("origem","principal")
       .eq("tipo_midia","imagem")
       .order("criado_em",{ascending:false})
-      .limit(8);
+      .limit(12);
+
+    /* Compatível com bancos que já tenham exclusão lógica. */
+    try{q=q.is("excluido_em",null)}catch(_){}
+
+    let {data,error}=await q;
+
+    /* Fallback: alguns registros antigos podem não ter origem/tipo preenchidos.
+       Nesse caso, busca por O.S. no mesmo banco usado pelo módulo de Mídias. */
+    if((error || !data?.length)){
+      const fb=await s.from(tabela)
+        .select("id,os,bucket,caminho_arquivo,nome_original,criado_em,tipo_midia,origem")
+        .eq("os",String(os))
+        .order("criado_em",{ascending:false})
+        .limit(12);
+
+      if(!fb.error){
+        data=(fb.data||[]).filter(r=>{
+          const tipo=String(r.tipo_midia||"imagem").toLowerCase();
+          return tipo==="imagem" || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(String(r.nome_original||""));
+        });
+        error=null;
+      }
+    }
 
     if(error||!Array.isArray(data)){fotoCacheV943[os]=[];return []}
 
     const fotos=[];
     for(const r of data){
+      if(!r?.caminho_arquivo)continue;
       try{
-        const sig=await s.storage.from(r.bucket||bucket).createSignedUrl(r.caminho_arquivo,1800);
-        if(sig?.data?.signedUrl)fotos.push({url:sig.data.signedUrl,nome:r.nome_original||""});
+        const sig=await s.storage
+          .from(r.bucket||bucket)
+          .createSignedUrl(r.caminho_arquivo,3600);
+
+        if(sig?.data?.signedUrl){
+          fotos.push({
+            url:sig.data.signedUrl,
+            nome:r.nome_original||"",
+            caminho:r.caminho_arquivo
+          });
+        }
       }catch(_){}
     }
+
     fotoCacheV943[os]=fotos;
     return fotos;
-  }catch(_){
+  }catch(e){
+    console.warn("[V9.6.2 fotos da coleta]",e);
     fotoCacheV943[os]=[];
     return [];
   }
@@ -25375,6 +25416,7 @@ async function renderColetaFotosV943(){
           </div>
           <div class="coleta-fotos-hist-acoes-v961">
             <button type="button" onclick="abrirHistoricoColetaFotosV961('${String(x.id||idx).replace(/'/g,"\\'")}')">👁 Ver relação</button>
+            <button type="button" style="background:#b00020" onclick="removerHistoricoColetaFotosV962('${String(x.id||idx).replace(/'/g,"\\'")}')">🗑 Remover</button>
           </div>
         </div>`;
     }).join(""):'<div class="admin-info">Nenhuma coleta finalizada ainda.</div>';
@@ -25442,7 +25484,7 @@ window.abrirHistoricoColetaFotosV961=async function(id){
 
       if(!fotos.length){
         main.className="coleta-hist-sem-foto-v961";
-        main.innerHTML="Sem foto<br>disponível";
+        main.innerHTML="Foto não carregou<br><small>Use Mídias para conferir</small>";
         if(gal)gal.innerHTML="";
         return;
       }
@@ -25459,6 +25501,33 @@ window.abrirHistoricoColetaFotosV961=async function(id){
       }
     });
   }
+};
+
+
+window.removerHistoricoColetaFotosV962=function(id){
+  const hist=histLoad();
+  const idx=hist.findIndex((x,i)=>String(x.id||i)===String(id));
+  if(idx<0){
+    alert("Coleta não encontrada.");
+    return;
+  }
+
+  const coleta=hist[idx];
+  const qtdOS=(coleta.itens||[]).length;
+  const qtdFotos=(coleta.itens||[]).reduce((s,x)=>s+Number(x.fotos||0),0);
+
+  if(!confirm(`Remover esta coleta finalizada?\n\n${qtdOS} O.S. • ${qtdFotos} foto(s)\n\nAs fotos das O.S. NÃO serão apagadas. Apenas o registro da coleta será removido.`)){
+    return;
+  }
+
+  hist.splice(idx,1);
+  histSave(hist);
+
+  if(coletaHistoricoAtualV961 && String(coletaHistoricoAtualV961.id||"")===String(id)){
+    window.fecharHistoricoColetaFotosV961?.();
+  }
+
+  renderColetaFotosV943();
 };
 
 window.fecharHistoricoColetaFotosV961=function(){
@@ -26345,6 +26414,11 @@ document.addEventListener("click",function(e){
   if(e.target===modal)window.fecharHistoricoColetaFotosV961?.();
 });
 console.info("ERP V9.6.1: histórico de coletas finalizadas visível, clicável e com relação fotográfica.");
+</script>
+
+
+<script id="erp-v962-historico-fotos-fix">
+console.info("ERP V9.6.2: histórico da coleta usa a mesma configuração do módulo Mídias e permite remover coletas finalizadas.");
 </script>
 
 </body>
