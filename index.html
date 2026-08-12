@@ -20423,7 +20423,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.4.7</div>
+<div id="erpVersionBadgeV7542">ERP V9.4.9</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21035,7 +21035,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.4.7",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.4.9",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -25212,6 +25212,207 @@ console.info("ERP V9.4.7: múltiplas fotos por O.S. com galeria na coleta.");
 
 
 
+})();
+</script>
+
+
+<script id="erp-v948-fix-aguardando-pecas">
+(function(){
+"use strict";
+
+function normV948(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+function ehAgPedidoV948(v){
+  return normV948(v)==="ag pedido de peca";
+}
+function ehAguardandoPecasV948(v){
+  const s=normV948(v);
+  return s==="aguardando pecas" || s==="ag pecas";
+}
+function baseV948(){
+  try{
+    if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros) && intelRegistros.length)
+      return intelRegistros;
+  }catch(_){}
+  try{
+    if(Array.isArray(window.rexpedlrDados) && window.rexpedlrDados.length)
+      return window.rexpedlrDados;
+  }catch(_){}
+  return [];
+}
+
+window.atualizarAguardandoPecasV948=function(){
+  const qtd=baseV948().filter(r=>ehAguardandoPecasV948(r?.status)).length;
+
+  /* Atualiza qualquer contador já existente cujo id/texto indique Aguardando Peças */
+  const ids=[
+    "intelAguardandoPecasTotal",
+    "intelAguardandoPecasTotalV925",
+    "intelAguardandoPecasTotalV948",
+    "cardAguardandoPecasTotal",
+    "intelMiniAguardandoPecasV925"
+  ];
+  ids.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.textContent=qtd.toLocaleString("pt-BR");
+  });
+
+  document.querySelectorAll("[data-status-card]").forEach(el=>{
+    const s=normV948(el.getAttribute("data-status-card"));
+    if(s==="aguardando pecas" || s==="ag pecas"){
+      const n=el.querySelector("strong,[data-count],.count,.numero");
+      if(n)n.textContent=qtd.toLocaleString("pt-BR");
+    }
+  });
+
+  return qtd;
+};
+
+window.abrirAguardandoPecasV948=function(){
+  const lista=baseV948().filter(r=>ehAguardandoPecasV948(r?.status));
+  const modal=document.getElementById("intelModal");
+  const titulo=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!titulo||!area)return;
+
+  titulo.textContent="AGUARDANDO PEÇAS ("+lista.length.toLocaleString("pt-BR")+")";
+  area.innerHTML=lista.length
+    ? "<div class='erp-zero-info-v920'>Zero Relation DOM: 100 O.S. exibidas por vez.</div><div class='intel-list'>"+
+      lista.slice(0,100).map(r=>"<div class='intel-row'><b>"+String(r.os||"-")+"</b><span>"+
+        String(r.desc_produto||"")+"<br><small>Status: "+String(r.status||"-")+
+        " • GR: "+String(r.grupo||"-")+" • N.C.E.: "+String(r.nce||"-")+
+        "</small></span><span>"+String(r.tecnico||"")+
+        "</span><button onclick=\"abrirOSIntel('"+String(r.os||"").replace(/'/g,"\\'")+"')\">Abrir</button></div>"
+      ).join("")+"</div>"
+    : "<div class='admin-info'>Nenhuma O.S. em AGUARDANDO PEÇAS.</div>";
+  modal.style.display="flex";
+};
+
+/* Reimplementa a transição diária usando os nomes corretos:
+   AG. PEDIDO DE PECA -> AGUARDANDO PEÇAS */
+window.registrarProgressaoPecasV925=function(antes,depois,meta={}){
+  const mapaAntes=new Map(
+    (antes||[])
+      .filter(r=>String(r?.os||"").trim())
+      .map(r=>[String(r.os).trim(),r])
+  );
+
+  const mudaram=[];
+  (depois||[]).forEach(novo=>{
+    const os=String(novo?.os||"").trim();
+    const antigo=mapaAntes.get(os);
+    if(!antigo)return;
+    if(ehAgPedidoV948(antigo.status) && ehAguardandoPecasV948(novo.status)){
+      mudaram.push(os);
+    }
+  });
+
+  const d=new Date(meta.data||Date.now());
+  const keyDia=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+
+  const KEY="ERP_PROGRESSAO_PECAS_V925";
+  let hist={dias:{}};
+  try{hist=JSON.parse(localStorage.getItem(KEY)||'{"dias":{}}')}catch(_){}
+  hist.dias=hist.dias||{};
+
+  const atual=hist.dias[keyDia]||{transicoesOS:[],atualizadoEm:null};
+  atual.transicoesOS=[...new Set([...(atual.transicoesOS||[]),...mudaram])];
+  atual.atualizadoEm=meta.data||new Date().toISOString();
+  atual.arquivo=meta.arquivo||atual.arquivo||"";
+  hist.dias[keyDia]=atual;
+
+  localStorage.setItem(KEY,JSON.stringify(hist));
+
+  try{window.renderMiniDashboardPecasV925?.()}catch(_){}
+  try{window.atualizarAguardandoPecasV948?.()}catch(_){}
+
+  return atual;
+};
+
+/* Atualiza o cartão quando a Inteligência for aberta */
+const abrirIntelBaseV948=window.abrirInteligencia;
+if(typeof abrirIntelBaseV948==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV948.apply(this,arguments);
+    setTimeout(()=>window.atualizarAguardandoPecasV948?.(),0);
+    setTimeout(()=>window.atualizarAguardandoPecasV948?.(),500);
+    return r;
+  };
+}
+
+/* Auditoria rápida */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.aguardandoPecasAudit=function(){
+  const base=baseV948();
+  const r={
+    totalBase:base.length,
+    aguardandoPecas:base.filter(x=>ehAguardandoPecasV948(x?.status)).length,
+    agPedidoPeca:base.filter(x=>ehAgPedidoV948(x?.status)).length,
+    statusEncontrados:[...new Set(base.map(x=>String(x?.status??"").trim()).filter(Boolean))].sort()
+  };
+  console.info("[AGUARDANDO PEÇAS / PROGRESSÃO]",r);
+  return r;
+};
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>window.atualizarAguardandoPecasV948?.(),1500);
+});
+
+console.info("ERP V9.4.8: Aguardando Peças e progressão Ag. Pedido -> Aguardando Peças corrigidos.");
+})();
+</script>
+
+
+<script id="erp-v949-fix-contador-ag-pedido">
+(function(){
+"use strict";
+function n(v){return String(v??"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[.\-_/]+/g," ").replace(/\s+/g," ").trim()}
+function base(){
+  try{if(typeof intelRegistros!=="undefined"&&Array.isArray(intelRegistros)&&intelRegistros.length)return intelRegistros}catch(_){}
+  try{if(Array.isArray(window.rexpedlrDados)&&window.rexpedlrDados.length)return window.rexpedlrDados}catch(_){}
+  return [];
+}
+function atualizar(){
+  const qtd=base().filter(r=>n(r?.status)==="ag pedido de peca").length;
+  const el=document.getElementById("intelAgPedidoPecasTotalV924");
+  if(el)el.textContent=qtd.toLocaleString("pt-BR");
+  return qtd;
+}
+window.atualizarAgPedidoPecaV928=atualizar;
+window.atualizarAgPedidoPecaV949=atualizar;
+
+const abrir=window.abrirInteligencia;
+if(typeof abrir==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrir.apply(this,arguments);
+    let t=0;
+    const id=setInterval(()=>{
+      t++;
+      atualizar();
+      if(base().length||t>=25)clearInterval(id);
+    },200);
+    return r;
+  };
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(atualizar,1000);
+  setTimeout(atualizar,2500);
+});
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.agPedidoContadorAudit=function(){
+  const r={total:atualizar(),base:base().length,visivel:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null};
+  console.info("[AG PEDIDO CONTADOR]",r);
+  return r;
+};
+console.info("ERP V9.4.9: contador AG. PEDIDO DE PECA sempre visível.");
 })();
 </script>
 
