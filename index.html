@@ -6000,6 +6000,40 @@ body.dark-mode .agpedido-chip-v937{
 
 
 
+<div id="telaRelatorios">
+    <div class="title">
+        <h1>RELATÓRIOS</h1>
+        <p>Filtros avançados direto do Supabase</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="admin-painel">
+        <h2>▥ Relatório de O.S.</h2>
+        <div class="admin-info">Pesquise por status, técnico, PDV, produto, O.S, NF, série ou NCE. O resultado pode ser exportado para CSV.</div>
+        <div class="relatorio-filtros">
+            <div class="ci-campo"><label>Pesquisar</label><input class="ci-input" id="relTermo" placeholder="O.S, produto, técnico, série..."></div>
+            <div class="ci-campo"><label>Status</label><input class="ci-input" id="relStatus" placeholder="Ex: PRONTO"></div>
+            <div class="ci-campo"><label>Técnico</label><input class="ci-input" id="relTecnico" placeholder="Nome do técnico"></div>
+            <div class="ci-campo"><label>PDV</label><input class="ci-input" id="relPDV" placeholder="Loja/PDV"></div>
+            <div class="ci-campo"><label>Categoria</label><select class="ci-input" id="relCategoria"><option value="">Todas</option><option value="Linha Branca">Linha Branca</option><option value="Linha Marrom">Linha Marrom</option><option value="Eletroportáteis">Eletroportáteis</option><option value="Informática">Informática</option><option value="Telefonia">Telefonia</option><option value="Não classificado">Não classificado</option></select></div>
+        </div>
+        <div class="relatorio-acoes">
+            <button class="btn-voltar" onclick="gerarRelatorioOS()">Gerar Relatório</button>
+            <button class="btn-voltar" onclick="exportarRelatorioCSV()">Exportar arquivo ▾</button>
+            <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao Painel</button>
+            <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+        </div>
+        <div id="relMensagem" class="ci-msg"></div>
+        <div class="relatorio-resumo">
+            <div class="relatorio-box">Resultados<span id="relTotal">0</span></div>
+            <div class="relatorio-box">Status<span id="relQtdStatus">0</span></div>
+            <div class="relatorio-box">Técnicos<span id="relQtdTecnicos">0</span></div>
+            <div class="relatorio-box">PDVs<span id="relQtdPDV">0</span></div>
+        </div>
+        <div id="relatorioTabela" class="relatorio-tabela" style="display:none"></div>
+    </div>
+</div>
+
 <div id="telaInicio">
 
     <div class="home-integrada" id="homeIntegradaV502">
@@ -6915,39 +6949,7 @@ body.dark-mode .agpedido-chip-v937{
 <div id="telaAdminBackup"><div class="title"><h1>BACKUP</h1><p>Exportação e segurança</p><div class="underline"></div></div><div class="admin-painel"><h2>💾 Backup</h2><div class="admin-info">Estrutura criada. Próxima fase: exportar base, gerar cópia de segurança e restaurar dados.</div><button class="btn-voltar" onclick="abrirAdmin()">Voltar ao painel</button></div></div>
 
 
-<div id="telaRelatorios">
-    <div class="title">
-        <h1>RELATÓRIOS</h1>
-        <p>Filtros avançados direto do Supabase</p>
-        <div class="underline"></div>
-    </div>
 
-    <div class="admin-painel">
-        <h2>▥ Relatório de O.S.</h2>
-        <div class="admin-info">Pesquise por status, técnico, PDV, produto, O.S, NF, série ou NCE. O resultado pode ser exportado para CSV.</div>
-        <div class="relatorio-filtros">
-            <div class="ci-campo"><label>Pesquisar</label><input class="ci-input" id="relTermo" placeholder="O.S, produto, técnico, série..."></div>
-            <div class="ci-campo"><label>Status</label><input class="ci-input" id="relStatus" placeholder="Ex: PRONTO"></div>
-            <div class="ci-campo"><label>Técnico</label><input class="ci-input" id="relTecnico" placeholder="Nome do técnico"></div>
-            <div class="ci-campo"><label>PDV</label><input class="ci-input" id="relPDV" placeholder="Loja/PDV"></div>
-            <div class="ci-campo"><label>Categoria</label><select class="ci-input" id="relCategoria"><option value="">Todas</option><option value="Linha Branca">Linha Branca</option><option value="Linha Marrom">Linha Marrom</option><option value="Eletroportáteis">Eletroportáteis</option><option value="Informática">Informática</option><option value="Telefonia">Telefonia</option><option value="Não classificado">Não classificado</option></select></div>
-        </div>
-        <div class="relatorio-acoes">
-            <button class="btn-voltar" onclick="gerarRelatorioOS()">Gerar Relatório</button>
-            <button class="btn-voltar" onclick="exportarRelatorioCSV()">Exportar arquivo ▾</button>
-            <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao Painel</button>
-            <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
-        </div>
-        <div id="relMensagem" class="ci-msg"></div>
-        <div class="relatorio-resumo">
-            <div class="relatorio-box">Resultados<span id="relTotal">0</span></div>
-            <div class="relatorio-box">Status<span id="relQtdStatus">0</span></div>
-            <div class="relatorio-box">Técnicos<span id="relQtdTecnicos">0</span></div>
-            <div class="relatorio-box">PDVs<span id="relQtdPDV">0</span></div>
-        </div>
-        <div id="relatorioTabela" class="relatorio-tabela" style="display:none"></div>
-    </div>
-</div>
 
 
 <div class="footer">Sistema de Assistência Técnica - Logística Reversa</div>
@@ -20703,7 +20705,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.6.6</div>
+<div id="erpVersionBadgeV7542">ERP V9.6.7</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21315,7 +21317,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.6.6",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.6.7",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -26238,6 +26240,112 @@ ERP.Performance.adminV966Audit=function(){
 };
 
 console.info("ERP V9.6.6: Administração movida estruturalmente para o topo da área principal.");
+})();
+</script>
+
+
+<script id="erp-v967-relatorios-e-datas-progressao">
+(function(){
+"use strict";
+
+function keyDiaV967(d){
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function lerHistV967(){
+  try{
+    return JSON.parse(localStorage.getItem("ERP_PROGRESSAO_PECAS_V925")||'{"dias":{}}');
+  }catch(_){
+    return {dias:{}};
+  }
+}
+function renderDatasProgressaoV967(){
+  const host=document.getElementById("intelMiniPecasUltimosDiasV925");
+  if(!host)return;
+
+  const hist=lerHistV967();
+  const cards=[];
+
+  for(let i=6;i>=0;i--){
+    const d=new Date();
+    d.setDate(d.getDate()-i);
+    const k=keyDiaV967(d);
+    const qtd=(hist?.dias?.[k]?.transicoesOS||[]).length;
+
+    cards.push(`
+      <div class="intel-mini-dia-v925">
+        <small>${d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+        <b>${Number(qtd||0).toLocaleString("pt-BR")}</b>
+        <small>transições</small>
+      </div>
+    `);
+  }
+
+  host.innerHTML=cards.join("");
+}
+window.renderDatasProgressaoV967=renderDatasProgressaoV967;
+
+const renderMiniBaseV967=window.renderMiniDashboardPecasV925;
+if(typeof renderMiniBaseV967==="function"){
+  window.renderMiniDashboardPecasV925=function(){
+    const r=renderMiniBaseV967.apply(this,arguments);
+    renderDatasProgressaoV967();
+    return r;
+  };
+}
+
+const abrirIntelBaseV967=window.abrirInteligencia;
+if(typeof abrirIntelBaseV967==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV967.apply(this,arguments);
+    setTimeout(renderDatasProgressaoV967,0);
+    return r;
+  };
+}
+
+/* Relatórios agora retorna para o topo sem depender do local antigo. */
+function instalarRelatoriosV967(){
+  const base=window.abrirRelatorios;
+  if(typeof base!=="function" || base.__v967)return;
+
+  const fn=function(){
+    window.erpMontarTelaV7544?.("telaRelatorios");
+    const r=base.apply(this,arguments);
+    const tela=document.getElementById("telaRelatorios");
+    if(tela)tela.style.display="block";
+    window.scrollTo({top:0,left:0,behavior:"instant"});
+    setTimeout(()=>window.erpSincronizarModulosV7544?.(),0);
+    return r;
+  };
+  fn.__v967=true;
+  window.abrirRelatorios=fn;
+}
+
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(instalarRelatoriosV967,3500);
+    setTimeout(renderDatasProgressaoV967,1200);
+  },{once:true});
+}else{
+  setTimeout(instalarRelatoriosV967,3500);
+  setTimeout(renderDatasProgressaoV967,1200);
+}
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.v967Audit=function(){
+  const rel=document.getElementById("telaRelatorios");
+  const inicio=document.getElementById("telaInicio");
+  const r={
+    relatoriosExiste:!!rel,
+    relatoriosAntesInicio:!!(rel&&inicio&&(rel.compareDocumentPosition(inicio)&Node.DOCUMENT_POSITION_FOLLOWING)),
+    datasCards:document.querySelectorAll("#intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925").length,
+    domTotal:document.getElementsByTagName("*").length
+  };
+  console.info("[V9.6.7]",r);
+  return r;
+};
+
+console.info("ERP V9.6.7: Relatórios no topo e datas da progressão restauradas.");
 })();
 </script>
 
