@@ -5325,6 +5325,226 @@ body.dark-mode .agpedido-chip-v937{
 .coleta-fotos-contagem-v947{font-size:10px;font-weight:900;color:#49647f;margin-top:4px}
 </style>
 
+
+<style id="erp-v961-historico-coleta-fotos-style">
+.coleta-fotos-historico-v943{
+  margin-top:24px!important;
+  border-top:2px solid #c9d9e8!important;
+  padding-top:18px!important;
+}
+.coleta-fotos-historico-v943 h3{
+  font-size:18px!important;
+  color:#003c7a!important;
+  margin-bottom:12px!important;
+}
+.coleta-fotos-hist-item-v943{
+  display:grid!important;
+  grid-template-columns:minmax(0,1fr) auto!important;
+  gap:12px!important;
+  align-items:center!important;
+  padding:14px!important;
+  margin-bottom:10px!important;
+  border:1px solid #cbd9e8!important;
+  border-radius:12px!important;
+  background:#f8fbff!important;
+  font-size:12px!important;
+  box-shadow:0 2px 8px rgba(0,39,82,.05)!important;
+}
+.coleta-fotos-hist-main-v961 strong{
+  display:block;
+  font-size:16px;
+  color:#003c7a;
+  margin-bottom:4px;
+}
+.coleta-fotos-hist-meta-v961{
+  display:flex;
+  flex-wrap:wrap;
+  gap:6px;
+  color:#5a728a;
+  font-weight:800;
+}
+.coleta-fotos-hist-meta-v961 span{
+  background:#eef5fb;
+  border-radius:999px;
+  padding:5px 8px;
+}
+.coleta-fotos-hist-acoes-v961{
+  display:flex;
+  gap:8px;
+}
+.coleta-fotos-hist-acoes-v961 button{
+  border:0;
+  border-radius:9px;
+  padding:9px 12px;
+  background:#0046b8;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+#coletaFotosHistoricoModalV961{
+  position:fixed;
+  inset:0;
+  z-index:15000;
+  background:rgba(0,18,38,.76);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:16px;
+}
+#coletaFotosHistoricoModalV961.aberto{display:flex}
+#coletaFotosHistoricoBoxV961{
+  width:min(1180px,97vw);
+  max-height:94vh;
+  overflow:auto;
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 30px 90px rgba(0,0,0,.40);
+}
+.coleta-hist-topo-v961{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.coleta-hist-topo-v961 h2{
+  margin:0;
+  color:#003c7a;
+}
+.coleta-hist-topo-v961 p{
+  margin:5px 0 0;
+  color:#60778e;
+  font-size:12px;
+}
+.coleta-hist-topo-v961 button{
+  border:0;
+  border-radius:9px;
+  padding:9px 12px;
+  font-weight:900;
+  cursor:pointer;
+}
+.coleta-hist-resumo-v961{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(130px,1fr));
+  gap:10px;
+  margin-bottom:16px;
+}
+.coleta-hist-kpi-v961{
+  padding:12px;
+  border:1px solid #d5e1ec;
+  border-radius:12px;
+  background:#f8fbff;
+}
+.coleta-hist-kpi-v961 small{
+  display:block;
+  color:#6b8298;
+  font-weight:800;
+}
+.coleta-hist-kpi-v961 strong{
+  display:block;
+  margin-top:4px;
+  color:#003c7a;
+  font-size:22px;
+}
+#coletaFotosHistoricoRelacaoV961{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(380px,1fr));
+  gap:16px;
+}
+.coleta-hist-card-v961{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 180px;
+  gap:16px;
+  padding:16px;
+  border:2px solid #24394d;
+  border-radius:16px;
+  background:#fff;
+  box-shadow:0 5px 18px rgba(0,31,63,.08);
+}
+.coleta-hist-os-v961{
+  font-size:28px;
+  font-weight:950;
+  color:#003c7a;
+  margin-bottom:10px;
+}
+.coleta-hist-campo-v961{
+  display:grid;
+  grid-template-columns:90px minmax(0,1fr);
+  gap:8px;
+  margin-bottom:9px;
+  align-items:center;
+}
+.coleta-hist-campo-v961 b{
+  color:#001f45;
+  font-size:15px;
+}
+.coleta-hist-campo-v961 span{
+  border:1px solid #d5e0ea;
+  border-radius:8px;
+  background:#f8fbff;
+  padding:8px 10px;
+  min-height:18px;
+  font-weight:800;
+  color:#284a69;
+}
+.coleta-hist-foto-v961{
+  width:100%;
+  height:150px;
+  object-fit:contain;
+  background:#eef3f8;
+  border:1px solid #d6e0e9;
+  border-radius:12px;
+}
+.coleta-hist-sem-foto-v961{
+  height:150px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  background:#eef3f8;
+  border:1px solid #d6e0e9;
+  border-radius:12px;
+  color:#71869a;
+  font-size:11px;
+  font-weight:800;
+}
+.coleta-hist-galeria-v961{
+  display:flex;
+  gap:5px;
+  overflow-x:auto;
+  margin-top:6px;
+}
+.coleta-hist-mini-v961{
+  width:48px;
+  height:40px;
+  object-fit:cover;
+  border-radius:7px;
+  border:2px solid transparent;
+  cursor:pointer;
+  flex:0 0 auto;
+}
+.coleta-hist-mini-v961.ativa{border-color:#0046b8}
+.coleta-hist-acoes-card-v961{
+  grid-column:1/-1;
+  display:flex;
+  gap:8px;
+  justify-content:flex-end;
+  flex-wrap:wrap;
+}
+.coleta-hist-acoes-card-v961 button{
+  border:0;
+  border-radius:8px;
+  padding:8px 10px;
+  font-weight:900;
+  cursor:pointer;
+}
+@media(max-width:780px){
+  .coleta-hist-resumo-v961{grid-template-columns:1fr 1fr}
+  .coleta-hist-card-v961{grid-template-columns:1fr}
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -6208,15 +6428,7 @@ body.dark-mode .agpedido-chip-v937{
           <button type="button" onclick="exportarEnderecadosSemCPPV922()">Exportar ▾</button>
         </div>
       </div>
-      <div class="intel-kpi alerta" id="intelAgPedidoPecasV924">
-        <small>AG. PEDIDO DE PECA</small>
-        <strong id="intelAgPedidoPecasTotalV924">0</strong>
-        <span>Status: AG. PEDIDO DE PECA</span>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
-          <button type="button" onclick="abrirAgPedidoPecasV924()">Ver relação</button>
-          <button type="button" onclick="exportarAgPedidoPecasV924()">Exportar ▾</button>
-        </div>
-      </div>
+</div>
 
 </div>
   <section id="intelMiniDashPecasV925" class="intel-mini-pecas-v925">
@@ -6242,6 +6454,17 @@ body.dark-mode .agpedido-chip-v937{
           <button type="button" onclick="exportarRelacaoMiniPecasV925('transicoes')">Exportar ▾</button>
         </div>
       </article>
+
+      <article class="intel-mini-pecas-card-v925 alerta" id="intelAgPedidoPecasV924">
+        <small>AG. PEDIDO DE PECA / PECAS</small>
+        <strong id="intelAgPedidoPecasTotalV924">0</strong>
+        <span id="intelAgPedidoPecasResumoV959">Quantidade atual no relatório</span>
+        <div class="intel-mini-pecas-actions-v925">
+          <button type="button" onclick="abrirAgPedidoPecasV924()">Ver relação</button>
+          <button type="button" onclick="exportarAgPedidoPecasV924()">Exportar ▾</button>
+        </div>
+      </article>
+
 <article class="intel-mini-pecas-card-v925">
         <small>Saíram de AG. ANALISE TECNICA EM TAT → AG. PEDIDO DE PECA</small>
         <strong id="intelMiniTatParaPedidoV926">0</strong>
@@ -10216,7 +10439,29 @@ if(!alertas.length)alertas.push("<div class='intel-alert green'><b>🟢 Nenhuma 
 
     // V9.2.8: atualiza cartões que dependem da base somente depois
     // que intelRegistros estiver realmente carregado.
-    window.atualizarAgPedidoPecaV928?.();
+    /* V9.5.9: AG. PEDIDO usa o MESMO momento de renderização dos cartões de progressão.
+       intelAnalise.status já está pronto aqui, então o número não depende de clicar. */
+    try{
+      const normPeca=v=>String(v??"").trim().toLocaleLowerCase("pt-BR")
+        .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+        .replace(/[.\-_/]+/g," ").replace(/\s+/g," ").trim();
+
+      let qtdAgPedido=0;
+      for(const item of (a.status||[])){
+        const nome=normPeca(item?.[0]);
+        if(nome==="ag pedido de peca" || nome==="ag pedido de pecas"){
+          qtdAgPedido+=Number(item?.[1]||0);
+        }
+      }
+
+      const elAg=document.getElementById("intelAgPedidoPecasTotalV924");
+      const resumoAg=document.getElementById("intelAgPedidoPecasResumoV959");
+      if(elAg)elAg.textContent=qtdAgPedido.toLocaleString("pt-BR");
+      if(resumoAg)resumoAg.textContent=`${qtdAgPedido.toLocaleString("pt-BR")} O.S. no relatório atual`;
+    }catch(e){
+      console.warn("Falha ao atualizar AG. PEDIDO:",e);
+    }
+
     window.renderMiniDashboardPecasV925?.(intelRegistros);
     window.renderMiniTatPedidoV926?.(intelRegistros);
 }
@@ -20443,7 +20688,7 @@ else iniciar();
   padding:5px 9px;font:700 10px Segoe UI,Arial;opacity:.65;pointer-events:none;
 }
 </style>
-<div id="erpVersionBadgeV7542">ERP V9.5.8</div>
+<div id="erpVersionBadgeV7542">ERP V9.6.1</div>
 <script id="v7542-performance-diagnostics">
 (function(){
 "use strict";
@@ -21055,7 +21300,7 @@ function detectarInicial(){
 setTimeout(()=>{
     const inicial=detectarInicial();
     ERP.ModuleManager.active=inicial;
-    ERP.Events.emit("kernel:ready",{version:"9.5.8",active:inicial});
+    ERP.Events.emit("kernel:ready",{version:"9.6.1",active:inicial});
     console.info("ERP Kernel V8.1.0 pronto. Módulo ativo:",inicial);
 },2300);
 
@@ -23177,10 +23422,29 @@ function obterLista(){
   });
 }
 function atualizar(){
-  const lista=obterLista();
+  let qtd=0;
+
+  try{
+    if(typeof intelAnalise!=="undefined" && intelAnalise?.status){
+      for(const item of intelAnalise.status){
+        const s=norm(item?.[0]);
+        if(s==="ag pedido de peca" || s==="ag pedido de pecas"){
+          qtd+=Number(item?.[1]||0);
+        }
+      }
+    }
+  }catch(_){}
+
+  /* fallback: mesma relação usada pelo botão Ver relação */
+  if(!qtd){
+    qtd=obterLista().length;
+  }
+
   const el=document.getElementById("intelAgPedidoPecasTotalV924");
-  if(el)el.textContent=lista.length.toLocaleString("pt-BR");
-  return lista.length;
+  const resumo=document.getElementById("intelAgPedidoPecasResumoV959");
+  if(el)el.textContent=qtd.toLocaleString("pt-BR");
+  if(resumo)resumo.textContent=`${qtd.toLocaleString("pt-BR")} O.S. no relatório atual`;
+  return qtd;
 }
 window.atualizarAgPedidoPecaV928=atualizar;
 
@@ -25096,13 +25360,120 @@ async function renderColetaFotosV943(){
   const h=document.getElementById("coletaFotosHistoricoV943");
   if(h){
     const hist=histLoad().slice(0,8);
-    h.innerHTML=hist.length?hist.map(x=>`
-      <div class="coleta-fotos-hist-item-v943">
-        <span><b>${(x.itens||[]).length} O.S.</b> • ${(x.itens||[]).reduce((s,i)=>s+Number(i.fotos||0),0)} fotos</span>
-        <span>${esc(fmt(x.inicio))} → ${esc(fmt(x.fim))}</span>
-      </div>`).join(""):'<div class="admin-info">Nenhuma coleta finalizada ainda.</div>';
+    h.innerHTML=hist.length?hist.map((x,idx)=>{
+      const qtdOS=(x.itens||[]).length;
+      const qtdFotos=(x.itens||[]).reduce((s,i)=>s+Number(i.fotos||0),0);
+      return `
+        <div class="coleta-fotos-hist-item-v943">
+          <div class="coleta-fotos-hist-main-v961">
+            <strong>📸 Coleta ${esc(fmt(x.inicio))}</strong>
+            <div class="coleta-fotos-hist-meta-v961">
+              <span>${qtdOS} O.S.</span>
+              <span>${qtdFotos} foto(s)</span>
+              <span>Finalizada: ${esc(fmt(x.fim))}</span>
+            </div>
+          </div>
+          <div class="coleta-fotos-hist-acoes-v961">
+            <button type="button" onclick="abrirHistoricoColetaFotosV961('${String(x.id||idx).replace(/'/g,"\\'")}')">👁 Ver relação</button>
+          </div>
+        </div>`;
+    }).join(""):'<div class="admin-info">Nenhuma coleta finalizada ainda.</div>';
   }
 }
+
+
+let coletaHistoricoAtualV961=null;
+
+window.abrirHistoricoColetaFotosV961=async function(id){
+  const hist=histLoad();
+  const coleta=hist.find((x,idx)=>String(x.id||idx)===String(id));
+  if(!coleta){
+    alert("Coleta finalizada não encontrada.");
+    return;
+  }
+
+  coletaHistoricoAtualV961=coleta;
+
+  document.getElementById("coletaHistTituloV961").textContent="📸 Relação da coleta finalizada";
+  document.getElementById("coletaHistPeriodoV961").textContent=
+    `${fmt(coleta.inicio)} → ${fmt(coleta.fim)}`;
+
+  const itens=coleta.itens||[];
+  document.getElementById("coletaHistQtdOSV961").textContent=itens.length.toLocaleString("pt-BR");
+  document.getElementById("coletaHistQtdFotosV961").textContent=
+    itens.reduce((s,x)=>s+Number(x.fotos||0),0).toLocaleString("pt-BR");
+  document.getElementById("coletaHistInicioV961").textContent=fmt(coleta.inicio);
+  document.getElementById("coletaHistFimV961").textContent=fmt(coleta.fim);
+
+  const area=document.getElementById("coletaFotosHistoricoRelacaoV961");
+  area.innerHTML=itens.length
+    ? itens.map(item=>`
+      <article class="coleta-hist-card-v961">
+        <div>
+          <div class="coleta-hist-os-v961">O.S: ${esc(item.os)}</div>
+          <div class="coleta-hist-campo-v961"><b>LOJA:</b><span>${esc(item.loja||"-")}</span></div>
+          <div class="coleta-hist-campo-v961"><b>DEPREC.:</b><span>${esc(item.deprec||"-")}</span></div>
+          <div class="coleta-hist-campo-v961"><b>ACESSÓRIO:</b><span>${esc(item.acessorio||"-")}</span></div>
+          <div class="coleta-hist-campo-v961"><b>FOTOS:</b><span>${Number(item.fotos||0)} registrada(s) nesta coleta</span></div>
+        </div>
+
+        <div>
+          <div id="coletaHistFotoMain_${esc(item.os)}" class="coleta-hist-sem-foto-v961">Carregando<br>foto...</div>
+          <div id="coletaHistGaleria_${esc(item.os)}" class="coleta-hist-galeria-v961"></div>
+        </div>
+
+        <div class="coleta-hist-acoes-card-v961">
+          <button onclick="abrirOSIntel('${String(item.os).replace(/'/g,"\\\\'")}')">Abrir O.S.</button>
+          <button onclick="abrirMidiasOS?.('${String(item.os).replace(/'/g,"\\\\'")}')">Mídias</button>
+        </div>
+      </article>
+    `).join("")
+    : '<div class="admin-info">Esta coleta não possui O.S. registradas.</div>';
+
+  document.getElementById("coletaFotosHistoricoModalV961")?.classList.add("aberto");
+
+  /* Carrega fotos somente quando a relação finalizada é aberta.
+     Preserva o Zero Relation DOM da tela principal. */
+  for(const item of itens.slice(0,80)){
+    fotosOSV947(item.os).then(fotos=>{
+      const main=document.getElementById("coletaHistFotoMain_"+item.os);
+      const gal=document.getElementById("coletaHistGaleria_"+item.os);
+      if(!main)return;
+
+      if(!fotos.length){
+        main.className="coleta-hist-sem-foto-v961";
+        main.innerHTML="Sem foto<br>disponível";
+        if(gal)gal.innerHTML="";
+        return;
+      }
+
+      main.outerHTML=`<img id="coletaHistFotoMain_${esc(item.os)}" class="coleta-hist-foto-v961" src="${esc(fotos[0].url)}" alt="Foto O.S. ${esc(item.os)}">`;
+
+      if(gal){
+        gal.innerHTML=fotos.map((f,i)=>`
+          <img class="coleta-hist-mini-v961 ${i===0?"ativa":""}"
+            src="${esc(f.url)}"
+            title="${esc(f.nome||"Foto")}"
+            onclick="trocarFotoHistoricoColetaV961('${String(item.os).replace(/'/g,"\\\\'")}',this)">
+        `).join("");
+      }
+    });
+  }
+};
+
+window.fecharHistoricoColetaFotosV961=function(){
+  document.getElementById("coletaFotosHistoricoModalV961")?.classList.remove("aberto");
+  document.getElementById("coletaFotosHistoricoRelacaoV961").innerHTML="";
+  coletaHistoricoAtualV961=null;
+};
+
+window.trocarFotoHistoricoColetaV961=function(os,thumb){
+  const main=document.getElementById("coletaHistFotoMain_"+os);
+  if(main&&thumb?.src)main.src=thumb.src;
+  thumb?.parentElement?.querySelectorAll(".coleta-hist-mini-v961").forEach(x=>x.classList.remove("ativa"));
+  thumb?.classList.add("ativa");
+};
+
 
 /* botão fixo ao lado do upload de fotos no menu */
 document.addEventListener("DOMContentLoaded",()=>{
@@ -25778,6 +26149,202 @@ function garantirV958(){
 document.addEventListener("DOMContentLoaded",()=>setTimeout(garantirV958,300));
 console.info("ERP V9.5.8: cartão Saíram de Ag. Pedido → Aguardando peças restaurado no HTML estático.");
 })();
+</script>
+
+
+<script id="erp-v959-audit-ag-pedido">
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.agPedidoV959Audit=function(){
+  let analise=[];
+  try{analise=intelAnalise?.status||[]}catch(_){}
+  const r={
+    statusAgregados:analise,
+    card:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
+    relacao:typeof window.abrirAgPedidoPecasV924==="function"
+  };
+  console.info("[V9.5.9 AG PEDIDO]",r);
+  return r;
+};
+console.info("ERP V9.5.9: AG. PEDIDO agora é cartão da Progressão e usa intelAnalise.status.");
+</script>
+
+
+<script id="erp-v960-ag-pedido-preload">
+(function(){
+"use strict";
+
+const STATUS_VARIANTES_V960 = [
+  "AG. PEDIDO DE PECA",
+  "AG. PEDIDO DE PECAS",
+  "AG. PEDIDO DE PEÇA",
+  "AG. PEDIDO DE PEÇAS",
+  "AG PEDIDO DE PECA",
+  "AG PEDIDO DE PECAS",
+  "AG PEDIDO DE PEÇA",
+  "AG PEDIDO DE PEÇAS"
+];
+
+let agPedidoQtdCacheV960 = null;
+let agPedidoAtualizandoV960 = null;
+let agPedidoUltimaAtualizacaoV960 = 0;
+
+function escreverCardV960(qtd){
+  const el=document.getElementById("intelAgPedidoPecasTotalV924");
+  const resumo=document.getElementById("intelAgPedidoPecasResumoV959");
+  if(el) el.textContent=Number(qtd||0).toLocaleString("pt-BR");
+  if(resumo) resumo.textContent=`${Number(qtd||0).toLocaleString("pt-BR")} O.S. no relatório atual`;
+}
+
+async function contarDiretoV960(){
+  const sb=obterSupabaseClient();
+  let total=0;
+
+  /* Faz contagem exata por variante. Como são strings distintas,
+     não existe risco de somar a mesma linha duas vezes. */
+  for(const status of STATUS_VARIANTES_V960){
+    const {count,error}=await sb
+      .from("rexpedlr")
+      .select("os",{count:"exact",head:true})
+      .eq("status",status);
+
+    if(error) throw error;
+    total += Number(count||0);
+  }
+
+  return total;
+}
+
+async function carregarContadorAgPedidoV960(forcar=false){
+  const agora=Date.now();
+
+  if(!forcar && agPedidoQtdCacheV960!==null && (agora-agPedidoUltimaAtualizacaoV960)<30000){
+    escreverCardV960(agPedidoQtdCacheV960);
+    return agPedidoQtdCacheV960;
+  }
+
+  if(agPedidoAtualizandoV960) return agPedidoAtualizandoV960;
+
+  agPedidoAtualizandoV960=(async()=>{
+    try{
+      const qtd=await contarDiretoV960();
+      agPedidoQtdCacheV960=qtd;
+      agPedidoUltimaAtualizacaoV960=Date.now();
+      escreverCardV960(qtd);
+      return qtd;
+    }catch(e){
+      console.warn("[V9.6.0 AG PEDIDO] Falha na contagem direta:",e);
+
+      /* Fallback: se a Inteligência já tiver base carregada, usa a mesma lista
+         do Ver relação, sem abrir/renderizar a relação. */
+      try{
+        if(typeof window.atualizarAgPedidoPecaV928==="function"){
+          const qtd=Number(window.atualizarAgPedidoPecaV928()||0);
+          agPedidoQtdCacheV960=qtd;
+          agPedidoUltimaAtualizacaoV960=Date.now();
+          escreverCardV960(qtd);
+          return qtd;
+        }
+      }catch(_){}
+
+      return 0;
+    }finally{
+      agPedidoAtualizandoV960=null;
+    }
+  })();
+
+  return agPedidoAtualizandoV960;
+}
+
+window.carregarContadorAgPedidoV960=carregarContadorAgPedidoV960;
+
+/* IMPORTANTE:
+   O contador é carregado SEM clicar no cartão e SEM renderizar a relação. */
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>carregarContadorAgPedidoV960(true),500);
+  setTimeout(()=>carregarContadorAgPedidoV960(true),1800);
+});
+
+/* Se o usuário entra na Inteligência, o número já é buscado imediatamente. */
+const abrirIntelBaseV960=window.abrirInteligencia;
+if(typeof abrirIntelBaseV960==="function"){
+  window.abrirInteligencia=function(){
+    const r=abrirIntelBaseV960.apply(this,arguments);
+    carregarContadorAgPedidoV960(true);
+    return r;
+  };
+}
+
+/* Ao voltar para a aba/janela, refresca sem exigir clique no cartão. */
+document.addEventListener("visibilitychange",()=>{
+  if(!document.hidden) carregarContadorAgPedidoV960(true);
+});
+
+/* Depois de salvar comparação/importação, invalida cache e recarrega. */
+if(typeof window.salvarComparacaoImportacao==="function"){
+  const salvarBaseV960=window.salvarComparacaoImportacao;
+  window.salvarComparacaoImportacao=async function(){
+    const r=await salvarBaseV960.apply(this,arguments);
+    agPedidoQtdCacheV960=null;
+    setTimeout(()=>carregarContadorAgPedidoV960(true),150);
+    return r;
+  };
+}
+
+/* A cada 60s, se a Inteligência estiver visível, atualiza silenciosamente. */
+setInterval(()=>{
+  const tela=document.getElementById("telaInteligencia");
+  if(tela && tela.style.display!=="none"){
+    carregarContadorAgPedidoV960(true);
+  }
+},60000);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.agPedidoV960Audit=async function(){
+  const qtd=await carregarContadorAgPedidoV960(true);
+  const r={
+    qtdDiretoBanco:qtd,
+    card:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent||null,
+    cache:agPedidoQtdCacheV960
+  };
+  console.info("[V9.6.0 AG PEDIDO]",r);
+  return r;
+};
+
+console.info("ERP V9.6.0: AG. PEDIDO pré-carrega a quantidade sem clicar no cartão.");
+})();
+</script>
+
+
+<div id="coletaFotosHistoricoModalV961">
+  <div id="coletaFotosHistoricoBoxV961">
+    <div class="coleta-hist-topo-v961">
+      <div>
+        <h2 id="coletaHistTituloV961">📸 Coleta finalizada</h2>
+        <p id="coletaHistPeriodoV961"></p>
+      </div>
+      <button onclick="fecharHistoricoColetaFotosV961()">✕ Fechar</button>
+    </div>
+
+    <div class="coleta-hist-resumo-v961">
+      <div class="coleta-hist-kpi-v961"><small>O.S.</small><strong id="coletaHistQtdOSV961">0</strong></div>
+      <div class="coleta-hist-kpi-v961"><small>Fotos registradas</small><strong id="coletaHistQtdFotosV961">0</strong></div>
+      <div class="coleta-hist-kpi-v961"><small>Início</small><strong id="coletaHistInicioV961" style="font-size:15px">—</strong></div>
+      <div class="coleta-hist-kpi-v961"><small>Finalização</small><strong id="coletaHistFimV961" style="font-size:15px">—</strong></div>
+    </div>
+
+    <div id="coletaFotosHistoricoRelacaoV961"></div>
+  </div>
+</div>
+
+
+<script id="erp-v961-fechar-historico-coleta">
+document.addEventListener("click",function(e){
+  const modal=document.getElementById("coletaFotosHistoricoModalV961");
+  if(e.target===modal)window.fecharHistoricoColetaFotosV961?.();
+});
+console.info("ERP V9.6.1: histórico de coletas finalizadas visível, clicável e com relação fotográfica.");
 </script>
 
 </body>
