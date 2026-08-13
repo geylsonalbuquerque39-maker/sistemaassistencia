@@ -30126,6 +30126,302 @@ console.info("ERP V12.0: status online/ausente/ocupado/offline corrigidos.");
 })();
 </script>
 
+
+<style id="erp-v122-figurinhas-style">
+#chatFigurinhasPainelV122{
+  position:absolute;
+  left:8px;
+  bottom:66px;
+  width:330px;
+  max-width:calc(100vw - 40px);
+  max-height:390px;
+  display:none;
+  flex-direction:column;
+  background:#fff;
+  border:1px solid #c9d7e6;
+  border-radius:14px;
+  box-shadow:0 18px 45px rgba(0,0,0,.28);
+  overflow:hidden;
+  z-index:19000;
+}
+#chatFigurinhasPainelV122.aberto{display:flex}
+#chatFigurinhasTopoV122{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  padding:10px 12px;border-bottom:1px solid #d7e2ee
+}
+#chatFigurinhasTopoV122 b{color:#001b3d}
+#chatFigurinhasAcoesV122{display:flex;gap:6px}
+#chatFigurinhasAcoesV122 button{
+  border:0;border-radius:8px;padding:7px 9px;cursor:pointer;
+  background:#0046b8;color:#fff;font-weight:800;font-size:12px
+}
+#chatFigurinhasGradeV122{
+  padding:10px;display:grid;grid-template-columns:repeat(4,1fr);
+  gap:8px;overflow:auto;min-height:110px
+}
+.chat-figurinha-item-v122{
+  position:relative;border:0;background:transparent;border-radius:10px;
+  padding:5px;cursor:pointer;min-height:70px
+}
+.chat-figurinha-item-v122:hover{background:#eef5ff}
+.chat-figurinha-item-v122 img{
+  width:100%;height:68px;object-fit:contain;display:block
+}
+.chat-figurinha-remover-v122{
+  position:absolute;right:2px;top:2px;width:20px;height:20px;
+  border:0;border-radius:50%;background:#b00020;color:#fff;
+  font-size:11px;line-height:20px;cursor:pointer;display:none
+}
+.chat-figurinha-item-v122:hover .chat-figurinha-remover-v122{display:block}
+.chat-figurinha-msg-v122{
+  display:block!important;
+  max-width:180px!important;
+  max-height:180px!important;
+  width:auto!important;
+  height:auto!important;
+  object-fit:contain!important;
+  background:transparent!important;
+  border:0!important;
+  border-radius:0!important;
+  box-shadow:none!important;
+}
+.chat-msg-balao:has(.chat-figurinha-msg-v122){
+  background:transparent!important;
+  padding:2px!important;
+  box-shadow:none!important;
+}
+body.dark-mode #chatFigurinhasPainelV122{
+  background:#0d223a;border-color:#315a80;color:#fff
+}
+body.dark-mode #chatFigurinhasTopoV122{border-color:#315a80}
+body.dark-mode #chatFigurinhasTopoV122 b{color:#fff}
+body.dark-mode .chat-figurinha-item-v122:hover{background:#173957}
+</style>
+
+<div id="chatFigurinhasPainelV122">
+  <div id="chatFigurinhasTopoV122">
+    <b>🖼️ Figurinhas</b>
+    <div id="chatFigurinhasAcoesV122">
+      <button type="button" onclick="document.getElementById('chatFigurinhasImportV122').click()">Importar</button>
+      <button type="button" onclick="fecharFigurinhasV122()">✕</button>
+    </div>
+  </div>
+  <div id="chatFigurinhasGradeV122">
+    <div class="chat-sem-usuarios">Carregando figurinhas...</div>
+  </div>
+  <input id="chatFigurinhasImportV122" type="file" hidden multiple
+         accept=".webp,.png,.jpg,.jpeg,.gif,image/webp,image/png,image/jpeg,image/gif">
+</div>
+
+<script id="erp-v122-figurinhas-chat">
+(function(){
+"use strict";
+
+let figurinhasCacheV122=[];
+
+function sbV122(){return chatSbV57()}
+function escV122(v){return chatEscV57(v)}
+function usuarioIdV122(){return String(usuarioLogado?.id||"")}
+
+function painelV122(){return document.getElementById("chatFigurinhasPainelV122")}
+function gradeV122(){return document.getElementById("chatFigurinhasGradeV122")}
+
+window.fecharFigurinhasV122=function(){
+  painelV122()?.classList.remove("aberto");
+};
+
+window.alternarFigurinhasV122=async function(event){
+  event?.preventDefault?.();event?.stopPropagation?.();
+  const p=painelV122();if(!p)return;
+  const abrir=!p.classList.contains("aberto");
+  p.classList.toggle("aberto",abrir);
+  if(abrir)await carregarFigurinhasV122();
+};
+
+async function carregarFigurinhasV122(){
+  const g=gradeV122();if(!g||!usuarioIdV122())return;
+  g.innerHTML="<div class='chat-sem-usuarios'>Carregando...</div>";
+  try{
+    const {data,error}=await sbV122()
+      .from("chat_figurinhas")
+      .select("id,nome,url,caminho,tipo,created_at")
+      .eq("user_id",usuarioIdV122())
+      .order("created_at",{ascending:false});
+    if(error)throw error;
+    figurinhasCacheV122=data||[];
+    renderFigurinhasV122();
+  }catch(e){
+    console.error("[FIGURINHAS]",e);
+    g.innerHTML="<div class='chat-sem-usuarios'>Erro ao carregar figurinhas.</div>";
+  }
+}
+window.carregarFigurinhasV122=carregarFigurinhasV122;
+
+function renderFigurinhasV122(){
+  const g=gradeV122();if(!g)return;
+  if(!figurinhasCacheV122.length){
+    g.innerHTML="<div class='chat-sem-usuarios' style='grid-column:1/-1'>Nenhuma figurinha ainda.<br>Use <b>Importar</b> para adicionar arquivos do WhatsApp.</div>";
+    return;
+  }
+  g.innerHTML=figurinhasCacheV122.map(f=>`
+    <button type="button" class="chat-figurinha-item-v122"
+            onclick="enviarFigurinhaV122('${String(f.id).replace(/'/g,"\\'")}')"
+            title="${escV122(f.nome||"Figurinha")}">
+      <img src="${escV122(f.url||"")}" alt="${escV122(f.nome||"Figurinha")}">
+      <span class="chat-figurinha-remover-v122"
+            onclick="event.stopPropagation();removerFigurinhaV122('${String(f.id).replace(/'/g,"\\'")}')">✕</span>
+    </button>
+  `).join("");
+}
+
+async function importarArquivosFigurinhaV122(files){
+  if(!files?.length||!usuarioIdV122())return;
+  const permitidos=new Set(["image/webp","image/png","image/jpeg","image/gif"]);
+  try{
+    for(const f of files){
+      const ext=String(f.name.split(".").pop()||"webp").toLowerCase();
+      const tipo=f.type||(
+        ext==="webp"?"image/webp":
+        ext==="png"?"image/png":
+        ext==="gif"?"image/gif":"image/jpeg"
+      );
+      if(!permitidos.has(tipo))throw new Error(`${f.name}: formato não suportado.`);
+      if(f.size>5*1024*1024)throw new Error(`${f.name}: limite de 5 MB por figurinha.`);
+
+      const nomeArquivo=`${crypto.randomUUID()}.${ext}`;
+      const caminho=`figurinhas/${usuarioIdV122()}/${nomeArquivo}`;
+
+      const up=await sbV122().storage.from("chat-anexos").upload(caminho,f,{
+        contentType:tipo,upsert:false,cacheControl:"31536000"
+      });
+      if(up.error)throw up.error;
+
+      const {data:urlData}=sbV122().storage.from("chat-anexos").getPublicUrl(caminho);
+      const url=urlData?.publicUrl||"";
+
+      const ins=await sbV122().from("chat_figurinhas").insert({
+        user_id:usuarioIdV122(),
+        nome:f.name,
+        url,
+        caminho,
+        tipo
+      });
+      if(ins.error){
+        await sbV122().storage.from("chat-anexos").remove([caminho]);
+        throw ins.error;
+      }
+    }
+    await carregarFigurinhasV122();
+  }catch(e){
+    alert("Erro ao importar figurinha: "+(e?.message||e));
+  }finally{
+    const i=document.getElementById("chatFigurinhasImportV122");
+    if(i)i.value="";
+  }
+}
+
+window.enviarFigurinhaV122=async function(id){
+  if(!chatConversaAtualV57)return;
+  const f=figurinhasCacheV122.find(x=>String(x.id)===String(id));
+  if(!f)return;
+
+  try{
+    const anexo={
+      nome:f.nome||"figurinha.webp",
+      tipo:f.tipo||"image/webp",
+      url:f.url,
+      caminho:f.caminho,
+      figurinha:true
+    };
+
+    const {data,error}=await sbV122().rpc("enviar_mensagem_chat_v600",{
+      p_conversa_id:chatConversaAtualV57,
+      p_mensagem:"",
+      p_resposta_id:chatRespostaAtualV600?.id||null,
+      p_anexos:[anexo]
+    });
+    if(error)throw error;
+    if(!data)throw new Error("O servidor não confirmou o envio.");
+    cancelarRespostaChatV600();
+    fecharFigurinhasV122();
+    await carregarMensagensChatV57(true);
+  }catch(e){
+    alert("Não foi possível enviar a figurinha: "+(e?.message||e));
+  }
+};
+
+window.removerFigurinhaV122=async function(id){
+  const f=figurinhasCacheV122.find(x=>String(x.id)===String(id));
+  if(!f)return;
+  if(!confirm("Remover esta figurinha da sua coleção?"))return;
+  try{
+    const del=await sbV122().from("chat_figurinhas").delete()
+      .eq("id",f.id).eq("user_id",usuarioIdV122());
+    if(del.error)throw del.error;
+    if(f.caminho)await sbV122().storage.from("chat-anexos").remove([f.caminho]);
+    await carregarFigurinhasV122();
+  }catch(e){
+    alert("Erro ao remover figurinha: "+(e?.message||e));
+  }
+};
+
+/* Renderização especial: figurinha sem moldura de foto */
+const renderAnexosOriginalV122=window.renderizarAnexosChatV600;
+window.renderizarAnexosChatV600=function(v){
+  const arr=normalizarAnexosV600(v);
+  return arr.map(a=>{
+    const url=escV122(a.url||""),nome=escV122(a.nome||"arquivo"),tipo=String(a.tipo||"");
+    if(a.figurinha===true || a.figurinha==="true"){
+      return `<img class="chat-figurinha-msg-v122" src="${url}" alt="${nome}" title="${nome}">`;
+    }
+    if(tipo.startsWith("image/"))return `<a href="${url}" target="_blank"><img class="chat-imagem" src="${url}" alt="${nome}"></a>`;
+    if(tipo.startsWith("audio/"))return `<audio class="chat-audio" controls src="${url}"></audio>`;
+    if(tipo.startsWith("video/"))return `<video controls style="max-width:280px;max-height:240px" src="${url}"></video>`;
+    return `<a class="chat-anexo" href="${url}" target="_blank" download>📎 <span>${nome}</span></a>`;
+  }).join("");
+};
+
+/* Instala botão ao lado do emoji, sem mexer no restante do compositor */
+function instalarBotaoFigurinhasV122(){
+  const tools=document.querySelector("#chatPainel .chat-tools");
+  if(!tools||tools.querySelector(".chat-btn-figurinha-v122"))return;
+
+  const btn=document.createElement("button");
+  btn.type="button";
+  btn.className="chat-ferramenta chat-btn-figurinha-v122";
+  btn.title="Figurinhas";
+  btn.textContent="🖼️";
+  btn.onclick=alternarFigurinhasV122;
+
+  const emoji=[...tools.querySelectorAll("button")].find(b=>/alternarEmojiV600/.test(b.getAttribute("onclick")||""));
+  if(emoji)emoji.insertAdjacentElement("afterend",btn);
+  else tools.appendChild(btn);
+
+  /* move painel para dentro do compositor/painel visual para posicionamento correto */
+  const comp=document.querySelector("#chatPainel .chat-compositor")||document.querySelector("#chatPainel");
+  const painel=painelV122();
+  if(comp&&painel&&painel.parentElement!==comp)comp.appendChild(painel);
+}
+
+document.getElementById("chatFigurinhasImportV122")?.addEventListener("change",e=>{
+  importarArquivosFigurinhaV122(e.target.files);
+});
+
+document.addEventListener("click",e=>{
+  if(!e.target.closest("#chatFigurinhasPainelV122")&&!e.target.closest(".chat-btn-figurinha-v122")){
+    fecharFigurinhasV122();
+  }
+});
+
+new MutationObserver(instalarBotaoFigurinhasV122)
+  .observe(document.body,{childList:true,subtree:true});
+setInterval(instalarBotaoFigurinhasV122,1600);
+setTimeout(instalarBotaoFigurinhasV122,600);
+
+console.info("ERP V12.2: Figurinhas no chat + importação de .webp do WhatsApp.");
+})();
+</script>
+
 </body>
 </html>
 
