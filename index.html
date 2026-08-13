@@ -19654,7 +19654,7 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
            A Inteligência possui exportação nativa baseada nos dados do backend.
            O interceptador V7.2.3 não pode tentar capturar um CSV intermediário. */
         if(el?.closest?.("#telaInteligencia"))return null;
-        if(el?.closest?.(".erp-native-export-v111"))return null;
+        if(el?.closest?.(".erp-native-export-v111,.erp-export-wrap-v109"))return null;
 
         if(!el)return null;
         const botao=el.closest("button,a");
@@ -19662,6 +19662,15 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
 
         const texto=String(botao.textContent||"").toUpperCase();
         const onclick=String(botao.getAttribute("onclick")||"").toUpperCase();
+
+        /* Botões que apenas ABREM um seletor não geram arquivo.
+           Interceptá-los fazia o V7.2.3 tentar capturar um Blob inexistente. */
+        if(
+            onclick.includes("TOGGLEEXPORTMENU") ||
+            onclick.includes("ABRIREXPORT") ||
+            onclick.includes("MENUEXPORT") ||
+            botao.closest?.(".erp-native-export-v111,.erp-export-wrap-v109")
+        ) return null;
 
         const ehExportacao=
             texto.includes("EXPORTAR") ||
@@ -19954,16 +19963,46 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
         fecharMenuV720();
         if(!botao)return;
 
+        formato=String(formato||"csv").toUpperCase();
+
         try{
-            if(formato==="csv"){
+            if(formato==="CSV"){
                 executarHandlerOriginalV720(botao);
                 return;
             }
 
+            /* V11.3: caminho principal.
+               Em vez de "capturar" um CSV depois do clique, força XLS/XLT
+               diretamente no exportador oficial do ERP. */
+            const exportObj=window.ERP?.Export;
+            const exportOriginal=exportObj?.exportar;
+            let exportadorFoiChamado=false;
+
+            if(typeof exportOriginal==="function"){
+                exportObj.exportar=function(opcoes){
+                    exportadorFoiChamado=true;
+                    return exportOriginal.call(this,{
+                        ...(opcoes||{}),
+                        formato:formato
+                    });
+                };
+
+                try{
+                    executarHandlerOriginalV720(botao);
+                    await new Promise(resolve=>setTimeout(resolve,0));
+                }finally{
+                    exportObj.exportar=exportOriginal;
+                }
+
+                if(exportadorFoiChamado)return;
+            }
+
+            /* Compatibilidade com exportadores muito antigos que ainda
+               criam um CSV manualmente fora de ERP.Export. */
             const dados=await capturarExportacaoOriginalV720(botao);
-            baixarOfficeV720(dados.texto,dados.nome,formato);
+            baixarOfficeV720(dados.texto,dados.nome,formato.toLowerCase());
         }catch(e){
-            console.error("Exportação Office V7.2.3:",e);
+            console.error("Exportação Office V11.3:",e);
             alert("Não foi possível gerar o arquivo: "+(e?.message||e));
         }
     };
@@ -20022,6 +20061,7 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     function ajustarBotaoV721(el){
         if(!el || !ehExportacaoV721(el))return;
         if(el.closest("#telaInteligencia"))return;
+        if(el.closest(".erp-native-export-v111,.erp-export-wrap-v109"))return;
         if(el.closest("#exportacaoOfficeMenuV720"))return;
 
         el.classList.add("botao-exportacao-office-v721");
@@ -28950,6 +28990,49 @@ ERP.Performance.exportV112Audit=function(){
 };
 
 console.info("ERP V11.2: interceptador V7.2.3 desativado dentro da Inteligência.");
+})();
+</script>
+
+
+<script id="erp-v113-export-global-fix">
+(function(){
+"use strict";
+
+/* Proteção final: os seletores novos controlam o próprio formato.
+   O interceptor legado só deve atuar em botões antigos que realmente exportam. */
+document.addEventListener("click",function(ev){
+  const b=ev.target?.closest?.("button,a");
+  if(!b)return;
+
+  const onclick=String(b.getAttribute?.("onclick")||"").toLowerCase();
+  const menuTrigger=
+    b.closest(".erp-native-export-v111,.erp-export-wrap-v109") ||
+    onclick.includes("toggleexportmenu") ||
+    onclick.includes("abrirexport") ||
+    onclick.includes("menuexport");
+
+  if(menuTrigger){
+    /* Não cancela o clique. Apenas marca para diagnóstico. */
+    b.dataset.erpExportMenuTrigger="1";
+  }
+},true);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.exportV113Audit=function(){
+  const r={
+    exportadorAtual:typeof ERP?.Export?.exportar==="function",
+    menusNovos:document.querySelectorAll(".erp-native-export-v111,.erp-export-wrap-v109").length,
+    menuLegado:!!document.getElementById("exportacaoOfficeMenuV720"),
+    mensagemCapturaAindaNoCodigo:
+      document.documentElement.innerHTML.includes("Não foi possível capturar os dados desta exportação."),
+    correcao:"V11.3 força XLS/XLT diretamente em ERP.Export; captura fica apenas como fallback legado"
+  };
+  console.info("[V11.3 EXPORT GLOBAL]",r);
+  return r;
+};
+
+console.info("ERP V11.3: exportação global corrigida — menus novos não são mais capturados pelo V7.2.3.");
 })();
 </script>
 
