@@ -31319,6 +31319,149 @@ console.info("ERP V12.5: grupos + chamada em grupo + paste foto/figurinha + salv
 })();
 </script>
 
+
+<style id="erp-v126-grupo-ux">
+#chatMensagens .chat-msg-v126-grupo{width:auto!important;max-width:78%!important;min-width:0!important;align-self:flex-start!important;margin-right:auto!important}
+#chatMensagens .chat-msg-v126-grupo.minha{align-self:flex-end!important;margin-left:auto!important;margin-right:0!important}
+#chatMensagens .chat-msg-v126-grupo .chat-msg-balao{width:fit-content!important;max-width:100%!important;min-width:34px!important;display:block!important;padding:9px 11px!important;border-radius:15px!important;word-break:break-word!important;overflow-wrap:anywhere!important}
+#chatMensagens .chat-msg-v126-grupo.minha .chat-msg-balao{background:#0e63c7!important;color:#fff!important}
+#chatMensagens .chat-msg-v126-grupo.outra .chat-msg-balao{background:#eef4fa!important;color:#001b3d!important}
+body.dark-mode #chatMensagens .chat-msg-v126-grupo.outra .chat-msg-balao{background:#173957!important;color:#fff!important}
+#chatCabecalho.chat-grupo-header-v125 .chat-avatar,#chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info{cursor:pointer}
+#chatGrupoPerfilV126{position:fixed;inset:0;z-index:47000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,18,38,.72)}
+#chatGrupoPerfilV126.aberto{display:flex}
+#chatGrupoPerfilCardV126{width:min(760px,96vw);max-height:92vh;overflow:auto;background:#fff;border:2px solid #1ea5ff;border-radius:18px;box-shadow:0 26px 72px rgba(0,0,0,.42);padding:18px}
+#chatGrupoPerfilTopV126{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid #d7e2ee}
+#chatGrupoPerfilIdentV126{display:flex;align-items:center;gap:12px}
+#chatGrupoPerfilAvatarV126{width:58px;height:58px;border-radius:50%;display:grid;place-items:center;background:#0046b8;color:#fff;font-size:26px}
+#chatGrupoPerfilTopV126 h2{margin:0;color:#001b3d;font-size:21px}
+#chatGrupoPerfilTopV126>button{border:0;border-radius:9px;padding:8px 11px;background:#c90025;color:#fff;font-weight:900;cursor:pointer}
+.chat-grupo-tabs-v126{display:flex;gap:8px;margin:14px 0}
+.chat-grupo-tabs-v126 button{border:1px solid #b8c9da;border-radius:9px;padding:8px 12px;background:#f3f7fb;color:#001b3d;font-weight:900;cursor:pointer}
+.chat-grupo-tabs-v126 button.ativo{background:#0046b8;color:#fff;border-color:#0046b8}
+.chat-grupo-membro-v126{display:flex;align-items:center;gap:10px;padding:10px;border-bottom:1px solid #e1e9f1}
+.chat-grupo-membro-avatar-v126{width:44px;height:44px;border-radius:50%;overflow:hidden;display:grid;place-items:center;background:#dfeaf5;color:#003b76;font-weight:900}
+.chat-grupo-membro-avatar-v126 img{width:100%;height:100%;object-fit:cover}
+.chat-grupo-membro-v126 b{display:block;color:#001b3d}.chat-grupo-membro-v126 small{color:#657b90}
+.chat-grupo-midias-v126{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.chat-grupo-midia-v126{aspect-ratio:1/1;border-radius:10px;overflow:hidden;background:#edf3f9;display:grid;place-items:center;border:1px solid #d4e0eb}
+.chat-grupo-midia-v126 img,.chat-grupo-midia-v126 video{width:100%;height:100%;object-fit:cover}
+.chat-grupo-sem-midias-v126{padding:28px;text-align:center;color:#6a7d90}
+.chat-salvar-figurinha-v125{opacity:1!important;right:4px!important;top:4px!important;background:rgba(0,27,61,.86)!important}
+body.dark-mode #chatGrupoPerfilCardV126{background:#0d223a;color:#fff}
+body.dark-mode #chatGrupoPerfilTopV126{border-color:#315a80}
+body.dark-mode #chatGrupoPerfilTopV126 h2,body.dark-mode .chat-grupo-membro-v126 b{color:#fff}
+body.dark-mode .chat-grupo-membro-v126{border-color:#31506d}
+body.dark-mode .chat-grupo-membro-v126 small{color:#a9bed3}
+body.dark-mode .chat-grupo-tabs-v126 button{background:#173957;color:#fff;border-color:#315a80}
+body.dark-mode .chat-grupo-tabs-v126 button.ativo{background:#0d6efd}
+@media(max-width:700px){#chatMensagens .chat-msg-v126-grupo{max-width:88%!important}.chat-grupo-midias-v126{grid-template-columns:repeat(2,minmax(0,1fr))}}
+</style>
+<div id="chatGrupoPerfilV126" onclick="if(event.target===this)fecharPerfilGrupoV126()">
+ <div id="chatGrupoPerfilCardV126" onclick="event.stopPropagation()">
+  <div id="chatGrupoPerfilTopV126">
+   <div id="chatGrupoPerfilIdentV126"><div id="chatGrupoPerfilAvatarV126">👥</div><div><h2 id="chatGrupoPerfilNomeV126">Grupo</h2><small id="chatGrupoPerfilResumoV126"></small></div></div>
+   <button onclick="fecharPerfilGrupoV126()">✕</button>
+  </div>
+  <div class="chat-grupo-tabs-v126">
+   <button id="chatGrupoTabMembrosV126" class="ativo" onclick="mostrarAbaGrupoV126('membros')">👥 Participantes</button>
+   <button id="chatGrupoTabMidiasV126" onclick="mostrarAbaGrupoV126('midias')">🖼️ Mídias</button>
+  </div>
+  <div id="chatGrupoPerfilConteudoV126"></div>
+ </div>
+</div>
+<script id="erp-v126-grupo-ux-js">
+(function(){
+"use strict";
+let membros126=[],msgs126=[],aba126="membros";
+const esc126=v=>{try{return chatEscV57(v)}catch(_){return String(v??"").replace(/[&<>"']/g,"")}};
+const sb126=()=>obterSupabaseClient();
+const ini126=n=>String(n||"U").trim().split(/\s+/).slice(0,2).map(x=>x[0]||"").join("").toUpperCase();
+
+window.renderMensagensGrupoV125=function(rows){
+ const area=document.getElementById("chatMensagens");if(!area)return;
+ if(!rows?.length){area.innerHTML="<div class='chat-conversa-vazia' style='display:block'>Nenhuma mensagem no grupo ainda.</div>";return}
+ area.innerHTML=rows.map(m=>{
+  const minha=String(m.remetente_id)===String(usuarioLogado?.id||"");
+  const anexos=renderizarAnexosChatV600(m.anexos);
+  return `<div class="chat-msg chat-msg-v126-grupo ${minha?"minha":"outra"}"><div class="chat-msg-balao">${minha?"":`<div class="chat-grupo-remetente-v125">${esc126(m.remetente_nome||"Usuário")}</div>`}${m.mensagem?`<div>${esc126(m.mensagem)}</div>`:""}${anexos}</div><div class="chat-msg-meta">${chatDataHoraV57(m.created_at)}</div></div>`;
+ }).join("");
+ requestAnimationFrame(()=>area.scrollTop=area.scrollHeight);
+};
+
+window.abrirPerfilGrupoV126=async function(){
+ if(!grupoAtualV125)return;
+ document.getElementById("chatGrupoPerfilNomeV126").textContent=grupoAtualV125.nome||"Grupo";
+ document.getElementById("chatGrupoPerfilResumoV126").textContent=`${Number(grupoAtualV125.total_membros||0)} participantes`;
+ document.getElementById("chatGrupoPerfilV126")?.classList.add("aberto");
+ const area=document.getElementById("chatGrupoPerfilConteudoV126");if(area)area.innerHTML="<div class='chat-carregando'>Carregando...</div>";
+ try{
+  const [a,b]=await Promise.all([
+   sb126().rpc("listar_membros_grupo_v125",{p_grupo_id:grupoAtualV125.id}),
+   sb126().rpc("listar_mensagens_grupo_v125",{p_grupo_id:grupoAtualV125.id,p_limit:300})
+  ]);
+  if(a.error)throw a.error;if(b.error)throw b.error;
+  membros126=Array.isArray(a.data)?a.data:[];msgs126=Array.isArray(b.data)?b.data:[];
+  mostrarAbaGrupoV126(aba126);
+ }catch(e){if(area)area.innerHTML=`<div class="chat-grupo-sem-midias-v126">${esc126(e?.message||e)}</div>`}
+};
+window.fecharPerfilGrupoV126=()=>document.getElementById("chatGrupoPerfilV126")?.classList.remove("aberto");
+window.mostrarAbaGrupoV126=function(aba){
+ aba126=aba;
+ document.getElementById("chatGrupoTabMembrosV126")?.classList.toggle("ativo",aba==="membros");
+ document.getElementById("chatGrupoTabMidiasV126")?.classList.toggle("ativo",aba==="midias");
+ const area=document.getElementById("chatGrupoPerfilConteudoV126");if(!area)return;
+ if(aba==="membros"){
+  area.innerHTML=membros126.length?membros126.map(u=>`<div class="chat-grupo-membro-v126"><div class="chat-grupo-membro-avatar-v126">${u.avatar_url?`<img src="${esc126(u.avatar_url)}">`:esc126(ini126(u.nome))}</div><div><b>${esc126(u.nome||"Usuário")}</b><small>${String(u.user_id)===String(usuarioLogado?.id)?"Você":"Participante do grupo"}</small></div></div>`).join(""):"<div class='chat-grupo-sem-midias-v126'>Nenhum participante encontrado.</div>";
+  return;
+ }
+ const midias=[];
+ msgs126.forEach(m=>{let aa=[];try{aa=normalizarAnexosV600(m.anexos)}catch(_){} aa.forEach(x=>{const t=String(x.tipo||"");if(t.startsWith("image/")||t.startsWith("video/"))midias.push(x)})});
+ area.innerHTML=midias.length?`<div class="chat-grupo-midias-v126">${midias.map(a=>{const url=esc126(a.url||""),t=String(a.tipo||"");return t.startsWith("video/")?`<a class="chat-grupo-midia-v126" href="${url}" target="_blank"><video src="${url}" muted preload="metadata"></video></a>`:`<a class="chat-grupo-midia-v126" href="${url}" target="_blank"><img src="${url}" alt="${esc126(a.nome||"mídia")}"></a>`}).join("")}</div>`:"<div class='chat-grupo-sem-midias-v126'>Nenhuma mídia enviada neste grupo.</div>";
+};
+
+function bind126(){
+ const cab=document.getElementById("chatCabecalho"),av=document.getElementById("chatCabecalhoAvatar"),info=cab?.querySelector(".chat-cabecalho-info");
+ if(av&&!av.__gp126){av.__gp126=true;av.addEventListener("click",()=>{if(cab?.classList.contains("chat-grupo-header-v125")&&grupoAtualV125)abrirPerfilGrupoV126()})}
+ if(info&&!info.__gp126){info.__gp126=true;info.addEventListener("click",()=>{if(cab?.classList.contains("chat-grupo-header-v125")&&grupoAtualV125)abrirPerfilGrupoV126()})}
+}
+new MutationObserver(bind126).observe(document.body,{childList:true,subtree:true});setInterval(bind126,1800);setTimeout(bind126,500);
+
+window.salvarFigurinhaRecebidaV125=async function(url,nome,tipo){
+ try{
+  if(!url)throw new Error("Figurinha sem endereço válido.");
+  const {data:ex,error:eb}=await sb126().from("chat_figurinhas").select("id").eq("user_id",usuarioLogado.id).eq("url",url).limit(1);
+  if(eb)throw eb;if(ex?.length){alert("Essa figurinha já está salva na sua coleção.");return}
+  const resp=await fetch(url,{cache:"force-cache"});if(!resp.ok)throw new Error("Não foi possível baixar a figurinha.");
+  const blob=await resp.blob(),mime=tipo||blob.type||"image/webp",ext=mime.includes("webp")?"webp":mime.includes("png")?"png":mime.includes("gif")?"gif":"jpg";
+  const file=new File([blob],nome||`figurinha-${Date.now()}.${ext}`,{type:mime});
+  const caminho=`${usuarioLogado.id}/figurinhas/${crypto.randomUUID()}.${ext}`;
+  const up=await sb126().storage.from("chat-anexos").upload(caminho,file,{contentType:mime,upsert:false,cacheControl:"31536000"});if(up.error)throw up.error;
+  const {data:u}=sb126().storage.from("chat-anexos").getPublicUrl(caminho);
+  const ins=await sb126().from("chat_figurinhas").insert({user_id:usuarioLogado.id,nome:file.name,url:u?.publicUrl||"",caminho,tipo:mime});
+  if(ins.error){await sb126().storage.from("chat-anexos").remove([caminho]);throw ins.error}
+  try{await carregarFigurinhasV122()}catch(_){}
+  alert("⭐ Figurinha salva na sua coleção.");
+ }catch(e){alert("Erro ao salvar figurinha: "+(e?.message||e))}
+};
+
+window.renderizarAnexosChatV600=function(v){
+ const arr=normalizarAnexosV600(v);
+ return arr.map(a=>{
+  const url=esc126(a.url||""),nome=esc126(a.nome||"arquivo"),tipo=String(a.tipo||"");
+  if(a.figurinha===true||a.figurinha==="true"){
+   return `<span class="chat-figurinha-wrap-v125"><img class="chat-figurinha-msg-v122" src="${url}" alt="${nome}"><button class="chat-salvar-figurinha-v125" type="button" title="Salvar na minha coleção" onclick="event.preventDefault();event.stopPropagation();salvarFigurinhaRecebidaV125('${String(a.url||"").replace(/'/g,"\\'")}','${String(a.nome||"figurinha.webp").replace(/'/g,"\\'")}','${String(tipo).replace(/'/g,"\\'")}')">⭐ Salvar</button></span>`;
+  }
+  if(tipo.startsWith("image/"))return `<a href="${url}" target="_blank"><img class="chat-imagem" src="${url}" alt="${nome}"></a>`;
+  if(tipo.startsWith("audio/"))return `<audio class="chat-audio" controls src="${url}"></audio>`;
+  if(tipo.startsWith("video/"))return `<video controls style="max-width:280px;max-height:240px" src="${url}"></video>`;
+  return `<a class="chat-anexo" href="${url}" target="_blank" download>📎 <span>${nome}</span></a>`;
+ }).join("");
+};
+console.info("ERP V12.6: grupo compacto + perfil/mídias + salvar figurinha recebida.");
+})();
+</script>
+
 </body>
 </html>
 
