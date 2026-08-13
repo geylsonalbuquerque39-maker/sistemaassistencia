@@ -30126,6 +30126,246 @@ console.info("ERP V12.0: status online/ausente/ocupado/offline corrigidos.");
 })();
 </script>
 
+
+<style id="erp-v122-msn">
+@keyframes msnNudgeV122{0%,100%{transform:translate(0)}10%{transform:translate(-12px)}20%{transform:translate(12px)}30%{transform:translate(-10px,6px)}40%{transform:translate(10px,-6px)}50%{transform:translate(-8px)}60%{transform:translate(8px,5px)}70%{transform:translate(-6px,-4px)}80%{transform:translate(6px)}90%{transform:translate(-3px)}}
+.msn-nudge-v122{animation:msnNudgeV122 .58s ease-in-out 0s 2}
+#msnNudgeToastV122{position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:50000;display:none;padding:13px 18px;border-radius:14px;background:#082b55;color:#fff;border:2px solid #36a9ff;box-shadow:0 15px 40px #0006;font-weight:900}
+#msnNudgeToastV122.show{display:block}
+.msn-nudge-btn-v122{border:0;border-radius:9px;padding:8px 11px;cursor:pointer;background:#ffb000;color:#07182c;font-weight:900}
+</style>
+<div id="msnNudgeToastV122"></div>
+<script id="erp-v122-msn-js">
+(function(){
+"use strict";
+const CHANNEL="erp_msn_nudge_v122", COOLDOWN=10000;
+let channel=null,last=0;
+const myId=()=>String(window.usuarioLogado?.id||"");
+const myName=()=>String(window.usuarioLogado?.nome||"Alguém");
+function targetId(){
+ return String(window.chatContatoAtualV57?.id||window.chatUsuarioAtual?.id||window.chatContatoSelecionado?.id||"");
+}
+function toast(t){
+ const e=document.getElementById("msnNudgeToastV122"); if(!e)return;
+ e.textContent="🔔 "+t;e.classList.add("show");clearTimeout(e._t);
+ e._t=setTimeout(()=>e.classList.remove("show"),4000);
+}
+function sound(){
+ try{
+  const A=window.AudioContext||window.webkitAudioContext,c=new A(),o=c.createOscillator(),g=c.createGain();
+  o.frequency.setValueAtTime(660,c.currentTime);o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.13);
+  g.gain.setValueAtTime(.001,c.currentTime);g.gain.exponentialRampToValueAtTime(.14,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.32);
+  o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);
+ }catch(_){}
+}
+function shake(){
+ const e=document.querySelector(".chat-window-v57,.chat-modal,.chat-panel,#chatModal,#chatPainel")||document.body;
+ e.classList.remove("msn-nudge-v122");void e.offsetWidth;e.classList.add("msn-nudge-v122");
+ setTimeout(()=>e.classList.remove("msn-nudge-v122"),1300);
+}
+function receive(p){
+ if(!p||String(p.para)!==myId()||String(p.de)===myId())return;
+ shake();sound();toast((p.nome||"Alguém")+" está chamando sua atenção!");
+}
+async function connect(){
+ try{
+  if(channel)return channel;
+  const sb=obterSupabaseClient();
+  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false}}})
+   .on("broadcast",{event:"nudge"},({payload})=>receive(payload)).subscribe();
+  return channel;
+ }catch(e){console.warn("[MSN Nudge]",e);return null}
+}
+window.chamarAtencaoMSNV122=async function(){
+ const para=targetId();
+ if(!para){toast("Abra uma conversa primeiro.");return}
+ const now=Date.now();
+ if(now-last<COOLDOWN){toast("Espere "+Math.ceil((COOLDOWN-(now-last))/1000)+"s para chamar novamente.");return}
+ last=now; const ch=await connect();
+ try{
+  await ch.send({type:"broadcast",event:"nudge",payload:{de:myId(),para,nome:myName(),at:now}});
+  sound();toast("Atenção chamada! 😄");
+ }catch(e){toast("Não foi possível chamar atenção.");}
+};
+function install(){
+ const selectors=[".chat-header-v57",".chat-conversa-topo-v57",".chat-header","#chatCabecalho","#chatTopo"];
+ const h=selectors.map(s=>document.querySelector(s)).find(Boolean);
+ if(!h||h.querySelector(".msn-nudge-btn-v122"))return;
+ const b=document.createElement("button");b.type="button";b.className="msn-nudge-btn-v122";
+ b.textContent="🔔 Chamar atenção";b.onclick=e=>{e.preventDefault();e.stopPropagation();chamarAtencaoMSNV122()};h.appendChild(b);
+}
+new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
+setInterval(install,1800);setTimeout(()=>{connect();install()},700);
+console.info("ERP V12.2: Chamar Atenção estilo MSN ativo.");
+})();
+</script>
+
+
+<script id="erp-v123-msn-destinatario-fix">
+(function(){
+"use strict";
+
+/* V12.3 — usa o estado REAL do chat V5.7:
+   chatUsuarioAtualV57 é uma variável global lexical (let), não window.*. */
+
+function alvoRealV123(){
+  try{
+    if(typeof chatUsuarioAtualV57!=="undefined" && chatUsuarioAtualV57?.id){
+      return String(chatUsuarioAtualV57.id);
+    }
+  }catch(_){}
+
+  /* fallback visual: usuário ativo da lista */
+  try{
+    const ativo=document.querySelector(".chat-usuario.ativo");
+    const oc=String(ativo?.getAttribute("onclick")||"");
+    const m=oc.match(/abrirConversaChatV57\(event,'([^']+)'\)/);
+    if(m?.[1])return String(m[1]);
+  }catch(_){}
+
+  return "";
+}
+
+function nomeAlvoRealV123(){
+  try{
+    if(typeof chatUsuarioAtualV57!=="undefined" && chatUsuarioAtualV57){
+      return String(chatUsuarioAtualV57.nome||chatUsuarioAtualV57.email||"usuário");
+    }
+  }catch(_){}
+  return "usuário";
+}
+
+window.chamarAtencaoMSNV122=async function(){
+  const para=alvoRealV123();
+
+  if(!para){
+    const e=document.getElementById("msnNudgeToastV122");
+    if(e){
+      e.textContent="🔔 Abra uma conversa primeiro.";
+      e.classList.add("show");
+      clearTimeout(e._t);
+      e._t=setTimeout(()=>e.classList.remove("show"),4000);
+    }
+    return;
+  }
+
+  /* reaproveita o canal realtime já criado pela V12.2 */
+  try{
+    const sb=obterSupabaseClient();
+
+    if(!window.__msnChannelV123){
+      window.__msnChannelV123=sb.channel("erp_msn_nudge_v123",{config:{broadcast:{self:false}}})
+        .on("broadcast",{event:"nudge"},({payload})=>{
+          try{
+            const meu=String(usuarioLogado?.id||"");
+            if(!payload || String(payload.para)!==meu || String(payload.de)===meu)return;
+
+            const area=document.querySelector(
+              ".chat-janela,.chat-painel,#chatPainel,.chat-window-v57,.chat-modal,.chat-panel"
+            )||document.body;
+
+            area.classList.remove("msn-nudge-v122");
+            void area.offsetWidth;
+            area.classList.add("msn-nudge-v122");
+            setTimeout(()=>area.classList.remove("msn-nudge-v122"),1300);
+
+            try{
+              const A=window.AudioContext||window.webkitAudioContext;
+              const c=new A(),o=c.createOscillator(),g=c.createGain();
+              o.frequency.setValueAtTime(660,c.currentTime);
+              o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.13);
+              g.gain.setValueAtTime(.001,c.currentTime);
+              g.gain.exponentialRampToValueAtTime(.14,c.currentTime+.02);
+              g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.32);
+              o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);
+            }catch(_){}
+
+            const e=document.getElementById("msnNudgeToastV122");
+            if(e){
+              e.textContent="🔔 "+String(payload.nome||"Alguém")+" está chamando sua atenção!";
+              e.classList.add("show");
+              clearTimeout(e._t);
+              e._t=setTimeout(()=>e.classList.remove("show"),4200);
+            }
+          }catch(err){
+            console.warn("[V12.3 Nudge receive]",err);
+          }
+        })
+        .subscribe();
+    }
+
+    const key="ERP_MSN_NUDGE_LAST_V123";
+    const agora=Date.now();
+    const ultimo=Number(sessionStorage.getItem(key)||0);
+    const cooldown=10000;
+
+    if(agora-ultimo<cooldown){
+      const resta=Math.ceil((cooldown-(agora-ultimo))/1000);
+      const e=document.getElementById("msnNudgeToastV122");
+      if(e){
+        e.textContent=`🔔 Espere ${resta}s para chamar novamente.`;
+        e.classList.add("show");
+        clearTimeout(e._t);
+        e._t=setTimeout(()=>e.classList.remove("show"),3000);
+      }
+      return;
+    }
+
+    sessionStorage.setItem(key,String(agora));
+
+    await window.__msnChannelV123.send({
+      type:"broadcast",
+      event:"nudge",
+      payload:{
+        de:String(usuarioLogado?.id||""),
+        para,
+        nome:String(usuarioLogado?.nome||"Alguém"),
+        alvo:nomeAlvoRealV123(),
+        at:agora
+      }
+    });
+
+    const e=document.getElementById("msnNudgeToastV122");
+    if(e){
+      e.textContent="🔔 Atenção chamada para "+nomeAlvoRealV123()+"! 😄";
+      e.classList.add("show");
+      clearTimeout(e._t);
+      e._t=setTimeout(()=>e.classList.remove("show"),3200);
+    }
+
+  }catch(err){
+    console.error("[V12.3 Nudge]",err);
+    const e=document.getElementById("msnNudgeToastV122");
+    if(e){
+      e.textContent="🔔 Não foi possível chamar atenção.";
+      e.classList.add("show");
+      clearTimeout(e._t);
+      e._t=setTimeout(()=>e.classList.remove("show"),3500);
+    }
+  }
+};
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.nudgeV123Audit=function(){
+  let alvo="";
+  let conversa="";
+  try{alvo=typeof chatUsuarioAtualV57!=="undefined"?chatUsuarioAtualV57?.id||"":""}catch(_){}
+  try{conversa=typeof chatConversaAtualV57!=="undefined"?chatConversaAtualV57||"":""}catch(_){}
+  const r={
+    usuarioSelecionado:alvo,
+    conversaAtual:conversa,
+    nome:nomeAlvoRealV123(),
+    pronto:!!alvo
+  };
+  console.info("[V12.3 NUDGE]",r);
+  return r;
+};
+
+console.info("ERP V12.3: Chamar Atenção agora usa chatUsuarioAtualV57 real.");
+})();
+</script>
+
 </body>
 </html>
 
