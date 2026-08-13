@@ -30127,106 +30127,80 @@ console.info("ERP V12.0: status online/ausente/ocupado/offline corrigidos.");
 </script>
 
 
-<style id="erp-v122-msn">
-@keyframes msnNudgeV122{0%,100%{transform:translate(0)}10%{transform:translate(-12px)}20%{transform:translate(12px)}30%{transform:translate(-10px,6px)}40%{transform:translate(10px,-6px)}50%{transform:translate(-8px)}60%{transform:translate(8px,5px)}70%{transform:translate(-6px,-4px)}80%{transform:translate(6px)}90%{transform:translate(-3px)}}
-.msn-nudge-v122{animation:msnNudgeV122 .58s ease-in-out 0s 2}
-#msnNudgeToastV122{position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:50000;display:none;padding:13px 18px;border-radius:14px;background:#082b55;color:#fff;border:2px solid #36a9ff;box-shadow:0 15px 40px #0006;font-weight:900}
-#msnNudgeToastV122.show{display:block}
-.msn-nudge-btn-v122{border:0;border-radius:9px;padding:8px 11px;cursor:pointer;background:#ffb000;color:#07182c;font-weight:900}
+<style id="erp-v122-chamar-atencao-geleia">
+@keyframes erpGeleiaNudgeV122{
+  0%{transform:translate(0,0) scale(1,1)}
+  10%{transform:translate(-14px,0) scale(.97,1.04)}
+  20%{transform:translate(14px,0) scale(1.04,.97)}
+  30%{transform:translate(-11px,7px) scale(.96,1.05)}
+  40%{transform:translate(11px,-7px) scale(1.05,.96)}
+  50%{transform:translate(-8px,0) scale(.98,1.03)}
+  60%{transform:translate(8px,6px) scale(1.03,.98)}
+  70%{transform:translate(-6px,-5px) scale(.99,1.02)}
+  80%{transform:translate(6px,0) scale(1.02,.99)}
+  90%{transform:translate(-3px,0) scale(.995,1.005)}
+  100%{transform:translate(0,0) scale(1,1)}
+}
+.erp-geleia-nudge-v122{
+  animation:erpGeleiaNudgeV122 .62s cubic-bezier(.36,.07,.19,.97) 0s 2!important;
+  transform-origin:center center!important;
+  will-change:transform!important;
+}
+#erpNudgeToastV122{
+  position:fixed;
+  left:50%;
+  top:78px;
+  transform:translateX(-50%);
+  z-index:60000;
+  display:none;
+  max-width:min(560px,92vw);
+  padding:14px 18px;
+  border-radius:14px;
+  background:#082b55;
+  color:#fff;
+  border:2px solid #36a9ff;
+  box-shadow:0 18px 45px rgba(0,0,0,.4);
+  font-weight:900;
+  text-align:center;
+}
+#erpNudgeToastV122.show{display:block}
+.erp-btn-nudge-v122{
+  border:0;
+  border-radius:10px;
+  padding:8px 12px;
+  background:#ffb000;
+  color:#07182c;
+  font-weight:900;
+  cursor:pointer;
+}
 </style>
-<div id="msnNudgeToastV122"></div>
-<script id="erp-v122-msn-js">
-(function(){
-"use strict";
-const CHANNEL="erp_msn_nudge_v122", COOLDOWN=10000;
-let channel=null,last=0;
-const myId=()=>String(window.usuarioLogado?.id||"");
-const myName=()=>String(window.usuarioLogado?.nome||"Alguém");
-function targetId(){
- return String(window.chatContatoAtualV57?.id||window.chatUsuarioAtual?.id||window.chatContatoSelecionado?.id||"");
-}
-function toast(t){
- const e=document.getElementById("msnNudgeToastV122"); if(!e)return;
- e.textContent="🔔 "+t;e.classList.add("show");clearTimeout(e._t);
- e._t=setTimeout(()=>e.classList.remove("show"),4000);
-}
-function sound(){
- try{
-  const A=window.AudioContext||window.webkitAudioContext,c=new A(),o=c.createOscillator(),g=c.createGain();
-  o.frequency.setValueAtTime(660,c.currentTime);o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.13);
-  g.gain.setValueAtTime(.001,c.currentTime);g.gain.exponentialRampToValueAtTime(.14,c.currentTime+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.32);
-  o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);
- }catch(_){}
-}
-function shake(){
- const e=document.querySelector(".chat-window-v57,.chat-modal,.chat-panel,#chatModal,#chatPainel")||document.body;
- e.classList.remove("msn-nudge-v122");void e.offsetWidth;e.classList.add("msn-nudge-v122");
- setTimeout(()=>e.classList.remove("msn-nudge-v122"),1300);
-}
-function receive(p){
- if(!p||String(p.para)!==myId()||String(p.de)===myId())return;
- shake();sound();toast((p.nome||"Alguém")+" está chamando sua atenção!");
-}
-async function connect(){
- try{
-  if(channel)return channel;
-  const sb=obterSupabaseClient();
-  channel=sb.channel(CHANNEL,{config:{broadcast:{self:false}}})
-   .on("broadcast",{event:"nudge"},({payload})=>receive(payload)).subscribe();
-  return channel;
- }catch(e){console.warn("[MSN Nudge]",e);return null}
-}
-window.chamarAtencaoMSNV122=async function(){
- const para=targetId();
- if(!para){toast("Abra uma conversa primeiro.");return}
- const now=Date.now();
- if(now-last<COOLDOWN){toast("Espere "+Math.ceil((COOLDOWN-(now-last))/1000)+"s para chamar novamente.");return}
- last=now; const ch=await connect();
- try{
-  await ch.send({type:"broadcast",event:"nudge",payload:{de:myId(),para,nome:myName(),at:now}});
-  sound();toast("Atenção chamada! 😄");
- }catch(e){toast("Não foi possível chamar atenção.");}
-};
-function install(){
- const selectors=[".chat-header-v57",".chat-conversa-topo-v57",".chat-header","#chatCabecalho","#chatTopo"];
- const h=selectors.map(s=>document.querySelector(s)).find(Boolean);
- if(!h||h.querySelector(".msn-nudge-btn-v122"))return;
- const b=document.createElement("button");b.type="button";b.className="msn-nudge-btn-v122";
- b.textContent="🔔 Chamar atenção";b.onclick=e=>{e.preventDefault();e.stopPropagation();chamarAtencaoMSNV122()};h.appendChild(b);
-}
-new MutationObserver(install).observe(document.body,{childList:true,subtree:true});
-setInterval(install,1800);setTimeout(()=>{connect();install()},700);
-console.info("ERP V12.2: Chamar Atenção estilo MSN ativo.");
-})();
-</script>
 
+<div id="erpNudgeToastV122"></div>
 
-<script id="erp-v123-msn-destinatario-fix">
+<script id="erp-v122-chamar-atencao-geleia-js">
 (function(){
 "use strict";
 
-/* V12.3 — usa o estado REAL do chat V5.7:
-   chatUsuarioAtualV57 é uma variável global lexical (let), não window.*. */
+const CHANNEL_V122="erp_chamar_atencao_v122";
+const COOLDOWN_V122=10000;
+let canalV122=null;
+let ultimoEnvioV122=0;
 
-function alvoRealV123(){
+function meuIdV122(){
+  return String(usuarioLogado?.id||"");
+}
+function meuNomeV122(){
+  return String(usuarioLogado?.nome||"Alguém");
+}
+function alvoAtualV122(){
   try{
     if(typeof chatUsuarioAtualV57!=="undefined" && chatUsuarioAtualV57?.id){
       return String(chatUsuarioAtualV57.id);
     }
   }catch(_){}
-
-  /* fallback visual: usuário ativo da lista */
-  try{
-    const ativo=document.querySelector(".chat-usuario.ativo");
-    const oc=String(ativo?.getAttribute("onclick")||"");
-    const m=oc.match(/abrirConversaChatV57\(event,'([^']+)'\)/);
-    if(m?.[1])return String(m[1]);
-  }catch(_){}
-
   return "";
 }
-
-function nomeAlvoRealV123(){
+function alvoNomeV122(){
   try{
     if(typeof chatUsuarioAtualV57!=="undefined" && chatUsuarioAtualV57){
       return String(chatUsuarioAtualV57.nome||chatUsuarioAtualV57.email||"usuário");
@@ -30234,135 +30208,132 @@ function nomeAlvoRealV123(){
   }catch(_){}
   return "usuário";
 }
+function toastV122(txt){
+  const e=document.getElementById("erpNudgeToastV122");
+  if(!e)return;
+  e.textContent="🔔 "+txt;
+  e.classList.add("show");
+  clearTimeout(e._t);
+  e._t=setTimeout(()=>e.classList.remove("show"),4000);
+}
+function somV122(){
+  try{
+    const A=window.AudioContext||window.webkitAudioContext;
+    const c=new A(),o=c.createOscillator(),g=c.createGain();
+    o.type="sine";
+    o.frequency.setValueAtTime(620,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(920,c.currentTime+.16);
+    g.gain.setValueAtTime(.001,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.14,c.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.34);
+    o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.36);
+  }catch(_){}
+}
+function geleiaV122(){
+  /* A pessoa chamada sente a TELA PRINCIPAL do ERP mexer, não só o chat. */
+  const alvo=
+    document.querySelector(".main") ||
+    document.querySelector("#app") ||
+    document.body;
 
-window.chamarAtencaoMSNV122=async function(){
-  const para=alvoRealV123();
+  alvo.classList.remove("erp-geleia-nudge-v122");
+  void alvo.offsetWidth;
+  alvo.classList.add("erp-geleia-nudge-v122");
+  setTimeout(()=>alvo.classList.remove("erp-geleia-nudge-v122"),1500);
+}
+function receberV122(payload){
+  if(!payload)return;
+  if(String(payload.para)!==meuIdV122())return;
+  if(String(payload.de)===meuIdV122())return;
 
+  geleiaV122();
+  somV122();
+  toastV122((payload.nome||"Alguém")+" está chamando sua atenção!");
+}
+
+async function conectarV122(){
+  try{
+    if(canalV122)return canalV122;
+    const sb=obterSupabaseClient();
+    canalV122=sb
+      .channel(CHANNEL_V122,{config:{broadcast:{self:false}}})
+      .on("broadcast",{event:"nudge"},({payload})=>receberV122(payload))
+      .subscribe();
+    return canalV122;
+  }catch(e){
+    console.warn("[V12.2 Chamar atenção]",e);
+    return null;
+  }
+}
+
+window.chamarAtencaoV122=async function(){
+  const para=alvoAtualV122();
   if(!para){
-    const e=document.getElementById("msnNudgeToastV122");
-    if(e){
-      e.textContent="🔔 Abra uma conversa primeiro.";
-      e.classList.add("show");
-      clearTimeout(e._t);
-      e._t=setTimeout(()=>e.classList.remove("show"),4000);
-    }
+    toastV122("Abra uma conversa primeiro.");
     return;
   }
 
-  /* reaproveita o canal realtime já criado pela V12.2 */
+  const agora=Date.now();
+  if(agora-ultimoEnvioV122<COOLDOWN_V122){
+    const resta=Math.ceil((COOLDOWN_V122-(agora-ultimoEnvioV122))/1000);
+    toastV122("Espere "+resta+"s para chamar novamente.");
+    return;
+  }
+
+  ultimoEnvioV122=agora;
+  const ch=await conectarV122();
+  if(!ch){
+    toastV122("Não foi possível conectar ao Realtime.");
+    return;
+  }
+
   try{
-    const sb=obterSupabaseClient();
-
-    if(!window.__msnChannelV123){
-      window.__msnChannelV123=sb.channel("erp_msn_nudge_v123",{config:{broadcast:{self:false}}})
-        .on("broadcast",{event:"nudge"},({payload})=>{
-          try{
-            const meu=String(usuarioLogado?.id||"");
-            if(!payload || String(payload.para)!==meu || String(payload.de)===meu)return;
-
-            const area=document.querySelector(
-              ".chat-janela,.chat-painel,#chatPainel,.chat-window-v57,.chat-modal,.chat-panel"
-            )||document.body;
-
-            area.classList.remove("msn-nudge-v122");
-            void area.offsetWidth;
-            area.classList.add("msn-nudge-v122");
-            setTimeout(()=>area.classList.remove("msn-nudge-v122"),1300);
-
-            try{
-              const A=window.AudioContext||window.webkitAudioContext;
-              const c=new A(),o=c.createOscillator(),g=c.createGain();
-              o.frequency.setValueAtTime(660,c.currentTime);
-              o.frequency.exponentialRampToValueAtTime(880,c.currentTime+.13);
-              g.gain.setValueAtTime(.001,c.currentTime);
-              g.gain.exponentialRampToValueAtTime(.14,c.currentTime+.02);
-              g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.32);
-              o.connect(g);g.connect(c.destination);o.start();o.stop(c.currentTime+.34);
-            }catch(_){}
-
-            const e=document.getElementById("msnNudgeToastV122");
-            if(e){
-              e.textContent="🔔 "+String(payload.nome||"Alguém")+" está chamando sua atenção!";
-              e.classList.add("show");
-              clearTimeout(e._t);
-              e._t=setTimeout(()=>e.classList.remove("show"),4200);
-            }
-          }catch(err){
-            console.warn("[V12.3 Nudge receive]",err);
-          }
-        })
-        .subscribe();
-    }
-
-    const key="ERP_MSN_NUDGE_LAST_V123";
-    const agora=Date.now();
-    const ultimo=Number(sessionStorage.getItem(key)||0);
-    const cooldown=10000;
-
-    if(agora-ultimo<cooldown){
-      const resta=Math.ceil((cooldown-(agora-ultimo))/1000);
-      const e=document.getElementById("msnNudgeToastV122");
-      if(e){
-        e.textContent=`🔔 Espere ${resta}s para chamar novamente.`;
-        e.classList.add("show");
-        clearTimeout(e._t);
-        e._t=setTimeout(()=>e.classList.remove("show"),3000);
-      }
-      return;
-    }
-
-    sessionStorage.setItem(key,String(agora));
-
-    await window.__msnChannelV123.send({
+    await ch.send({
       type:"broadcast",
       event:"nudge",
       payload:{
-        de:String(usuarioLogado?.id||""),
+        de:meuIdV122(),
         para,
-        nome:String(usuarioLogado?.nome||"Alguém"),
-        alvo:nomeAlvoRealV123(),
+        nome:meuNomeV122(),
+        alvo:alvoNomeV122(),
         at:agora
       }
     });
 
-    const e=document.getElementById("msnNudgeToastV122");
-    if(e){
-      e.textContent="🔔 Atenção chamada para "+nomeAlvoRealV123()+"! 😄";
-      e.classList.add("show");
-      clearTimeout(e._t);
-      e._t=setTimeout(()=>e.classList.remove("show"),3200);
-    }
-
-  }catch(err){
-    console.error("[V12.3 Nudge]",err);
-    const e=document.getElementById("msnNudgeToastV122");
-    if(e){
-      e.textContent="🔔 Não foi possível chamar atenção.";
-      e.classList.add("show");
-      clearTimeout(e._t);
-      e._t=setTimeout(()=>e.classList.remove("show"),3500);
-    }
+    somV122();
+    toastV122("Atenção chamada para "+alvoNomeV122()+"!");
+  }catch(e){
+    console.error("[V12.2 Chamar atenção]",e);
+    toastV122("Não foi possível chamar atenção.");
   }
 };
 
-window.ERP=window.ERP||{};
-ERP.Performance=ERP.Performance||{};
-ERP.Performance.nudgeV123Audit=function(){
-  let alvo="";
-  let conversa="";
-  try{alvo=typeof chatUsuarioAtualV57!=="undefined"?chatUsuarioAtualV57?.id||"":""}catch(_){}
-  try{conversa=typeof chatConversaAtualV57!=="undefined"?chatConversaAtualV57||"":""}catch(_){}
-  const r={
-    usuarioSelecionado:alvo,
-    conversaAtual:conversa,
-    nome:nomeAlvoRealV123(),
-    pronto:!!alvo
-  };
-  console.info("[V12.3 NUDGE]",r);
-  return r;
-};
+function instalarBotaoV122(){
+  const head=
+    document.querySelector("#chatCabecalho") ||
+    document.querySelector(".chat-header-v57") ||
+    document.querySelector(".chat-conversa-topo-v57");
 
-console.info("ERP V12.3: Chamar Atenção agora usa chatUsuarioAtualV57 real.");
+  if(!head || head.querySelector(".erp-btn-nudge-v122"))return;
+
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="erp-btn-nudge-v122";
+  b.textContent="🔔 Chamar atenção";
+  b.onclick=e=>{
+    e.preventDefault();
+    e.stopPropagation();
+    window.chamarAtencaoV122();
+  };
+  head.appendChild(b);
+}
+
+new MutationObserver(instalarBotaoV122).observe(document.body,{childList:true,subtree:true});
+setInterval(instalarBotaoV122,1800);
+setTimeout(()=>{conectarV122();instalarBotaoV122()},700);
+
+console.info("ERP V12.2: Chamar atenção com efeito geleia na tela do destinatário.");
 })();
 </script>
 
