@@ -29869,6 +29869,129 @@ console.info("ERP V11.9: cartões do Admin usam backend e perfil aceita status o
 })();
 </script>
 
+
+<script id="erp-v120-status-perfil">
+(function(){
+"use strict";
+
+/* =========================================================
+   V12.0 — STATUS DO PERFIL
+   Corrige de forma consistente:
+   online / ausente / ocupado / offline
+   ========================================================= */
+
+function statusPerfilPermitidoV120(s){
+  return ["online","ausente","ocupado","offline"].includes(String(s||"").toLowerCase());
+}
+
+/* Quick status: agora aceita offline também */
+window.alterarStatusUsuarioV620=async function(status){
+  status=String(status||"").toLowerCase();
+  if(!statusPerfilPermitidoV120(status)||!usuarioLogado)return;
+
+  const antigo=usuarioLogado.status_perfil||"online";
+  usuarioLogado.status_perfil=status;
+  try{aplicarStatusPainelV620?.(status)}catch(_){}
+  document.getElementById("painelStatusMenuV620")?.classList.remove("aberto");
+
+  try{
+    const {error}=await obterSupabaseClient().rpc("alterar_meu_status_v620",{p_status:status});
+    if(error)throw error;
+    if(typeof carregarUsuariosChatV57==="function")await carregarUsuariosChatV57();
+  }catch(e){
+    usuarioLogado.status_perfil=antigo;
+    try{aplicarStatusPainelV620?.(antigo)}catch(_){}
+    alert("Não foi possível alterar o status: "+(e?.message||e));
+  }
+};
+
+/* Heartbeat respeita o status manual escolhido.
+   - ocupado permanece ocupado
+   - offline permanece offline
+   - ausente permanece ausente
+   - online continua podendo virar ausente por inatividade */
+const heartbeatOriginalV120=window.enviarHeartbeatPresencaV56;
+window.enviarHeartbeatPresencaV56=async function(){
+  if(!usuarioLogado?.id)return false;
+
+  const manual=String(usuarioLogado.status_perfil||"online").toLowerCase();
+  if(["ocupado","offline","ausente"].includes(manual)){
+    try{
+      const agora=new Date().toISOString();
+      const tabela=(typeof PRESENCA_V56_TABELA!=="undefined"&&PRESENCA_V56_TABELA)
+        ?PRESENCA_V56_TABELA:"presenca_usuarios";
+
+      const {error}=await obterSupabaseClient().from(tabela).upsert({
+        user_id:usuarioLogado.id,
+        nome:usuarioLogado.nome||"",
+        email:usuarioLogado.email||"",
+        perfil:usuarioLogado.perfil||"",
+        status:manual,
+        tela:typeof telaAtualPresencaV56==="function"?telaAtualPresencaV56():"ERP",
+        contexto:typeof contextoAtualPresencaV56==="function"?contextoAtualPresencaV56():"",
+        last_seen:agora,
+        updated_at:agora
+      },{onConflict:"user_id"});
+      if(error)throw error;
+      return true;
+    }catch(e){
+      console.warn("[V12 status heartbeat]",e?.message||e);
+      return false;
+    }
+  }
+
+  return typeof heartbeatOriginalV120==="function"
+    ?heartbeatOriginalV120.apply(this,arguments)
+    :false;
+};
+
+/* Classificação visual */
+const classificarOriginalV120=window.classificarPresencaV56;
+window.classificarPresencaV56=function(item){
+  const s=String(item?.status||"").toLowerCase();
+  if(s==="ocupado")return "ocupado";
+  if(s==="offline")return "offline";
+  if(s==="ausente")return "ausente";
+  return typeof classificarOriginalV120==="function"
+    ?classificarOriginalV120(item)
+    :"online";
+};
+
+/* Chat também reconhece ocupado explicitamente */
+const chatStatusOriginalV120=window.chatStatusUsuarioV57;
+window.chatStatusUsuarioV57=function(u){
+  if(String(u?.status||"").toLowerCase()==="ocupado")return "ocupado";
+  return typeof chatStatusOriginalV120==="function"
+    ?chatStatusOriginalV120(u)
+    :"offline";
+};
+
+const chatTextoOriginalV120=window.chatStatusTextoV57;
+window.chatStatusTextoV57=function(u){
+  const s=String(u?.status||"").toLowerCase();
+  if(s==="ocupado")return "🔴 Ocupado";
+  if(s==="offline")return "⚫ Offline — receberá quando entrar";
+  return typeof chatTextoOriginalV120==="function"
+    ?chatTextoOriginalV120(u)
+    :"";
+};
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.statusV120Audit=function(){
+  const r={
+    statusAtual:usuarioLogado?.status_perfil||null,
+    permitidos:["online","ausente","ocupado","offline"],
+    heartbeatRespeitaManual:true
+  };
+  console.info("[V12 STATUS]",r);
+  return r;
+};
+
+console.info("ERP V12.0: status online/ausente/ocupado/offline corrigidos.");
+})();
+</script>
+
 </body>
 </html>
 
