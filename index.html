@@ -5584,6 +5584,95 @@ html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
 }
 </style>
 
+
+<style id="erp-v106-admin-import-darkmode">
+/* Importador sempre começa no topo da área principal. */
+#telaAdminAtualizar{
+  margin-top:0!important;
+  padding-top:1px!important;
+}
+
+/* Preview da REXPEDLR */
+#adminPreviewImportacao{
+  max-height:520px;
+  overflow:auto;
+  border:1px solid #c8d2df;
+  border-radius:12px;
+  background:#fff;
+}
+#adminPreviewImportacao table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  background:#fff;
+}
+#adminPreviewImportacao th,
+#adminPreviewImportacao td{
+  padding:8px 10px;
+  border-right:1px solid #d7dfe8;
+  border-bottom:1px solid #d7dfe8;
+  text-align:left;
+  white-space:nowrap;
+  color:#001b3d;
+}
+#adminPreviewImportacao th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#001b3d;
+  color:#fff;
+}
+body.dark-mode #telaAdminAtualizar,
+html.dark #telaAdminAtualizar,
+[data-theme="dark"] #telaAdminAtualizar{
+  color:#eaf2ff!important;
+}
+body.dark-mode #adminPreviewImportacao,
+html.dark #adminPreviewImportacao,
+[data-theme="dark"] #adminPreviewImportacao{
+  background:#0d223a!important;
+  border-color:#315a80!important;
+}
+body.dark-mode #adminPreviewImportacao table,
+html.dark #adminPreviewImportacao table,
+[data-theme="dark"] #adminPreviewImportacao table{
+  background:#0d223a!important;
+}
+body.dark-mode #adminPreviewImportacao td,
+html.dark #adminPreviewImportacao td,
+[data-theme="dark"] #adminPreviewImportacao td{
+  background:#0d223a!important;
+  color:#f5f9ff!important;
+  border-color:#31506d!important;
+}
+body.dark-mode #adminPreviewImportacao tr:nth-child(even) td,
+html.dark #adminPreviewImportacao tr:nth-child(even) td,
+[data-theme="dark"] #adminPreviewImportacao tr:nth-child(even) td{
+  background:#102b49!important;
+}
+body.dark-mode #adminPreviewImportacao th,
+html.dark #adminPreviewImportacao th,
+[data-theme="dark"] #adminPreviewImportacao th{
+  background:#031a34!important;
+  color:#fff!important;
+  border-color:#31506d!important;
+}
+body.dark-mode #telaAdminAtualizar .admin-mini-box,
+html.dark #telaAdminAtualizar .admin-mini-box,
+[data-theme="dark"] #telaAdminAtualizar .admin-mini-box{
+  background:#102b49!important;
+  color:#eaf2ff!important;
+  border-color:#315a80!important;
+}
+body.dark-mode #telaAdminAtualizar input,
+html.dark #telaAdminAtualizar input,
+[data-theme="dark"] #telaAdminAtualizar input{
+  background:#07192c!important;
+  color:#fff!important;
+  border-color:#1ea5ff!important;
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -6057,6 +6146,39 @@ html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
             <div class="relatorio-box">PDVs<span id="relQtdPDV">0</span></div>
         </div>
         <div id="relatorioTabela" class="relatorio-tabela" style="display:none"></div>
+    </div>
+</div>
+
+<div id="telaAdminAtualizar">
+    <div class="title">
+        <h1>ATUALIZAR BANCO DE O.S.</h1>
+        <p>Importe o arquivo gerado pelo NetTerm</p>
+        <div class="underline"></div>
+    </div>
+
+    <div class="admin-painel">
+        <h2>📥 Importador NetTerm → Supabase</h2>
+        <div class="admin-info">
+            Selecione o arquivo <b>.xlt, .xls, .html ou .htm</b> gerado pelo NetTerm. O sistema vai ler a tabela HTML, detectar o cabeçalho da REXPEDLR e montar os registros para envio ao banco.
+        </div>
+        <div class="ci-campo">
+            <label>Arquivo gerado pelo NetTerm</label>
+            <input class="admin-file" type="file" id="arquivoNetterm" accept=".xlt,.xls,.html,.htm,.txt">
+        </div>
+        <button class="btn-voltar" id="btnPreVisualizarNetterm" onclick="preVisualizarArquivoNetterm()">Pré-visualizar arquivo</button>
+        <button class="btn-voltar" id="btnImportarNetterm" onclick="importarNettermParaSupabase()">Importar para Supabase</button>
+        <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao painel</button>
+        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
+        <div id="msgAdminImportacao" class="ci-msg"></div>
+        <div class="admin-mini-list">
+            <div class="admin-mini-box">Linhas de dados<span id="adminQtdRegistros">0</span></div>
+            <div class="admin-mini-box">O.S. únicas válidas<span id="adminQtdValidos">0</span></div>
+            <div class="admin-mini-box">Linhas rejeitadas<span id="adminQtdErros">0</span></div>
+            <div class="admin-mini-box">Duplicadas no arquivo<span id="adminQtdDuplicadasArquivo">0</span></div>
+            <div class="admin-mini-box">Verificadas no banco<span id="adminQtdVerificadas">0</span></div>
+            <div class="admin-mini-box">Status da conferência<span id="adminStatusConferencia" style="font-size:18px">Aguardando</span></div>
+        </div>
+        <div id="adminPreviewImportacao" class="admin-preview" style="display:none"></div>
     </div>
 </div>
 
@@ -6765,38 +6887,7 @@ html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
 <div id="intelModal" class="intel-modal" onclick="if(event.target===this)fecharIntelModal()"><div class="intel-modal-box"><button class="intel-close" onclick="fecharIntelModal()">Fechar</button><h2 id="intelModalTitulo">Detalhes</h2><div id="intelModalConteudo"></div></div></div>
 
 
-<div id="telaAdminAtualizar">
-    <div class="title">
-        <h1>ATUALIZAR BANCO DE O.S.</h1>
-        <p>Importe o arquivo gerado pelo NetTerm</p>
-        <div class="underline"></div>
-    </div>
 
-    <div class="admin-painel">
-        <h2>📥 Importador NetTerm → Supabase</h2>
-        <div class="admin-info">
-            Selecione o arquivo <b>.xlt, .xls, .html ou .htm</b> gerado pelo NetTerm. O sistema vai ler a tabela HTML, detectar o cabeçalho da REXPEDLR e montar os registros para envio ao banco.
-        </div>
-        <div class="ci-campo">
-            <label>Arquivo gerado pelo NetTerm</label>
-            <input class="admin-file" type="file" id="arquivoNetterm" accept=".xlt,.xls,.html,.htm,.txt">
-        </div>
-        <button class="btn-voltar" id="btnPreVisualizarNetterm" onclick="preVisualizarArquivoNetterm()">Pré-visualizar arquivo</button>
-        <button class="btn-voltar" id="btnImportarNetterm" onclick="importarNettermParaSupabase()">Importar para Supabase</button>
-        <button class="btn-voltar" onclick="abrirAdmin()">Voltar ao painel</button>
-        <button class="btn-voltar" onclick="voltarInicio()">Página inicial</button>
-        <div id="msgAdminImportacao" class="ci-msg"></div>
-        <div class="admin-mini-list">
-            <div class="admin-mini-box">Linhas de dados<span id="adminQtdRegistros">0</span></div>
-            <div class="admin-mini-box">O.S. únicas válidas<span id="adminQtdValidos">0</span></div>
-            <div class="admin-mini-box">Linhas rejeitadas<span id="adminQtdErros">0</span></div>
-            <div class="admin-mini-box">Duplicadas no arquivo<span id="adminQtdDuplicadasArquivo">0</span></div>
-            <div class="admin-mini-box">Verificadas no banco<span id="adminQtdVerificadas">0</span></div>
-            <div class="admin-mini-box">Status da conferência<span id="adminStatusConferencia" style="font-size:18px">Aguardando</span></div>
-        </div>
-        <div id="adminPreviewImportacao" class="admin-preview" style="display:none"></div>
-    </div>
-</div>
 
 
 <div id="telaAdminPresenca">
@@ -23513,17 +23604,32 @@ async function carregarFotosPagina(registrosPagina){
   const s=midiaCliente(),c=midiaCfg();
   if(!s)return;
 
-  let q=s.from(c.tabela)
-    .select("id,os,bucket,caminho_arquivo,nome_original,criado_em")
+  /* Primeiro tenta o padrão novo. */
+  let {data,error}=await s.from(c.tabela)
+    .select("id,os,bucket,caminho_arquivo,nome_original,criado_em,tipo_midia,origem")
     .in("os",osList)
     .eq("origem","principal")
     .eq("tipo_midia","imagem")
     .order("criado_em",{ascending:false});
 
-  // compatível com tabela que tenha excluido_em
-  try{q=q.is("excluido_em",null)}catch(_){}
+  /* Fallback para fotos antigas:
+     no módulo Mídias elas aparecem, mas alguns registros não têm origem/tipo. */
+  if(error || !Array.isArray(data) || !data.length){
+    const fb=await s.from(c.tabela)
+      .select("id,os,bucket,caminho_arquivo,nome_original,criado_em,tipo_midia,origem")
+      .in("os",osList)
+      .order("criado_em",{ascending:false});
 
-  const {data,error}=await q;
+    if(!fb.error){
+      data=(fb.data||[]).filter(r=>{
+        const tipo=String(r.tipo_midia||"imagem").toLowerCase();
+        const nome=String(r.nome_original||"");
+        return tipo==="imagem" || /\.(jpg|jpeg|png|webp|gif|bmp)$/i.test(nome);
+      });
+      error=null;
+    }
+  }
+
   if(error){
     console.warn("[AG PEDIDO FOTOS] Falha ao consultar mídias:",error.message);
     return;
@@ -23532,13 +23638,15 @@ async function carregarFotosPagina(registrosPagina){
   const grupos={};
   (data||[]).forEach(r=>{
     const os=String(r.os||"").trim();
+    if(!os)return;
     if(!grupos[os])grupos[os]=[];
-    if(grupos[os].length<4)grupos[os].push(r);
+    if(grupos[os].length<6)grupos[os].push(r);
   });
 
   for(const [os,arr] of Object.entries(grupos)){
     const resolvidas=[];
     for(const r of arr){
+      if(!r?.caminho_arquivo)continue;
       try{
         const {data:sig,error:sigErr}=await s.storage
           .from(r.bucket||c.bucket)
@@ -23546,7 +23654,9 @@ async function carregarFotosPagina(registrosPagina){
         if(!sigErr&&sig?.signedUrl){
           resolvidas.push({...r,url:sig.signedUrl});
         }
-      }catch(_){}
+      }catch(e){
+        console.warn("[AG PEDIDO FOTO URL]",os,e);
+      }
     }
     fotosPaginaV937[os]=resolvidas;
   }
@@ -27722,6 +27832,174 @@ ERP.Performance.v104Audit=async function(){
 };
 
 console.info("ERP V10.4: Endereçados S/ CPP backend + dark mode dos cartões diários.");
+})();
+</script>
+
+
+<style id="erp-v105-ranking-fix">
+#intelRankingTecnicos .bar-row,
+#intelRankingPDV .bar-row,
+#intelMapa .bar-row{
+  display:grid!important;
+  grid-template-columns:minmax(120px,190px) minmax(120px,1fr) 70px!important;
+  gap:10px!important;
+  align-items:center!important;
+  margin:10px 0!important;
+}
+#intelRankingTecnicos .bar-row > span:first-child,
+#intelRankingPDV .bar-row > span:first-child,
+#intelMapa .bar-row > span:first-child{
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-weight:800;
+}
+#intelRankingTecnicos .bar-track,
+#intelRankingPDV .bar-track,
+#intelMapa .bar-track{
+  height:13px!important;
+  background:#e8edf3!important;
+  border-radius:999px!important;
+  overflow:hidden!important;
+}
+#intelRankingTecnicos .bar-fill,
+#intelRankingPDV .bar-fill,
+#intelMapa .bar-fill{
+  display:block!important;
+  height:100%!important;
+  min-width:2px;
+  background:linear-gradient(90deg,#0046b8,#16a8ff)!important;
+  border-radius:999px!important;
+}
+#intelRankingTecnicos .bar-row > b,
+#intelRankingPDV .bar-row > b,
+#intelMapa .bar-row > b{
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+body.dark-mode #intelRankingTecnicos .bar-track,
+body.dark-mode #intelRankingPDV .bar-track,
+body.dark-mode #intelMapa .bar-track{
+  background:#284967!important;
+}
+body.dark-mode #intelRankingTecnicos .bar-row,
+body.dark-mode #intelRankingPDV .bar-row,
+body.dark-mode #intelMapa .bar-row{
+  color:#eaf2ff!important;
+}
+</style>
+
+<script id="erp-v105-ranking-render-fix">
+(function(){
+"use strict";
+
+/* A V10.3 criou classes intel-bar-* que não tinham CSS.
+   Reutiliza as classes históricas .bar-row/.bar-track/.bar-fill. */
+function barrasV105(lista,max=10){
+  const arr=(lista||[]).slice(0,max);
+  const maior=Math.max(1,...arr.map(x=>Number(x[1]||0)));
+  const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+  return arr.map(([label,total])=>`
+    <div class="bar-row">
+      <span title="${esc(label)}">${esc(label)}</span>
+      <div class="bar-track"><span class="bar-fill" style="width:${Math.max(2,Math.round(Number(total||0)*100/maior))}%"></span></div>
+      <b>${Number(total||0).toLocaleString("pt-BR")}</b>
+    </div>
+  `).join("");
+}
+
+const intelBaseV105=window.carregarIntelBackendV103;
+if(typeof intelBaseV105==="function"){
+  window.carregarIntelBackendV103=async function(forcar=false){
+    const r=await intelBaseV105(forcar);
+    try{
+      const s=r?.summary||await window.ERPBackendV100.api("/summary");
+      const pares=v=>(Array.isArray(v)?v:[]).map(x=>[x.label,Number(x.total||0)])
+        .filter(x=>x[0]!=="(vazio)");
+
+      const tec=document.getElementById("intelRankingTecnicos");
+      const pdv=document.getElementById("intelRankingPDV");
+      const mapa=document.getElementById("intelMapa");
+
+      if(tec)tec.innerHTML=barrasV105(pares(s.tecnicos_top),10);
+      if(pdv)pdv.innerHTML=barrasV105(pares(s.pdv_top),10);
+      if(mapa)mapa.innerHTML=barrasV105(pares(s.pdv_top),12);
+    }catch(e){
+      console.warn("[V10.5 rankings]",e);
+    }
+    return r;
+  };
+}
+
+console.info("ERP V10.5: fotos AG. PEDIDO e rankings corrigidos.");
+})();
+</script>
+
+
+<script id="erp-v106-admin-import-top-fix">
+(function(){
+"use strict";
+
+function instalarAdminSecaoV106(){
+  const base=window.abrirAdminSecao;
+  if(typeof base!=="function" || base.__v106)return;
+
+  const fn=function(secao){
+    if(secao==="atualizar"){
+      window.erpMontarTelaV7544?.("telaAdminAtualizar");
+    }
+
+    const r=base.apply(this,arguments);
+
+    if(secao==="atualizar"){
+      const tela=document.getElementById("telaAdminAtualizar");
+      if(tela){
+        tela.style.display="block";
+        tela.style.visibility="visible";
+        tela.style.opacity="1";
+      }
+
+      /* Evita herdar a posição vertical de telas anteriores. */
+      requestAnimationFrame(()=>{
+        window.scrollTo({top:0,left:0,behavior:"instant"});
+      });
+      setTimeout(()=>window.scrollTo({top:0,left:0,behavior:"instant"}),40);
+    }
+
+    return r;
+  };
+  fn.__v106=true;
+  window.abrirAdminSecao=fn;
+}
+
+/* Instala depois dos wrappers antigos do ModuleManager. */
+if(document.readyState==="loading"){
+  document.addEventListener("DOMContentLoaded",()=>{
+    setTimeout(instalarAdminSecaoV106,3800);
+  },{once:true});
+}else{
+  setTimeout(instalarAdminSecaoV106,3800);
+}
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.adminImportV106Audit=function(){
+  const tela=document.getElementById("telaAdminAtualizar");
+  const inicio=document.getElementById("telaInicio");
+  const r={
+    existe:!!tela,
+    antesInicio:!!(tela&&inicio&&(tela.compareDocumentPosition(inicio)&Node.DOCUMENT_POSITION_FOLLOWING)),
+    top:tela?.getBoundingClientRect?.().top??null,
+    scrollY:window.scrollY,
+    previewRows:document.querySelectorAll("#adminPreviewImportacao tbody tr").length
+  };
+  console.info("[V10.6 ADMIN IMPORT]",r);
+  return r;
+};
+
+console.info("ERP V10.6: Importar REXPEDLR reposicionado no topo + dark mode do preview.");
 })();
 </script>
 
