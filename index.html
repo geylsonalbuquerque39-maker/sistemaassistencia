@@ -27103,9 +27103,9 @@ function renderProgressaoBackendV100(prog){
   const t=Number(hoje.tat_pedido||0),to=Number(ontem.tat_pedido||0);
 
   setTxtV100("intelMiniTransicoesV925",a.toLocaleString("pt-BR"));
-  setTxtV100("intelMiniTransicoesComparativoV925",`Hoje • Ontem: ${b} • ${a-b>=0?"+":""}${a-b}`);
+  setTxtV100("intelMiniTransicoesComparativoV925",`Hoje: ${a} • Ontem: ${b} • ${a-b>0?"↑ "+(a-b):a-b<0?"↓ "+Math.abs(a-b):"= 0"}`);
   setTxtV100("intelMiniTatParaPedidoV926",t.toLocaleString("pt-BR"));
-  setTxtV100("intelMiniTatParaPedidoComparativoV926",`Hoje • Ontem: ${to}`);
+  setTxtV100("intelMiniTatParaPedidoComparativoV926",`Hoje: ${t} • Ontem: ${to} • ${t-to>0?"↑ "+(t-to):t-to<0?"↓ "+Math.abs(t-to):"= 0"}`);
 
   const host=document.getElementById("intelMiniPecasUltimosDiasV925");
   if(host){
@@ -27677,9 +27677,9 @@ function renderProgressaoV103(rows){
   const to=Number(ontem.tat_pedido||0);
 
   setV103("intelMiniTransicoesV925",a.toLocaleString("pt-BR"));
-  setV103("intelMiniTransicoesComparativoV925",`Hoje • Ontem: ${b} • ${a-b>=0?"+":""}${a-b}`);
+  setV103("intelMiniTransicoesComparativoV925",`Hoje: ${a} • Ontem: ${b} • ${a-b>0?"↑ "+(a-b):a-b<0?"↓ "+Math.abs(a-b):"= 0"}`);
   setV103("intelMiniTatParaPedidoV926",t.toLocaleString("pt-BR"));
-  setV103("intelMiniTatParaPedidoComparativoV926",`Hoje • Ontem: ${to}`);
+  setV103("intelMiniTatParaPedidoComparativoV926",`Hoje: ${t} • Ontem: ${to} • ${t-to>0?"↑ "+(t-to):t-to<0?"↓ "+Math.abs(t-to):"= 0"}`);
 
   const host=document.getElementById("intelMiniPecasUltimosDiasV925");
   if(host){
@@ -28135,7 +28135,7 @@ function renderProgressaoEntradasV107(rows){
 
   setV107("intelMiniTatParaPedidoV926",atual.toLocaleString("pt-BR"));
   setV107("intelMiniTatParaPedidoComparativoV926",
-    `Hoje • Ontem: ${ant} • ${atual-ant>=0?"+":""}${atual-ant}`);
+    `Hoje: ${atual} • Ontem: ${ant} • ${atual-ant>0?"↑ "+(atual-ant):atual-ant<0?"↓ "+Math.abs(atual-ant):"= 0"}`);
 
   const host=document.getElementById("intelMiniAgPedidoEntradasDiasV107");
   if(host){
@@ -29297,6 +29297,104 @@ ERP.Performance.exportV115Audit=function(){
 };
 
 console.info("ERP V11.5: segundo interceptador legado corrigido na Inteligência.");
+})();
+</script>
+
+
+<style id="erp-v116-home-cards-estaveis">
+/* Destaque visual e estabilidade dos cartões da Home */
+#telaInicio .home-card,
+#telaInicio .dashboard-box,
+#telaInicio .card,
+#telaInicio [data-home-card]{
+  cursor:pointer;
+}
+</style>
+
+<script id="erp-v116-home-cards-estaveis">
+(function(){
+"use strict";
+
+/* =========================================================
+   V11.6 — HOME: cartões não fecham no mesmo clique de abertura
+   Problema típico: o clique que abre a relação também sobe até
+   um listener global de "fechar ao clicar fora", fechando logo depois.
+   ========================================================= */
+
+let bloqueioFechamentoHomeV116=0;
+
+function marcarAberturaHomeV116(){
+  bloqueioFechamentoHomeV116=Date.now()+350;
+}
+window.marcarAberturaHomeV116=marcarAberturaHomeV116;
+
+/* Captura qualquer clique em cartões/botões da Home antes dos listeners de bubble. */
+document.addEventListener("click",function(ev){
+  const tela=document.getElementById("telaInicio");
+  if(!tela || getComputedStyle(tela).display==="none")return;
+
+  const alvo=ev.target?.closest?.(
+    "#telaInicio button,"+
+    "#telaInicio .dashboard-box,"+
+    "#telaInicio .home-card,"+
+    "#telaInicio [onclick]"
+  );
+  if(!alvo)return;
+
+  marcarAberturaHomeV116();
+},true);
+
+/* Protege modais/painéis abertos pela Home contra o MESMO clique de abertura. */
+document.addEventListener("click",function(ev){
+  if(Date.now()>bloqueioFechamentoHomeV116)return;
+
+  const modalAberto=[
+    "intelModal",
+    "fotosos-modal",
+    "comparadorModal",
+    "coletaFotosModal",
+    "modalOS",
+    "modalRelacao"
+  ].map(id=>document.getElementById(id)).find(el=>el && getComputedStyle(el).display!=="none");
+
+  if(!modalAberto)return;
+
+  /* durante a janela curta após abrir, não deixa listeners de "fora do modal"
+     receberem o mesmo clique */
+  ev.stopPropagation();
+},false);
+
+/* Corrige também handlers inline que chamem abrir e depois algum fechamento
+   por propagação: após abertura, o modal recebe uma pequena trava temporal. */
+const obs=new MutationObserver(()=>{
+  if(Date.now()>bloqueioFechamentoHomeV116)return;
+  document.querySelectorAll(
+    '#intelModal,#fotosos-modal,#comparadorModal,#coletaFotosModal,#modalOS,#modalRelacao'
+  ).forEach(el=>{
+    if(getComputedStyle(el).display!=="none"){
+      el.dataset.abertoEmV116=String(Date.now());
+    }
+  });
+});
+obs.observe(document.body,{attributes:true,subtree:true,attributeFilter:["style","class"]});
+
+/* Auditoria rápida */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.homeV116Audit=function(){
+  const abertos=[...document.querySelectorAll(
+    '#intelModal,#fotosos-modal,#comparadorModal,#coletaFotosModal,#modalOS,#modalRelacao'
+  )].filter(el=>getComputedStyle(el).display!=="none").map(el=>el.id);
+  const r={
+    bloqueioAtivo:Date.now()<bloqueioFechamentoHomeV116,
+    modaisAbertos:abertos,
+    homeVisivel:getComputedStyle(document.getElementById("telaInicio")||document.body).display!=="none"
+  };
+  console.info("[V11.6 HOME]",r);
+  return r;
+};
+
+console.info("ERP V11.6: comparação diária clara + cartões da Home estáveis.");
 })();
 </script>
 
