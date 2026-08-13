@@ -30289,7 +30289,7 @@ async function importarArquivosFigurinhaV122(files){
       if(f.size>5*1024*1024)throw new Error(`${f.name}: limite de 5 MB por figurinha.`);
 
       const nomeArquivo=`${crypto.randomUUID()}.${ext}`;
-      const caminho=`figurinhas/${usuarioIdV122()}/${nomeArquivo}`;
+      const caminho=`${usuarioIdV122()}/figurinhas/${nomeArquivo}`;
 
       const up=await sbV122().storage.from("chat-anexos").upload(caminho,f,{
         contentType:tipo,upsert:false,cacheControl:"31536000"
@@ -30674,7 +30674,7 @@ window.salvarCriadorFigurinhaV123=async function(){
     const blob=await canvasBlobV123();
     const nome=`figurinha-${Date.now()}.webp`;
     const file=new File([blob],nome,{type:"image/webp"});
-    const caminho=`figurinhas/${usuarioLogado.id}/${crypto.randomUUID()}.webp`;
+    const caminho=`${usuarioLogado.id}/figurinhas/${crypto.randomUUID()}.webp`;
 
     const up=await chatSbV57().storage.from("chat-anexos").upload(caminho,file,{
       contentType:"image/webp",upsert:false,cacheControl:"31536000"
@@ -30724,6 +30724,36 @@ setTimeout(instalarCriadorV123,500);
 draw();
 
 console.info("ERP V12.3: Criador de figurinhas ativo.");
+})();
+</script>
+
+
+<script id="erp-v124-figurinhas-rls-fix">
+(function(){
+"use strict";
+
+/* V12.4
+   O bucket chat-anexos já usa o padrão:
+   <user_id>/<conversa ou pasta>/arquivo
+   As figurinhas agora seguem o mesmo padrão:
+   <user_id>/figurinhas/arquivo.webp
+   Isso mantém compatibilidade com as policies atuais do Storage. */
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.figurinhasV124Audit=function(){
+  const uid=String(usuarioLogado?.id||"");
+  const r={
+    usuario:uid,
+    pastaEsperada:uid?`${uid}/figurinhas/`:"",
+    bucket:"chat-anexos",
+    rlsStorage:"usa o mesmo prefixo de usuário dos anexos normais do chat"
+  };
+  console.info("[V12.4 FIGURINHAS]",r);
+  return r;
+};
+
+console.info("ERP V12.4: caminho das figurinhas ajustado às policies do Storage.");
 })();
 </script>
 
