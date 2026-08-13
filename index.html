@@ -29572,6 +29572,128 @@ console.info("ERP V11.7: relações da Home usam modal independente e não fecha
 })();
 </script>
 
+
+<script id="erp-v118-bloqueio-os-clientes-6-digitos">
+(function(){
+"use strict";
+
+/* =========================================================
+   V11.8 — DESVINCULAÇÃO DEFINITIVA DE CLIENTES
+   Regra ILR: qualquer O.S. com EXATAMENTE 6 dígitos é CLIENTE
+   e não pode aparecer em relatórios, Inteligência, Home, busca
+   global, Copiloto, rankings ou relações da base ILR.
+   ========================================================= */
+
+function osClienteV118(v){
+  const d=String(v??"").replace(/\D/g,"");
+  return d.length===6;
+}
+function somenteILRV118(lista){
+  return (Array.isArray(lista)?lista:[]).filter(r=>!osClienteV118(r?.os));
+}
+window.osClienteV118=osClienteV118;
+window.somenteILRV118=somenteILRV118;
+
+/* Fonte principal em memória/cache */
+const buscarBaseV118=window.buscarTodaRexpedlr;
+if(typeof buscarBaseV118==="function"){
+  window.buscarTodaRexpedlr=async function(){
+    const lista=await buscarBaseV118.apply(this,arguments);
+    const limpa=somenteILRV118(lista);
+
+    try{
+      if(Array.isArray(rexpedlrIntelCacheV7543))rexpedlrIntelCacheV7543=limpa;
+    }catch(_){}
+    return limpa;
+  };
+}
+
+/* Defesa para análises legadas que recebam uma lista já carregada. */
+const analisarBaseV118=window.analisarIntel;
+if(typeof analisarBaseV118==="function"){
+  window.analisarIntel=function(lista){
+    return analisarBaseV118.call(this,somenteILRV118(lista));
+  };
+}
+
+/* Pesquisa global */
+function limparCachesClientesV118(){
+  try{
+    if(Array.isArray(intelRegistros))intelRegistros=somenteILRV118(intelRegistros);
+  }catch(_){}
+  try{
+    if(Array.isArray(window.pesquisaGlobalOsCache))
+      window.pesquisaGlobalOsCache=somenteILRV118(window.pesquisaGlobalOsCache);
+  }catch(_){}
+  try{
+    if(Array.isArray(window.rexpedlrDados))
+      window.rexpedlrDados=somenteILRV118(window.rexpedlrDados);
+  }catch(_){}
+  try{
+    if(Array.isArray(window.bancoRexpedlr))
+      window.bancoRexpedlr=somenteILRV118(window.bancoRexpedlr);
+  }catch(_){}
+}
+window.limparCachesClientesV118=limparCachesClientesV118;
+
+/* Ao abrir módulos ILR, elimina qualquer resíduo antigo já em memória. */
+["abrirInteligencia","abrirRelatorios","voltarInicio","abrirCopilotoERP"].forEach(nome=>{
+  const base=window[nome];
+  if(typeof base!=="function"||base.__v118)return;
+  const fn=function(){
+    limparCachesClientesV118();
+    return base.apply(this,arguments);
+  };
+  fn.__v118=true;
+  window[nome]=fn;
+});
+
+/* Relações backend: segurança visual adicional caso algum endpoint antigo
+   ainda retorne uma O.S. de cliente até o SQL ser aplicado. */
+const apiBaseV118=window.ERPBackendV100?.api?.bind(window.ERPBackendV100);
+if(apiBaseV118){
+  window.ERPBackendV100.api=async function(path,opts){
+    const r=await apiBaseV118(path,opts);
+
+    if(r && Array.isArray(r.rows)){
+      const antes=r.rows.length;
+      r.rows=somenteILRV118(r.rows);
+      if(typeof r.total==="number" && r.total===antes)r.total=r.rows.length;
+    }
+    if(Array.isArray(r)){
+      return r.filter(x=>!osClienteV118(x?.os));
+    }
+    if(r?.os && osClienteV118(r.os)){
+      throw new Error("Esta O.S. pertence à base CLIENTES e não está disponível no ERP ILR.");
+    }
+    return r;
+  };
+}
+
+/* Limpa imediatamente resíduos herdados de cache/local state. */
+setTimeout(limparCachesClientesV118,0);
+setTimeout(limparCachesClientesV118,1500);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.clientesV118Audit=function(){
+  let regs=[];
+  try{regs=Array.isArray(intelRegistros)?intelRegistros:[]}catch(_){}
+  const clientes=regs.filter(r=>osClienteV118(r?.os));
+  const r={
+    regra:"O.S. com 6 dígitos = CLIENTES",
+    intelTotal:regs.length,
+    clientesNaInteligencia:clientes.length,
+    status:clientes.length===0?"OK":"RESÍDUO ENCONTRADO"
+  };
+  console.info("[V11.8 CLIENTES]",r);
+  return r;
+};
+
+console.info("ERP V11.8: O.S. de 6 dígitos bloqueadas globalmente no ERP ILR.");
+})();
+</script>
+
 </body>
 </html>
 
