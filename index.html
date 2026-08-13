@@ -30337,6 +30337,319 @@ console.info("ERP V12.2: Chamar atenção com efeito geleia na tela do destinat�
 })();
 </script>
 
+
+<style id="erp-v123-notificacoes-chat-style">
+#erpToastStackV123{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:65000;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  width:min(380px,calc(100vw - 36px));
+  pointer-events:none;
+}
+.erp-toast-v123{
+  pointer-events:auto;
+  background:#082b55;
+  color:#fff;
+  border:2px solid #36a9ff;
+  border-radius:14px;
+  padding:13px 15px;
+  box-shadow:0 16px 40px rgba(0,0,0,.38);
+  animation:erpToastInV123 .22s ease-out;
+}
+.erp-toast-v123 b{display:block;font-size:14px;margin-bottom:4px}
+.erp-toast-v123 span{display:block;font-size:13px;line-height:1.35;color:#dcecff}
+.erp-toast-v123 small{display:block;margin-top:6px;color:#9fc7e8}
+@keyframes erpToastInV123{
+  from{transform:translateY(20px);opacity:0}
+  to{transform:translateY(0);opacity:1}
+}
+</style>
+
+<div id="erpToastStackV123"></div>
+
+<script id="erp-v123-chat-notificacoes">
+(function(){
+"use strict";
+
+const CHANNEL_MSG_V123="erp_chat_msg_notify_v123";
+let canalMsgV123=null;
+let audioLiberadoV123=false;
+
+/* ---------------------------------------------------------
+   SOM GLOBAL
+   --------------------------------------------------------- */
+function somMensagemV123(){
+  try{
+    const A=window.AudioContext||window.webkitAudioContext;
+    const c=new A(),o=c.createOscillator(),g=c.createGain();
+    o.type="sine";
+    o.frequency.setValueAtTime(520,c.currentTime);
+    o.frequency.exponentialRampToValueAtTime(760,c.currentTime+.10);
+    g.gain.setValueAtTime(.001,c.currentTime);
+    g.gain.exponentialRampToValueAtTime(.12,c.currentTime+.015);
+    g.gain.exponentialRampToValueAtTime(.001,c.currentTime+.26);
+    o.connect(g);g.connect(c.destination);
+    o.start();o.stop(c.currentTime+.28);
+    audioLiberadoV123=true;
+  }catch(_){}
+}
+window.somMensagemV123=somMensagemV123;
+
+/* libera áudio após primeira interação do usuário */
+["click","keydown","touchstart"].forEach(ev=>{
+  document.addEventListener(ev,()=>{audioLiberadoV123=true},{once:true,capture:true});
+});
+
+/* ---------------------------------------------------------
+   TOAST INTERNO - APARECE INDEPENDENTE DO MÓDULO ABERTO
+   --------------------------------------------------------- */
+function toastMsgV123(titulo,mensagem,extra=""){
+  const stack=document.getElementById("erpToastStackV123");
+  if(!stack)return;
+  const el=document.createElement("div");
+  el.className="erp-toast-v123";
+  el.innerHTML=`<b>${String(titulo||"Nova mensagem")}</b>
+    <span>${String(mensagem||"")}</span>
+    ${extra?`<small>${String(extra)}</small>`:""}`;
+  stack.appendChild(el);
+  setTimeout(()=>el.remove(),6000);
+}
+window.toastMsgV123=toastMsgV123;
+
+/* ---------------------------------------------------------
+   NOTIFICAÇÃO NATIVA DO SISTEMA / ÁREA DE TRABALHO
+   --------------------------------------------------------- */
+async function pedirPermissaoV123(){
+  try{
+    if(!("Notification" in window))return "unsupported";
+    if(Notification.permission==="granted")return "granted";
+    if(Notification.permission==="denied")return "denied";
+    return await Notification.requestPermission();
+  }catch(_){
+    return "error";
+  }
+}
+window.ativarNotificacoesDesktopV123=pedirPermissaoV123;
+
+function notificarDesktopV123(titulo,corpo){
+  try{
+    if(!("Notification" in window))return;
+    if(Notification.permission!=="granted")return;
+    const n=new Notification(titulo||"ERP - Nova mensagem",{
+      body:corpo||"",
+      tag:"erp-chat-msg",
+      renotify:true,
+      silent:true
+    });
+    n.onclick=()=>{
+      try{
+        window.focus();
+        if(typeof abrirChatERP==="function")abrirChatERP();
+        else document.getElementById("chatPainel")?.classList.add("aberto");
+      }catch(_){}
+      try{n.close()}catch(_){}
+    };
+  }catch(e){
+    console.warn("[V12.3 desktop notify]",e);
+  }
+}
+
+/* ---------------------------------------------------------
+   RECEBIMENTO REALTIME
+   --------------------------------------------------------- */
+function meuIdV123(){
+  try{return String(usuarioLogado?.id||"")}catch(_){return ""}
+}
+function meuNomeV123(){
+  try{return String(usuarioLogado?.nome||"Usuário")}catch(_){return "Usuário"}
+}
+
+function receberMsgV123(payload){
+  try{
+    if(!payload)return;
+    if(String(payload.para)!==meuIdV123())return;
+    if(String(payload.de)===meuIdV123())return;
+
+    const remetente=String(payload.nome||"Alguém");
+    const texto=String(payload.texto||"Nova mensagem");
+
+    /* sempre mostra aviso interno, independente da tela */
+    toastMsgV123("💬 "+remetente,texto,"Nova mensagem no ERP");
+
+    /* som sempre que chega mensagem */
+    somMensagemV123();
+
+    /* área de trabalho / sistema */
+    notificarDesktopV123("💬 "+remetente,texto);
+
+  }catch(e){
+    console.warn("[V12.3 receber msg]",e);
+  }
+}
+
+async function conectarMsgV123(){
+  try{
+    if(canalMsgV123)return canalMsgV123;
+    const sb=obterSupabaseClient();
+    canalMsgV123=sb
+      .channel(CHANNEL_MSG_V123,{config:{broadcast:{self:false}}})
+      .on("broadcast",{event:"chat_message"},({payload})=>receberMsgV123(payload))
+      .subscribe();
+    return canalMsgV123;
+  }catch(e){
+    console.warn("[V12.3 realtime msg]",e);
+    return null;
+  }
+}
+
+/* ---------------------------------------------------------
+   INTERCEPTA ENVIO REAL DO CHAT E DISPARA SOM + REALTIME
+   --------------------------------------------------------- */
+function usuarioAtualChatV123(){
+  try{
+    if(typeof chatUsuarioAtualV57!=="undefined" && chatUsuarioAtualV57?.id){
+      return chatUsuarioAtualV57;
+    }
+  }catch(_){}
+  return null;
+}
+
+async function avisarEnvioMsgV123(texto){
+  const u=usuarioAtualChatV123();
+  if(!u?.id)return;
+  const ch=await conectarMsgV123();
+  if(!ch)return;
+  try{
+    await ch.send({
+      type:"broadcast",
+      event:"chat_message",
+      payload:{
+        de:meuIdV123(),
+        para:String(u.id),
+        nome:meuNomeV123(),
+        texto:String(texto||"Nova mensagem"),
+        at:Date.now()
+      }
+    });
+  }catch(e){
+    console.warn("[V12.3 broadcast msg]",e);
+  }
+}
+
+/* tenta envolver a função de envio existente */
+const candidatosEnvioV123=[
+  "enviarMensagemChatV57",
+  "enviarMensagemV57",
+  "chatEnviarMensagemV57"
+];
+
+for(const nome of candidatosEnvioV123){
+  try{
+    const base=window[nome];
+    if(typeof base!=="function"||base.__v123)continue;
+
+    const fn=async function(){
+      let texto="";
+      try{
+        texto=String(document.getElementById("chatTexto")?.value||"").trim();
+      }catch(_){}
+
+      const r=await base.apply(this,arguments);
+
+      if(texto){
+        somMensagemV123();            // som no remetente
+        avisarEnvioMsgV123(texto);    // notifica destinatário
+      }
+      return r;
+    };
+    fn.__v123=true;
+    window[nome]=fn;
+  }catch(_){}
+}
+
+/* fallback: botão/enviar pelo compositor */
+document.addEventListener("click",function(ev){
+  const b=ev.target?.closest?.(
+    "#chatEnviar,.chat-enviar,.chat-send,.chat-compositor button[type='submit']"
+  );
+  if(!b)return;
+  const texto=String(document.getElementById("chatTexto")?.value||"").trim();
+  if(!texto)return;
+  setTimeout(()=>{
+    somMensagemV123();
+    avisarEnvioMsgV123(texto);
+  },50);
+},true);
+
+document.addEventListener("keydown",function(ev){
+  if(ev.key!=="Enter"||ev.shiftKey)return;
+  const campo=ev.target;
+  if(!(campo?.id==="chatTexto"))return;
+  const texto=String(campo.value||"").trim();
+  if(!texto)return;
+  setTimeout(()=>{
+    somMensagemV123();
+    avisarEnvioMsgV123(texto);
+  },50);
+},true);
+
+/* ---------------------------------------------------------
+   BOTÃO PARA ATIVAR NOTIFICAÇÕES NATIVAS
+   --------------------------------------------------------- */
+function instalarBotaoNotificacaoV123(){
+  const head=
+    document.querySelector("#chatCabecalho") ||
+    document.querySelector(".chat-header-v57") ||
+    document.querySelector(".chat-conversa-topo-v57");
+  if(!head||head.querySelector(".erp-btn-notify-v123"))return;
+
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="erp-btn-notify-v123";
+  b.style.cssText="border:0;border-radius:9px;padding:8px 10px;background:#0d6efd;color:#fff;font-weight:900;cursor:pointer";
+  b.textContent="🔔 Notificações";
+  b.onclick=async e=>{
+    e.preventDefault();e.stopPropagation();
+    const p=await pedirPermissaoV123();
+    if(p==="granted"){
+      toastMsgV123("🔔 Notificações ativadas","As mensagens podem aparecer na área de trabalho.");
+    }else if(p==="denied"){
+      toastMsgV123("🔕 Notificações bloqueadas","Libere as notificações nas permissões do navegador.");
+    }else{
+      toastMsgV123("🔔 Notificações","Seu navegador não permitiu ativar as notificações.");
+    }
+  };
+  head.appendChild(b);
+}
+
+new MutationObserver(instalarBotaoNotificacaoV123).observe(document.body,{childList:true,subtree:true});
+setInterval(instalarBotaoNotificacaoV123,1800);
+setTimeout(()=>{
+  conectarMsgV123();
+  instalarBotaoNotificacaoV123();
+},800);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.notifyV123Audit=function(){
+  const r={
+    notificationsSupported:"Notification" in window,
+    permission:("Notification" in window)?Notification.permission:"unsupported",
+    realtime:!!canalMsgV123,
+    usuario:meuIdV123()
+  };
+  console.info("[V12.3 NOTIFY]",r);
+  return r;
+};
+
+console.info("ERP V12.3: som em envio de mensagem + toast global + notificações de área de trabalho.");
+})();
+</script>
+
 </body>
 </html>
 
