@@ -6804,7 +6804,7 @@ html.dark #telaAdminAtualizar input,
       </article>
 
 <article class="intel-mini-pecas-card-v925">
-        <small>Saíram de AG. ANALISE TECNICA EM TAT → AG. PEDIDO DE PECA</small>
+        <small>Entraram em AG. PEDIDO DE PECA / PECAS</small>
         <strong id="intelMiniTatParaPedidoV926">0</strong>
         <span id="intelMiniTatParaPedidoComparativoV926">Hoje • Ontem: 0</span>
         <div class="intel-mini-pecas-actions-v925">
@@ -6815,6 +6815,10 @@ html.dark #telaAdminAtualizar input,
 </div>
 
     <div id="intelMiniPecasUltimosDiasV925" class="intel-mini-pecas-dias-v925"></div>
+    <div style="margin-top:14px">
+      <small style="display:block;font-weight:900;margin-bottom:8px">Entradas em AG. PEDIDO DE PECA / PECAS por dia</small>
+      <div id="intelMiniAgPedidoEntradasDiasV107" class="intel-mini-pecas-dias-v925"></div>
+    </div>
   </section>
 
 
@@ -28000,6 +28004,111 @@ ERP.Performance.adminImportV106Audit=function(){
 };
 
 console.info("ERP V10.6: Importar REXPEDLR reposicionado no topo + dark mode do preview.");
+})();
+</script>
+
+
+<script id="erp-v107-progressao-entradas-ag-pedido">
+(function(){
+"use strict";
+
+function setV107(id,v){
+  const e=document.getElementById(id);
+  if(e)e.textContent=String(v??"--");
+}
+
+function renderProgressaoEntradasV107(rows){
+  const prog=Array.isArray(rows)?rows:[];
+  const hoje=prog[prog.length-1]||{};
+  const ontem=prog[prog.length-2]||{};
+  const atual=Number(hoje.entraram_ag_pedido||0);
+  const ant=Number(ontem.entraram_ag_pedido||0);
+
+  setV107("intelMiniTatParaPedidoV926",atual.toLocaleString("pt-BR"));
+  setV107("intelMiniTatParaPedidoComparativoV926",
+    `Hoje • Ontem: ${ant} • ${atual-ant>=0?"+":""}${atual-ant}`);
+
+  const host=document.getElementById("intelMiniAgPedidoEntradasDiasV107");
+  if(host){
+    host.innerHTML=prog.map(x=>{
+      const d=new Date(String(x.date)+"T12:00:00");
+      return `<div class="intel-mini-dia-v925" style="cursor:pointer"
+        onclick="abrirEntradasAgPedidoDataV107('${x.date}')">
+        <small>${d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+        <b>${Number(x.entraram_ag_pedido||0).toLocaleString("pt-BR")}</b>
+        <small>entradas</small>
+      </div>`;
+    }).join("");
+  }
+}
+
+async function carregarProgressaoEntradasV107(){
+  try{
+    const prog=await window.ERPBackendV100.api("/progress/parts?days=7");
+    renderProgressaoEntradasV107(prog);
+  }catch(e){
+    console.warn("[V10.7 progressão AG PEDIDO]",e);
+  }
+}
+window.carregarProgressaoEntradasV107=carregarProgressaoEntradasV107;
+
+window.abrirEntradasAgPedidoDataV107=async function(date){
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+
+  tit.textContent="Entraram em AG. PEDIDO DE PECA / PECAS";
+  area.innerHTML="<div class='dashboard-loading'>Carregando histórico do backend...</div>";
+  modal.style.display="flex";
+
+  try{
+    const d=await window.ERPBackendV100.api(`/progress/parts/relation?kind=entrou_ag_pedido&date=${date}&limit=100`);
+    const rows=Array.isArray(d?.rows)?d.rows:[];
+    tit.textContent+=` (${Number(d?.total||0).toLocaleString("pt-BR")})`;
+
+    area.innerHTML=rows.length
+      ? "<div class='intel-list'>"+rows.map(x=>{
+          const r=x.registro||{};
+          return `<div class="intel-row">
+            <b>${String(x.os||"-")}</b>
+            <span>${String(r.desc_produto||"")}<br>
+              <small>${String(x.status_anterior||"(vazio)")} → ${String(x.status_novo||"AG. PEDIDO DE PECA")}</small>
+            </span>
+            <span>${String(r.tecnico||"")}</span>
+            <button onclick="abrirOSIntel('${String(x.os||"").replace(/'/g,"\\'")}')">Abrir</button>
+          </div>`;
+        }).join("")+"</div>"
+      : "<div class='admin-info'>Nenhuma entrada em AG. PEDIDO nesta data.</div>";
+  }catch(e){
+    area.innerHTML="<div class='dashboard-erro'>"+String(e?.message||e)+"</div>";
+  }
+};
+
+window.abrirRelacaoMiniPecasV926=function(tipo){
+  if(tipo==="tatParaPedido"){
+    return window.abrirEntradasAgPedidoDataV107(new Date().toISOString().slice(0,10));
+  }
+};
+
+/* Atualiza junto da Inteligência */
+const intelBaseV107=window.carregarIntelBackendV103;
+if(typeof intelBaseV107==="function"){
+  window.carregarIntelBackendV103=async function(forcar=false){
+    const r=await intelBaseV107(forcar);
+    try{
+      const prog=await window.ERPBackendV100.api("/progress/parts?days=7");
+      renderProgressaoEntradasV107(prog);
+    }catch(_){}
+    return r;
+  };
+}
+
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(carregarProgressaoEntradasV107,3000);
+},{once:true});
+
+console.info("ERP V10.7: cartão de entrada em AG. PEDIDO considera qualquer status anterior e ganhou progressão diária.");
 })();
 </script>
 
