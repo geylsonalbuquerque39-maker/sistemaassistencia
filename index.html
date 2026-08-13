@@ -19650,6 +19650,10 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     };
 
     function ehBotaoExportacaoV720(el){
+        /* V11.2:
+           A Inteligência possui exportação nativa baseada nos dados do backend.
+           O interceptador V7.2.3 não pode tentar capturar um CSV intermediário. */
+        if(el?.closest?.("#telaInteligencia"))return null;
         if(el?.closest?.(".erp-native-export-v111"))return null;
 
         if(!el)return null;
@@ -20017,6 +20021,7 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
 
     function ajustarBotaoV721(el){
         if(!el || !ehExportacaoV721(el))return;
+        if(el.closest("#telaInteligencia"))return;
         if(el.closest("#exportacaoOfficeMenuV720"))return;
 
         el.classList.add("botao-exportacao-office-v721");
@@ -28838,6 +28843,113 @@ ERP.Performance.exportV111Audit=function(){
 };
 
 console.info('ERP V11.1: exportação direta sem interceptador legado + dark mode das duas progressões.');
+})();
+</script>
+
+
+<script id="erp-v112-export-intel-final">
+(function(){
+"use strict";
+
+async function reforcarExportIntelV112(){
+  try{
+    /* Usa o renderizador nativo V11.1 já existente. */
+    if(typeof ERPBackendV100==="undefined")return;
+
+    const s=await ERPBackendV100.api("/summary");
+
+    /* Os cartões operacionais podem ter sido re-renderizados por patches antigos.
+       Chamamos a função pública de abertura/carregamento somente para estabilizar
+       e em seguida reaplicamos o conteúdo nativo se ele sumiu. */
+    const din=document.getElementById("intelCartoesDinamicos");
+    const precisa=din && document.querySelectorAll("#intelCartoesDinamicos .erp-native-export-v111").length<6;
+
+    if(precisa && typeof menu111==="function"){
+      const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+      }[m]));
+
+      const cards=[
+        ["O.S. abertas",s.abertas,"abertas","green","os_abertas"],
+        ["Rack 500",s.rack500_abertas,"rack500Abertas","red","rack_500_abertas"],
+        ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange","grupos_13_14_abertos"],
+        ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange","grupos_5_21_22_abertos"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas","green","prontas_abertas"],
+        ["Sem rack",s.sem_rack_abertas,"semRack","orange","os_sem_rack"]
+      ];
+
+      din.innerHTML=cards.map((x,i)=>`
+        <div class="intel-dynamic-card ${x[3]}">
+          <b>${esc(x[0])}</b>
+          <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+          <span>Backend + Zero Relation DOM</span>
+          <div class="intel-dynamic-actions">
+            <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+            ${menu111(x[2],"v112op"+i,x[4],x[0],false)}
+          </div>
+        </div>`).join("");
+    }
+
+    /* Mini cartões: substitui qualquer botão legado de Exportar por menu nativo. */
+    const mini=[
+      ["intelMiniCardTransicoesV925","pedido_aguardando","v112m1","progressao_ag_pedido_aguardando","AG Pedido para Aguardando Peças",true],
+      ["intelAgPedidoPecasV924","agPedido","v112m2","ag_pedido_de_peca","AG PEDIDO DE PECA",false]
+    ];
+
+    mini.forEach(c=>{
+      const card=document.getElementById(c[0]);
+      const actions=card?.querySelector(".intel-mini-pecas-actions-v925");
+      if(!actions)return;
+      if(actions.querySelector(".erp-native-export-v111"))return;
+      [...actions.querySelectorAll("button")].filter(b=>/exportar/i.test(b.textContent||"")).forEach(b=>b.remove());
+      if(typeof menu111==="function")actions.insertAdjacentHTML("beforeend",menu111(c[1],c[2],c[3],c[4],c[5]));
+    });
+
+    const entrada=document.getElementById("intelMiniTatParaPedidoV926")?.closest("article");
+    const actionsEntrada=entrada?.querySelector(".intel-mini-pecas-actions-v925");
+    if(actionsEntrada && !actionsEntrada.querySelector(".erp-native-export-v111")){
+      [...actionsEntrada.querySelectorAll("button")].filter(b=>/exportar/i.test(b.textContent||"")).forEach(b=>b.remove());
+      if(typeof menu111==="function"){
+        actionsEntrada.insertAdjacentHTML("beforeend",
+          menu111("entrou_ag_pedido","v112m3","entradas_ag_pedido","Entradas em AG PEDIDO",true));
+      }
+    }
+  }catch(e){
+    console.warn("[V11.2 reforço exportação]",e);
+  }
+}
+window.reforcarExportIntelV112=reforcarExportIntelV112;
+
+const abrirBaseV112=window.abrirInteligencia;
+window.abrirInteligencia=function(){
+  const r=abrirBaseV112?.apply(this,arguments);
+  Promise.resolve(r).finally(()=>{
+    setTimeout(reforcarExportIntelV112,50);
+    setTimeout(reforcarExportIntelV112,400);
+  });
+  return r;
+};
+
+const carregarBaseV112=window.carregarInteligencia;
+window.carregarInteligencia=function(){
+  const r=carregarBaseV112?.apply(this,arguments);
+  Promise.resolve(r).finally(()=>setTimeout(reforcarExportIntelV112,50));
+  return r;
+};
+
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.exportV112Audit=function(){
+  const r={
+    menuLegadoAberto:document.getElementById("exportacaoOfficeMenuV720")?.classList.contains("aberto")||false,
+    operacionais:document.querySelectorAll("#intelCartoesDinamicos .erp-native-export-v111").length,
+    minis:document.querySelectorAll("#intelMiniDashPecasV925 .erp-native-export-v111").length,
+    interceptadorIntel:"desativado na origem"
+  };
+  console.info("[V11.2 EXPORT]",r);
+  return r;
+};
+
+console.info("ERP V11.2: interceptador V7.2.3 desativado dentro da Inteligência.");
 })();
 </script>
 
