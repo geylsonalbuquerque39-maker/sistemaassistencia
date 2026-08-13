@@ -30422,6 +30422,311 @@ console.info("ERP V12.2: Figurinhas no chat + importação de .webp do WhatsApp.
 })();
 </script>
 
+
+<style id="erp-v123-criador-figurinhas-style">
+#chatCriadorFigurinhaV123{
+  position:fixed;inset:0;z-index:26000;display:none;
+  align-items:center;justify-content:center;padding:18px;
+  background:rgba(0,18,38,.72);
+}
+#chatCriadorFigurinhaV123.aberto{display:flex}
+#chatCriadorFigurinhaBoxV123{
+  width:min(760px,96vw);max-height:92vh;overflow:auto;
+  background:#fff;border:2px solid #1ea5ff;border-radius:18px;
+  padding:18px;box-shadow:0 25px 70px rgba(0,0,0,.4)
+}
+#chatCriadorFigurinhaTopoV123{
+  display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px
+}
+#chatCriadorFigurinhaTopoV123 h3{margin:0;color:#001b3d}
+#chatCriadorFigurinhaTopoV123 button{
+  border:0;border-radius:9px;padding:8px 11px;background:#c90025;color:#fff;font-weight:900;cursor:pointer
+}
+#chatCriadorFigurinhaGridV123{
+  display:grid;grid-template-columns:360px 1fr;gap:18px;align-items:start
+}
+#chatCriadorCanvasWrapV123{
+  width:360px;height:360px;max-width:100%;
+  border:2px dashed #6b8fb0;border-radius:16px;
+  background:
+    linear-gradient(45deg,#eef2f6 25%,transparent 25%),
+    linear-gradient(-45deg,#eef2f6 25%,transparent 25%),
+    linear-gradient(45deg,transparent 75%,#eef2f6 75%),
+    linear-gradient(-45deg,transparent 75%,#eef2f6 75%);
+  background-size:22px 22px;
+  background-position:0 0,0 11px,11px -11px,-11px 0;
+  overflow:hidden;display:flex;align-items:center;justify-content:center
+}
+#chatCriadorCanvasV123{width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#chatCriadorCanvasV123.arrastando{cursor:grabbing}
+.chat-criador-controles-v123{display:grid;gap:12px}
+.chat-criador-controles-v123 label{font-weight:800;color:#001b3d;font-size:13px}
+.chat-criador-controles-v123 input[type="range"]{width:100%}
+.chat-criador-botoes-v123{display:flex;gap:8px;flex-wrap:wrap}
+.chat-criador-botoes-v123 button{
+  border:0;border-radius:9px;padding:9px 11px;cursor:pointer;background:#0046b8;color:#fff;font-weight:800
+}
+.chat-criador-botoes-v123 button.sec{background:#eef3f8;color:#001b3d;border:1px solid #c8d2df}
+#chatCriadorSalvarV123{background:#0b7a2a!important}
+#chatCriadorMsgV123{font-weight:800;min-height:22px}
+body.dark-mode #chatCriadorFigurinhaBoxV123{
+  background:#0d223a;color:#eaf2ff;border-color:#1ea5ff
+}
+body.dark-mode #chatCriadorFigurinhaTopoV123 h3,
+body.dark-mode .chat-criador-controles-v123 label{color:#fff}
+body.dark-mode .chat-criador-botoes-v123 button.sec{background:#173957;color:#fff;border-color:#315a80}
+@media(max-width:760px){
+  #chatCriadorFigurinhaGridV123{grid-template-columns:1fr}
+  #chatCriadorCanvasWrapV123{width:min(360px,100%);height:auto;aspect-ratio:1/1;margin:auto}
+}
+</style>
+
+<div id="chatCriadorFigurinhaV123" onclick="if(event.target===this)fecharCriadorFigurinhaV123()">
+  <div id="chatCriadorFigurinhaBoxV123" onclick="event.stopPropagation()">
+    <div id="chatCriadorFigurinhaTopoV123">
+      <h3>✨ Criador de Figurinhas</h3>
+      <button type="button" onclick="fecharCriadorFigurinhaV123()">✕</button>
+    </div>
+
+    <div id="chatCriadorFigurinhaGridV123">
+      <div id="chatCriadorCanvasWrapV123">
+        <canvas id="chatCriadorCanvasV123" width="512" height="512"></canvas>
+      </div>
+
+      <div class="chat-criador-controles-v123">
+        <div>
+          <label>Imagem</label>
+          <div class="chat-criador-botoes-v123" style="margin-top:6px">
+            <button type="button" onclick="document.getElementById('chatCriadorArquivoV123').click()">Escolher foto</button>
+            <button type="button" class="sec" onclick="resetCriadorFigurinhaV123()">Resetar</button>
+          </div>
+          <input id="chatCriadorArquivoV123" type="file" hidden accept="image/*,.webp,.png,.jpg,.jpeg">
+        </div>
+
+        <div>
+          <label>Zoom</label>
+          <input id="chatCriadorZoomV123" type="range" min="0.3" max="4" value="1" step="0.01">
+        </div>
+
+        <div>
+          <label>Rotação</label>
+          <input id="chatCriadorRotacaoV123" type="range" min="-180" max="180" value="0" step="1">
+        </div>
+
+        <div>
+          <label><input id="chatCriadorContornoV123" type="checkbox" checked> Contorno branco estilo figurinha</label>
+        </div>
+
+        <div>
+          <label><input id="chatCriadorFundoV123" type="checkbox"> Fundo branco</label>
+        </div>
+
+        <div class="chat-criador-botoes-v123">
+          <button type="button" class="sec" onclick="centralizarCriadorFigurinhaV123()">Centralizar</button>
+          <button type="button" class="sec" onclick="girar90CriadorFigurinhaV123()">↻ 90°</button>
+        </div>
+
+        <button type="button" id="chatCriadorSalvarV123" onclick="salvarCriadorFigurinhaV123()">Salvar na coleção</button>
+        <div id="chatCriadorMsgV123"></div>
+
+        <small style="opacity:.7">
+          Arraste a imagem dentro do quadro para posicionar. O resultado é salvo em 512×512 em WebP.
+        </small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script id="erp-v123-criador-figurinhas-js">
+(function(){
+"use strict";
+
+const cv=document.getElementById("chatCriadorCanvasV123");
+const ctx=cv?.getContext("2d");
+let img=null;
+let zoom=1,rot=0,offX=0,offY=0;
+let dragging=false,lastX=0,lastY=0;
+
+function draw(){
+  if(!ctx||!cv)return;
+  ctx.clearRect(0,0,cv.width,cv.height);
+
+  const fundo=document.getElementById("chatCriadorFundoV123")?.checked;
+  if(fundo){
+    ctx.fillStyle="#fff";
+    ctx.fillRect(0,0,cv.width,cv.height);
+  }
+
+  if(!img){
+    ctx.fillStyle="#6c7f91";
+    ctx.font="700 24px Segoe UI";
+    ctx.textAlign="center";
+    ctx.fillText("Escolha uma foto",cv.width/2,cv.height/2);
+    return;
+  }
+
+  const base=Math.min(cv.width/img.width,cv.height/img.height);
+  const scale=base*zoom;
+  const w=img.width*scale,h=img.height*scale;
+
+  ctx.save();
+  ctx.translate(cv.width/2+offX,cv.height/2+offY);
+  ctx.rotate(rot*Math.PI/180);
+
+  const contorno=document.getElementById("chatCriadorContornoV123")?.checked;
+  if(contorno){
+    ctx.shadowColor="#fff";
+    ctx.shadowBlur=14;
+    for(let i=0;i<4;i++)ctx.drawImage(img,-w/2,-h/2,w,h);
+    ctx.shadowBlur=0;
+  }
+  ctx.drawImage(img,-w/2,-h/2,w,h);
+  ctx.restore();
+}
+window.renderCriadorFigurinhaV123=draw;
+
+window.abrirCriadorFigurinhaV123=function(){
+  document.getElementById("chatCriadorFigurinhaV123")?.classList.add("aberto");
+  draw();
+};
+window.fecharCriadorFigurinhaV123=function(){
+  document.getElementById("chatCriadorFigurinhaV123")?.classList.remove("aberto");
+};
+
+window.resetCriadorFigurinhaV123=function(){
+  img=null;zoom=1;rot=0;offX=0;offY=0;
+  const z=document.getElementById("chatCriadorZoomV123");
+  const r=document.getElementById("chatCriadorRotacaoV123");
+  if(z)z.value="1"; if(r)r.value="0";
+  draw();
+};
+window.centralizarCriadorFigurinhaV123=function(){offX=0;offY=0;draw()};
+window.girar90CriadorFigurinhaV123=function(){
+  rot=(rot+90)%360;
+  const r=document.getElementById("chatCriadorRotacaoV123");
+  if(r)r.value=String(rot>180?rot-360:rot);
+  draw();
+};
+
+document.getElementById("chatCriadorArquivoV123")?.addEventListener("change",e=>{
+  const f=e.target.files?.[0];if(!f)return;
+  const url=URL.createObjectURL(f);
+  const im=new Image();
+  im.onload=()=>{
+    img=im;zoom=1;rot=0;offX=0;offY=0;
+    document.getElementById("chatCriadorZoomV123").value="1";
+    document.getElementById("chatCriadorRotacaoV123").value="0";
+    draw();
+    URL.revokeObjectURL(url);
+  };
+  im.src=url;
+});
+
+document.getElementById("chatCriadorZoomV123")?.addEventListener("input",e=>{
+  zoom=Number(e.target.value||1);draw();
+});
+document.getElementById("chatCriadorRotacaoV123")?.addEventListener("input",e=>{
+  rot=Number(e.target.value||0);draw();
+});
+document.getElementById("chatCriadorContornoV123")?.addEventListener("change",draw);
+document.getElementById("chatCriadorFundoV123")?.addEventListener("change",draw);
+
+function pointerPos(e){
+  const r=cv.getBoundingClientRect();
+  return {
+    x:(e.clientX-r.left)*(cv.width/r.width),
+    y:(e.clientY-r.top)*(cv.height/r.height)
+  };
+}
+cv?.addEventListener("pointerdown",e=>{
+  if(!img)return;
+  dragging=true;cv.setPointerCapture?.(e.pointerId);
+  const p=pointerPos(e);lastX=p.x;lastY=p.y;
+  cv.classList.add("arrastando");
+});
+cv?.addEventListener("pointermove",e=>{
+  if(!dragging||!img)return;
+  const p=pointerPos(e);
+  offX+=p.x-lastX;offY+=p.y-lastY;lastX=p.x;lastY=p.y;
+  draw();
+});
+function endDrag(e){
+  dragging=false;cv?.classList.remove("arrastando");
+  try{cv?.releasePointerCapture?.(e.pointerId)}catch(_){}
+}
+cv?.addEventListener("pointerup",endDrag);
+cv?.addEventListener("pointercancel",endDrag);
+
+function canvasBlobV123(){
+  return new Promise((resolve,reject)=>{
+    cv.toBlob(b=>b?resolve(b):reject(new Error("Não foi possível gerar a figurinha.")),"image/webp",0.92);
+  });
+}
+
+window.salvarCriadorFigurinhaV123=async function(){
+  const msg=document.getElementById("chatCriadorMsgV123");
+  if(!img){if(msg)msg.textContent="Escolha uma imagem primeiro.";return}
+  if(!usuarioLogado?.id){if(msg)msg.textContent="Faça login para salvar.";return}
+
+  try{
+    if(msg){msg.style.color="#0046b8";msg.textContent="Gerando figurinha..."}
+    draw();
+    const blob=await canvasBlobV123();
+    const nome=`figurinha-${Date.now()}.webp`;
+    const file=new File([blob],nome,{type:"image/webp"});
+    const caminho=`figurinhas/${usuarioLogado.id}/${crypto.randomUUID()}.webp`;
+
+    const up=await chatSbV57().storage.from("chat-anexos").upload(caminho,file,{
+      contentType:"image/webp",upsert:false,cacheControl:"31536000"
+    });
+    if(up.error)throw up.error;
+
+    const {data:urlData}=chatSbV57().storage.from("chat-anexos").getPublicUrl(caminho);
+    const ins=await chatSbV57().from("chat_figurinhas").insert({
+      user_id:usuarioLogado.id,
+      nome,
+      url:urlData?.publicUrl||"",
+      caminho,
+      tipo:"image/webp"
+    });
+    if(ins.error){
+      await chatSbV57().storage.from("chat-anexos").remove([caminho]);
+      throw ins.error;
+    }
+
+    if(msg){msg.style.color="#0b7a2a";msg.textContent="✓ Figurinha salva na sua coleção."}
+    try{await carregarFigurinhasV122()}catch(_){}
+    setTimeout(()=>fecharCriadorFigurinhaV123(),700);
+  }catch(e){
+    console.error("[CRIADOR FIGURINHA]",e);
+    if(msg){msg.style.color="#b00020";msg.textContent="Erro: "+(e?.message||e)}
+  }
+};
+
+/* Adiciona o botão CRIAR no painel de figurinhas existente */
+function instalarCriadorV123(){
+  const acoes=document.getElementById("chatFigurinhasAcoesV122");
+  if(!acoes||acoes.querySelector(".chat-criar-figurinha-v123"))return;
+  const b=document.createElement("button");
+  b.type="button";
+  b.className="chat-criar-figurinha-v123";
+  b.textContent="Criar";
+  b.onclick=e=>{
+    e.preventDefault();e.stopPropagation();
+    fecharFigurinhasV122?.();
+    abrirCriadorFigurinhaV123();
+  };
+  acoes.insertBefore(b,acoes.firstChild);
+}
+new MutationObserver(instalarCriadorV123).observe(document.body,{childList:true,subtree:true});
+setInterval(instalarCriadorV123,1500);
+setTimeout(instalarCriadorV123,500);
+draw();
+
+console.info("ERP V12.3: Criador de figurinhas ativo.");
+})();
+</script>
+
 </body>
 </html>
 
