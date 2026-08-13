@@ -20008,6 +20008,10 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     };
 
     document.addEventListener("click",function(event){
+        /* V11.4: interceptador V7.2.3 DESATIVADO.
+           Ele dependia de capturar Blob/CSV e era a origem do erro global. */
+        return;
+
         if(ignorarInterceptacaoV720)return;
 
         const botao=ehBotaoExportacaoV720(event.target);
@@ -29033,6 +29037,237 @@ ERP.Performance.exportV113Audit=function(){
 };
 
 console.info("ERP V11.3: exportação global corrigida — menus novos não são mais capturados pelo V7.2.3.");
+})();
+</script>
+
+
+<style id="erp-v114-export-global-style">
+#erpExportGlobalV114{
+  position:fixed;inset:0;display:none;z-index:30000;
+  background:rgba(0,0,0,.18);
+}
+#erpExportGlobalV114.aberto{display:block}
+#erpExportGlobalBoxV114{
+  position:fixed;min-width:310px;max-width:92vw;
+  background:#fff;border:1px solid #bcc9d8;border-radius:14px;
+  box-shadow:0 18px 45px rgba(0,0,0,.32);
+  padding:10px;overflow:hidden
+}
+#erpExportGlobalBoxV114 .titulo{
+  padding:8px 10px;color:#667085;font-weight:900;font-size:12px;
+  text-transform:uppercase
+}
+#erpExportGlobalBoxV114 button{
+  width:100%;display:block;border:0;background:transparent;
+  padding:11px 12px;border-radius:9px;text-align:left;
+  color:#001b3d;font-size:15px;font-weight:900;cursor:pointer
+}
+#erpExportGlobalBoxV114 button small{
+  display:block;font-weight:600;color:#7a8798;margin-top:3px
+}
+#erpExportGlobalBoxV114 button:hover{background:#edf5ff}
+#erpExportGlobalBoxV114 button.recomendado{background:#eaf8ed}
+#erpExportGlobalBoxV114 button.recomendado:hover{background:#dcf3e1}
+
+body.dark-mode #erpExportGlobalBoxV114{
+  background:#102b49;border-color:#315a80
+}
+body.dark-mode #erpExportGlobalBoxV114 .titulo{color:#9fb5cc}
+body.dark-mode #erpExportGlobalBoxV114 button{color:#fff}
+body.dark-mode #erpExportGlobalBoxV114 button small{color:#a9bed3}
+body.dark-mode #erpExportGlobalBoxV114 button:hover{background:#173957}
+body.dark-mode #erpExportGlobalBoxV114 button.recomendado{background:#17492b}
+</style>
+
+<div id="erpExportGlobalV114" onclick="if(event.target===this)fecharExportGlobalV114()">
+  <div id="erpExportGlobalBoxV114">
+    <div class="titulo">Escolha o formato</div>
+    <button onclick="executarExportGlobalV114('CSV')">
+      📄 CSV
+      <small>Formato simples separado por colunas</small>
+    </button>
+    <button class="recomendado" onclick="executarExportGlobalV114('XLS')">
+      📊 Excel / LibreOffice (.xls)
+      <small>Recomendado: abre organizado em colunas</small>
+    </button>
+    <button onclick="executarExportGlobalV114('XLT')">
+      📑 Modelo Excel (.xlt)
+      <small>Arquivo de modelo compatível com LibreOffice</small>
+    </button>
+  </div>
+</div>
+
+<script id="erp-v114-export-global">
+(function(){
+"use strict";
+
+let payloadV114=null;
+let exportOriginalV114=null;
+let capturandoV114=false;
+
+function ehMenuNovoV114(el){
+  return !!el?.closest?.(
+    "#erpExportGlobalV114,"+
+    ".erp-export-menu-v109,.erp-export-wrap-v109,"+
+    ".erp-native-export-v111,.erp-native-export-menu-v111"
+  );
+}
+
+function ehBotaoExportarV114(el){
+  if(!el || ehMenuNovoV114(el))return null;
+  const b=el.closest?.("button,a");
+  if(!b)return null;
+
+  const txt=String(b.textContent||"").toUpperCase();
+  const oc=String(b.getAttribute?.("onclick")||"").toUpperCase();
+
+  /* Botões que somente abrem um menu novo continuam usando seu próprio menu. */
+  if(
+    oc.includes("TOGGLEEXPORTMENU") ||
+    oc.includes("ABRIREXPORT") ||
+    oc.includes("MENUEXPORT")
+  ) return null;
+
+  return (txt.includes("EXPORTAR") || oc.includes("EXPORTAR") || oc.includes("CSV"))
+    ? b : null;
+}
+
+async function executarHandlerV114(botao,event){
+  if(!botao)return;
+  if(typeof botao.onclick==="function"){
+    return await botao.onclick.call(
+      botao,
+      new MouseEvent("click",{bubbles:false,cancelable:true,clientX:event?.clientX||0,clientY:event?.clientY||0})
+    );
+  }
+
+  const codigo=botao.getAttribute?.("onclick");
+  if(codigo){
+    return await new Function("event","return (async()=>{"+codigo+"})()")
+      .call(botao,event||new MouseEvent("click"));
+  }
+}
+
+function abrirMenuV114(event){
+  const fundo=document.getElementById("erpExportGlobalV114");
+  const box=document.getElementById("erpExportGlobalBoxV114");
+  if(!fundo||!box)return;
+
+  fundo.classList.add("aberto");
+
+  const w=330,h=245;
+  let x=(event?.clientX||window.innerWidth/2);
+  let y=(event?.clientY||window.innerHeight/2);
+
+  x=Math.max(8,Math.min(x,window.innerWidth-w-8));
+  y=Math.max(8,Math.min(y,window.innerHeight-h-8));
+
+  box.style.left=x+"px";
+  box.style.top=y+"px";
+}
+
+window.fecharExportGlobalV114=function(){
+  document.getElementById("erpExportGlobalV114")?.classList.remove("aberto");
+};
+
+window.executarExportGlobalV114=function(formato){
+  const p=payloadV114;
+  payloadV114=null;
+  fecharExportGlobalV114();
+
+  if(!p || typeof exportOriginalV114!=="function"){
+    alert("Não há dados preparados para exportar.");
+    return;
+  }
+
+  try{
+    exportOriginalV114.call(window.ERP.Export,{
+      ...p,
+      formato:String(formato||"CSV").toUpperCase()
+    });
+  }catch(e){
+    console.error("[V11.4 export]",e);
+    alert("Não foi possível gerar o arquivo: "+(e?.message||e));
+  }
+};
+
+/* Captura o OBJETO de exportação, não Blob, não CSV e não clique em <a>. */
+async function prepararExportacaoV114(botao,event){
+  const exp=window.ERP?.Export;
+  if(!exp || typeof exp.exportar!=="function"){
+    /* Exportador muito antigo: executa normalmente sem bloquear. */
+    await executarHandlerV114(botao,event);
+    return false;
+  }
+
+  exportOriginalV114=exp.exportar;
+  let capturado=null;
+
+  exp.exportar=function(opcoes){
+    capturado={...(opcoes||{})};
+    return capturado;
+  };
+
+  capturandoV114=true;
+  try{
+    await executarHandlerV114(botao,event);
+  }finally{
+    capturandoV114=false;
+    exp.exportar=exportOriginalV114;
+  }
+
+  if(capturado && Array.isArray(capturado.dados) && capturado.dados.length){
+    payloadV114=capturado;
+    abrirMenuV114(event);
+    return true;
+  }
+
+  /* Não usa ERP.Export: executa o comportamento original uma vez.
+     Isso mantém compatibilidade com módulos muito antigos. */
+  if(!capturado){
+    await executarHandlerV114(botao,event);
+  }
+  return false;
+}
+
+/* Novo interceptador global. O legado V7.2.3 acima está desativado. */
+document.addEventListener("click",function(event){
+  if(capturandoV114)return;
+
+  const botao=ehBotaoExportarV114(event.target);
+  if(!botao)return;
+
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+
+  prepararExportacaoV114(botao,event).catch(e=>{
+    console.error("[V11.4 preparar exportação]",e);
+    alert("Não foi possível preparar a exportação: "+(e?.message||e));
+  });
+},true);
+
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape")fecharExportGlobalV114();
+});
+
+/* Menus novos já existentes: suas opções CSV/XLS/XLT devem baixar diretamente,
+   sem cair novamente no menu global. */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.exportV114Audit=function(){
+  const r={
+    legadoV720:"desativado",
+    novoGlobal:!!document.getElementById("erpExportGlobalV114"),
+    erpExport:typeof ERP?.Export?.exportar==="function",
+    payloadPendente:!!payloadV114,
+    estrategia:"captura estruturada de dados; sem Blob intermediário"
+  };
+  console.info("[V11.4 EXPORT GLOBAL]",r);
+  return r;
+};
+
+console.info("ERP V11.4: exportação global refeita sem capturar Blob/CSV.");
 })();
 </script>
 
