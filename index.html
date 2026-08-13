@@ -5558,6 +5558,32 @@ body.dark-mode .agpedido-chip-v937{
 }
 </style>
 
+
+<style id="erp-v104-darkmode-progressao">
+body.dark-mode #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925,
+html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925,
+[data-theme="dark"] #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925{
+  background:#173957!important;
+  border:1px solid #6f94b8!important;
+  color:#fff!important;
+}
+body.dark-mode #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 small,
+body.dark-mode #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
+html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 small,
+html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
+[data-theme="dark"] #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 small,
+[data-theme="dark"] #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b{
+  color:#fff!important;
+  opacity:1!important;
+}
+body.dark-mode #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
+html.dark #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b,
+[data-theme="dark"] #intelMiniPecasUltimosDiasV925 .intel-mini-dia-v925 b{
+  font-size:22px!important;
+  font-weight:950!important;
+}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -27606,6 +27632,96 @@ ERP.Performance.intelV103Audit=async function(){
 };
 
 console.info("ERP V10.3: Inteligência corrigida para consumir o backend diretamente.");
+})();
+</script>
+
+
+<script id="erp-v104-progressao-cpp-darkmode">
+(function(){
+"use strict";
+
+function setV104(id,v){
+  const e=document.getElementById(id);
+  if(e)e.textContent=String(v??"--");
+}
+
+/* Corrige Endereçados S/ CPP para backend.
+   O cartão antigo calculava em intelRegistros; agora intelRegistros fica 0
+   por design, então ele precisa vir de /summary e /relations. */
+const carregarIntelBaseV104=window.carregarIntelBackendV103;
+if(typeof carregarIntelBaseV104==="function"){
+  window.carregarIntelBackendV103=async function(forcar=false){
+    const r=await carregarIntelBaseV104(forcar);
+    try{
+      const s=r?.summary || await window.ERPBackendV100.api("/summary");
+      setV104("intelEnderecadosSemCPPTotalV922",
+        Number(s.enderecados_sem_cpp||0).toLocaleString("pt-BR"));
+    }catch(e){
+      console.warn("[V10.4 Endereçados S/ CPP]",e);
+    }
+    return r;
+  };
+}
+
+/* Substitui relação antiga (que dependia de intelRegistros) pela paginação backend. */
+window.abrirEnderecadosSemCPPV922=function(){
+  return window.abrirListaIntel?.("enderecadosSemCPP");
+};
+window.abrirEnderecadosSemCPPV921=window.abrirEnderecadosSemCPPV922;
+
+/* Exportação: busca somente esta relação; não baixa a REXPEDLR inteira. */
+window.exportarEnderecadosSemCPPV922=async function(){
+  try{
+    const d=await window.ERPBackendV100.api("/relations/enderecadosSemCPP?limit=1000&offset=0");
+    const lista=Array.isArray(d?.rows)?d.rows:[];
+    if(!lista.length){
+      alert("Não há O.S. endereçada sem CPP para exportar.");
+      return;
+    }
+    ERP.Export.exportar({
+      dados:lista,formato:"CSV",nome:"enderecados_sem_cpp",aba:"Endereçados S CPP",
+      colunas:[
+        {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+        {label:"Produto",key:"desc_produto"},{label:"Rack",key:"rack"},{label:"Status",key:"status"},
+        {label:"Situação da O.S.",key:"status_da_os"},{label:"Técnico",key:"tecnico"},
+        {label:"PDV",key:"pdv"},{label:"NF",key:"nf"}
+      ]
+    });
+  }catch(e){
+    alert("Erro ao exportar Endereçados S/ CPP: "+(e?.message||e));
+  }
+};
+window.exportarEnderecadosSemCPPV921=window.exportarEnderecadosSemCPPV922;
+
+/* Relação backend precisa reconhecer o novo tipo no título. */
+const abrirListaBaseV104=window.abrirListaIntel;
+window.abrirListaIntel=function(type){
+  if(type==="enderecadosSemCPP"){
+    const tit=document.getElementById("intelModalTitulo");
+    if(tit)tit.textContent="Endereçados S/ CPP";
+  }
+  return abrirListaBaseV104?.apply(this,arguments);
+};
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.v104Audit=async function(){
+  const [s,p]=await Promise.all([
+    window.ERPBackendV100.api("/summary"),
+    window.ERPBackendV100.api("/progress/parts?days=7")
+  ]);
+  const r={
+    enderecadosSemCPP:s.enderecados_sem_cpp,
+    progressao:p,
+    cardCPP:document.getElementById("intelEnderecadosSemCPPTotalV922")?.textContent,
+    cardProgressao:document.getElementById("intelMiniTransicoesV925")?.textContent,
+    intelEmMemoria:Array.isArray(intelRegistros)?intelRegistros.length:0
+  };
+  console.info("[V10.4 AUDIT]",r);
+  return r;
+};
+
+console.info("ERP V10.4: Endereçados S/ CPP backend + dark mode dos cartões diários.");
 })();
 </script>
 
