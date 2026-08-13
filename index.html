@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Assistência Técnica</title>
+<title>Assistência Técnica — Backend V10</title>
 <!-- V8.7.0: CLIENTES realmente Lazy DOM — sem dashboard/consulta pré-renderizados -->
 
 <style>
@@ -26346,6 +26346,714 @@ ERP.Performance.v967Audit=function(){
 };
 
 console.info("ERP V9.6.7: Relatórios no topo e datas da progressão restauradas.");
+})();
+</script>
+
+
+
+<!-- =========================================================
+ ERP V9.6.8 — CACHE PERSISTENTE REXPEDLR
+ - 1ª consulta: Supabase -> IndexedDB + memória
+ - próximas consultas: memória/IndexedDB, sem TTL
+ - nova consulta somente após importação/alteração/invalidação
+ ========================================================= -->
+<script id="erp-v968-cache-persistente-rexpedlr">
+(function(){
+"use strict";
+
+const DB_NAME="ERP_CACHE_V968";
+const DB_VERSION=1;
+const STORE="dados";
+const KEY_REXPEDLR="rexpedlr:completa";
+const REV_KEY="ERP_CACHE_REXPEDLR_REV_V968";
+let dbPromiseV968=null;
+let cachePromiseV968=null;
+let versaoMemoriaV968="";
+
+function abrirDBV968(){
+    if(dbPromiseV968)return dbPromiseV968;
+    dbPromiseV968=new Promise((resolve,reject)=>{
+        const req=indexedDB.open(DB_NAME,DB_VERSION);
+        req.onupgradeneeded=()=>{
+            const db=req.result;
+            if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE,{keyPath:"key"});
+        };
+        req.onsuccess=()=>resolve(req.result);
+        req.onerror=()=>reject(req.error||new Error("Falha ao abrir cache IndexedDB."));
+    });
+    return dbPromiseV968;
+}
+
+async function cacheLerV968(key){
+    try{
+        const db=await abrirDBV968();
+        return await new Promise((resolve,reject)=>{
+            const tx=db.transaction(STORE,"readonly");
+            const req=tx.objectStore(STORE).get(key);
+            req.onsuccess=()=>resolve(req.result||null);
+            req.onerror=()=>reject(req.error);
+        });
+    }catch(e){
+        console.warn("[CACHE V9.6.8] leitura IndexedDB indisponível:",e);
+        return null;
+    }
+}
+
+async function cacheSalvarV968(key,versao,data){
+    try{
+        const db=await abrirDBV968();
+        await new Promise((resolve,reject)=>{
+            const tx=db.transaction(STORE,"readwrite");
+            tx.objectStore(STORE).put({key,versao,data,salvoEm:Date.now()});
+            tx.oncomplete=()=>resolve();
+            tx.onerror=()=>reject(tx.error||new Error("Falha ao gravar cache."));
+            tx.onabort=()=>reject(tx.error||new Error("Gravação do cache abortada."));
+        });
+        return true;
+    }catch(e){
+        console.warn("[CACHE V9.6.8] não foi possível persistir a base:",e);
+        return false;
+    }
+}
+
+async function cacheExcluirV968(key){
+    try{
+        const db=await abrirDBV968();
+        await new Promise((resolve,reject)=>{
+            const tx=db.transaction(STORE,"readwrite");
+            tx.objectStore(STORE).delete(key);
+            tx.oncomplete=()=>resolve();
+            tx.onerror=()=>reject(tx.error);
+        });
+    }catch(e){
+        console.warn("[CACHE V9.6.8] falha ao excluir cache:",e);
+    }
+}
+
+function versaoAtualV968(){
+    const importacao=localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR")||"SEM_IMPORTACAO";
+    const qtd=localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR_QTD")||"";
+    const rev=localStorage.getItem(REV_KEY)||"0";
+    return importacao+"|"+qtd+"|"+rev;
+}
+
+window.erpInvalidarCacheRexpedlrV968=function(motivo="alteracao"){
+    const atual=Number(localStorage.getItem(REV_KEY)||"0")||0;
+    localStorage.setItem(REV_KEY,String(atual+1));
+    versaoMemoriaV968="";
+    cachePromiseV968=null;
+    try{rexpedlrIntelCacheV7543=null;rexpedlrIntelCacheEmV7543=0;}catch(e){}
+    try{intelRegistros=[];intelAnalise=null;}catch(e){}
+    try{window.ERP?.Cache?.clear?.("intel:");}catch(e){}
+    cacheExcluirV968(KEY_REXPEDLR);
+    console.info("[CACHE V9.6.8] REXPEDLR invalidada:",motivo);
+};
+
+// Substitui apenas a origem dos dados. Toda a análise/renderização existente permanece igual.
+buscarTodaRexpedlr=async function(){
+    const versao=versaoAtualV968();
+
+    if(Array.isArray(rexpedlrIntelCacheV7543) && rexpedlrIntelCacheV7543.length && versaoMemoriaV968===versao){
+        return rexpedlrIntelCacheV7543;
+    }
+    if(cachePromiseV968)return cachePromiseV968;
+
+    cachePromiseV968=(async()=>{
+        const persistido=await cacheLerV968(KEY_REXPEDLR);
+        if(persistido && persistido.versao===versao && Array.isArray(persistido.data) && persistido.data.length){
+            rexpedlrIntelCacheV7543=persistido.data;
+            rexpedlrIntelCacheEmV7543=Date.now();
+            versaoMemoriaV968=versao;
+            console.info("[CACHE V9.6.8] REXPEDLR carregada do IndexedDB:",persistido.data.length,"registros");
+            return persistido.data;
+        }
+
+        console.info("[CACHE V9.6.8] Cache ausente/desatualizado. Consultando Supabase uma única vez...");
+        const supa=obterSupabaseClient();
+        const campos="os,dt_geracao,pdv,nf,grupo,nce,desc_produto,cor,n_serie,tecnico,rack,status,dt_expedicao,pdv_expedicao,analise_do_defeito,dt_conserto,obs_status,obs_ordem_de_servico,solicitante_cpp,data_cpp,nr_cpp,sit_cpp,recebedor_cpp,data_recebedor,dt_ult_entrada,dt_saida_oficina,dt_recb_at,status_da_os,tipo_garantia";
+        let todos=[],inicio=0,tamanho=1000;
+        while(true){
+            const {data,error}=await supa.from("rexpedlr").select(campos).range(inicio,inicio+tamanho-1);
+            if(error)throw error;
+            const lote=data||[];
+            todos.push(...lote);
+            if(lote.length<tamanho||todos.length>=50000)break;
+            inicio+=tamanho;
+            await new Promise(r=>setTimeout(r,0));
+        }
+
+        rexpedlrIntelCacheV7543=todos;
+        rexpedlrIntelCacheEmV7543=Date.now();
+        versaoMemoriaV968=versao;
+        await cacheSalvarV968(KEY_REXPEDLR,versao,todos);
+        console.info("[CACHE V9.6.8] REXPEDLR salva no cache persistente:",todos.length,"registros");
+        return todos;
+    })();
+
+    try{return await cachePromiseV968;}
+    finally{cachePromiseV968=null;}
+};
+
+// O cache do Kernel também deixa de vencer por tempo: a base persistente é a fonte de verdade local.
+function sincronizarKernelCacheV968(){
+    if(!window.ERP?.Cache)return;
+    const originalSet=window.ERP.Cache.set.bind(window.ERP.Cache);
+    if(window.ERP.Cache.__v968SemTTL)return;
+    window.ERP.Cache.set=function(key,value,ttl=0){
+        if(String(key).startsWith("intel:"))ttl=0;
+        return originalSet(key,value,ttl);
+    };
+    window.ERP.Cache.__v968SemTTL=true;
+}
+
+// Invalidação explícita feita por módulos/importadores também invalida o IndexedDB.
+function instalarInvalidacaoKernelV968(){
+    if(!window.ERP || typeof window.ERP.invalidateHeavyModules!=="function")return;
+    const original=window.ERP.invalidateHeavyModules;
+    if(original.__v968)return;
+    const fn=function(modulo="all"){
+        const r=original.apply(this,arguments);
+        if(modulo==="all"||modulo==="inteligencia")window.erpInvalidarCacheRexpedlrV968("invalidateHeavyModules:"+modulo);
+        return r;
+    };
+    fn.__v968=true;
+    window.ERP.invalidateHeavyModules=fn;
+}
+
+function iniciarV968(){
+    sincronizarKernelCacheV968();
+    instalarInvalidacaoKernelV968();
+    console.info("ERP V9.6.8: cache persistente REXPEDLR ativo. Sem TTL; banco só é relido após alteração/invalidação.");
+}
+
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",()=>setTimeout(iniciarV968,3200),{once:true});
+else setTimeout(iniciarV968,3200);
+})();
+</script>
+
+
+<script id="erp-v100-backend-supabase">
+(function(){
+"use strict";
+
+/* =========================================================
+   ERP V10 — FRONTEND LEVE + SUPABASE EDGE BACKEND
+   GitHub Pages => Edge Function => Postgres
+   ========================================================= */
+
+const ERP_BACKEND_URL_V100 =
+  localStorage.getItem("ERP_BACKEND_URL") ||
+  "https://gtggqsnqayvhekrffibp.supabase.co/functions/v1/erp-api";
+
+let resumoBackendV100=null;
+let resumoBackendEmV100=0;
+let resumoPromiseV100=null;
+
+async function apiBackendV100(path,opts={}){
+  const supa=obterSupabaseClient();
+  const {data:{session}}=await supa.auth.getSession();
+  if(!session?.access_token)throw new Error("Sessão expirada. Faça login novamente.");
+
+  const resp=await fetch(ERP_BACKEND_URL_V100+path,{
+    method:opts.method||"GET",
+    headers:{
+      "Authorization":"Bearer "+session.access_token,
+      "Content-Type":"application/json",
+      ...(opts.headers||{})
+    },
+    body:opts.body?JSON.stringify(opts.body):undefined
+  });
+
+  let body=null;
+  try{body=await resp.json()}catch(_){}
+  if(!resp.ok)throw new Error(body?.error||("Backend HTTP "+resp.status));
+  return body;
+}
+window.ERPBackendV100={
+  url:ERP_BACKEND_URL_V100,
+  api:apiBackendV100,
+  setURL(url){
+    localStorage.setItem("ERP_BACKEND_URL",String(url||"").replace(/\/+$/,""));
+    location.reload();
+  }
+};
+
+async function resumoV100(forcar=false){
+  const agora=Date.now();
+  if(!forcar&&resumoBackendV100&&(agora-resumoBackendEmV100)<30000)return resumoBackendV100;
+  if(resumoPromiseV100)return resumoPromiseV100;
+  resumoPromiseV100=(async()=>{
+    try{
+      resumoBackendV100=await apiBackendV100("/summary");
+      resumoBackendEmV100=Date.now();
+      return resumoBackendV100;
+    }finally{
+      resumoPromiseV100=null;
+    }
+  })();
+  return resumoPromiseV100;
+}
+
+function paresV100(v){
+  return (Array.isArray(v)?v:[]).map(x=>[x.label,Number(x.total||0)]);
+}
+function setTxtV100(id,v){
+  const e=document.getElementById(id);
+  if(e)e.textContent=String(v??"--");
+}
+function escV100(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+/* ================= HOME — SEM BAIXAR REXPEDLR ================= */
+window.carregarHomeIntegradaV502=async function(forcar){
+  try{
+    if(typeof homeV502Saudacao==="function")homeV502Saudacao();
+    if(typeof homeV502Status==="function")homeV502Status("Consultando backend...");
+    const s=await resumoV100(!!forcar);
+
+    setTxtV100("hiAbertas",Number(s.abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("hiProntas",Number(s.prontas_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("hiRack500",Number(s.rack500_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("hiSemRack",Number(s.sem_rack_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("hiExpHoje",Number(s.exp_hoje||0).toLocaleString("pt-BR"));
+    setTxtV100("homeIntegradaBase","Base: "+Number(s.total_os||0).toLocaleString("pt-BR")+" O.S.");
+    setTxtV100("homeIntegradaAtualizacao","Backend • "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+    setTxtV100("homeIntegradaSistema","Backend online");
+
+    const area=document.getElementById("homeIntegradaAlertas");
+    if(area){
+      const cards=[
+        ["Rack 500 aberto",s.rack500_abertas,"rack500Abertas"],
+        ["Grupos 13 e 14 abertos",s.grupo1314_abertos,"grupo1314Abertos"],
+        ["Grupos 5, 21 e 22 abertos",s.grupo52122_abertos,"grupo52122Abertos"],
+        ["Prontas aguardando",s.prontas_abertas,"prontasAbertas"],
+        ["Sem rack",s.sem_rack_abertas,"semRack"]
+      ].filter(x=>Number(x[1]||0)>0);
+
+      area.innerHTML=cards.length?cards.map(x=>
+        `<div class="home-integrada-alerta" onclick="abrirListaIntel('${x[2]}')">
+          <div><b>${escV100(x[0])}</b><small>Relação carregada somente ao clicar</small></div>
+          <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+        </div>`
+      ).join(""):"<div class='home-integrada-status ok'>Nenhuma inconsistência crítica encontrada.</div>";
+    }
+
+    if(typeof homeV502Status==="function")homeV502Status("Indicadores recebidos prontos do backend.","ok");
+  }catch(e){
+    console.error("[V10 HOME]",e);
+    if(typeof homeV502Status==="function")homeV502Status("Backend indisponível: "+e.message,"erro");
+  }
+};
+
+/* ============= INTELIGÊNCIA — RESUMO SERVER-SIDE ============= */
+async function carregarIntelResumoV100(forcar=false){
+  const m=document.getElementById("intelMensagem");
+  if(m){m.className="dashboard-loading";m.textContent="Carregando indicadores do backend...";}
+  try{
+    const [s,prog]=await Promise.all([
+      resumoV100(forcar),
+      apiBackendV100("/progress/parts?days=7")
+    ]);
+
+    setTxtV100("ikProntas",Number(s.prontas_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("ikQualidade",Number(s.qualidade||0)+"%");
+    setTxtV100("ikParadas","—");
+    setTxtV100("ieAbertas",Number(s.abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("ieFechadas",Number(s.fechadas||0).toLocaleString("pt-BR"));
+    setTxtV100("ieExpHoje",Number(s.exp_hoje||0).toLocaleString("pt-BR"));
+    setTxtV100("ieTotal",Number(s.total_os||0).toLocaleString("pt-BR"));
+    setTxtV100("intelAgPedidoPecasTotalV924",Number(s.ag_pedido||0).toLocaleString("pt-BR"));
+
+    const agResumo=document.getElementById("intelAgPedidoPecasResumoV959");
+    if(agResumo)agResumo.textContent=Number(s.ag_pedido||0).toLocaleString("pt-BR")+" O.S. no banco";
+
+    const tec=document.getElementById("intelRankingTecnicos");
+    const pdv=document.getElementById("intelRankingPDV");
+    const mapa=document.getElementById("intelMapa");
+    if(tec&&typeof barrasIntel==="function")tec.innerHTML=barrasIntel(paresV100(s.tecnicos_top).filter(x=>x[0]!=="(vazio)"),10);
+    if(pdv&&typeof barrasIntel==="function")pdv.innerHTML=barrasIntel(paresV100(s.pdv_top).filter(x=>x[0]!=="(vazio)"),10);
+    if(mapa&&typeof barrasIntel==="function")mapa.innerHTML=barrasIntel(paresV100(s.pdv_top).filter(x=>x[0]!=="(vazio)"),12);
+
+    const alert=document.getElementById("intelAlertas");
+    if(alert){
+      const arr=[
+        ["📦",s.rack500_abertas,"Rack 500 — O.S. abertas","rack500Abertas"],
+        ["🟠",s.grupo1314_abertos,"Grupos 13 e 14 — O.S. abertas","grupo1314Abertos"],
+        ["🟠",s.grupo52122_abertos,"Grupos 5, 21 e 22 — O.S. abertas","grupo52122Abertos"],
+        ["🟢",s.prontas_abertas,"Prontas e abertas","prontasAbertas"],
+        ["📍",s.sem_rack_abertas,"O.S. abertas sem rack","semRack"]
+      ].filter(x=>Number(x[1]||0)>0);
+      alert.innerHTML=arr.length?arr.map(x=>
+        `<div class="intel-alert orange" onclick="abrirListaIntel('${x[3]}')">
+          <b>${x[0]} ${Number(x[1]||0).toLocaleString("pt-BR")} ${escV100(x[2])}</b>
+          <span>O backend busca a relação somente ao clicar.</span>
+        </div>`
+      ).join(""):"<div class='intel-alert green'><b>✔ Nenhuma inconsistência crítica encontrada</b></div>";
+    }
+
+    const din=document.getElementById("intelCartoesDinamicos");
+    if(din){
+      const cards=[
+        ["O.S. abertas",s.abertas,"abertas","green"],
+        ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+        ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+        ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+        ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+      ];
+      din.innerHTML=cards.map(x=>
+        `<div class="intel-dynamic-card ${x[3]}">
+          <b>${escV100(x[0])}</b><strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+          <span>Zero Relation DOM + Backend</span>
+          <div class="intel-dynamic-actions"><button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button></div>
+        </div>`
+      ).join("");
+    }
+
+    const pri=document.getElementById("intelPrioridades");
+    if(pri)pri.innerHTML="<div class='admin-info'>Prioridades detalhadas são carregadas apenas quando uma função que exige a base completa for usada.</div>";
+
+    renderProgressaoBackendV100(prog);
+
+    if(m){
+      m.className="dashboard-ok";
+      m.textContent="Backend ativo: indicadores prontos sem baixar toda a REXPEDLR para o navegador.";
+    }
+  }catch(e){
+    console.error("[V10 INTEL]",e);
+    if(m){m.className="dashboard-erro";m.textContent="Erro no backend: "+e.message;}
+  }
+}
+
+window.abrirInteligencia=function(){
+  if(!usuarioLogado){mostrarBloqueioPermissao("Faça login para acessar a Central de Inteligência.");return;}
+  window.erpMontarTelaV7544?.("telaInteligencia");
+  esconderTelas();
+  definirMenuAtivo("inteligencia");
+  const tela=document.getElementById("telaInteligencia");
+  if(tela)tela.style.display="block";
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+  carregarIntelResumoV100(false);
+};
+
+/* Relações fixas: paginação server-side. */
+const TITULOS_REL_V100={
+  rack500Abertas:"Rack 500 — O.S. abertas",
+  prontasAbertas:"Prontas e abertas",
+  prontas:"Prontas",
+  grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",
+  grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",
+  semRack:"O.S. abertas sem rack",
+  abertas:"O.S. abertas",
+  fechadas:"O.S. fechadas",
+  expHoje:"Expedidas hoje",
+  aguardandoPecas:"Aguardando peças"
+};
+let relBackendV100={type:"",page:0,pageSize:100,total:0};
+
+async function abrirRelacaoBackendV100(type,page=0){
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+
+  relBackendV100={...relBackendV100,type,page};
+  tit.textContent=TITULOS_REL_V100[type]||type;
+  area.innerHTML="<div class='dashboard-loading'>Buscando relação no backend...</div>";
+  modal.style.display="flex";
+
+  try{
+    const offset=page*relBackendV100.pageSize;
+    const d=await apiBackendV100(`/relations/${encodeURIComponent(type)}?limit=${relBackendV100.pageSize}&offset=${offset}`);
+    relBackendV100.total=Number(d.total||0);
+    const rows=Array.isArray(d.rows)?d.rows:[];
+    const totalPages=Math.max(1,Math.ceil(relBackendV100.total/relBackendV100.pageSize));
+
+    const nav=`<div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;margin:10px 0">
+      <button class="usuario-acao" ${page<=0?"disabled":""} onclick="mudarRelacaoBackendV100(-1)">‹ Anterior</button>
+      <b>${relBackendV100.total?offset+1:0}–${Math.min(offset+rows.length,relBackendV100.total)} de ${relBackendV100.total.toLocaleString("pt-BR")}</b>
+      <button class="usuario-acao" ${page>=totalPages-1?"disabled":""} onclick="mudarRelacaoBackendV100(1)">Próxima ›</button>
+    </div>`;
+
+    area.innerHTML=nav+"<div class='intel-list'>"+rows.map(r=>
+      `<div class="intel-row">
+        <b>${escV100(r.os||"-")}</b>
+        <span>${escV100(r.desc_produto||"")}<br><small>Status: ${escV100(r.status||"-")} • Rack: ${escV100(r.rack||"-")} • N.C.E.: ${escV100(r.nce||"-")}</small></span>
+        <span>${escV100(r.tecnico||"")}</span>
+        <button onclick="abrirOSIntel('${String(r.os||"").replace(/'/g,"\\'")}')">Abrir</button>
+      </div>`
+    ).join("")+"</div>"+nav;
+  }catch(e){
+    area.innerHTML="<div class='dashboard-erro'>"+escV100(e.message)+"</div>";
+  }
+}
+window.abrirListaIntel=function(type){abrirRelacaoBackendV100(type,0)};
+window.mudarRelacaoBackendV100=function(delta){
+  const p=Math.max(0,relBackendV100.page+Number(delta||0));
+  abrirRelacaoBackendV100(relBackendV100.type,p);
+};
+
+/* Dossiê unitário sem carregar toda a base. */
+const abrirOSIntelLocalV100=window.abrirOSIntel;
+window.abrirOSIntel=async function(os){
+  const local=Array.isArray(intelRegistros)?intelRegistros.find(x=>String(x.os)===String(os)):null;
+  if(local&&typeof abrirOSIntelLocalV100==="function")return abrirOSIntelLocalV100(os);
+
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+  tit.textContent="O.S. "+os;
+  area.innerHTML="<div class='dashboard-loading'>Carregando dossiê pelo backend...</div>";
+  modal.style.display="flex";
+  try{
+    const r=await apiBackendV100("/os/"+encodeURIComponent(String(os)));
+    area.innerHTML=Object.entries(r).map(([k,v])=>
+      `<div class="ficha-linha"><span class="ficha-label">${escV100(k.replaceAll("_"," "))}:</span>${escV100(v??"-")}</div>`
+    ).join("");
+  }catch(e){
+    area.innerHTML="<div class='dashboard-erro'>"+escV100(e.message)+"</div>";
+  }
+};
+
+/* AG. PEDIDO mantém o layout fotográfico existente, mas baixa SOMENTE
+   as O.S. desse status quando o usuário clicar. */
+const abrirAgPedidoOriginalV100=window.abrirAgPedidoPecasV924;
+const exportarAgPedidoOriginalV100=window.exportarAgPedidoPecasV924;
+
+async function executarComAgPedidoV100(fn){
+  const d=await apiBackendV100("/relations/agPedido?limit=1000&offset=0");
+  const anterior=Array.isArray(intelRegistros)?intelRegistros:[];
+  try{
+    intelRegistros=Array.isArray(d.rows)?d.rows:[];
+    return await fn();
+  }finally{
+    intelRegistros=anterior;
+  }
+}
+if(typeof abrirAgPedidoOriginalV100==="function"){
+  window.abrirAgPedidoPecasV924=function(){
+    return executarComAgPedidoV100(()=>abrirAgPedidoOriginalV100());
+  };
+}
+if(typeof exportarAgPedidoOriginalV100==="function"){
+  window.exportarAgPedidoPecasV924=function(){
+    return executarComAgPedidoV100(()=>exportarAgPedidoOriginalV100());
+  };
+}
+
+/* ================= PROGRESSÃO SERVER-SIDE ================= */
+function renderProgressaoBackendV100(prog){
+  const rows=Array.isArray(prog)?prog:[];
+  const hoje=rows[rows.length-1]||{};
+  const ontem=rows[rows.length-2]||{};
+  const a=Number(hoje.pedido_aguardando||0),b=Number(ontem.pedido_aguardando||0);
+  const t=Number(hoje.tat_pedido||0),to=Number(ontem.tat_pedido||0);
+
+  setTxtV100("intelMiniTransicoesV925",a.toLocaleString("pt-BR"));
+  setTxtV100("intelMiniTransicoesComparativoV925",`Hoje • Ontem: ${b} • ${a-b>=0?"+":""}${a-b}`);
+  setTxtV100("intelMiniTatParaPedidoV926",t.toLocaleString("pt-BR"));
+  setTxtV100("intelMiniTatParaPedidoComparativoV926",`Hoje • Ontem: ${to}`);
+
+  const host=document.getElementById("intelMiniPecasUltimosDiasV925");
+  if(host){
+    host.innerHTML=rows.map(x=>{
+      const d=new Date(String(x.date)+"T12:00:00");
+      return `<div class="intel-mini-dia-v925" style="cursor:pointer" onclick="abrirProgressaoDataBackendV100('${x.date}')">
+        <small>${d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+        <b>${Number(x.pedido_aguardando||0).toLocaleString("pt-BR")}</b>
+        <small>transições</small>
+      </div>`;
+    }).join("");
+  }
+
+  const upd=document.getElementById("intelMiniPecasAtualizadoV925");
+  if(upd)upd.textContent="Histórico server-side • "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"});
+}
+
+async function abrirProgressaoRelV100(kind,date){
+  const modal=document.getElementById("intelModal");
+  const tit=document.getElementById("intelModalTitulo");
+  const area=document.getElementById("intelModalConteudo");
+  if(!modal||!tit||!area)return;
+  tit.textContent=kind==="tat_pedido"?"AG. ANÁLISE TÉCNICA EM TAT → AG. PEDIDO":"AG. PEDIDO → AGUARDANDO PEÇAS";
+  area.innerHTML="<div class='dashboard-loading'>Carregando histórico do backend...</div>";
+  modal.style.display="flex";
+  try{
+    const d=await apiBackendV100(`/progress/parts/relation?kind=${kind}&date=${date}&limit=100`);
+    const rows=Array.isArray(d.rows)?d.rows:[];
+    tit.textContent+=` (${Number(d.total||0).toLocaleString("pt-BR")})`;
+    area.innerHTML=rows.length?"<div class='intel-list'>"+rows.map(x=>{
+      const r=x.registro||{};
+      return `<div class="intel-row">
+        <b>${escV100(x.os||"-")}</b>
+        <span>${escV100(r.desc_produto||"")}<br><small>${escV100(x.status_anterior||"-")} → ${escV100(x.status_novo||"-")}</small></span>
+        <span>${escV100(r.tecnico||"")}</span>
+        <button onclick="abrirOSIntel('${String(x.os||"").replace(/'/g,"\\'")}')">Abrir</button>
+      </div>`;
+    }).join("")+"</div>":"<div class='admin-info'>Nenhuma transição registrada nesta data.</div>";
+  }catch(e){
+    area.innerHTML="<div class='dashboard-erro'>"+escV100(e.message)+"</div>";
+  }
+}
+window.abrirProgressaoDataBackendV100=function(date){abrirProgressaoRelV100("pedido_aguardando",date)};
+window.abrirRelacaoMiniPecasV925=function(tipo){
+  if(tipo==="transicoes")return abrirProgressaoRelV100("pedido_aguardando",new Date().toISOString().slice(0,10));
+};
+window.abrirRelacaoMiniPecasV926=function(tipo){
+  if(tipo==="tatParaPedido")return abrirProgressaoRelV100("tat_pedido",new Date().toISOString().slice(0,10));
+};
+
+/* ================ ADMIN — BACKEND + ZERO RELATION DOM ================ */
+function tabelaResumoBackendV100(lista){
+  const p=paresV100(lista);
+  return p.length?"<table><thead><tr><th>Descrição</th><th>Total</th></tr></thead><tbody>"+
+    p.map(x=>`<tr><td>${escV100(x[0])}</td><td><b>${x[1].toLocaleString("pt-BR")}</b></td></tr>`).join("")+
+    "</tbody></table>":"<div class='admin-info'>Sem dados.</div>";
+}
+
+function destruirAdminPesadoV100(){
+  ["dashTabelaStatus","dashTabelaTecnicos","dashTabelaPDV","dashTabelaRecentes","pendenciasDashboardLista"]
+    .forEach(id=>{const e=document.getElementById(id);if(e)e.innerHTML=""});
+  try{
+    if(typeof dashboardCharts!=="undefined"&&dashboardCharts){
+      Object.keys(dashboardCharts).forEach(k=>{
+        try{dashboardCharts[k]?.destroy?.()}catch(_){}
+        delete dashboardCharts[k];
+      });
+    }
+  }catch(_){}
+}
+window.destruirAdminPesadoV100=destruirAdminPesadoV100;
+
+window.carregarDashboardAdmin=async function(){
+  const msg=document.getElementById("dashboardMensagem");
+  if(msg){msg.className="dashboard-loading";msg.textContent="Carregando dashboard pelo backend...";}
+  try{
+    const s=await apiBackendV100("/admin/summary");
+
+    setTxtV100("dashTotalOS",Number(s.total_os||0).toLocaleString("pt-BR"));
+    setTxtV100("dashTotalPDV",Number(s.total_pdv||0).toLocaleString("pt-BR"));
+    setTxtV100("dashTotalTecnicos",Number(s.total_tecnicos||0).toLocaleString("pt-BR"));
+    setTxtV100("dashTotalStatus",Number(s.total_status||0).toLocaleString("pt-BR"));
+    setTxtV100("dashBancoStatus","🟢 Backend");
+    setTxtV100("dashUltimaImportacao",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR")||"--");
+    setTxtV100("dashUltimaQtd",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR_QTD")||"--");
+    setTxtV100("dashDuplicadas",localStorage.getItem("ULTIMA_IMPORTACAO_REXPEDLR_DUP")||"--");
+
+    const ps=paresV100(s.status_top),pt=paresV100(s.tecnicos_top),pp=paresV100(s.pdv_top);
+    if(typeof renderGraficosDashboard==="function")renderGraficosDashboard(ps,pt,pp);
+    const ds=document.getElementById("dashTabelaStatus");if(ds)ds.innerHTML=tabelaResumoBackendV100(s.status_top);
+    const dt=document.getElementById("dashTabelaTecnicos");if(dt)dt.innerHTML=tabelaResumoBackendV100(s.tecnicos_top);
+    const dp=document.getElementById("dashTabelaPDV");if(dp)dp.innerHTML=tabelaResumoBackendV100(s.pdv_top);
+    const dr=document.getElementById("dashTabelaRecentes");if(dr)dr.innerHTML="<div class='admin-info'>Relação recente não fica pré-renderizada. Zero Relation DOM ativo.</div>";
+
+    setTxtV100("opRack500",Number(s.rack500_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("opProntas",Number(s.prontas_abertas||0).toLocaleString("pt-BR"));
+    setTxtV100("opExpedidasHoje",Number(s.exp_hoje||0).toLocaleString("pt-BR"));
+
+    const pend=document.getElementById("pendenciasDashboardLista");
+    if(pend){
+      pend.innerHTML=[
+        ["Rack 500",s.rack500_abertas,"rack500Abertas"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas"],
+        ["Sem rack",s.sem_rack_abertas,"semRack"]
+      ].map(x=>`<div class="home-integrada-alerta" onclick="abrirListaIntel('${x[2]}')"><div><b>${escV100(x[0])}</b><small>Relação sob demanda</small></div><strong>${Number(x[1]||0)}</strong></div>`).join("");
+    }
+
+    if(msg){msg.className="dashboard-ok";msg.textContent="Dashboard calculado no backend. Nenhuma REXPEDLR completa foi baixada.";}
+  }catch(e){
+    if(msg){msg.className="dashboard-erro";msg.textContent="Backend: "+e.message;}
+  }
+};
+
+const abrirAdminBaseV100=window.abrirAdmin;
+window.abrirAdmin=function(){
+  window.erpMontarTelaV7544?.("telaAdmin");
+  if(typeof exigirPermissao==="function"&&!exigirPermissao(["administrador"],"Administração"))return;
+  esconderTelas();
+  definirMenuAtivo("admin");
+  const t=document.getElementById("telaAdmin");if(t)t.style.display="block";
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+  destruirAdminPesadoV100();
+  carregarDashboardAdmin();
+};
+
+/* Ao sair do Admin, destrói gráficos/tabelas gerados. */
+document.addEventListener("click",e=>{
+  const alvo=e.target.closest?.(".menu,[onclick]");
+  if(!alvo)return;
+  const txt=((alvo.dataset?.menu||"")+" "+(alvo.getAttribute?.("onclick")||"")).toLowerCase();
+  if(!txt.includes("admin")){
+    const t=document.getElementById("telaAdmin");
+    if(t&&getComputedStyle(t).display!=="none")setTimeout(destruirAdminPesadoV100,0);
+  }
+},true);
+
+/* ================= FUNÇÕES PESADAS: SOMENTE SOB DEMANDA ================= */
+let intelCompletaPromiseV100=null;
+async function garantirIntelCompletaV100(){
+  if(Array.isArray(intelRegistros)&&intelRegistros.length&&intelAnalise)return true;
+  if(intelCompletaPromiseV100)return intelCompletaPromiseV100;
+  intelCompletaPromiseV100=(async()=>{
+    try{
+      const m=document.getElementById("intelMensagem");
+      if(m){m.className="dashboard-loading";m.textContent="Carregando base completa somente para esta função...";}
+      await carregarInteligencia(true);
+      return Array.isArray(intelRegistros)&&intelRegistros.length>0;
+    }finally{
+      intelCompletaPromiseV100=null;
+    }
+  })();
+  return intelCompletaPromiseV100;
+}
+window.garantirIntelCompletaV100=garantirIntelCompletaV100;
+
+/* Consulta avançada, Copiloto e Motor de Regras continuam disponíveis,
+   mas só puxam a base completa quando o usuário realmente usar. */
+const aplicarConsultaOriginalV100=window.aplicarConsultaIntel;
+if(typeof aplicarConsultaOriginalV100==="function"){
+  window.aplicarConsultaIntel=async function(){
+    if(!intelRegistros?.length)await garantirIntelCompletaV100();
+    return aplicarConsultaOriginalV100.apply(this,arguments);
+  };
+}
+const abrirCopilotoOriginalV100=window.abrirCopilotoERP;
+if(typeof abrirCopilotoOriginalV100==="function"){
+  window.abrirCopilotoERP=async function(){
+    if(!intelRegistros?.length)await garantirIntelCompletaV100();
+    return abrirCopilotoOriginalV100.apply(this,arguments);
+  };
+}
+
+/* Limpa relações ao fechar modal. */
+const fecharIntelOriginalV100=window.fecharIntelModal;
+window.fecharIntelModal=function(){
+  try{return typeof fecharIntelOriginalV100==="function"?fecharIntelOriginalV100.apply(this,arguments):undefined}
+  finally{
+    const a=document.getElementById("intelModalConteudo");if(a)a.innerHTML="";
+  }
+};
+
+/* Auditoria */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.backendV100Audit=async function(){
+  const health=await apiBackendV100("/health");
+  const r={
+    backend:health,
+    domTotal:document.getElementsByTagName("*").length,
+    intelEmMemoria:Array.isArray(intelRegistros)?intelRegistros.length:0,
+    adminNodes:document.getElementById("telaAdmin")?.getElementsByTagName("*").length||0
+  };
+  console.info("[ERP V10 BACKEND]",r);
+  return r;
+};
+
+console.info("ERP V10: backend Supabase Edge habilitado. Base completa só é baixada sob demanda.");
 })();
 </script>
 
