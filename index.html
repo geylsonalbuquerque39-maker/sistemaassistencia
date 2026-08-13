@@ -28392,6 +28392,251 @@ console.info("ERP V10.9: exportação padronizada CSV/XLS/XLT em todos os cartõ
 })();
 </script>
 
+
+<script id="erp-v110-inteligencia-final-export-filtros">
+(function(){
+"use strict";
+
+function esc110(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function set110(id,v){
+  const e=document.getElementById(id);
+  if(e)e.textContent=String(v??"--");
+}
+function option110(v){
+  return `<option value="${esc110(v)}">${esc110(v)}</option>`;
+}
+function preencherSelect110(id,placeholder,lista){
+  const el=document.getElementById(id);
+  if(!el)return;
+  const atual=el.value;
+  el.innerHTML=`<option value="">${placeholder}</option>`+
+    (Array.isArray(lista)?lista:[]).map(option110).join("");
+  if([...el.options].some(o=>o.value===atual))el.value=atual;
+}
+
+async function carregarFiltrosBackend110(){
+  const f=await window.ERPBackendV100.api("/filters");
+  preencherSelect110("icRack","Todos os racks",f.racks);
+  preencherSelect110("icStatusOS","Todas as situações",f.status_os);
+  preencherSelect110("icStatus","Todos os status",f.status);
+  preencherSelect110("icTecnico","Todos os técnicos",f.tecnicos);
+  preencherSelect110("icGarantia","Todas as garantias",f.garantias);
+  return f;
+}
+window.carregarFiltrosBackend110=carregarFiltrosBackend110;
+
+function menuExport110(type,idx){
+  const id=`erpExport110_${idx}_${type}`;
+  return `<div class="erp-export-wrap-v109">
+    <button class="exportar" onclick="toggleExportMenuV109('${id}',event)">Exportar ▾</button>
+    <div class="erp-export-menu-v109" id="${id}" onclick="event.stopPropagation()">
+      <button onclick="exportarBackendV109('${type}','CSV');this.closest('.erp-export-menu-v109').classList.remove('aberto')">CSV</button>
+      <button onclick="exportarBackendV109('${type}','XLS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLS</button>
+      <button onclick="exportarBackendV109('${type}','XLT');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLT</button>
+    </div>
+  </div>`;
+}
+
+async function renderInteligenciaFinal110(forcar=false){
+  const msg=document.getElementById("intelMensagem");
+  if(msg){
+    msg.className="dashboard-loading";
+    msg.textContent="Carregando Inteligência pelo backend...";
+  }
+
+  try{
+    const [s,prog,filtros]=await Promise.all([
+      window.ERPBackendV100.api("/summary"),
+      window.ERPBackendV100.api("/progress/parts?days=7"),
+      carregarFiltrosBackend110()
+    ]);
+
+    set110("ikProntas",Number(s.prontas_abertas||0).toLocaleString("pt-BR"));
+    set110("ikQualidade",Number(s.qualidade||0)+"%");
+    set110("ikParadas","Sob demanda");
+    set110("ieAbertas",Number(s.abertas||0).toLocaleString("pt-BR"));
+    set110("ieFechadas",Number(s.fechadas||0).toLocaleString("pt-BR"));
+    set110("ieExpHoje",Number(s.exp_hoje||0).toLocaleString("pt-BR"));
+    set110("ieTempoExp","Sob demanda");
+    set110("ieTotal",Number(s.total_os||0).toLocaleString("pt-BR"));
+    set110("intelAgPedidoPecasTotalV924",Number(s.ag_pedido||0).toLocaleString("pt-BR"));
+    set110("intelEnderecadosSemCPPTotalV922",Number(s.enderecados_sem_cpp||0).toLocaleString("pt-BR"));
+
+    const agResumo=document.getElementById("intelAgPedidoPecasResumoV959");
+    if(agResumo)agResumo.textContent=`${Number(s.ag_pedido||0).toLocaleString("pt-BR")} O.S. no banco`;
+
+    const din=document.getElementById("intelCartoesDinamicos");
+    if(din){
+      const cards=[
+        ["O.S. abertas",s.abertas,"abertas","green"],
+        ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+        ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+        ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+        ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+      ];
+      din.innerHTML=cards.map((x,i)=>`
+        <div class="intel-dynamic-card ${x[3]}">
+          <b>${esc110(x[0])}</b>
+          <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+          <span>Backend + Zero Relation DOM</span>
+          <div class="intel-dynamic-actions">
+            <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+            ${menuExport110(x[2],i)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    /* Mantém os renderizadores já corrigidos das versões anteriores. */
+    try{await window.carregarIntelBackendV103?.(false)}catch(_){}
+    try{await window.carregarProgressaoEntradasV107?.()}catch(_){}
+
+    /* Reaplica cartões depois de qualquer renderizador legado que tenha rodado acima. */
+    if(din){
+      const cards=[
+        ["O.S. abertas",s.abertas,"abertas","green"],
+        ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+        ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+        ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+        ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+      ];
+      din.innerHTML=cards.map((x,i)=>`
+        <div class="intel-dynamic-card ${x[3]}">
+          <b>${esc110(x[0])}</b>
+          <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+          <span>Backend + Zero Relation DOM</span>
+          <div class="intel-dynamic-actions">
+            <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+            ${menuExport110(x[2],i)}
+          </div>
+        </div>
+      `).join("");
+    }
+
+    if(msg){
+      msg.className="dashboard-ok";
+      msg.textContent=`Backend ativo: ${Number(s.total_os||0).toLocaleString("pt-BR")} O.S. • filtros carregados do servidor.`;
+    }
+    return {summary:s,progress:prog,filters:filtros};
+  }catch(e){
+    console.error("[V11 INTEL]",e);
+    if(msg){
+      msg.className="dashboard-erro";
+      msg.textContent="Erro ao carregar Inteligência: "+(e?.message||e);
+    }
+    throw e;
+  }
+}
+window.renderInteligenciaFinal110=renderInteligenciaFinal110;
+
+/* Override FINAL: evita o problema de escopo dos IIFEs antigos. */
+window.abrirInteligencia=function(){
+  try{
+    if(!usuarioLogado){
+      mostrarBloqueioPermissao?.("Faça login para acessar a Central de Inteligência.");
+      return;
+    }
+  }catch(_){}
+
+  window.erpMontarTelaV7544?.("telaInteligencia");
+  esconderTelas();
+  definirMenuAtivo?.("inteligencia");
+  const tela=document.getElementById("telaInteligencia");
+  if(tela)tela.style.display="block";
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+
+  try{intelRegistros=[];intelAnalise=null}catch(_){}
+  renderInteligenciaFinal110(false);
+};
+
+window.carregarInteligencia=function(forcar=false){
+  try{intelRegistros=[];intelAnalise=null}catch(_){}
+  return renderInteligenciaFinal110(!!forcar);
+};
+
+/* Exportar consulta avançada também usa seletor CSV/XLS/XLT. */
+window.abrirExportConsulta110=function(event){
+  event?.stopPropagation?.();
+  let wrap=document.getElementById("erpExportConsultaWrap110");
+  if(!wrap)return;
+  toggleExportMenuV109("erpExportConsultaMenu110",event);
+};
+window.exportarConsultaFormato110=function(formato){
+  let lista=[];
+  try{lista=Array.isArray(intelConsultaAtual)?intelConsultaAtual:[]}catch(_){}
+  if(!lista.length){
+    alert("Não há resultados para exportar. Aplique os filtros primeiro.");
+    return;
+  }
+  ERP.Export.exportar({
+    dados:lista,
+    formato,
+    nome:"consulta_avancada",
+    aba:"Consulta Avançada",
+    colunas:[
+      {label:"O.S.",key:"os"},{label:"GR",key:"grupo"},{label:"N.C.E",key:"nce"},
+      {label:"Produto",key:"desc_produto"},{label:"Rack",key:"rack"},
+      {label:"Status",key:"status"},{label:"Status da O.S.",key:"status_da_os"},
+      {label:"Técnico",key:"tecnico"},{label:"PDV",key:"pdv"},
+      {label:"Garantia",key:"tipo_garantia"},{label:"NF",key:"nf"},
+      {label:"Data geração",key:"dt_geracao"},{label:"Data expedição",key:"dt_expedicao"}
+    ]
+  });
+};
+
+function instalarBotaoConsulta110(){
+  const btn=[...document.querySelectorAll(".intel-consulta-acoes button")]
+    .find(b=>/Exportar Excel\/CSV/i.test(b.textContent||""));
+  if(!btn || document.getElementById("erpExportConsultaWrap110"))return;
+
+  const wrap=document.createElement("div");
+  wrap.id="erpExportConsultaWrap110";
+  wrap.className="erp-export-wrap-v109";
+  wrap.innerHTML=`
+    <button class="ok" type="button" onclick="abrirExportConsulta110(event)">Exportar ▾</button>
+    <div class="erp-export-menu-v109" id="erpExportConsultaMenu110" onclick="event.stopPropagation()">
+      <button onclick="exportarConsultaFormato110('CSV')">CSV</button>
+      <button onclick="exportarConsultaFormato110('XLS')">XLS</button>
+      <button onclick="exportarConsultaFormato110('XLT')">XLT</button>
+    </div>`;
+  btn.replaceWith(wrap);
+}
+document.addEventListener("DOMContentLoaded",()=>setTimeout(instalarBotaoConsulta110,2500),{once:true});
+setTimeout(instalarBotaoConsulta110,100);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.intelV110Audit=async function(){
+  const [s,f]=await Promise.all([
+    ERPBackendV100.api("/summary"),
+    ERPBackendV100.api("/filters")
+  ]);
+  const r={
+    total:s.total_os,
+    filtros:{
+      racks:f.racks?.length||0,
+      statusOS:f.status_os?.length||0,
+      status:f.status?.length||0,
+      tecnicos:f.tecnicos?.length||0,
+      garantias:f.garantias?.length||0
+    },
+    botoesExportar:document.querySelectorAll("#intelCartoesDinamicos .exportar").length,
+    intelEmMemoria:Array.isArray(intelRegistros)?intelRegistros.length:0
+  };
+  console.info("[V11.0 INTEL]",r);
+  return r;
+};
+
+console.info("ERP V11.0: Inteligência final com exportação e filtros backend.");
+})();
+</script>
+
 </body>
 </html>
 
