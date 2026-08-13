@@ -28112,6 +28112,286 @@ console.info("ERP V10.7: cartão de entrada em AG. PEDIDO considera qualquer sta
 })();
 </script>
 
+
+<script id="erp-v108-exportar-cartoes-operacionais">
+(function(){
+"use strict";
+
+const NOMES_EXPORT_V108={
+  abertas:"os_abertas",
+  rack500Abertas:"rack_500_abertas",
+  grupo1314Abertos:"grupos_13_14_abertos",
+  grupo52122Abertos:"grupos_5_21_22_abertos",
+  prontasAbertas:"prontas_abertas",
+  semRack:"os_sem_rack",
+  fechadas:"os_fechadas",
+  expHoje:"expedidas_hoje",
+  agPedido:"ag_pedido_de_peca",
+  aguardandoPecas:"aguardando_pecas",
+  enderecadosSemCPP:"enderecados_sem_cpp"
+};
+
+async function exportarRelacaoBackendV108(type){
+  try{
+    const d=await window.ERPBackendV100.api(`/relations/${encodeURIComponent(type)}?limit=1000&offset=0`);
+    const lista=Array.isArray(d?.rows)?d.rows:[];
+    if(!lista.length){
+      alert("Não há registros nesta relação para exportar.");
+      return;
+    }
+
+    ERP.Export.exportar({
+      dados:lista,
+      formato:"CSV",
+      nome:NOMES_EXPORT_V108[type]||("relacao_"+type),
+      aba:"Relação",
+      colunas:[
+        {label:"O.S.",key:"os"},
+        {label:"Data",key:"dt_geracao"},
+        {label:"PDV",key:"pdv"},
+        {label:"Rack",key:"rack"},
+        {label:"Status",key:"status"},
+        {label:"Status da O.S.",key:"status_da_os"},
+        {label:"GR",key:"grupo"},
+        {label:"N.C.E",key:"nce"},
+        {label:"Produto",key:"desc_produto"},
+        {label:"Técnico",key:"tecnico"},
+        {label:"Tipo Garantia",key:"tipo_garantia"},
+        {label:"NF",key:"nf"}
+      ]
+    });
+  }catch(e){
+    console.error("[V10.8 EXPORT]",e);
+    alert("Erro ao exportar relação: "+(e?.message||e));
+  }
+}
+window.exportarRelacaoBackendV108=exportarRelacaoBackendV108;
+
+/* Recria somente os cartões operacionais com Ver relação + Exportar. */
+const intelBaseV108=window.carregarIntelBackendV103;
+if(typeof intelBaseV108==="function"){
+  window.carregarIntelBackendV103=async function(forcar=false){
+    const r=await intelBaseV108(forcar);
+
+    try{
+      const s=r?.summary||await window.ERPBackendV100.api("/summary");
+      const din=document.getElementById("intelCartoesDinamicos");
+      if(din){
+        const cards=[
+          ["O.S. abertas",s.abertas,"abertas","green"],
+          ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+          ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+          ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+          ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+          ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+        ];
+
+        din.innerHTML=cards.map(x=>`
+          <div class="intel-dynamic-card ${x[3]}">
+            <b>${String(x[0])}</b>
+            <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+            <span>Backend + Zero Relation DOM</span>
+            <div class="intel-dynamic-actions">
+              <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+              <button class="exportar" onclick="exportarRelacaoBackendV108('${x[2]}')">Exportar ▾</button>
+            </div>
+          </div>
+        `).join("");
+      }
+    }catch(e){
+      console.warn("[V10.8 cartões operacionais]",e);
+    }
+
+    return r;
+  };
+}
+
+/* Caso a Inteligência já esteja aberta, força atualização visual leve. */
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(()=>{
+    try{
+      const tela=document.getElementById("telaInteligencia");
+      if(tela && getComputedStyle(tela).display!=="none"){
+        window.carregarIntelBackendV103?.(false);
+      }
+    }catch(_){}
+  },3200);
+},{once:true});
+
+console.info("ERP V10.8: botões Exportar restaurados nos cartões operacionais.");
+})();
+</script>
+
+
+<style id="erp-v109-export-menu-style">
+.erp-export-wrap-v109{position:relative;display:inline-block}
+.erp-export-menu-v109{
+  position:absolute;left:0;top:calc(100% + 6px);z-index:16000;
+  min-width:120px;background:#fff;border:1px solid #c8d2df;border-radius:10px;
+  box-shadow:0 10px 28px rgba(0,0,0,.22);padding:6px;display:none
+}
+.erp-export-menu-v109.aberto{display:block}
+.erp-export-menu-v109 button{
+  display:block!important;width:100%!important;text-align:left!important;
+  border:0!important;background:transparent!important;color:#001b3d!important;
+  padding:8px 10px!important;border-radius:7px!important;font-weight:800!important;
+  cursor:pointer!important
+}
+.erp-export-menu-v109 button:hover{background:#eef5ff!important}
+body.dark-mode .erp-export-menu-v109{background:#102b49;border-color:#315a80}
+body.dark-mode .erp-export-menu-v109 button{color:#fff!important}
+body.dark-mode .erp-export-menu-v109 button:hover{background:#173957!important}
+</style>
+
+<script id="erp-v109-export-csv-xls-xlt">
+(function(){
+"use strict";
+
+const NOMES_V109={
+  abertas:["os_abertas","O.S. abertas"],
+  rack500Abertas:["rack_500_abertas","Rack 500"],
+  grupo1314Abertos:["grupos_13_14_abertos","Grupos 13 e 14"],
+  grupo52122Abertos:["grupos_5_21_22_abertos","Grupos 5 21 e 22"],
+  prontasAbertas:["prontas_abertas","Prontas"],
+  semRack:["os_sem_rack","Sem rack"],
+  fechadas:["os_fechadas","O.S. fechadas"],
+  expHoje:["expedidas_hoje","Expedidas hoje"],
+  enderecadosSemCPP:["enderecados_sem_cpp","Endereçados S CPP"],
+  agPedido:["ag_pedido_de_peca","AG PEDIDO DE PECA"]
+};
+
+const COLUNAS_V109=[
+  {label:"O.S.",key:"os"},
+  {label:"Data",key:"dt_geracao"},
+  {label:"PDV",key:"pdv"},
+  {label:"Rack",key:"rack"},
+  {label:"Status",key:"status"},
+  {label:"Status da O.S.",key:"status_da_os"},
+  {label:"GR",key:"grupo"},
+  {label:"N.C.E",key:"nce"},
+  {label:"Produto",key:"desc_produto"},
+  {label:"Técnico",key:"tecnico"},
+  {label:"Tipo Garantia",key:"tipo_garantia"},
+  {label:"NF",key:"nf"}
+];
+
+window.toggleExportMenuV109=function(id,event){
+  event?.stopPropagation?.();
+  document.querySelectorAll(".erp-export-menu-v109.aberto").forEach(el=>{
+    if(el.id!==id)el.classList.remove("aberto");
+  });
+  document.getElementById(id)?.classList.toggle("aberto");
+};
+
+document.addEventListener("click",()=>{
+  document.querySelectorAll(".erp-export-menu-v109.aberto").forEach(el=>el.classList.remove("aberto"));
+});
+
+async function exportarBackendV109(type,formato){
+  try{
+    formato=String(formato||"CSV").toUpperCase();
+    if(!["CSV","XLS","XLT"].includes(formato))return;
+
+    const d=await window.ERPBackendV100.api(`/relations/${encodeURIComponent(type)}?limit=1000&offset=0`);
+    const lista=Array.isArray(d?.rows)?d.rows:[];
+    if(!lista.length){
+      alert("Não há registros nesta relação para exportar.");
+      return;
+    }
+
+    const meta=NOMES_V109[type]||["relacao_"+type,"Relação"];
+    ERP.Export.exportar({
+      dados:lista,
+      formato,
+      nome:meta[0],
+      aba:meta[1],
+      colunas:COLUNAS_V109
+    });
+  }catch(e){
+    console.error("[V10.9 EXPORT]",e);
+    alert("Erro ao exportar: "+(e?.message||e));
+  }
+}
+window.exportarBackendV109=exportarBackendV109;
+
+function menuV109(type,idx){
+  const id=`erpExportMenuV109_${idx}`;
+  return `<div class="erp-export-wrap-v109">
+    <button class="exportar" onclick="toggleExportMenuV109('${id}',event)">Exportar ▾</button>
+    <div class="erp-export-menu-v109" id="${id}" onclick="event.stopPropagation()">
+      <button onclick="exportarBackendV109('${type}','CSV');this.closest('.erp-export-menu-v109').classList.remove('aberto')">CSV</button>
+      <button onclick="exportarBackendV109('${type}','XLS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLS</button>
+      <button onclick="exportarBackendV109('${type}','XLT');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLT</button>
+    </div>
+  </div>`;
+}
+
+/* Último override: todos os cartões operacionais recebem o mesmo padrão. */
+const intelBaseV109=window.carregarIntelBackendV103;
+if(typeof intelBaseV109==="function"){
+  window.carregarIntelBackendV103=async function(forcar=false){
+    const r=await intelBaseV109(forcar);
+    try{
+      const s=r?.summary||await window.ERPBackendV100.api("/summary");
+      const din=document.getElementById("intelCartoesDinamicos");
+      if(din){
+        const cards=[
+          ["O.S. abertas",s.abertas,"abertas","green"],
+          ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+          ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+          ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+          ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+          ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+        ];
+
+        din.innerHTML=cards.map((x,i)=>`
+          <div class="intel-dynamic-card ${x[3]}">
+            <b>${x[0]}</b>
+            <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+            <span>Backend + Zero Relation DOM</span>
+            <div class="intel-dynamic-actions">
+              <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+              ${menuV109(x[2],i)}
+            </div>
+          </div>
+        `).join("");
+      }
+    }catch(e){
+      console.warn("[V10.9 cartões]",e);
+    }
+    return r;
+  };
+}
+
+/* Endereçados S/ CPP também recebe seletor CSV/XLS/XLT */
+window.abrirMenuExportCPPV109=function(event){
+  const host=document.querySelector("#intelEnderecadosSemCPPV922 div[style*='display:flex']");
+  if(!host)return;
+  let menu=document.getElementById("erpExportMenuCPPV109");
+  if(!menu){
+    const wrap=document.createElement("div");
+    wrap.className="erp-export-wrap-v109";
+    wrap.innerHTML=`<button type="button" class="exportar" onclick="toggleExportMenuV109('erpExportMenuCPPV109',event)">Exportar ▾</button>
+      <div class="erp-export-menu-v109" id="erpExportMenuCPPV109" onclick="event.stopPropagation()">
+        <button onclick="exportarBackendV109('enderecadosSemCPP','CSV')">CSV</button>
+        <button onclick="exportarBackendV109('enderecadosSemCPP','XLS')">XLS</button>
+        <button onclick="exportarBackendV109('enderecadosSemCPP','XLT')">XLT</button>
+      </div>`;
+    const antigos=[...host.querySelectorAll("button")].filter(b=>/Exportar/i.test(b.textContent||""));
+    antigos.forEach(b=>b.remove());
+    host.appendChild(wrap);
+  }
+};
+
+function aplicarCPPV109(){
+  try{window.abrirMenuExportCPPV109()}catch(_){}
+}
+document.addEventListener("DOMContentLoaded",()=>setTimeout(aplicarCPPV109,3200),{once:true});
+
+console.info("ERP V10.9: exportação padronizada CSV/XLS/XLT em todos os cartões operacionais.");
+})();
+</script>
+
 </body>
 </html>
 
