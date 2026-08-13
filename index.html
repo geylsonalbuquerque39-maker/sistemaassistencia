@@ -30757,6 +30757,568 @@ console.info("ERP V12.4: caminho das figurinhas ajustado às policies do Storage
 })();
 </script>
 
+
+<style id="erp-v125-chat-pro-style">
+/* ===== Grupos ===== */
+.chat-grupos-bloco-v125{border-bottom:1px solid #d7e2ee;padding:8px}
+.chat-grupos-topo-v125{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.chat-grupos-topo-v125 b{font-size:12px;color:#60758b;text-transform:uppercase}
+.chat-grupos-topo-v125 button{border:0;border-radius:8px;padding:6px 9px;background:#0046b8;color:#fff;font-weight:900;cursor:pointer;font-size:12px}
+.chat-grupo-item-v125{width:100%;display:flex;align-items:center;gap:9px;border:0;background:transparent;padding:8px;border-radius:10px;cursor:pointer;text-align:left}
+.chat-grupo-item-v125:hover,.chat-grupo-item-v125.ativo{background:#eaf3ff}
+.chat-grupo-avatar-v125{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:#0046b8;color:#fff;font-weight:900}
+.chat-grupo-item-v125 span{display:block;font-size:11px;color:#6a7d90;margin-top:2px}
+body.dark-mode .chat-grupos-bloco-v125{border-color:#31506d}
+body.dark-mode .chat-grupos-topo-v125 b{color:#a9bed3}
+body.dark-mode .chat-grupo-item-v125{color:#fff}
+body.dark-mode .chat-grupo-item-v125:hover,
+body.dark-mode .chat-grupo-item-v125.ativo{background:#173957}
+body.dark-mode .chat-grupo-item-v125 span{color:#a9bed3}
+
+/* ===== Modal criar grupo ===== */
+#chatGrupoModalV125,#chatPasteModalV125,#chatGrupoCallV125{
+ position:fixed;inset:0;z-index:42000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(0,18,38,.72)
+}
+#chatGrupoModalV125.aberto,#chatPasteModalV125.aberto,#chatGrupoCallV125.aberto{display:flex}
+.chat-modal-card-v125{width:min(620px,96vw);max-height:90vh;overflow:auto;background:#fff;border:2px solid #1ea5ff;border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(0,0,0,.42)}
+.chat-modal-top-v125{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}
+.chat-modal-top-v125 h3{margin:0;color:#001b3d}
+.chat-modal-top-v125>button{border:0;border-radius:9px;background:#c90025;color:#fff;padding:8px 11px;font-weight:900;cursor:pointer}
+#chatGrupoNomeV125{width:100%;padding:11px;border:1px solid #b9c9d8;border-radius:10px;font-size:15px}
+#chatGrupoMembrosV125{display:grid;gap:6px;max-height:360px;overflow:auto;margin:12px 0}
+.chat-grupo-membro-check-v125{display:flex;align-items:center;gap:10px;padding:8px;border-radius:9px;background:#f5f9fd}
+.chat-grupo-membro-check-v125 input{width:17px;height:17px}
+.chat-grupo-salvar-v125{width:100%;border:0;border-radius:10px;padding:11px;background:#0b7a2a;color:#fff;font-weight:900;cursor:pointer}
+body.dark-mode .chat-modal-card-v125{background:#0d223a;color:#fff}
+body.dark-mode .chat-modal-top-v125 h3{color:#fff}
+body.dark-mode #chatGrupoNomeV125{background:#07192c;color:#fff;border-color:#315a80}
+body.dark-mode .chat-grupo-membro-check-v125{background:#102b49}
+
+/* ===== Mensagem de grupo ===== */
+.chat-grupo-remetente-v125{font-size:11px;font-weight:900;color:#0064bd;margin-bottom:3px}
+body.dark-mode .chat-grupo-remetente-v125{color:#65bdff}
+
+/* ===== Paste imagem ===== */
+#chatPastePreviewV125{display:block;max-width:100%;max-height:360px;margin:8px auto 14px;object-fit:contain;border-radius:12px}
+.chat-paste-actions-v125{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.chat-paste-actions-v125 button{border:0;border-radius:10px;padding:11px;font-weight:900;cursor:pointer}
+.chat-paste-foto-v125{background:#0046b8;color:#fff}
+.chat-paste-sticker-v125{background:#0b7a2a;color:#fff}
+
+/* ===== Salvar sticker recebido ===== */
+.chat-figurinha-wrap-v125{position:relative;display:inline-block}
+.chat-salvar-figurinha-v125{
+ position:absolute;right:2px;top:2px;border:0;border-radius:999px;background:rgba(0,27,61,.82);color:#fff;
+ padding:5px 8px;font-size:11px;font-weight:900;cursor:pointer;opacity:0;transition:.15s
+}
+.chat-figurinha-wrap-v125:hover .chat-salvar-figurinha-v125{opacity:1}
+
+/* ===== Menu 3 pontos / reações ===== */
+#chatMenuMsgV600{z-index:50000!important;min-width:205px!important}
+.chat-reacoes-menu-v125{display:flex!important;gap:4px!important;padding:5px!important;border-bottom:1px solid #d7e2ee}
+.chat-reacoes-menu-v125 button{width:auto!important;font-size:19px!important;padding:5px 7px!important}
+body.dark-mode .chat-reacoes-menu-v125{border-color:#31506d}
+
+/* ===== Chamada em grupo ===== */
+#chatGrupoCallV125{z-index:52000;background:#03101f}
+#chatGrupoCallBoxV125{width:min(1180px,98vw);height:min(820px,94vh);display:flex;flex-direction:column;background:#07192c;border:1px solid #315a80;border-radius:18px;overflow:hidden}
+#chatGrupoCallTopV125{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;color:#fff;background:#0d223a}
+#chatGrupoCallTopV125 h3{margin:0}
+#chatGrupoCallGridV125{flex:1;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;padding:10px;overflow:auto}
+.chat-peer-tile-v125{position:relative;min-height:190px;border-radius:14px;background:#102b49;overflow:hidden;display:grid;place-items:center;color:#fff}
+.chat-peer-tile-v125 video{width:100%;height:100%;object-fit:cover;background:#000}
+.chat-peer-tile-v125 .nome{position:absolute;left:8px;bottom:8px;background:#0009;color:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}
+.chat-peer-avatar-v125{font-size:42px;font-weight:900}
+#chatGrupoCallControlsV125{display:flex;justify-content:center;gap:10px;padding:12px;background:#0d223a}
+#chatGrupoCallControlsV125 button{width:48px;height:48px;border:0;border-radius:50%;cursor:pointer;font-size:20px}
+#chatGrupoCallEndV125{background:#d71920;color:#fff}
+
+/* Header grupo */
+.chat-grupo-header-v125 #chatFavoritoV600{display:none!important}
+
+@media(max-width:700px){
+ .chat-paste-actions-v125{grid-template-columns:1fr}
+ #chatGrupoCallGridV125{grid-template-columns:1fr}
+}
+</style>
+
+<div id="chatGrupoModalV125" onclick="if(event.target===this)fecharCriarGrupoV125()">
+ <div class="chat-modal-card-v125" onclick="event.stopPropagation()">
+  <div class="chat-modal-top-v125"><h3>👥 Novo grupo</h3><button onclick="fecharCriarGrupoV125()">✕</button></div>
+  <input id="chatGrupoNomeV125" maxlength="80" placeholder="Nome do grupo">
+  <div id="chatGrupoMembrosV125"></div>
+  <button class="chat-grupo-salvar-v125" onclick="criarGrupoV125()">Criar grupo</button>
+ </div>
+</div>
+
+<div id="chatPasteModalV125" onclick="if(event.target===this)fecharPasteImagemV125()">
+ <div class="chat-modal-card-v125" onclick="event.stopPropagation()">
+  <div class="chat-modal-top-v125"><h3>Imagem colada</h3><button onclick="fecharPasteImagemV125()">✕</button></div>
+  <img id="chatPastePreviewV125" alt="Prévia">
+  <div class="chat-paste-actions-v125">
+   <button class="chat-paste-foto-v125" onclick="enviarPasteComoFotoV125()">🖼️ Enviar como foto</button>
+   <button class="chat-paste-sticker-v125" onclick="enviarPasteComoFigurinhaV125()">✨ Enviar como figurinha</button>
+  </div>
+ </div>
+</div>
+
+<div id="chatGrupoCallV125">
+ <div id="chatGrupoCallBoxV125">
+  <div id="chatGrupoCallTopV125">
+   <div><h3 id="chatGrupoCallTituloV125">Chamada em grupo</h3><small id="chatGrupoCallStatusV125">Conectando...</small></div>
+   <div id="chatGrupoCallParticipantesV125"></div>
+  </div>
+  <div id="chatGrupoCallGridV125"></div>
+  <div id="chatGrupoCallControlsV125">
+   <button id="chatGrupoCallMicV125" onclick="toggleMicGrupoV125()" title="Microfone">🎤</button>
+   <button id="chatGrupoCallCamV125" onclick="toggleCamGrupoV125()" title="Câmera">🎥</button>
+   <button id="chatGrupoCallEndV125" onclick="encerrarChamadaGrupoV125()" title="Encerrar">📞</button>
+  </div>
+ </div>
+</div>
+
+<script id="erp-v125-chat-pro-js">
+(function(){
+"use strict";
+
+let grupoAtualV125=null;
+let gruposV125=[];
+let canalGrupoMensagensV125=null;
+let pasteFileV125=null,pasteUrlV125=null;
+let baseAbrirConversaV125=window.abrirConversaChatV57;
+let baseEnviarMensagemV125=window.enviarMensagemChatV57;
+let baseIniciarChamadaV125=window.iniciarChamadaV630;
+
+/* =========================
+   GRUPOS
+   ========================= */
+function esc125(v){return typeof chatEscV57==="function"?chatEscV57(v):String(v??"").replace(/[&<>"']/g,"")}
+function meuId125(){return String(usuarioLogado?.id||"")}
+function sb125(){return obterSupabaseClient()}
+
+function instalarAreaGruposV125(){
+ const lateral=document.querySelector("#chatPainel .chat-lateral");
+ const usuarios=document.getElementById("chatUsuarios");
+ const topo=document.querySelector("#chatPainel .chat-lateral-topo");
+ if(!lateral||!usuarios||document.getElementById("chatGruposBlocoV125"))return;
+ const bloco=document.createElement("div");
+ bloco.id="chatGruposBlocoV125";
+ bloco.className="chat-grupos-bloco-v125";
+ bloco.innerHTML=`<div class="chat-grupos-topo-v125"><b>Grupos</b><button type="button" onclick="abrirCriarGrupoV125()">＋ Grupo</button></div><div id="chatGruposListaV125"></div>`;
+ usuarios.parentNode.insertBefore(bloco,usuarios);
+ carregarGruposV125();
+}
+
+window.carregarGruposV125=async function(){
+ if(!usuarioLogado?.id)return;
+ try{
+  const {data,error}=await sb125().rpc("listar_meus_grupos_v125");
+  if(error)throw error;
+  gruposV125=Array.isArray(data)?data:[];
+  renderGruposV125();
+  assinarConvitesGruposV125();
+ }catch(e){console.warn("[GRUPOS]",e)}
+};
+
+function renderGruposV125(){
+ const area=document.getElementById("chatGruposListaV125");if(!area)return;
+ if(!gruposV125.length){area.innerHTML=`<small style="opacity:.65">Nenhum grupo</small>`;return}
+ area.innerHTML=gruposV125.map(g=>`
+  <button class="chat-grupo-item-v125 ${grupoAtualV125?.id===g.id?"ativo":""}" onclick="abrirGrupoV125('${g.id}')">
+   <span class="chat-grupo-avatar-v125">👥</span>
+   <span style="min-width:0"><b>${esc125(g.nome)}</b><span>${Number(g.total_membros||0)} participantes</span></span>
+  </button>`).join("");
+}
+
+window.abrirCriarGrupoV125=function(){
+ const area=document.getElementById("chatGrupoMembrosV125");
+ if(area){
+  area.innerHTML=(chatUsuariosV57||[])
+   .filter(u=>String(u.id)!==meuId125())
+   .map(u=>`<label class="chat-grupo-membro-check-v125"><input type="checkbox" value="${esc125(u.id)}"><span><b>${esc125(u.nome||u.email)}</b><br><small>${esc125(u.cargo||u.perfil||"")}</small></span></label>`).join("");
+ }
+ document.getElementById("chatGrupoNomeV125").value="";
+ document.getElementById("chatGrupoModalV125")?.classList.add("aberto");
+};
+window.fecharCriarGrupoV125=function(){document.getElementById("chatGrupoModalV125")?.classList.remove("aberto")};
+
+window.criarGrupoV125=async function(){
+ const nome=String(document.getElementById("chatGrupoNomeV125")?.value||"").trim();
+ const membros=[...document.querySelectorAll("#chatGrupoMembrosV125 input:checked")].map(x=>x.value);
+ if(!nome)return alert("Informe o nome do grupo.");
+ if(!membros.length)return alert("Selecione pelo menos uma pessoa.");
+ try{
+  const {data,error}=await sb125().rpc("criar_grupo_chat_v125",{p_nome:nome,p_membros:membros});
+  if(error)throw error;
+  fecharCriarGrupoV125();
+  await carregarGruposV125();
+  if(data)abrirGrupoV125(String(data));
+ }catch(e){alert("Erro ao criar grupo: "+(e?.message||e))}
+};
+
+window.abrirGrupoV125=async function(id){
+ const g=gruposV125.find(x=>String(x.id)===String(id));if(!g)return;
+ grupoAtualV125=g;
+ try{chatUsuarioAtualV57=null;chatConversaAtualV57=null}catch(_){}
+ document.getElementById("chatPainel")?.classList.add("conversa-aberta");
+ document.getElementById("chatCabecalho")?.classList.add("ativo","chat-grupo-header-v125");
+ document.getElementById("chatMensagens")?.classList.add("ativo");
+ document.getElementById("chatCompositor")?.classList.add("ativo");
+ const vazia=document.getElementById("chatConversaVazia");if(vazia)vazia.style.display="none";
+ document.getElementById("chatCabecalhoAvatar").innerHTML="👥";
+ document.getElementById("chatCabecalhoNome").textContent=g.nome;
+ document.getElementById("chatCabecalhoStatus").textContent=`${Number(g.total_membros||0)} participantes`;
+ renderGruposV125();
+ await carregarMensagensGrupoV125();
+ assinarMensagensGrupoV125();
+};
+
+window.abrirConversaChatV57=async function(){
+ grupoAtualV125=null;
+ document.getElementById("chatCabecalho")?.classList.remove("chat-grupo-header-v125");
+ renderGruposV125();
+ return baseAbrirConversaV125?.apply(this,arguments);
+};
+
+async function carregarMensagensGrupoV125(){
+ if(!grupoAtualV125)return;
+ const area=document.getElementById("chatMensagens");if(!area)return;
+ area.innerHTML="<div class='chat-carregando'>Carregando grupo...</div>";
+ try{
+  const {data,error}=await sb125().rpc("listar_mensagens_grupo_v125",{p_grupo_id:grupoAtualV125.id,p_limit:120});
+  if(error)throw error;
+  renderMensagensGrupoV125(Array.isArray(data)?data:[]);
+ }catch(e){area.innerHTML="<div class='chat-sem-usuarios'>"+esc125(e?.message||e)+"</div>"}
+}
+window.carregarMensagensGrupoV125=carregarMensagensGrupoV125;
+
+function renderMensagensGrupoV125(rows){
+ const area=document.getElementById("chatMensagens");if(!area)return;
+ if(!rows.length){area.innerHTML="<div class='chat-conversa-vazia' style='display:block'>Nenhuma mensagem no grupo ainda.</div>";return}
+ area.innerHTML=rows.map(m=>{
+  const minha=String(m.remetente_id)===meuId125();
+  const anexos=renderizarAnexosChatV600(m.anexos);
+  const corpo=(m.mensagem?`<div>${esc125(m.mensagem)}</div>`:"")+anexos;
+  return `<div class="chat-msg ${minha?"minha":"outra"}">
+   <div class="chat-msg-balao">
+    ${minha?"":`<div class="chat-grupo-remetente-v125">${esc125(m.remetente_nome||"Usuário")}</div>`}
+    ${corpo}
+   </div>
+   <div class="chat-msg-meta">${chatDataHoraV57(m.created_at)}</div>
+  </div>`;
+ }).join("");
+ requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight});
+}
+
+function assinarMensagensGrupoV125(){
+ if(canalGrupoMensagensV125){try{sb125().removeChannel(canalGrupoMensagensV125)}catch(_){}}
+ if(!grupoAtualV125)return;
+ canalGrupoMensagensV125=sb125().channel("grupo-msg-"+grupoAtualV125.id)
+  .on("postgres_changes",{event:"INSERT",schema:"public",table:"chat_grupo_mensagens",filter:"grupo_id=eq."+grupoAtualV125.id},
+   ()=>carregarMensagensGrupoV125())
+  .subscribe();
+}
+
+window.enviarMensagemChatV57=async function(){
+ if(!grupoAtualV125)return baseEnviarMensagemV125?.apply(this,arguments);
+ const campo=document.getElementById("chatTexto"),btn=document.getElementById("chatEnviar");
+ const mensagem=String(campo?.value||"").trim();if(!mensagem)return;
+ campo.value="";btn.disabled=true;
+ try{
+  const {error}=await sb125().rpc("enviar_mensagem_grupo_v125",{p_grupo_id:grupoAtualV125.id,p_mensagem:mensagem,p_anexos:[]});
+  if(error)throw error;
+  await carregarMensagensGrupoV125();
+ }catch(e){campo.value=mensagem;alert("Erro ao enviar no grupo: "+(e?.message||e))}
+ finally{btn.disabled=false;campo.focus()}
+};
+
+/* =========================
+   PASTE: FOTO OU FIGURINHA
+   ========================= */
+function abrirPasteV125(file){
+ pasteFileV125=file;
+ if(pasteUrlV125)URL.revokeObjectURL(pasteUrlV125);
+ pasteUrlV125=URL.createObjectURL(file);
+ document.getElementById("chatPastePreviewV125").src=pasteUrlV125;
+ document.getElementById("chatPasteModalV125")?.classList.add("aberto");
+}
+window.fecharPasteImagemV125=function(){
+ document.getElementById("chatPasteModalV125")?.classList.remove("aberto");
+ if(pasteUrlV125){URL.revokeObjectURL(pasteUrlV125);pasteUrlV125=null}
+ pasteFileV125=null;
+};
+document.getElementById("chatTexto")?.addEventListener("paste",e=>{
+ const item=[...(e.clipboardData?.items||[])].find(i=>String(i.type).startsWith("image/"));
+ if(!item)return;
+ const f=item.getAsFile();if(!f)return;
+ e.preventDefault();abrirPasteV125(f);
+});
+
+async function uploadAnexoV125(file,figurinha=false){
+ const ext=(file.type==="image/webp"?"webp":file.type==="image/png"?"png":file.type==="image/gif"?"gif":"jpg");
+ const scope=grupoAtualV125?`grupo-${grupoAtualV125.id}`:(chatConversaAtualV57||"chat");
+ const caminho=`${meuId125()}/${scope}/${Date.now()}-${crypto.randomUUID()}.${ext}`;
+ const up=await sb125().storage.from("chat-anexos").upload(caminho,file,{contentType:file.type||"image/jpeg",upsert:false});
+ if(up.error)throw up.error;
+ const {data:u}=sb125().storage.from("chat-anexos").getPublicUrl(caminho);
+ return {nome:file.name||`imagem.${ext}`,tipo:file.type||"image/jpeg",tamanho:file.size,url:u.publicUrl,caminho,figurinha};
+}
+async function enviarAnexoAtualV125(anexo){
+ if(grupoAtualV125){
+  const {error}=await sb125().rpc("enviar_mensagem_grupo_v125",{p_grupo_id:grupoAtualV125.id,p_mensagem:"",p_anexos:[anexo]});
+  if(error)throw error;await carregarMensagensGrupoV125();
+ }else{
+  if(!chatConversaAtualV57)throw new Error("Abra uma conversa.");
+  const {error}=await chatSbV57().rpc("enviar_mensagem_chat_v600",{p_conversa_id:chatConversaAtualV57,p_mensagem:"",p_resposta_id:chatRespostaAtualV600?.id||null,p_anexos:[anexo]});
+  if(error)throw error;await carregarMensagensChatV57(true);
+ }
+}
+window.enviarPasteComoFotoV125=async function(){
+ if(!pasteFileV125)return;
+ const f=pasteFileV125;
+ try{const a=await uploadAnexoV125(f,false);await enviarAnexoAtualV125(a);fecharPasteImagemV125()}
+ catch(e){alert("Erro ao enviar foto: "+(e?.message||e))}
+};
+window.enviarPasteComoFigurinhaV125=async function(){
+ if(!pasteFileV125)return;
+ const f=pasteFileV125;
+ try{const a=await uploadAnexoV125(f,true);await enviarAnexoAtualV125(a);fecharPasteImagemV125()}
+ catch(e){alert("Erro ao enviar figurinha: "+(e?.message||e))}
+};
+
+/* =========================
+   SALVAR FIGURINHA RECEBIDA
+   ========================= */
+window.salvarFigurinhaRecebidaV125=async function(url,nome,tipo){
+ try{
+  const resp=await fetch(url);if(!resp.ok)throw new Error("Não foi possível baixar a figurinha.");
+  const blob=await resp.blob();
+  const ext=(tipo||blob.type).includes("webp")?"webp":(tipo||blob.type).includes("png")?"png":"jpg";
+  const file=new File([blob],nome||`figurinha.${ext}`,{type:tipo||blob.type||"image/webp"});
+  const caminho=`${meuId125()}/figurinhas/${crypto.randomUUID()}.${ext}`;
+  const up=await sb125().storage.from("chat-anexos").upload(caminho,file,{contentType:file.type,upsert:false,cacheControl:"31536000"});
+  if(up.error)throw up.error;
+  const {data:u}=sb125().storage.from("chat-anexos").getPublicUrl(caminho);
+  const ins=await sb125().from("chat_figurinhas").insert({user_id:meuId125(),nome:file.name,url:u.publicUrl,caminho,tipo:file.type});
+  if(ins.error)throw ins.error;
+  alert("Figurinha salva na sua coleção.");
+  try{await carregarFigurinhasV122()}catch(_){}
+ }catch(e){alert("Erro ao salvar figurinha: "+(e?.message||e))}
+};
+
+window.renderizarAnexosChatV600=function(v){
+ const arr=normalizarAnexosV600(v);
+ return arr.map(a=>{
+  const url=esc125(a.url||""),nome=esc125(a.nome||"arquivo"),tipo=String(a.tipo||"");
+  if(a.figurinha===true||a.figurinha==="true"){
+   return `<span class="chat-figurinha-wrap-v125">
+    <img class="chat-figurinha-msg-v122" src="${url}" alt="${nome}">
+    <button class="chat-salvar-figurinha-v125" type="button" onclick="event.stopPropagation();salvarFigurinhaRecebidaV125('${String(a.url||"").replace(/'/g,"\\'")}','${String(a.nome||"figurinha.webp").replace(/'/g,"\\'")}','${String(tipo).replace(/'/g,"\\'")}')">＋ Salvar</button>
+   </span>`;
+  }
+  if(tipo.startsWith("image/"))return `<a href="${url}" target="_blank"><img class="chat-imagem" src="${url}" alt="${nome}"></a>`;
+  if(tipo.startsWith("audio/"))return `<audio class="chat-audio" controls src="${url}"></audio>`;
+  if(tipo.startsWith("video/"))return `<video controls style="max-width:280px;max-height:240px" src="${url}"></video>`;
+  return `<a class="chat-anexo" href="${url}" target="_blank" download>📎 <span>${nome}</span></a>`;
+ }).join("");
+};
+
+/* =========================
+   3 PONTOS + REAÇÕES
+   ========================= */
+function prepararMenuReacoesV125(){
+ const menu=document.getElementById("chatMenuMsgV600");if(!menu)return;
+ if(!menu.querySelector(".chat-reacoes-menu-v125")){
+  menu.insertAdjacentHTML("afterbegin",`<div class="chat-reacoes-menu-v125">
+   ${["👍","❤️","😂","😮","😢","🔥"].map(e=>`<button type="button" onclick="event.stopPropagation();reagirMensagemSelecionadaV600('${e}');fecharMenuMsgV125()">${e}</button>`).join("")}
+  </div>`);
+ }
+}
+window.fecharMenuMsgV125=function(){document.getElementById("chatMenuMsgV600")?.classList.remove("aberto")};
+window.abrirMenuMensagemV600=function(e,id){
+ e?.preventDefault?.();e?.stopPropagation?.();
+ try{chatMensagemSelecionadaV600=chatMensagensV57.find(x=>String(x.id)===String(id))}catch(_){}
+ const menu=document.getElementById("chatMenuMsgV600");if(!menu||!chatMensagemSelecionadaV600)return;
+ prepararMenuReacoesV125();
+ const minha=String(chatMensagemSelecionadaV600.remetente_id)===meuId125();
+ const ed=document.getElementById("chatMenuEditarV600"),ap=document.getElementById("chatMenuApagarV600");
+ if(ed)ed.style.display=minha?"block":"none";if(ap)ap.style.display=minha?"block":"none";
+ const x=Math.min(Number(e?.clientX||200),window.innerWidth-220);
+ const y=Math.min(Number(e?.clientY||200),window.innerHeight-310);
+ menu.style.left=Math.max(8,x)+"px";menu.style.top=Math.max(8,y)+"px";
+ menu.classList.add("aberto");
+};
+document.addEventListener("pointerdown",e=>{
+ const menu=document.getElementById("chatMenuMsgV600");
+ if(menu?.classList.contains("aberto")&&!e.target.closest("#chatMenuMsgV600")&&!e.target.closest(".chat-msg-acoes")){
+  menu.classList.remove("aberto");
+ }
+},true);
+prepararMenuReacoesV125();
+
+/* =========================
+   CHAMADA EM GRUPO - MESH WEBRTC
+   ========================= */
+let grupoCallV125=null;
+let grupoCallCanalV125=null;
+let grupoCallStreamV125=null;
+let grupoPeersV125=new Map();
+let grupoMetaPeersV125=new Map();
+let grupoCallConvitesV125=[];
+
+function rtcCfg125(){
+ try{return rtcConfigV630}catch(_){
+  return {iceServers:[{urls:"stun:stun.l.google.com:19302"}]};
+ }
+}
+async function membrosGrupoV125(id){
+ const {data,error}=await sb125().rpc("listar_membros_grupo_v125",{p_grupo_id:id});
+ if(error)throw error;return Array.isArray(data)?data:[];
+}
+function tileId125(id){return "peerGrupoV125_"+String(id).replace(/[^a-zA-Z0-9_-]/g,"")}
+function ensureTile125(id,nome,local=false){
+ const grid=document.getElementById("chatGrupoCallGridV125");if(!grid)return null;
+ let t=document.getElementById(tileId125(id));
+ if(!t){
+  t=document.createElement("div");t.id=tileId125(id);t.className="chat-peer-tile-v125";
+  t.innerHTML=`<div class="chat-peer-avatar-v125">${esc125((nome||"U").split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase())}</div><video autoplay playsinline ${local?"muted":""}></video><span class="nome">${esc125(nome||"Usuário")}${local?" (você)":""}</span>`;
+  grid.appendChild(t);
+ }
+ return t;
+}
+function attachStream125(id,nome,stream,local=false){
+ const t=ensureTile125(id,nome,local);if(!t)return;
+ const v=t.querySelector("video");if(v){v.srcObject=stream;v.style.display=stream.getVideoTracks().length?"block":"none"}
+}
+async function createPeer125(peerId,peerName,makeOffer){
+ if(grupoPeersV125.has(peerId))return grupoPeersV125.get(peerId);
+ const pc=new RTCPeerConnection(rtcCfg125());
+ grupoPeersV125.set(peerId,pc);grupoMetaPeersV125.set(peerId,{nome:peerName});
+ grupoCallStreamV125?.getTracks().forEach(tr=>pc.addTrack(tr,grupoCallStreamV125));
+ pc.onicecandidate=e=>{if(e.candidate)sendCall125("ice",{to:peerId,candidate:e.candidate})};
+ pc.ontrack=e=>{
+  const stream=e.streams?.[0]||new MediaStream([e.track]);
+  attachStream125(peerId,peerName,stream,false);
+ };
+ pc.onconnectionstatechange=()=>{
+  if(["failed","closed","disconnected"].includes(pc.connectionState)){
+   document.getElementById(tileId125(peerId))?.remove();
+  }
+ };
+ if(makeOffer){
+  const offer=await pc.createOffer();await pc.setLocalDescription(offer);
+  await sendCall125("offer",{to:peerId,sdp:pc.localDescription});
+ }
+ return pc;
+}
+async function sendCall125(event,payload={}){
+ if(!grupoCallCanalV125)return;
+ await grupoCallCanalV125.send({type:"broadcast",event,payload:{
+  ...payload,from:meuId125(),nome:usuarioLogado?.nome||"Usuário",session:grupoCallV125?.session,grupo_id:grupoCallV125?.grupo_id
+ }});
+}
+async function handleCall125(event,p){
+ if(!grupoCallV125||p?.session!==grupoCallV125.session||String(p.from)===meuId125())return;
+ if(p.to&&String(p.to)!==meuId125())return;
+ try{
+  if(event==="join"){
+   await createPeer125(String(p.from),p.nome||"Usuário",true);
+  }else if(event==="offer"){
+   const pc=await createPeer125(String(p.from),p.nome||"Usuário",false);
+   await pc.setRemoteDescription(new RTCSessionDescription(p.sdp));
+   const ans=await pc.createAnswer();await pc.setLocalDescription(ans);
+   await sendCall125("answer",{to:p.from,sdp:pc.localDescription});
+  }else if(event==="answer"){
+   const pc=grupoPeersV125.get(String(p.from));if(pc)await pc.setRemoteDescription(new RTCSessionDescription(p.sdp));
+  }else if(event==="ice"){
+   const pc=grupoPeersV125.get(String(p.from));if(pc&&p.candidate)await pc.addIceCandidate(new RTCIceCandidate(p.candidate));
+  }else if(event==="leave"){
+   grupoPeersV125.get(String(p.from))?.close();grupoPeersV125.delete(String(p.from));
+   document.getElementById(tileId125(String(p.from)))?.remove();
+  }
+ }catch(e){console.warn("[GROUP CALL SIGNAL]",event,e)}
+}
+async function joinCall125(info){
+ grupoCallV125=info;
+ grupoCallStreamV125=await navigator.mediaDevices.getUserMedia({
+  audio:{echoCancellation:true,noiseSuppression:true,autoGainControl:true},
+  video:info.tipo==="video"?{facingMode:{ideal:"user"}}:false
+ });
+ document.getElementById("chatGrupoCallV125")?.classList.add("aberto");
+ document.getElementById("chatGrupoCallTituloV125").textContent=info.nome||"Chamada em grupo";
+ document.getElementById("chatGrupoCallStatusV125").textContent=info.tipo==="video"?"Chamada de vídeo":"Chamada de áudio";
+ document.getElementById("chatGrupoCallGridV125").innerHTML="";
+ attachStream125(meuId125(),usuarioLogado?.nome||"Você",grupoCallStreamV125,true);
+
+ grupoCallCanalV125=sb125().channel("group-call-"+info.grupo_id+"-"+info.session,{config:{broadcast:{self:false}}});
+ ["join","offer","answer","ice","leave"].forEach(ev=>{
+  grupoCallCanalV125.on("broadcast",{event:ev},({payload})=>handleCall125(ev,payload));
+ });
+ await new Promise(resolve=>grupoCallCanalV125.subscribe(status=>{if(status==="SUBSCRIBED")resolve()}));
+ await sendCall125("join");
+}
+window.iniciarChamadaGrupoV125=async function(tipo){
+ if(!grupoAtualV125)return;
+ try{
+  const session=crypto.randomUUID();
+  const info={grupo_id:grupoAtualV125.id,nome:grupoAtualV125.nome,tipo,session,host:meuId125()};
+  await joinCall125(info);
+  const ch=grupoInviteChannelsV125.get(String(grupoAtualV125.id));
+  await ch?.send({type:"broadcast",event:"group_call_invite",payload:{...info,de:meuId125(),de_nome:usuarioLogado?.nome||"Usuário"}});
+ }catch(e){alert("Não foi possível iniciar a chamada em grupo: "+(e?.message||e));await encerrarChamadaGrupoV125()}
+};
+window.iniciarChamadaV630=function(tipo){
+ if(grupoAtualV125)return iniciarChamadaGrupoV125(tipo);
+ return baseIniciarChamadaV125?.apply(this,arguments);
+};
+window.encerrarChamadaGrupoV125=async function(){
+ try{await sendCall125("leave")}catch(_){}
+ grupoPeersV125.forEach(pc=>{try{pc.close()}catch(_){}});grupoPeersV125.clear();
+ grupoCallStreamV125?.getTracks().forEach(t=>t.stop());grupoCallStreamV125=null;
+ if(grupoCallCanalV125){try{await sb125().removeChannel(grupoCallCanalV125)}catch(_){}}grupoCallCanalV125=null;
+ grupoCallV125=null;document.getElementById("chatGrupoCallV125")?.classList.remove("aberto");
+ document.getElementById("chatGrupoCallGridV125").innerHTML="";
+};
+window.toggleMicGrupoV125=function(){
+ const t=grupoCallStreamV125?.getAudioTracks()?.[0];if(!t)return;t.enabled=!t.enabled;
+ document.getElementById("chatGrupoCallMicV125").textContent=t.enabled?"🎤":"🔇";
+};
+window.toggleCamGrupoV125=function(){
+ const t=grupoCallStreamV125?.getVideoTracks()?.[0];if(!t)return;t.enabled=!t.enabled;
+ document.getElementById("chatGrupoCallCamV125").textContent=t.enabled?"🎥":"🚫";
+};
+
+const grupoInviteChannelsV125=new Map();
+async function assinarConvitesGruposV125(){
+ for(const g of gruposV125){
+  if(grupoInviteChannelsV125.has(String(g.id)))continue;
+  const ch=sb125().channel("group-invite-"+g.id,{config:{broadcast:{self:false}}})
+   .on("broadcast",{event:"group_call_invite"},async({payload})=>{
+    if(String(payload.de)===meuId125()||grupoCallV125)return;
+    const ok=confirm(`${payload.de_nome||"Alguém"} está iniciando uma chamada ${payload.tipo==="video"?"de vídeo":"de áudio"} no grupo "${payload.nome}".\n\nEntrar na chamada?`);
+    if(ok){
+     try{await joinCall125(payload)}catch(e){alert("Não foi possível entrar na chamada: "+(e?.message||e))}
+    }
+   });
+  grupoInviteChannelsV125.set(String(g.id),ch);
+  ch.subscribe();
+ }
+}
+
+/* inicialização */
+new MutationObserver(instalarAreaGruposV125).observe(document.body,{childList:true,subtree:true});
+setInterval(instalarAreaGruposV125,1800);
+setTimeout(()=>{instalarAreaGruposV125();carregarGruposV125()},800);
+
+window.ERP=window.ERP||{};ERP.Performance=ERP.Performance||{};
+ERP.Performance.chatV125Audit=function(){
+ const r={grupos:gruposV125.length,grupoAtual:grupoAtualV125?.nome||null,paste:true,reacoesMenu:!!document.querySelector(".chat-reacoes-menu-v125"),groupCall:!!grupoCallV125};
+ console.info("[V12.5 CHAT]",r);return r;
+};
+console.info("ERP V12.5: grupos + chamada em grupo + paste foto/figurinha + salvar stickers + menu de reações.");
+})();
+</script>
+
 </body>
 </html>
 
