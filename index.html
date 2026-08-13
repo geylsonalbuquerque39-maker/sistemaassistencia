@@ -29398,6 +29398,180 @@ console.info("ERP V11.6: comparação diária clara + cartões da Home estáveis
 })();
 </script>
 
+
+<style id="erp-v117-home-relacao-style">
+#homeRelacaoModalV117{
+  position:fixed;inset:0;z-index:22000;display:none;
+  align-items:center;justify-content:center;padding:18px;
+  background:rgba(0,18,38,.68);
+}
+#homeRelacaoModalV117.aberto{display:flex}
+#homeRelacaoBoxV117{
+  width:min(1180px,97vw);max-height:92vh;overflow:auto;
+  background:#fff;border:2px solid #1ea5ff;border-radius:18px;
+  padding:20px;box-shadow:0 25px 70px rgba(0,0,0,.35)
+}
+#homeRelacaoTopoV117{
+  display:flex;justify-content:space-between;gap:14px;align-items:center;
+  position:sticky;top:-20px;z-index:3;background:#fff;padding:12px 0
+}
+#homeRelacaoTopoV117 h2{margin:0;color:#001b3d}
+#homeRelacaoFecharV117{
+  border:0;border-radius:10px;padding:10px 15px;background:#c90025;
+  color:#fff;font-weight:900;cursor:pointer
+}
+#homeRelacaoConteudoV117 .intel-list{display:grid;gap:8px}
+#homeRelacaoConteudoV117 .intel-row{
+  display:grid;grid-template-columns:110px minmax(280px,1fr) 180px 80px;
+  gap:12px;align-items:center;border:1px solid #d7e2ee;
+  border-radius:11px;padding:10px;background:#f8fbff;color:#001b3d
+}
+#homeRelacaoConteudoV117 .intel-row button{
+  border:0;border-radius:8px;padding:8px;background:#0046b8;color:#fff;
+  font-weight:800;cursor:pointer
+}
+body.dark-mode #homeRelacaoBoxV117,
+body.dark-mode #homeRelacaoTopoV117{
+  background:#0d223a;color:#eaf2ff
+}
+body.dark-mode #homeRelacaoTopoV117 h2{color:#fff}
+body.dark-mode #homeRelacaoConteudoV117 .intel-row{
+  background:#102b49;color:#eaf2ff;border-color:#315a80
+}
+@media(max-width:800px){
+ #homeRelacaoConteudoV117 .intel-row{grid-template-columns:1fr}
+}
+</style>
+
+<div id="homeRelacaoModalV117" onclick="if(event.target===this)fecharHomeRelacaoV117()">
+  <div id="homeRelacaoBoxV117">
+    <div id="homeRelacaoTopoV117">
+      <h2 id="homeRelacaoTituloV117">Relação</h2>
+      <button id="homeRelacaoFecharV117" onclick="fecharHomeRelacaoV117()">Fechar</button>
+    </div>
+    <div id="homeRelacaoConteudoV117"></div>
+  </div>
+</div>
+
+<script id="erp-v117-home-modal-independente">
+(function(){
+"use strict";
+
+const TITULOS_HOME_V117={
+  abertas:"O.S. abertas",
+  rack500Abertas:"Rack 500 — O.S. abertas",
+  grupo1314Abertos:"Grupos 13 e 14 — O.S. abertas",
+  grupo52122Abertos:"Grupos 5, 21 e 22 — O.S. abertas",
+  prontasAbertas:"Prontas e abertas",
+  semRack:"O.S. abertas sem rack",
+  fechadas:"O.S. fechadas",
+  expHoje:"Expedidas hoje"
+};
+
+let estadoHomeRelV117={type:"",page:0,total:0,pageSize:100};
+
+function esc117(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function homeVisivelV117(){
+  const t=document.getElementById("telaInicio");
+  return !!t && getComputedStyle(t).display!=="none";
+}
+
+window.fecharHomeRelacaoV117=function(){
+  const m=document.getElementById("homeRelacaoModalV117");
+  const c=document.getElementById("homeRelacaoConteudoV117");
+  if(m)m.classList.remove("aberto");
+  if(c)c.innerHTML="";
+  estadoHomeRelV117={type:"",page:0,total:0,pageSize:100};
+};
+
+async function abrirHomeRelacaoV117(type,page=0){
+  const modal=document.getElementById("homeRelacaoModalV117");
+  const tit=document.getElementById("homeRelacaoTituloV117");
+  const area=document.getElementById("homeRelacaoConteudoV117");
+  if(!modal||!tit||!area)return;
+
+  estadoHomeRelV117={...estadoHomeRelV117,type,page};
+  tit.textContent=TITULOS_HOME_V117[type]||type;
+  area.innerHTML="<div class='dashboard-loading'>Buscando relação no backend...</div>";
+  modal.classList.add("aberto");
+
+  try{
+    const offset=page*estadoHomeRelV117.pageSize;
+    const d=await ERPBackendV100.api(
+      `/relations/${encodeURIComponent(type)}?limit=${estadoHomeRelV117.pageSize}&offset=${offset}`
+    );
+
+    const rows=Array.isArray(d?.rows)?d.rows:[];
+    estadoHomeRelV117.total=Number(d?.total||0);
+    const pages=Math.max(1,Math.ceil(estadoHomeRelV117.total/estadoHomeRelV117.pageSize));
+
+    const nav=`<div style="display:flex;gap:10px;justify-content:flex-end;align-items:center;margin:12px 0">
+      <button class="usuario-acao" ${page<=0?"disabled":""} onclick="mudarHomeRelacaoV117(-1)">‹ Anterior</button>
+      <b>${estadoHomeRelV117.total?offset+1:0}–${Math.min(offset+rows.length,estadoHomeRelV117.total)} de ${estadoHomeRelV117.total.toLocaleString("pt-BR")}</b>
+      <button class="usuario-acao" ${page>=pages-1?"disabled":""} onclick="mudarHomeRelacaoV117(1)">Próxima ›</button>
+    </div>`;
+
+    area.innerHTML=nav+"<div class='intel-list'>"+rows.map(r=>`
+      <div class="intel-row">
+        <b>O.S. ${esc117(r.os||"-")}</b>
+        <span>${esc117(r.desc_produto||"")}<br>
+          <small>Status: ${esc117(r.status||"-")} • Rack: ${esc117(r.rack||"-")} • N.C.E.: ${esc117(r.nce||"-")}</small>
+        </span>
+        <span>${esc117(r.tecnico||"")}</span>
+        <button onclick="abrirOSIntel('${String(r.os||"").replace(/'/g,"\\'")}')">Abrir</button>
+      </div>`).join("")+"</div>"+nav;
+
+    /* Importante: este modal NÃO pertence ao ModuleManager da Inteligência.
+       Portanto nenhum destroy/sleep da Inteligência consegue fechá-lo. */
+  }catch(e){
+    area.innerHTML="<div class='dashboard-erro'>"+esc117(e?.message||e)+"</div>";
+  }
+}
+window.abrirHomeRelacaoV117=abrirHomeRelacaoV117;
+window.mudarHomeRelacaoV117=function(delta){
+  const p=Math.max(0,estadoHomeRelV117.page+Number(delta||0));
+  return abrirHomeRelacaoV117(estadoHomeRelV117.type,p);
+};
+
+/* Override final:
+   - Home -> modal independente
+   - Inteligência -> mantém abrirListaIntel original/backend */
+const abrirListaIntelBaseV117=window.abrirListaIntel;
+window.abrirListaIntel=function(type){
+  if(homeVisivelV117()){
+    return abrirHomeRelacaoV117(type,0);
+  }
+  return abrirListaIntelBaseV117?.apply(this,arguments);
+};
+
+/* O card da Home antiga pode chamar abrirListaHomeV502 diretamente. */
+if(typeof window.abrirListaHomeV502==="function"){
+  window.abrirListaHomeV502=function(type){
+    return abrirHomeRelacaoV117(type,0);
+  };
+}
+
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.homeV117Audit=function(){
+  const m=document.getElementById("homeRelacaoModalV117");
+  const r={
+    homeVisivel:homeVisivelV117(),
+    modalHomeAberto:m?.classList.contains("aberto")||false,
+    modalIntelAberto:getComputedStyle(document.getElementById("intelModal")||document.body).display!=="none",
+    estrategia:"modal independente do ModuleManager"
+  };
+  console.info("[V11.7 HOME]",r);
+  return r;
+};
+
+console.info("ERP V11.7: relações da Home usam modal independente e não fecham pelo destroy da Inteligência.");
+})();
+</script>
+
 </body>
 </html>
 
