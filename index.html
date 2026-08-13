@@ -27226,7 +27226,7 @@ ERP.Performance.backendV101Audit=async function(){
     cargaCompletaAutorizada:cargaCompletaAutorizadaV101,
     modo:"backend-first"
   };
-  console.info("[ERP V10.1 BACKEND]",r);
+  console.info("[ERP V10.2 BACKEND]",r);
   return r;
 };
 
@@ -27237,6 +27237,149 @@ document.addEventListener("DOMContentLoaded",()=>{
 },{once:true});
 
 console.info("ERP V10.1: REXPEDLR completa bloqueada no carregamento automático.");
+})();
+</script>
+
+
+<script id="erp-v102-migracao-historico-local">
+(function(){
+"use strict";
+
+/* =========================================================
+   ERP V10.2 — MIGRAÇÃO ÚNICA DO HISTÓRICO LOCAL
+   Lê IndexedDB erp_operacional_v37/comparacoes e envia SOMENTE
+   mudanças do campo status ao backend, em lotes idempotentes.
+   ========================================================= */
+
+function normHistV102(v){
+  return String(v??"").trim().toLocaleLowerCase("pt-BR")
+    .normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[.\-_/]+/g," ")
+    .replace(/\s+/g," ").trim();
+}
+
+function abrirDBHistoricoV102(){
+  return new Promise((resolve,reject)=>{
+    const req=indexedDB.open("erp_operacional_v37",1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains("comparacoes")){
+        db.createObjectStore("comparacoes",{keyPath:"id"});
+      }
+    };
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error);
+  });
+}
+
+async function lerComparacoesLocaisV102(){
+  const db=await abrirDBHistoricoV102();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction("comparacoes","readonly");
+    const req=tx.objectStore("comparacoes").getAll();
+    req.onsuccess=()=>{
+      const rows=req.result||[];
+      db.close();
+      resolve(rows);
+    };
+    req.onerror=()=>{
+      db.close();
+      reject(req.error);
+    };
+  });
+}
+
+function extrairEventosV102(comparacoes){
+  const mapa=new Map();
+
+  for(const c of comparacoes||[]){
+    const alteracoes=Array.isArray(c?.todas)
+      ? c.todas
+      : (Array.isArray(c?.status)?c.status:[]);
+
+    for(let i=0;i<alteracoes.length;i++){
+      const x=alteracoes[i];
+      if(String(x?.campoChave||"").trim().toLowerCase()!=="status")continue;
+
+      const os=String(x?.os||"").trim();
+      if(!os)continue;
+
+      const antes=String(x?.antes??"");
+      const depois=String(x?.depois??"");
+      if(normHistV102(antes)===normHistV102(depois))continue;
+
+      const compId=String(c?.id||("imp_"+String(c?.data||"sem-data")));
+      const source=`indexeddb:${compId}:${os}:status:${i}`;
+
+      mapa.set(source,{
+        os,
+        status_anterior:antes,
+        status_novo:depois,
+        changed_at:c?.data||new Date().toISOString(),
+        snapshot:x?.registro||{},
+        source_event_id:source
+      });
+    }
+  }
+
+  return [...mapa.values()];
+}
+
+async function migrarHistoricoLocalV102(){
+  if(!window.ERPBackendV100?.api){
+    throw new Error("ERPBackendV100 não está disponível.");
+  }
+
+  const comparacoes=await lerComparacoesLocaisV102();
+  const eventos=extrairEventosV102(comparacoes);
+
+  const resumo={
+    comparacoes:comparacoes.length,
+    eventosStatus:eventos.length,
+    enviados:0,
+    inseridos:0,
+    ignorados:0,
+    lotes:0
+  };
+
+  if(!eventos.length){
+    console.info("[V10.2 MIGRAÇÃO]",resumo);
+    return resumo;
+  }
+
+  for(let i=0;i<eventos.length;i+=500){
+    const lote=eventos.slice(i,i+500);
+    const r=await window.ERPBackendV100.api("/history/import-local",{
+      method:"POST",
+      body:{rows:lote}
+    });
+
+    resumo.lotes++;
+    resumo.enviados+=lote.length;
+    resumo.inseridos+=Number(r?.inserted||0);
+    resumo.ignorados+=Number(r?.ignored||0);
+  }
+
+  localStorage.setItem("ERP_V102_HISTORICO_MIGRADO_EM",new Date().toISOString());
+  console.info("[V10.2 MIGRAÇÃO CONCLUÍDA]",resumo);
+  return resumo;
+}
+
+window.ERP=window.ERP||{};
+ERP.Backend=ERP.Backend||{};
+ERP.Backend.lerComparacoesLocais=lerComparacoesLocaisV102;
+ERP.Backend.migrarHistoricoLocal=migrarHistoricoLocalV102;
+ERP.Backend.statusMigracaoHistorico=function(){
+  const r={
+    migradoEm:localStorage.getItem("ERP_V102_HISTORICO_MIGRADO_EM"),
+    banco:"erp_operacional_v37",
+    store:"comparacoes"
+  };
+  console.info("[V10.2 STATUS MIGRAÇÃO]",r);
+  return r;
+};
+
+console.info("ERP V10.2: migrador de histórico local disponível em ERP.Backend.migrarHistoricoLocal().");
 })();
 </script>
 
