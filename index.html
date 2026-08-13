@@ -29694,6 +29694,181 @@ console.info("ERP V11.8: O.S. de 6 dígitos bloqueadas globalmente no ERP ILR.")
 })();
 </script>
 
+
+<style id="erp-v119-admin-modal">
+#adminDetalheModalV119{
+  position:fixed;inset:0;z-index:23000;display:none;
+  align-items:center;justify-content:center;padding:18px;
+  background:rgba(0,18,38,.70);
+}
+#adminDetalheModalV119.aberto{display:flex}
+#adminDetalheBoxV119{
+  width:min(920px,96vw);max-height:90vh;overflow:auto;
+  background:#fff;border:2px solid #1ea5ff;border-radius:18px;
+  padding:20px;box-shadow:0 25px 70px rgba(0,0,0,.38)
+}
+#adminDetalheTopoV119{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#adminDetalheTopoV119 h2{margin:0;color:#001b3d}
+#adminDetalheTopoV119 button{border:0;border-radius:9px;padding:9px 13px;background:#c90025;color:#fff;font-weight:900;cursor:pointer}
+.admin-ranking-v119{display:grid;gap:8px;margin-top:16px}
+.admin-ranking-linha-v119{
+  display:grid;grid-template-columns:minmax(180px,1fr) minmax(120px,2fr) 90px;
+  gap:10px;align-items:center;padding:10px 12px;
+  border:1px solid #d7e2ee;border-radius:10px;background:#f8fbff
+}
+.admin-ranking-track-v119{height:12px;border-radius:999px;background:#e4ebf3;overflow:hidden}
+.admin-ranking-fill-v119{height:100%;border-radius:999px;background:linear-gradient(90deg,#0046b8,#16a8ff)}
+.admin-resumo-grid-v119{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:10px;margin-top:16px}
+.admin-resumo-item-v119{border:1px solid #d7e2ee;border-radius:12px;padding:14px;background:#f8fbff}
+.admin-resumo-item-v119 b{display:block;font-size:25px;color:#003c7a}
+body.dark-mode #adminDetalheBoxV119{background:#0d223a;color:#eaf2ff;border-color:#1ea5ff}
+body.dark-mode #adminDetalheTopoV119 h2{color:#fff}
+body.dark-mode .admin-ranking-linha-v119,
+body.dark-mode .admin-resumo-item-v119{background:#102b49;color:#eaf2ff;border-color:#315a80}
+body.dark-mode .admin-ranking-track-v119{background:#284967}
+body.dark-mode .admin-resumo-item-v119 b{color:#fff}
+</style>
+
+<div id="adminDetalheModalV119" onclick="if(event.target===this)fecharAdminDetalheV119()">
+  <div id="adminDetalheBoxV119">
+    <div id="adminDetalheTopoV119">
+      <h2 id="adminDetalheTituloV119">Detalhes</h2>
+      <button onclick="fecharAdminDetalheV119()">Fechar</button>
+    </div>
+    <div id="adminDetalheConteudoV119"></div>
+  </div>
+</div>
+
+<script id="erp-v119-admin-cards-perfil">
+(function(){
+"use strict";
+
+function esc119(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+
+window.fecharAdminDetalheV119=function(){
+  document.getElementById("adminDetalheModalV119")?.classList.remove("aberto");
+  const c=document.getElementById("adminDetalheConteudoV119");
+  if(c)c.innerHTML="";
+};
+
+function abrirModal119(titulo,html){
+  const m=document.getElementById("adminDetalheModalV119");
+  const t=document.getElementById("adminDetalheTituloV119");
+  const c=document.getElementById("adminDetalheConteudoV119");
+  if(!m||!t||!c)return;
+  t.textContent=titulo;
+  c.innerHTML=html;
+  m.classList.add("aberto");
+}
+
+function ranking119(lista){
+  const arr=Array.isArray(lista)?lista:[];
+  const max=Math.max(1,...arr.map(x=>Number(x.total||0)));
+  if(!arr.length)return "<div class='admin-info'>Sem dados para exibir.</div>";
+  return `<div class="admin-ranking-v119">${arr.map(x=>`
+    <div class="admin-ranking-linha-v119">
+      <b>${esc119(x.label||"(vazio)")}</b>
+      <div class="admin-ranking-track-v119"><div class="admin-ranking-fill-v119" style="width:${Math.max(2,Math.round(Number(x.total||0)*100/max))}%"></div></div>
+      <strong>${Number(x.total||0).toLocaleString("pt-BR")}</strong>
+    </div>`).join("")}</div>`;
+}
+
+/* Substitui os handlers antigos V5.5, que dependiam de intelAnalise vazio. */
+window.abrirListaDashboardV55=async function(tipo){
+  try{
+    const s=await ERPBackendV100.api("/admin/summary");
+    if(tipo==="todas"){
+      abrirModal119("Resumo de todas as O.S.",`
+        <div class="admin-resumo-grid-v119">
+          <div class="admin-resumo-item-v119"><span>Total de O.S.</span><b>${Number(s.total_os||0).toLocaleString("pt-BR")}</b></div>
+          <div class="admin-resumo-item-v119"><span>O.S. abertas</span><b>${Number(s.abertas||0).toLocaleString("pt-BR")}</b></div>
+          <div class="admin-resumo-item-v119"><span>O.S. fechadas</span><b>${Number(s.fechadas||0).toLocaleString("pt-BR")}</b></div>
+          <div class="admin-resumo-item-v119"><span>Prontas e abertas</span><b>${Number(s.prontas_abertas||0).toLocaleString("pt-BR")}</b></div>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="usuario-acao" onclick="fecharAdminDetalheV119();abrirListaIntel('abertas')">Ver O.S. abertas</button>
+          <button class="usuario-acao" onclick="fecharAdminDetalheV119();abrirListaIntel('fechadas')">Ver O.S. fechadas</button>
+        </div>`);
+    }
+  }catch(e){
+    abrirModal119("Erro","<div class='dashboard-erro'>"+esc119(e?.message||e)+"</div>");
+  }
+};
+
+window.abrirRankingDashboardV55=async function(tipo){
+  try{
+    const s=await ERPBackendV100.api("/admin/summary");
+    if(tipo==="pdv")abrirModal119("Ranking de PDVs / Lojas",ranking119(s.pdv_top));
+    else if(tipo==="tecnico")abrirModal119("Ranking de técnicos",ranking119(s.tecnicos_top));
+    else if(tipo==="status")abrirModal119("O.S. por Status",ranking119(s.status_top));
+  }catch(e){
+    abrirModal119("Erro","<div class='dashboard-erro'>"+esc119(e?.message||e)+"</div>");
+  }
+};
+
+/* Presença: "ocupado" passa a ser reconhecido visualmente também. */
+const classificarBase119=window.classificarPresencaV56;
+if(typeof classificarBase119==="function"){
+  window.classificarPresencaV56=function(item){
+    if(String(item?.status||"").toLowerCase()==="ocupado")return "ocupado";
+    return classificarBase119(item);
+  };
+}
+
+/* Heartbeat não deve apagar a preferência "ocupado".
+   Se o usuário escolheu ocupado, permanece ocupado até mudar manualmente. */
+const heartbeatBase119=window.enviarHeartbeatPresencaV56;
+if(typeof heartbeatBase119==="function"){
+  window.enviarHeartbeatPresencaV56=async function(){
+    if(usuarioLogado?.status_perfil==="ocupado"){
+      try{
+        const agora=new Date().toISOString();
+        const {error}=await obterSupabaseClient().from(
+          typeof PRESENCA_V56_TABELA!=="undefined"?PRESENCA_V56_TABELA:"presenca_usuarios"
+        ).upsert({
+          user_id:usuarioLogado.id,
+          nome:usuarioLogado.nome||"",
+          email:usuarioLogado.email||"",
+          perfil:usuarioLogado.perfil||"",
+          status:"ocupado",
+          tela:typeof telaAtualPresencaV56==="function"?telaAtualPresencaV56():"ERP",
+          contexto:typeof contextoAtualPresencaV56==="function"?contextoAtualPresencaV56():"",
+          last_seen:agora,
+          updated_at:agora
+        },{onConflict:"user_id"});
+        if(error)throw error;
+        return true;
+      }catch(e){
+        console.warn("[V11.9 presença ocupado]",e?.message||e);
+      }
+    }
+    return heartbeatBase119.apply(this,arguments);
+  };
+}
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.adminPerfilV119Audit=function(){
+  const r={
+    cards:{
+      total:typeof window.abrirListaDashboardV55==="function",
+      ranking:typeof window.abrirRankingDashboardV55==="function"
+    },
+    statusPerfil:usuarioLogado?.status_perfil||null,
+    ocupadoReconhecido:typeof window.classificarPresencaV56==="function"
+  };
+  console.info("[V11.9 ADMIN/PERFIL]",r);
+  return r;
+};
+
+console.info("ERP V11.9: cartões do Admin usam backend e perfil aceita status ocupado após patch SQL.");
+})();
+</script>
+
 </body>
 </html>
 
