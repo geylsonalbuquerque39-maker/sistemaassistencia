@@ -5673,6 +5673,56 @@ html.dark #telaAdminAtualizar input,
 }
 </style>
 
+
+<style id="erp-v111-export-darkmode-fix">
+/* Todas as progressões diárias ficam legíveis no dark mode, inclusive a segunda linha. */
+body.dark-mode .intel-mini-dia-v925,
+html.dark .intel-mini-dia-v925,
+[data-theme="dark"] .intel-mini-dia-v925{
+  background:#173957!important;
+  border:1px solid #78a7d2!important;
+  color:#fff!important;
+  opacity:1!important;
+}
+body.dark-mode .intel-mini-dia-v925 small,
+body.dark-mode .intel-mini-dia-v925 b,
+html.dark .intel-mini-dia-v925 small,
+html.dark .intel-mini-dia-v925 b,
+[data-theme="dark"] .intel-mini-dia-v925 small,
+[data-theme="dark"] .intel-mini-dia-v925 b{
+  color:#fff!important;
+  opacity:1!important;
+  text-shadow:none!important;
+}
+body.dark-mode .intel-mini-dia-v925 b,
+html.dark .intel-mini-dia-v925 b,
+[data-theme="dark"] .intel-mini-dia-v925 b{
+  font-weight:950!important;
+  font-size:21px!important;
+}
+body.dark-mode #intelMiniDashPecasV925 > div > small,
+html.dark #intelMiniDashPecasV925 > div > small,
+[data-theme="dark"] #intelMiniDashPecasV925 > div > small{
+  color:#fff!important;
+  opacity:1!important;
+}
+.erp-native-export-v111{position:relative;display:inline-block}
+.erp-native-export-menu-v111{
+  position:absolute;left:0;top:calc(100% + 6px);z-index:20000;
+  min-width:210px;padding:8px;background:#fff;border:1px solid #c8d2df;
+  border-radius:12px;box-shadow:0 12px 32px rgba(0,0,0,.25);display:none
+}
+.erp-native-export-menu-v111.aberto{display:block}
+.erp-native-export-menu-v111 button{
+  width:100%;display:block;border:0;background:transparent;color:#001b3d;
+  text-align:left;padding:9px 10px;border-radius:8px;font-weight:850;cursor:pointer
+}
+.erp-native-export-menu-v111 button:hover{background:#eef5ff}
+body.dark-mode .erp-native-export-menu-v111{background:#102b49;border-color:#315a80}
+body.dark-mode .erp-native-export-menu-v111 button{color:#fff}
+body.dark-mode .erp-native-export-menu-v111 button:hover{background:#173957}
+</style>
+
 </head>
 
 <body class="sem-login">
@@ -19600,6 +19650,8 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     };
 
     function ehBotaoExportacaoV720(el){
+        if(el?.closest?.(".erp-native-export-v111"))return null;
+
         if(!el)return null;
         const botao=el.closest("button,a");
         if(!botao)return null;
@@ -28634,6 +28686,158 @@ ERP.Performance.intelV110Audit=async function(){
 };
 
 console.info("ERP V11.0: Inteligência final com exportação e filtros backend.");
+})();
+</script>
+
+
+<script id="erp-v111-exportacao-direta">
+(function(){
+"use strict";
+
+function esc111(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+}
+function fecharMenus111(){
+  document.querySelectorAll('.erp-native-export-menu-v111.aberto').forEach(x=>x.classList.remove('aberto'));
+}
+window.toggleExport111=function(id,event){
+  event?.preventDefault?.();event?.stopPropagation?.();
+  document.querySelectorAll('.erp-native-export-menu-v111.aberto').forEach(x=>{if(x.id!==id)x.classList.remove('aberto')});
+  document.getElementById(id)?.classList.toggle('aberto');
+};
+document.addEventListener('click',fecharMenus111);
+
+const COL111=[
+ {label:'O.S.',key:'os'},{label:'Data',key:'dt_geracao'},{label:'PDV',key:'pdv'},
+ {label:'Rack',key:'rack'},{label:'Status',key:'status'},{label:'Status da O.S.',key:'status_da_os'},
+ {label:'GR',key:'grupo'},{label:'N.C.E',key:'nce'},{label:'Produto',key:'desc_produto'},
+ {label:'Técnico',key:'tecnico'},{label:'Tipo Garantia',key:'tipo_garantia'},{label:'NF',key:'nf'}
+];
+
+async function obterDados111(tipo){
+  if(tipo==='pedido_aguardando' || tipo==='entrou_ag_pedido'){
+    const hoje=new Date().toISOString().slice(0,10);
+    const d=await ERPBackendV100.api(`/progress/parts/relation?kind=${tipo}&date=${hoje}&limit=1000`);
+    return (d.rows||[]).map(x=>({
+      ...(x.registro||{}),
+      os:x.os,
+      status_anterior:x.status_anterior,
+      status_novo:x.status_novo,
+      changed_at:x.changed_at
+    }));
+  }
+  const d=await ERPBackendV100.api(`/relations/${encodeURIComponent(tipo)}?limit=1000&offset=0`);
+  return Array.isArray(d.rows)?d.rows:[];
+}
+
+async function exportar111(tipo,formato,nome,aba,progress=false){
+  try{
+    const dados=await obterDados111(tipo);
+    if(!dados.length){alert('Não há registros nesta relação para exportar.');return}
+    const colunas=progress?[
+      {label:'O.S.',key:'os'},{label:'Status anterior',key:'status_anterior'},
+      {label:'Status novo',key:'status_novo'},{label:'Data/Hora',key:'changed_at'},
+      ...COL111.filter(c=>!['os','status'].includes(c.key))
+    ]:COL111;
+    ERP.Export.exportar({dados,colunas,nome,formato,aba});
+  }catch(e){
+    console.error('[V11.1 EXPORTAÇÃO DIRETA]',e);
+    alert('Erro ao exportar: '+(e?.message||e));
+  }
+}
+window.exportar111=exportar111;
+
+function menu111(tipo,uid,nome,aba,progress=false){
+  const id='exp111_'+uid;
+  return `<div class="erp-native-export-v111">
+    <button class="exportar" type="button" onclick="toggleExport111('${id}',event)">Exportar ▾</button>
+    <div id="${id}" class="erp-native-export-menu-v111" onclick="event.stopPropagation()">
+      <button onclick="exportar111('${tipo}','CSV','${nome}','${aba}',${progress});fecharMenus111?.()">📄 CSV</button>
+      <button onclick="exportar111('${tipo}','XLS','${nome}','${aba}',${progress});fecharMenus111?.()">📊 Excel / LibreOffice (.xls)</button>
+      <button onclick="exportar111('${tipo}','XLT','${nome}','${aba}',${progress});fecharMenus111?.()">📑 Modelo Excel (.xlt)</button>
+    </div>
+  </div>`;
+}
+window.menu111=menu111;
+window.fecharMenus111=fecharMenus111;
+
+function aplicarCardsOperacionais111(s){
+  const din=document.getElementById('intelCartoesDinamicos');
+  if(!din)return;
+  const cards=[
+    ['O.S. abertas',s.abertas,'abertas','green','os_abertas'],
+    ['Rack 500',s.rack500_abertas,'rack500Abertas','red','rack_500_abertas'],
+    ['Grupos 13 e 14',s.grupo1314_abertos,'grupo1314Abertos','orange','grupos_13_14_abertos'],
+    ['Grupos 5, 21 e 22',s.grupo52122_abertos,'grupo52122Abertos','orange','grupos_5_21_22_abertos'],
+    ['Prontas',s.prontas_abertas,'prontasAbertas','green','prontas_abertas'],
+    ['Sem rack',s.sem_rack_abertas,'semRack','orange','os_sem_rack']
+  ];
+  din.innerHTML=cards.map((x,i)=>`<div class="intel-dynamic-card ${x[3]}">
+    <b>${esc111(x[0])}</b><strong>${Number(x[1]||0).toLocaleString('pt-BR')}</strong>
+    <span>Backend + Zero Relation DOM</span>
+    <div class="intel-dynamic-actions">
+      <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+      ${menu111(x[2],'op'+i,x[4],x[0],false)}
+    </div></div>`).join('');
+}
+
+function aplicarMiniCards111(){
+  const configs=[
+    ['intelMiniCardTransicoesV925','pedido_aguardando','prog_saida_ag_pedido','AG Pedido para Aguardando Peças',true],
+    ['intelAgPedidoPecasV924','agPedido','ag_pedido_de_peca','AG PEDIDO DE PECA',false]
+  ];
+  configs.forEach((c,i)=>{
+    const card=document.getElementById(c[0]);if(!card)return;
+    const actions=card.querySelector('.intel-mini-pecas-actions-v925');if(!actions)return;
+    [...actions.querySelectorAll('button')].filter(b=>/Exportar/i.test(b.textContent||'')).forEach(b=>b.remove());
+    actions.insertAdjacentHTML('beforeend',menu111(c[1],'mini'+i,c[2],c[3],c[4]));
+  });
+  const cardEntradas=document.querySelector('#intelMiniTatParaPedidoV926')?.closest('article');
+  if(cardEntradas){
+    const actions=cardEntradas.querySelector('.intel-mini-pecas-actions-v925');
+    if(actions){
+      [...actions.querySelectorAll('button')].filter(b=>/Exportar/i.test(b.textContent||'')).forEach(b=>b.remove());
+      actions.insertAdjacentHTML('beforeend',menu111('entrou_ag_pedido','miniEntradas','entradas_ag_pedido','Entradas em AG PEDIDO',true));
+    }
+  }
+}
+
+async function aplicarTudo111(){
+  try{
+    const s=await ERPBackendV100.api('/summary');
+    aplicarCardsOperacionais111(s);
+    aplicarMiniCards111();
+  }catch(e){console.warn('[V11.1 aplicar]',e)}
+}
+
+const abrirIntel111=window.abrirInteligencia;
+window.abrirInteligencia=function(){
+  const r=abrirIntel111?.apply(this,arguments);
+  setTimeout(aplicarTudo111,450);
+  setTimeout(aplicarTudo111,1200);
+  return r;
+};
+const carregarIntel111=window.carregarInteligencia;
+window.carregarInteligencia=function(){
+  const r=carregarIntel111?.apply(this,arguments);
+  Promise.resolve(r).finally(()=>setTimeout(aplicarTudo111,100));
+  return r;
+};
+
+document.addEventListener('DOMContentLoaded',()=>setTimeout(aplicarTudo111,3200),{once:true});
+
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.exportV111Audit=function(){
+  const r={
+    operacionais:document.querySelectorAll('#intelCartoesDinamicos .erp-native-export-v111').length,
+    minis:document.querySelectorAll('#intelMiniDashPecasV925 .erp-native-export-v111').length,
+    entradasDias:document.querySelectorAll('#intelMiniAgPedidoEntradasDiasV107 .intel-mini-dia-v925').length,
+    dark:document.body.classList.contains('dark-mode')
+  };
+  console.info('[V11.1 EXPORT/DARK]',r);return r;
+};
+
+console.info('ERP V11.1: exportação direta sem interceptador legado + dark mode das duas progressões.');
 })();
 </script>
 
