@@ -20112,6 +20112,8 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     document.addEventListener("click",function(event){
         const botao=event.target.closest?.("button,a");
         if(!botao || !ehExportacaoV721(botao))return;
+        if(botao.closest("#telaInteligencia"))return;
+        if(botao.closest(".erp-native-export-v111,.erp-export-wrap-v109"))return;
         if(botao.closest("#exportacaoOfficeMenuV720"))return;
 
         // O interceptor da V7.2.3 já abre o menu.
@@ -20132,6 +20134,12 @@ body.dark-mode #exportacaoOfficeMenuV720 .recomendado{
     document.addEventListener("click",function(event){
         const botao=event.target.closest?.("button,a");
         if(!botao)return;
+
+        /* V11.5:
+           Este era um SEGUNDO interceptador V7.2.3 que continuava ativo.
+           Ele pegava os botões da Inteligência antes dos menus novos. */
+        if(botao.closest("#telaInteligencia"))return;
+        if(botao.closest(".erp-native-export-v111,.erp-export-wrap-v109"))return;
         if(botao.closest("#exportacaoOfficeMenuV720"))return;
 
         const texto=String(botao.textContent||"").toUpperCase();
@@ -29268,6 +29276,27 @@ ERP.Performance.exportV114Audit=function(){
 };
 
 console.info("ERP V11.4: exportação global refeita sem capturar Blob/CSV.");
+})();
+</script>
+
+
+<script id="erp-v115-export-intel-diagnostico">
+(function(){
+"use strict";
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.exportV115Audit=function(){
+  const r={
+    inteligenciaMenusNovos:document.querySelectorAll("#telaInteligencia .erp-native-export-v111,#telaInteligencia .erp-export-wrap-v109").length,
+    menuLegadoAberto:document.getElementById("exportacaoOfficeMenuV720")?.classList.contains("aberto")||false,
+    correcao:"segundo interceptador V7.2.3 ignora toda a Inteligência"
+  };
+  console.info("[V11.5 EXPORT INTEL]",r);
+  return r;
+};
+
+console.info("ERP V11.5: segundo interceptador legado corrigido na Inteligência.");
 })();
 </script>
 
