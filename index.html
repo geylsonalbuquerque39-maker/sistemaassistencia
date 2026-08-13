@@ -27057,6 +27057,189 @@ console.info("ERP V10: backend Supabase Edge habilitado. Base completa só é ba
 })();
 </script>
 
+
+<script id="erp-v101-bloqueia-carga-completa-automatica">
+(function(){
+"use strict";
+
+/* =========================================================
+   V10.1
+   A V10 ainda herdava chamadas antigas para carregarInteligencia()
+   pelo ModuleManager/Admin. Isso fazia as 8 mil O.S. voltarem
+   para intelRegistros mesmo com o backend ativo.
+
+   Agora:
+   - carregarInteligencia() = resumo do backend.
+   - base completa SOMENTE quando uma função pesada pedir
+     explicitamente através da flag interna.
+   ========================================================= */
+
+const carregarInteligenciaLegadoV101 = window.carregarInteligencia;
+let cargaCompletaAutorizadaV101 = false;
+
+async function carregarResumoBackendV101(forcar=false){
+  /* limpa a base massiva que eventualmente tenha sido herdada */
+  try{
+    if(Array.isArray(window.intelRegistros) || typeof intelRegistros!=="undefined"){
+      intelRegistros=[];
+      intelAnalise=null;
+    }
+  }catch(_){}
+
+  if(typeof carregarIntelResumoV100==="function"){
+    return carregarIntelResumoV100(!!forcar);
+  }
+
+  /* fallback mínimo caso o símbolo interno não esteja exposto */
+  if(window.ERPBackendV100?.api){
+    const [s,prog]=await Promise.all([
+      window.ERPBackendV100.api("/summary"),
+      window.ERPBackendV100.api("/progress/parts?days=7")
+    ]);
+
+    const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v??"--")};
+    set("intelAgPedidoPecasTotalV924",Number(s.ag_pedido||0).toLocaleString("pt-BR"));
+    set("ieAbertas",Number(s.abertas||0).toLocaleString("pt-BR"));
+    set("ieFechadas",Number(s.fechadas||0).toLocaleString("pt-BR"));
+    set("ieTotal",Number(s.total_os||0).toLocaleString("pt-BR"));
+
+    if(typeof renderProgressaoBackendV100==="function"){
+      renderProgressaoBackendV100(prog);
+    }
+    return s;
+  }
+}
+
+/* Substitui a API antiga usada por módulos legados. */
+window.carregarInteligencia=async function(forcar=false){
+  if(cargaCompletaAutorizadaV101 && typeof carregarInteligenciaLegadoV101==="function"){
+    return carregarInteligenciaLegadoV101.call(this,true);
+  }
+  return carregarResumoBackendV101(!!forcar);
+};
+
+/* Funções que REALMENTE precisam da base completa recebem autorização
+   apenas durante a execução. */
+async function executarComBaseCompletaV101(fn,args,ctx){
+  cargaCompletaAutorizadaV101=true;
+  try{
+    if((!Array.isArray(intelRegistros)||!intelRegistros.length) &&
+       typeof carregarInteligenciaLegadoV101==="function"){
+      await carregarInteligenciaLegadoV101(true);
+    }
+    return await fn.apply(ctx,args);
+  }finally{
+    cargaCompletaAutorizadaV101=false;
+  }
+}
+
+function embrulharPesadaV101(nome){
+  const atual=window[nome];
+  if(typeof atual!=="function" || atual.__v101)return;
+
+  const fn=async function(){
+    return executarComBaseCompletaV101(atual,arguments,this);
+  };
+  fn.__v101=true;
+  window[nome]=fn;
+}
+
+/* Somente estas ações podem puxar a REXPEDLR completa. */
+[
+  "aplicarConsultaIntel",
+  "abrirCopilotoERP",
+  "aplicarRegrasIntel",
+  "executarRegraIntel"
+].forEach(embrulharPesadaV101);
+
+/* Admin antigo chamava atualizarDashboardOperacional -> carregarInteligencia(true).
+   Agora ele passa a buscar somente o resumo server-side. */
+const atualizarDashAntigoV101=window.atualizarDashboardOperacional;
+window.atualizarDashboardOperacional=async function(forcar=false){
+  try{
+    if(typeof window.carregarDashboardAdmin==="function"){
+      return window.carregarDashboardAdmin();
+    }
+  }catch(e){
+    console.warn("[V10.1 dashboard backend]",e);
+  }
+  if(typeof atualizarDashAntigoV101==="function"){
+    return atualizarDashAntigoV101.apply(this,arguments);
+  }
+};
+
+/* Limpa a base completa ao entrar em telas que não precisam dela. */
+function liberarMemoriaV101(){
+  if(cargaCompletaAutorizadaV101)return;
+  try{
+    intelRegistros=[];
+    intelAnalise=null;
+  }catch(_){}
+  try{
+    if(typeof rexpedlrIntelCacheV7543!=="undefined")rexpedlrIntelCacheV7543=null;
+    if(typeof rexpedlrIntelCacheEmV7543!=="undefined")rexpedlrIntelCacheEmV7543=0;
+  }catch(_){}
+  try{
+    window.ERP?.Cache?.delete?.("intel:registros");
+    window.ERP?.Cache?.delete?.("intel:analise");
+  }catch(_){}
+}
+window.liberarMemoriaV101=liberarMemoriaV101;
+
+const abrirIntelV101=window.abrirInteligencia;
+if(typeof abrirIntelV101==="function"){
+  window.abrirInteligencia=function(){
+    liberarMemoriaV101();
+    return abrirIntelV101.apply(this,arguments);
+  };
+}
+
+const abrirAdminV101=window.abrirAdmin;
+if(typeof abrirAdminV101==="function"){
+  window.abrirAdmin=function(){
+    liberarMemoriaV101();
+    return abrirAdminV101.apply(this,arguments);
+  };
+}
+
+const voltarInicioV101=window.voltarInicio;
+if(typeof voltarInicioV101==="function"){
+  window.voltarInicio=function(){
+    liberarMemoriaV101();
+    return voltarInicioV101.apply(this,arguments);
+  };
+}
+
+/* Corrige também o botão antigo "Reanalisar":
+   ele chama carregarInteligencia(true), que agora apenas reconsulta /summary. */
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.backendV101Audit=async function(){
+  const health=await window.ERPBackendV100.api("/health");
+  let n=0;
+  try{n=Array.isArray(intelRegistros)?intelRegistros.length:0}catch(_){}
+  const r={
+    backend:health,
+    domTotal:document.getElementsByTagName("*").length,
+    intelEmMemoria:n,
+    cargaCompletaAutorizada:cargaCompletaAutorizadaV101,
+    modo:"backend-first"
+  };
+  console.info("[ERP V10.1 BACKEND]",r);
+  return r;
+};
+
+/* Limpa qualquer carga massiva herdada assim que o documento estabilizar. */
+document.addEventListener("DOMContentLoaded",()=>{
+  setTimeout(liberarMemoriaV101,2500);
+  setTimeout(()=>carregarResumoBackendV101(false),2700);
+},{once:true});
+
+console.info("ERP V10.1: REXPEDLR completa bloqueada no carregamento automático.");
+})();
+</script>
+
 </body>
 </html>
 
