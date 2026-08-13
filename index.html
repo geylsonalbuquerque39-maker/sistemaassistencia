@@ -27383,6 +27383,232 @@ console.info("ERP V10.2: migrador de histórico local disponível em ERP.Backend
 })();
 </script>
 
+
+<script id="erp-v103-inteligencia-backend-fix">
+(function(){
+"use strict";
+
+/* =========================================================
+   V10.3 — CORREÇÃO DA INTELIGÊNCIA BACKEND-FIRST
+   O problema: as funções V100 estavam dentro de outro IIFE e
+   o V10.1 não conseguia enxergá-las; por isso só alguns IDs
+   recebiam fallback e o restante ficava em 0/aguardando.
+   ========================================================= */
+
+function setV103(id,v){
+  const e=document.getElementById(id);
+  if(e)e.textContent=String(v??"--");
+}
+function escV103(v){
+  return String(v??"").replace(/[&<>"']/g,m=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function paresV103(v){
+  return (Array.isArray(v)?v:[]).map(x=>[x.label,Number(x.total||0)]);
+}
+function barrasV103(lista,max=10){
+  const arr=(lista||[]).slice(0,max);
+  const maior=Math.max(1,...arr.map(x=>Number(x[1]||0)));
+  return arr.map(([label,total])=>`
+    <div class="intel-bar-row">
+      <div class="intel-bar-label"><span>${escV103(label)}</span><b>${Number(total||0).toLocaleString("pt-BR")}</b></div>
+      <div class="intel-bar-track"><div class="intel-bar-fill" style="width:${Math.max(2,Math.round(Number(total||0)*100/maior))}%"></div></div>
+    </div>
+  `).join("");
+}
+
+function renderProgressaoV103(rows){
+  const prog=Array.isArray(rows)?rows:[];
+  const hoje=prog[prog.length-1]||{};
+  const ontem=prog[prog.length-2]||{};
+  const a=Number(hoje.pedido_aguardando||0);
+  const b=Number(ontem.pedido_aguardando||0);
+  const t=Number(hoje.tat_pedido||0);
+  const to=Number(ontem.tat_pedido||0);
+
+  setV103("intelMiniTransicoesV925",a.toLocaleString("pt-BR"));
+  setV103("intelMiniTransicoesComparativoV925",`Hoje • Ontem: ${b} • ${a-b>=0?"+":""}${a-b}`);
+  setV103("intelMiniTatParaPedidoV926",t.toLocaleString("pt-BR"));
+  setV103("intelMiniTatParaPedidoComparativoV926",`Hoje • Ontem: ${to}`);
+
+  const host=document.getElementById("intelMiniPecasUltimosDiasV925");
+  if(host){
+    host.innerHTML=prog.map(x=>{
+      const d=new Date(String(x.date)+"T12:00:00");
+      return `<div class="intel-mini-dia-v925" style="cursor:pointer" onclick="abrirProgressaoDataBackendV100?.('${x.date}')">
+        <small>${d.toLocaleDateString("pt-BR",{day:"2-digit",month:"2-digit"})}</small>
+        <b>${Number(x.pedido_aguardando||0).toLocaleString("pt-BR")}</b>
+        <small>transições</small>
+      </div>`;
+    }).join("");
+  }
+
+  setV103("intelMiniPecasAtualizadoV925",
+    "Backend • "+new Date().toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}));
+}
+
+async function carregarIntelBackendV103(forcar=false){
+  const msg=document.getElementById("intelMensagem");
+  if(msg){
+    msg.className="dashboard-loading";
+    msg.textContent="Carregando indicadores do backend...";
+  }
+
+  try{
+    const [s,prog]=await Promise.all([
+      window.ERPBackendV100.api("/summary"),
+      window.ERPBackendV100.api("/progress/parts?days=7")
+    ]);
+
+    /* KPIs principais */
+    setV103("ikProntas",Number(s.prontas_abertas||0).toLocaleString("pt-BR"));
+    setV103("ikQualidade",Number(s.qualidade||0)+"%");
+    setV103("ikParadas","Sob demanda");
+
+    /* Executivo */
+    setV103("ieAbertas",Number(s.abertas||0).toLocaleString("pt-BR"));
+    setV103("ieFechadas",Number(s.fechadas||0).toLocaleString("pt-BR"));
+    setV103("ieExpHoje",Number(s.exp_hoje||0).toLocaleString("pt-BR"));
+    setV103("ieTempoExp","Sob demanda");
+    setV103("ieTotal",Number(s.total_os||0).toLocaleString("pt-BR"));
+
+    /* Peças */
+    setV103("intelAgPedidoPecasTotalV924",Number(s.ag_pedido||0).toLocaleString("pt-BR"));
+    const agResumo=document.getElementById("intelAgPedidoPecasResumoV959");
+    if(agResumo)agResumo.textContent=`${Number(s.ag_pedido||0).toLocaleString("pt-BR")} O.S. no banco`;
+
+    /* Endereçados S/ CPP pertence ao projeto CPP; não fingir 0 */
+    const cpp=document.getElementById("intelEnderecadosSemCPPTotalV922");
+    if(cpp && cpp.textContent==="0")cpp.textContent="—";
+
+    /* Rankings */
+    const tec=document.getElementById("intelRankingTecnicos");
+    const pdv=document.getElementById("intelRankingPDV");
+    const mapa=document.getElementById("intelMapa");
+    if(tec)tec.innerHTML=barrasV103(paresV103(s.tecnicos_top).filter(x=>x[0]!=="(vazio)"),10);
+    if(pdv)pdv.innerHTML=barrasV103(paresV103(s.pdv_top).filter(x=>x[0]!=="(vazio)"),10);
+    if(mapa)mapa.innerHTML=barrasV103(paresV103(s.pdv_top).filter(x=>x[0]!=="(vazio)"),12);
+
+    /* Cartões operacionais */
+    const din=document.getElementById("intelCartoesDinamicos");
+    if(din){
+      const cards=[
+        ["O.S. abertas",s.abertas,"abertas","green"],
+        ["Rack 500",s.rack500_abertas,"rack500Abertas","red"],
+        ["Grupos 13 e 14",s.grupo1314_abertos,"grupo1314Abertos","orange"],
+        ["Grupos 5, 21 e 22",s.grupo52122_abertos,"grupo52122Abertos","orange"],
+        ["Prontas",s.prontas_abertas,"prontasAbertas","green"],
+        ["Sem rack",s.sem_rack_abertas,"semRack","orange"]
+      ];
+      din.innerHTML=cards.map(x=>`
+        <div class="intel-dynamic-card ${x[3]}">
+          <b>${escV103(x[0])}</b>
+          <strong>${Number(x[1]||0).toLocaleString("pt-BR")}</strong>
+          <span>Backend + Zero Relation DOM</span>
+          <div class="intel-dynamic-actions">
+            <button class="ver" onclick="abrirListaIntel('${x[2]}')">Ver relação</button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    /* Alertas */
+    const alert=document.getElementById("intelAlertas");
+    if(alert){
+      const arr=[
+        ["📦",s.rack500_abertas,"Rack 500 — O.S. abertas","rack500Abertas"],
+        ["🟠",s.grupo1314_abertos,"Grupos 13 e 14 — O.S. abertas","grupo1314Abertos"],
+        ["🟠",s.grupo52122_abertos,"Grupos 5, 21 e 22 — O.S. abertas","grupo52122Abertos"],
+        ["🟢",s.prontas_abertas,"Prontas e abertas","prontasAbertas"],
+        ["📍",s.sem_rack_abertas,"O.S. abertas sem rack","semRack"]
+      ].filter(x=>Number(x[1]||0)>0);
+      alert.innerHTML=arr.length?arr.map(x=>`
+        <div class="intel-alert orange" onclick="abrirListaIntel('${x[3]}')">
+          <b>${x[0]} ${Number(x[1]||0).toLocaleString("pt-BR")} ${escV103(x[2])}</b>
+          <span>Relação carregada somente ao clicar.</span>
+        </div>
+      `).join(""):"<div class='intel-alert green'><b>✔ Nenhuma inconsistência crítica encontrada</b></div>";
+    }
+
+    const pri=document.getElementById("intelPrioridades");
+    if(pri)pri.innerHTML="<div class='admin-info'>Relações detalhadas ficam fora do DOM e são buscadas somente ao clicar.</div>";
+
+    renderProgressaoV103(prog);
+
+    if(msg){
+      msg.className="dashboard-ok";
+      msg.textContent=`Backend ativo: ${Number(s.total_os||0).toLocaleString("pt-BR")} O.S. analisadas sem carregar a base completa no navegador.`;
+    }
+
+    return {summary:s,progress:prog};
+  }catch(e){
+    console.error("[V10.3 INTEL]",e);
+    if(msg){
+      msg.className="dashboard-erro";
+      msg.textContent="Erro ao carregar Inteligência pelo backend: "+(e?.message||e);
+    }
+    throw e;
+  }
+}
+window.carregarIntelBackendV103=carregarIntelBackendV103;
+
+/* Corrige o botão Reanalisar */
+window.carregarInteligencia=async function(forcar=false){
+  try{
+    intelRegistros=[];
+    intelAnalise=null;
+  }catch(_){}
+  return carregarIntelBackendV103(!!forcar);
+};
+
+/* Corrige a abertura da Inteligência no último nível de override. */
+window.abrirInteligencia=function(){
+  try{
+    if(!usuarioLogado){
+      if(typeof mostrarBloqueioPermissao==="function")mostrarBloqueioPermissao("Faça login para acessar a Central de Inteligência.");
+      return;
+    }
+  }catch(_){}
+
+  window.erpMontarTelaV7544?.("telaInteligencia");
+  esconderTelas();
+  definirMenuAtivo?.("inteligencia");
+
+  const tela=document.getElementById("telaInteligencia");
+  if(tela)tela.style.display="block";
+  document.getElementById("sidebar")?.classList.remove("mobile-open");
+
+  try{
+    intelRegistros=[];
+    intelAnalise=null;
+  }catch(_){}
+
+  carregarIntelBackendV103(false);
+};
+
+/* auditoria visual/backend */
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.intelV103Audit=async function(){
+  const s=await window.ERPBackendV100.api("/summary");
+  const r={
+    backendTotal:s.total_os,
+    backendAgPedido:s.ag_pedido,
+    telaTotal:document.getElementById("ieTotal")?.textContent,
+    telaAbertas:document.getElementById("ieAbertas")?.textContent,
+    telaAgPedido:document.getElementById("intelAgPedidoPecasTotalV924")?.textContent,
+    mensagem:document.getElementById("intelMensagem")?.textContent,
+    intelEmMemoria:Array.isArray(intelRegistros)?intelRegistros.length:0
+  };
+  console.info("[V10.3 INTEL AUDIT]",r);
+  return r;
+};
+
+console.info("ERP V10.3: Inteligência corrigida para consumir o backend diretamente.");
+})();
+</script>
+
 </body>
 </html>
 
