@@ -5875,10 +5875,11 @@ html.dark #intelModal .intel-modal-box,
         </div>
         <button class="login-btn" onclick="fazerLogin()">Entrar no sistema</button>
         <button class="login-btn-secundario" type="button" onclick="abrirCadastroV580()">Criar uma conta</button>
+        <button class="login-link-v137" type="button" onclick="reenviarConfirmacaoEmailV137()">Reenviar e-mail de confirmação</button>
         <div id="loginMensagem" class="login-msg"></div>
         <div class="login-demo">
-            <b>Acesso controlado pelo administrador</b><br>
-            Novos usuários podem solicitar uma conta. O acesso só será liberado depois da aprovação no painel administrativo.
+            <b>Cadastro com confirmação por e-mail</b><br>
+            Crie sua conta e confirme o link enviado para o seu e-mail antes do primeiro acesso.
         </div>
     </div>
 </div>
@@ -5889,7 +5890,7 @@ html.dark #intelModal .intel-modal-box,
         <div class="cadastro-topo">
             <div>
                 <h2>Criar conta</h2>
-                <p>Preencha seus dados. O administrador analisará sua solicitação.</p>
+                <p>Preencha seus dados. Enviaremos um link para confirmar seu e-mail e finalizar o cadastro.</p>
             </div>
             <button class="cadastro-fechar" type="button" onclick="fecharCadastroV580()">×</button>
         </div>
@@ -5920,7 +5921,7 @@ html.dark #intelModal .intel-modal-box,
 
         <div class="cadastro-acoes">
             <button class="login-btn-secundario" type="button" onclick="fecharCadastroV580()">Cancelar</button>
-            <button class="login-btn" id="cadastroEnviarV580" type="button" onclick="solicitarCadastroV580()">Enviar solicitação</button>
+            <button class="login-btn" id="cadastroEnviarV580" type="button" onclick="solicitarCadastroV580()">Criar conta</button>
         </div>
     </div>
 </div>
@@ -7365,15 +7366,6 @@ async function fazerLogin(){
             throw new Error("Perfil não encontrado na tabela usuarios.");
         }
 
-        if(usuarioLogado.status_aprovacao && usuarioLogado.status_aprovacao !== "aprovado"){
-            const situacao = usuarioLogado.status_aprovacao === "negado"
-                ? "Sua solicitação de conta foi negada pelo administrador."
-                : "Sua conta ainda está aguardando aprovação do administrador.";
-            await supabase.auth.signOut();
-            usuarioLogado = null;
-            throw new Error(situacao);
-        }
-
         if(usuarioLogado.ativo === false){
             await supabase.auth.signOut();
             usuarioLogado = null;
@@ -7416,7 +7408,7 @@ async function recuperarSessao(){
         const usuarioAuth = data?.session?.user;
         if(usuarioAuth){
             await carregarPerfilUsuario(usuarioAuth);
-            if(usuarioLogado && usuarioLogado.ativo !== false && (!usuarioLogado.status_aprovacao || usuarioLogado.status_aprovacao === "aprovado")){
+            if(usuarioLogado && usuarioLogado.ativo !== false){
                 atualizarUsuarioTopo();
                 aplicarPermissoesVisuais();
                 ocultarLogin();
@@ -7471,7 +7463,7 @@ async function carregarPerfilUsuario(usuarioAuth){
         cargo: data.cargo || "",
         perfil: data.perfil || "consulta",
         ativo: data.ativo !== false,
-        status_aprovacao: data.status_aprovacao || "aprovado",
+        status_aprovacao: "aprovado",
         avatar_url: data.avatar_url || "",
         status_perfil: data.status_perfil || "online",
         recado: data.recado || "",
@@ -14180,96 +14172,85 @@ async function solicitarCadastroV580(){
     if(senha!==senha2)return mensagemCadastroV580("As senhas não são iguais.","erro");
 
     btn.disabled=true;
-    mensagemCadastroV580("Criando a solicitação...","info");
+    mensagemCadastroV580("Criando sua conta e enviando o e-mail de confirmação...","info");
 
     try{
-        const supabase=obterSupabaseClient();
-        let concluido=false;
-        let erroEdge=null;
+        /* Cliente separado: criar conta não altera a sessão de quem já está logado
+           em outro contexto/aba do ERP. */
+        const url=localStorage.getItem("SUPABASE_URL")||SUPABASE_URL_PADRAO;
+        const key=localStorage.getItem("SUPABASE_ANON_KEY")||SUPABASE_ANON_KEY_PADRAO;
+        const clienteCadastro=window.supabase.createClient(url,key,{
+            auth:{
+                persistSession:false,
+                autoRefreshToken:false,
+                detectSessionInUrl:false
+            }
+        });
 
-        // Caminho principal: Edge Function.
-        try{
-            const {data,error}=await supabase.functions.invoke("solicitar-conta",{
-                body:{nome,cargo,email,senha}
-            });
-            if(error)throw error;
-            if(data?.erro)throw new Error(data.erro);
-            concluido=true;
-        }catch(edgeError){
-            erroEdge=edgeError;
-            console.warn("Edge Function solicitar-conta indisponível. Tentando cadastro direto seguro.",edgeError);
+        /* GitHub Pages: volta exatamente para o index atual após confirmar. */
+        const redirectUrl=window.location.origin+window.location.pathname;
+
+        const {data,error}=await clienteCadastro.auth.signUp({
+            email,
+            password:senha,
+            options:{
+                emailRedirectTo:redirectUrl,
+                data:{
+                    nome,
+                    cargo,
+                    perfil:"consulta"
+                }
+            }
+        });
+
+        if(error)throw error;
+
+        if(!data?.user){
+            throw new Error("O Supabase não retornou o cadastro do usuário.");
         }
 
-        // Contingência: cria o usuário diretamente no Supabase Auth e grava o perfil
-        // como pendente, usando um cliente separado para não afetar outras sessões.
-        if(!concluido){
-            mensagemCadastroV580("Servidor de cadastro indisponível. Tentando método alternativo...","info");
-
-            const url=localStorage.getItem("SUPABASE_URL")||SUPABASE_URL_PADRAO;
-            const key=localStorage.getItem("SUPABASE_ANON_KEY")||SUPABASE_ANON_KEY_PADRAO;
-            const clienteCadastro=window.supabase.createClient(url,key,{
-                auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}
-            });
-
-            const {data:authData,error:authError}=await clienteCadastro.auth.signUp({
-                email,
-                password:senha,
-                options:{data:{nome,cargo,perfil:"consulta",status_aprovacao:"pendente"}}
-            });
-            if(authError)throw authError;
-
-            const userId=authData?.user?.id;
-            if(!userId)throw new Error("O Supabase não retornou o identificador da nova conta.");
-
-            const payload={
-                id:userId,
-                nome,
-                cargo,
-                perfil:"consulta",
-                ativo:false,
-                status_aprovacao:"pendente",
-                email
-            };
-
-            let resposta=await clienteCadastro.from("usuarios").upsert(payload,{onConflict:"id"});
-
-            // Compatibilidade com bancos sem a coluna e-mail.
-            if(resposta.error&&/email|column/i.test(String(resposta.error.message||""))){
-                const {email:_,...semEmail}=payload;
-                resposta=await clienteCadastro.from("usuarios").upsert(semEmail,{onConflict:"id"});
-            }
-
-            // Compatibilidade com bancos antigos sem status_aprovacao.
-            if(resposta.error&&/status_aprovacao|column/i.test(String(resposta.error.message||""))){
-                const minimo={id:userId,nome,cargo,perfil:"consulta",ativo:false};
-                resposta=await clienteCadastro.from("usuarios").upsert(minimo,{onConflict:"id"});
-            }
-
-            if(resposta.error){
-                const detalheEdge=[erroEdge?.message,erroEdge?.details].filter(Boolean).join(" — ");
-                throw new Error(
-                    "A conta foi criada no Authentication, mas a solicitação não pôde ser gravada na tabela usuarios: "+
-                    (resposta.error.message||resposta.error)+
-                    (detalheEdge?" | Edge Function: "+detalheEdge:"")
-                );
-            }
-
-            try{await clienteCadastro.auth.signOut()}catch(_){}
-            concluido=true;
-        }
-
+        /* Com Confirm Email ligado, session deve ser null até clicar no link. */
         mensagemCadastroV580(
-            "Solicitação criada com sucesso. Aguarde a aprovação do administrador para entrar no sistema.",
+            "Conta criada! Enviamos um link de confirmação para "+email+
+            ". Abra seu e-mail, clique no link e depois entre normalmente no ERP.",
             "ok"
         );
 
         ["cadastroNomeV580","cadastroCargoV580","cadastroEmailV580","cadastroSenhaV580","cadastroSenha2V580"]
             .forEach(id=>{const el=document.getElementById(id);if(el)el.value=""});
+
     }catch(e){
         const detalhe=[e?.message,e?.details,e?.hint,e?.code].filter(Boolean).join(" — ")||String(e);
-        mensagemCadastroV580("Não foi possível criar a solicitação: "+detalhe,"erro");
+
+        let amigavel=detalhe;
+        if(/already registered|already been registered|user already/i.test(detalhe)){
+            amigavel="Este e-mail já possui uma conta. Se ainda não confirmou o cadastro, use o reenvio do e-mail de confirmação.";
+        }
+
+        mensagemCadastroV580("Não foi possível criar a conta: "+amigavel,"erro");
     }finally{
         btn.disabled=false;
+    }
+}
+
+async function reenviarConfirmacaoEmailV137(){
+    const email=prompt("Digite o e-mail da conta que precisa receber novamente o link de confirmação:");
+    if(!email)return;
+
+    try{
+        const supabase=obterSupabaseClient();
+        const redirectUrl=window.location.origin+window.location.pathname;
+
+        const {error}=await supabase.auth.resend({
+            type:"signup",
+            email:String(email).trim().toLowerCase(),
+            options:{emailRedirectTo:redirectUrl}
+        });
+
+        if(error)throw error;
+        alert("E-mail de confirmação reenviado. Verifique também a caixa de spam.");
+    }catch(e){
+        alert("Não foi possível reenviar: "+(e?.message||e));
     }
 }
 
@@ -33232,6 +33213,54 @@ body.dark-mode #chatMensagens .chat-msg-grupo-v136.outra:not(.so-midia) > .chat-
   #chatMensagens .chat-msg-grupo-v136{max-width:86%!important}
 }
 </style>
+
+
+<style id="erp-v137-auth-email-style">
+.login-link-v137{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#0b63bd;
+  font-weight:800;
+  cursor:pointer;
+  padding:9px 5px 2px;
+  text-decoration:underline;
+}
+body.dark-mode .login-link-v137{color:#79bdff}
+</style>
+
+<script id="erp-v137-auth-email-js">
+(function(){
+"use strict";
+
+/* Traduz o erro padrão do Supabase para a mensagem que o usuário precisa ver. */
+const fazerLoginBaseV137=window.fazerLogin;
+window.fazerLogin=async function(){
+  const msg=document.getElementById("loginMensagem");
+
+  try{
+    await fazerLoginBaseV137.apply(this,arguments);
+
+    if(msg && /email not confirmed|email_not_confirmed/i.test(msg.textContent||"")){
+      msg.innerHTML=
+        "Seu e-mail ainda não foi confirmado. Abra o link enviado pelo Supabase ou clique em <b>Reenviar e-mail de confirmação</b>.";
+    }
+  }catch(e){
+    if(msg && /email not confirmed|email_not_confirmed/i.test(String(e?.message||e))){
+      msg.innerHTML=
+        "Seu e-mail ainda não foi confirmado. Abra o link enviado pelo Supabase ou clique em <b>Reenviar e-mail de confirmação</b>.";
+      return;
+    }
+    throw e;
+  }
+};
+
+/* Se o usuário acabou de voltar do link de confirmação,
+   o cliente principal detecta a sessão no URL e recuperarSessao()
+   assume o restante normalmente. */
+console.info("ERP V13.7: cadastro voltou para confirmação por e-mail do Supabase, sem aprovação manual.");
+})();
+</script>
 
 </body>
 </html>
