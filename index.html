@@ -32586,6 +32586,289 @@ console.info("ERP V12.9: modais do chat fecham sem fechar chat + foto do grupo +
 })();
 </script>
 
+
+<style id="erp-v130-chat-grupo-limpo">
+/* =========================================================
+   V13.0 — CHAT DE GRUPO LIMPO
+   1 único botão de informações + bolhas estilo WhatsApp
+   ========================================================= */
+
+/* Esconde permanentemente os dois botões duplicados herdados */
+#chatInfoGrupoBtnV127,
+#chatInfoGrupoBtnV128{
+  display:none!important;
+}
+
+/* Único botão de informações */
+#chatInfoGrupoBtnV130{
+  display:none;
+  width:36px;height:36px;border:0;border-radius:10px;
+  background:#213a55;color:#fff;cursor:pointer;
+  font-size:18px;font-weight:900;
+  align-items:center;justify-content:center;
+}
+#chatCabecalho.chat-grupo-header-v125 #chatInfoGrupoBtnV130{
+  display:inline-flex!important;
+}
+
+/* ===== mensagens do grupo ===== */
+#chatMensagens .chat-msg-grupo-v130{
+  display:flex!important;
+  flex-direction:column!important;
+  width:auto!important;
+  max-width:76%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  flex:0 0 auto!important;
+}
+#chatMensagens .chat-msg-grupo-v130.minha{
+  align-self:flex-end!important;
+  align-items:flex-end!important;
+  margin-left:auto!important;
+}
+#chatMensagens .chat-msg-grupo-v130.outra{
+  align-self:flex-start!important;
+  align-items:flex-start!important;
+  margin-right:auto!important;
+}
+
+/* Texto: bolha compacta, sem coluna vertical */
+#chatMensagens .chat-msg-grupo-v130 .chat-msg-balao{
+  display:inline-block!important;
+  width:auto!important;
+  max-width:100%!important;
+  min-width:0!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:7px 10px!important;
+  margin:0!important;
+  border-radius:12px!important;
+  line-height:1.35!important;
+  white-space:pre-wrap!important;
+  writing-mode:horizontal-tb!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+  box-sizing:border-box!important;
+}
+#chatMensagens .chat-msg-grupo-v130.minha .chat-msg-balao{
+  background:#1769c7!important;
+  color:#fff!important;
+  border-bottom-right-radius:4px!important;
+}
+#chatMensagens .chat-msg-grupo-v130.outra .chat-msg-balao{
+  background:#eef4fa!important;
+  color:#001b3d!important;
+  border-bottom-left-radius:4px!important;
+}
+body.dark-mode #chatMensagens .chat-msg-grupo-v130.outra .chat-msg-balao{
+  background:#173957!important;color:#fff!important;
+}
+
+/* Mídia/figurinha: sem aquele retângulo azul gigante */
+#chatMensagens .chat-msg-grupo-v130.so-midia .chat-msg-balao{
+  padding:0!important;
+  background:transparent!important;
+  box-shadow:none!important;
+  border-radius:0!important;
+}
+#chatMensagens .chat-msg-grupo-v130.so-midia .chat-grupo-remetente-v125{
+  background:rgba(8,35,63,.88);
+  color:#fff;
+  padding:4px 7px;
+  border-radius:8px;
+  margin-bottom:4px;
+  width:max-content;
+}
+#chatMensagens .chat-msg-grupo-v130 .chat-figurinha-msg-v122{
+  max-width:180px!important;
+  max-height:180px!important;
+}
+#chatMensagens .chat-msg-grupo-v130 .chat-imagem{
+  max-width:280px!important;
+  max-height:280px!important;
+  margin:0!important;
+  border-radius:12px!important;
+}
+#chatMensagens .chat-msg-grupo-v130 .chat-msg-meta{
+  margin-top:3px!important;
+  width:auto!important;
+  font-size:9px!important;
+}
+
+/* botão de foto no perfil do grupo bem evidente */
+#chatGrupoFotoAcoesV129{
+  display:flex!important;
+}
+#chatGrupoPerfilAvatarV128{
+  cursor:pointer!important;
+}
+
+@media(max-width:700px){
+  #chatMensagens .chat-msg-grupo-v130{max-width:86%!important}
+}
+</style>
+
+<script id="erp-v130-chat-grupo-limpo-js">
+(function(){
+"use strict";
+
+function esc130(v){
+  try{return chatEscV57(v)}
+  catch(_){return String(v??"").replace(/[&<>"']/g,"")}
+}
+
+/* ---------------------------------------------------------
+   1. UM ÚNICO BOTÃO DE INFORMAÇÕES DO GRUPO
+   --------------------------------------------------------- */
+function limparBotoesGrupoV130(){
+  document.querySelectorAll("#chatInfoGrupoBtnV127,#chatInfoGrupoBtnV128")
+    .forEach(el=>{el.style.display="none";el.setAttribute("aria-hidden","true")});
+
+  const cab=document.getElementById("chatCabecalho");
+  const acoes=cab?.querySelector(".chat-cabecalho-acoes");
+  if(!cab||!acoes)return;
+
+  let botao=document.getElementById("chatInfoGrupoBtnV130");
+  if(!botao){
+    botao=document.createElement("button");
+    botao.id="chatInfoGrupoBtnV130";
+    botao.className="chat-acao-topo";
+    botao.type="button";
+    botao.title="Informações do grupo";
+    botao.textContent="ⓘ";
+    botao.addEventListener("click",function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(typeof abrirPerfilGrupoV128==="function"){
+        abrirPerfilGrupoV128();
+      }
+    });
+    const busca=[...acoes.querySelectorAll("button")]
+      .find(b=>/pesquis/i.test(b.title||""));
+    if(busca)acoes.insertBefore(botao,busca);
+    else acoes.insertBefore(botao,acoes.firstChild);
+  }
+}
+
+new MutationObserver(limparBotoesGrupoV130)
+  .observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:["class","style"]});
+setInterval(limparBotoesGrupoV130,700);
+setTimeout(limparBotoesGrupoV130,100);
+
+/* ---------------------------------------------------------
+   2. RENDERIZAÇÃO DEFINITIVA DAS MENSAGENS DO GRUPO
+   --------------------------------------------------------- */
+window.renderMensagensGrupoV125=function(rows){
+  const area=document.getElementById("chatMensagens");
+  if(!area)return;
+
+  if(!rows?.length){
+    area.innerHTML="<div class='chat-conversa-vazia' style='display:block'>Nenhuma mensagem no grupo ainda.</div>";
+    return;
+  }
+
+  area.innerHTML=rows.map(m=>{
+    const minha=String(m.remetente_id)===String(usuarioLogado?.id||"");
+    let anexosNormalizados=[];
+    try{anexosNormalizados=normalizarAnexosV600(m.anexos)}catch(_){}
+    const temAnexo=anexosNormalizados.length>0;
+    const temTexto=!!String(m.mensagem||"").trim();
+    const soMidia=temAnexo&&!temTexto;
+
+    const anexos=renderizarAnexosChatV600(m.anexos);
+    const remetente=minha?"":`<div class="chat-grupo-remetente-v125">${esc130(m.remetente_nome||"Usuário")}</div>`;
+    const texto=temTexto?`<div class="chat-grupo-texto-v130">${esc130(m.mensagem)}</div>`:"";
+
+    return `
+      <div class="chat-msg chat-msg-grupo-v130 ${minha?"minha":"outra"} ${soMidia?"so-midia":""}">
+        <div class="chat-msg-balao">
+          ${remetente}
+          ${texto}
+          ${anexos}
+        </div>
+        <div class="chat-msg-meta">${chatDataHoraV57(m.created_at)}</div>
+      </div>`;
+  }).join("");
+
+  requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight});
+};
+
+/* Re-render imediato ao entrar na versão nova */
+setTimeout(()=>{
+  try{
+    if(window.__grupoAtualV125 && typeof carregarMensagensGrupoV125==="function"){
+      carregarMensagensGrupoV125();
+    }
+  }catch(_){}
+},400);
+
+console.info("ERP V13.0: cabeçalho do grupo sem duplicidade + bolhas compactas estilo WhatsApp.");
+})();
+</script>
+
+
+<style id="erp-v131-grupo-header">
+/* V13.1 — sem botão de informações; clique no centro do cabeçalho */
+#chatInfoGrupoBtnV127,
+#chatInfoGrupoBtnV128,
+#chatInfoGrupoBtnV130{
+  display:none!important;
+}
+
+/* Nome/avatar/resumo do grupo viram a área clicável */
+#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoAvatar,
+#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoInfo,
+#chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info{
+  cursor:pointer!important;
+}
+#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoInfo:hover,
+#chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info:hover{
+  opacity:.88;
+}
+</style>
+
+<script id="erp-v131-grupo-header-js">
+(function(){
+"use strict";
+
+function removerInfoGrupoV131(){
+  document.querySelectorAll("#chatInfoGrupoBtnV127,#chatInfoGrupoBtnV128,#chatInfoGrupoBtnV130")
+    .forEach(el=>el.remove());
+}
+
+function cliquePerfilGrupoV131(e){
+  const cab=document.getElementById("chatCabecalho");
+  if(!cab?.classList.contains("chat-grupo-header-v125")) return;
+
+  /* Não interfere nos botões de busca, ligação, vídeo e fechar */
+  if(e.target.closest(".chat-cabecalho-acoes,button")) return;
+
+  const alvo=e.target.closest(
+    "#chatCabecalhoAvatar,#chatCabecalhoInfo,.chat-cabecalho-info,#chatCabecalhoNome,#chatCabecalhoStatus"
+  );
+  if(!alvo) return;
+
+  e.preventDefault();
+  e.stopPropagation();
+
+  if(typeof abrirPerfilGrupoV128==="function"){
+    abrirPerfilGrupoV128();
+  }
+}
+
+document.addEventListener("click",cliquePerfilGrupoV131,true);
+
+new MutationObserver(removerInfoGrupoV131)
+  .observe(document.body,{childList:true,subtree:true});
+
+setInterval(removerInfoGrupoV131,800);
+setTimeout(removerInfoGrupoV131,50);
+
+console.info("ERP V13.1: perfil do grupo abre clicando no cabeçalho; botão de informações removido.");
+})();
+</script>
+
 </body>
 </html>
 
