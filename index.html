@@ -31015,18 +31015,29 @@ window.carregarMensagensGrupoV125=carregarMensagensGrupoV125;
 function renderMensagensGrupoV125(rows){
  const area=document.getElementById("chatMensagens");if(!area)return;
  if(!rows.length){area.innerHTML="<div class='chat-conversa-vazia' style='display:block'>Nenhuma mensagem no grupo ainda.</div>";return}
+
  area.innerHTML=rows.map(m=>{
   const minha=String(m.remetente_id)===meuId125();
+
+  let anexosNormalizados=[];
+  try{anexosNormalizados=normalizarAnexosV600(m.anexos)}catch(_){}
+
+  const temTexto=!!String(m.mensagem||"").trim();
+  const temAnexo=anexosNormalizados.length>0;
+  const soMidia=temAnexo&&!temTexto;
+
   const anexos=renderizarAnexosChatV600(m.anexos);
-  const corpo=(m.mensagem?`<div>${esc125(m.mensagem)}</div>`:"")+anexos;
-  return `<div class="chat-msg chat-msg-v127-grupo ${minha?"minha":"outra"}">
+  const texto=temTexto?`<div class="chat-grupo-texto-v136">${esc125(m.mensagem)}</div>`:"";
+
+  return `<div class="chat-msg chat-msg-grupo-v136 ${minha?"minha":"outra"} ${soMidia?"so-midia":""}">
    <div class="chat-msg-balao">
     ${minha?"":`<div class="chat-grupo-remetente-v125">${esc125(m.remetente_nome||"Usuário")}</div>`}
-    ${corpo}
+    ${texto}${anexos}
    </div>
    <div class="chat-msg-meta">${chatDataHoraV57(m.created_at)}</div>
   </div>`;
  }).join("");
+
  requestAnimationFrame(()=>{area.scrollTop=area.scrollHeight});
 }
 
@@ -33090,6 +33101,137 @@ setTimeout(()=>{
 console.info("ERP V13.5: flex/stretch das bolhas de grupo zerado definitivamente.");
 })();
 </script>
+
+
+<style id="erp-v136-bolha-real">
+/* =========================================================
+   V13.6 — CORREÇÃO REAL
+   Agora o próprio renderer interno do grupo usa estas classes.
+   ========================================================= */
+
+#chatMensagens .chat-msg-grupo-v136{
+  display:flex!important;
+  flex-direction:column!important;
+  flex:0 0 auto!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:76%!important;
+  height:auto!important;
+  min-height:0!important;
+  margin:4px 0!important;
+  padding:0!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136.minha{
+  align-self:flex-end!important;
+  align-items:flex-end!important;
+  margin-left:auto!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136.outra{
+  align-self:flex-start!important;
+  align-items:flex-start!important;
+  margin-right:auto!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136 > .chat-msg-balao{
+  display:inline-block!important;
+  flex:0 0 auto!important;
+  width:max-content!important;
+  min-width:0!important;
+  max-width:100%!important;
+  height:auto!important;
+  min-height:0!important;
+  padding:7px 10px!important;
+  margin:0!important;
+  box-sizing:border-box!important;
+  line-height:1.35!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136 .chat-grupo-texto-v136{
+  display:inline!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  white-space:pre-wrap!important;
+}
+
+/* WhatsApp-like text bubbles */
+#chatMensagens .chat-msg-grupo-v136.minha:not(.so-midia) > .chat-msg-balao{
+  background:#d9fdd3!important;
+  color:#111b21!important;
+  border-radius:9px!important;
+  border-top-right-radius:2px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136.outra:not(.so-midia) > .chat-msg-balao{
+  background:#fff!important;
+  color:#111b21!important;
+  border-radius:9px!important;
+  border-top-left-radius:2px!important;
+  box-shadow:0 1px 1px rgba(0,0,0,.08)!important;
+}
+
+/* Media/sticker: no blue container */
+#chatMensagens .chat-msg-grupo-v136.so-midia{
+  width:max-content!important;
+  max-width:300px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136.so-midia > .chat-msg-balao{
+  width:max-content!important;
+  max-width:300px!important;
+  padding:0!important;
+  background:transparent!important;
+  border:0!important;
+  box-shadow:none!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136 .chat-imagem{
+  display:block!important;
+  width:auto!important;
+  max-width:280px!important;
+  height:auto!important;
+  max-height:300px!important;
+  margin:0!important;
+  border-radius:12px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136 .chat-figurinha-msg-v122{
+  display:block!important;
+  width:auto!important;
+  max-width:180px!important;
+  height:auto!important;
+  max-height:180px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v136 .chat-msg-meta{
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  margin-top:2px!important;
+  padding:0 2px!important;
+  font-size:9px!important;
+  align-self:flex-end!important;
+}
+
+body.dark-mode #chatMensagens .chat-msg-grupo-v136.minha:not(.so-midia) > .chat-msg-balao{
+  background:#005c4b!important;
+  color:#fff!important;
+}
+
+body.dark-mode #chatMensagens .chat-msg-grupo-v136.outra:not(.so-midia) > .chat-msg-balao{
+  background:#202c33!important;
+  color:#fff!important;
+}
+
+@media(max-width:700px){
+  #chatMensagens .chat-msg-grupo-v136{max-width:86%!important}
+}
+</style>
 
 </body>
 </html>
