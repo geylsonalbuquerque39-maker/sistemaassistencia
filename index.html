@@ -13207,6 +13207,16 @@ document.addEventListener("pointerdown",e=>{
     const seletorOS=document.getElementById("chatOSSeletorOverlayV639");
     const visualizadorOS=document.getElementById("chatOSVisualizadorOverlayV639");
     const seletorContato=document.getElementById("chatContatoOverlayV640");
+    const grupoPerfil127=document.getElementById("chatGrupoPerfilV127");
+    const grupoPerfil128=document.getElementById("chatGrupoPerfilV128");
+    const grupoPerfil129=document.getElementById("chatGrupoPerfilV129");
+    const stickerView=document.getElementById("chatStickerViewV127");
+    const pasteModal=document.getElementById("chatPasteModalV125");
+    const grupoModal=document.getElementById("chatGrupoModalV125");
+    const grupoCall=document.getElementById("chatGrupoCallV125");
+    const fotoPerfil=document.getElementById("v698FotoModal");
+    const perfilContato=document.getElementById("v698PerfilModal");
+    const figurinhaCriador=document.getElementById("chatCriadorFigurinhaV123");
 
     // Sobreposições pertencentes ao chat não podem fechar a conversa que está atrás.
     if(
@@ -13214,7 +13224,17 @@ document.addEventListener("pointerdown",e=>{
         chamadaRecebida?.contains(e.target)||
         seletorOS?.contains(e.target)||
         visualizadorOS?.contains(e.target)||
-        seletorContato?.contains(e.target)
+        seletorContato?.contains(e.target)||
+        grupoPerfil127?.contains(e.target)||
+        grupoPerfil128?.contains(e.target)||
+        grupoPerfil129?.contains(e.target)||
+        stickerView?.contains(e.target)||
+        pasteModal?.contains(e.target)||
+        grupoModal?.contains(e.target)||
+        grupoCall?.contains(e.target)||
+        fotoPerfil?.contains(e.target)||
+        perfilContato?.contains(e.target)||
+        figurinhaCriador?.contains(e.target)
     )return;
 
     if(painel?.classList.contains("aberto")&&!painel.contains(e.target)&&!wrap?.contains(e.target)){
@@ -30925,7 +30945,7 @@ function renderGruposV125(){
  if(!gruposV125.length){area.innerHTML=`<small style="opacity:.65">Nenhum grupo</small>`;return}
  area.innerHTML=gruposV125.map(g=>`
   <button class="chat-grupo-item-v125 ${grupoAtualV125?.id===g.id?"ativo":""}" onclick="abrirGrupoV125('${g.id}')">
-   <span class="chat-grupo-avatar-v125">👥</span>
+   <span class="chat-grupo-avatar-v125">${g.foto_url?`<img src="${esc125(g.foto_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:"👥"}</span>
    <span style="min-width:0"><b>${esc125(g.nome)}</b><span>${Number(g.total_membros||0)} participantes</span></span>
   </button>`).join("");
 }
@@ -30965,7 +30985,7 @@ window.abrirGrupoV125=async function(id){
  document.getElementById("chatMensagens")?.classList.add("ativo");
  document.getElementById("chatCompositor")?.classList.add("ativo");
  const vazia=document.getElementById("chatConversaVazia");if(vazia)vazia.style.display="none";
- document.getElementById("chatCabecalhoAvatar").innerHTML="👥";
+ document.getElementById("chatCabecalhoAvatar").innerHTML=g.foto_url?`<img src="${esc125(g.foto_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:"👥";
  document.getElementById("chatCabecalhoNome").textContent=g.nome;
  document.getElementById("chatCabecalhoStatus").textContent=`${Number(g.total_membros||0)} participantes`;
  renderGruposV125();
@@ -31811,7 +31831,9 @@ async function consultarFavorito127(url){
 
 window.abrirStickerV127=async function(url,nome,tipo){
   stickerAtual127={url,nome:nome||"figurinha.webp",tipo:tipo||"image/webp"};
+  window.__stickerAtualV127={...stickerAtual127};
   stickerFavorito127=null;
+  window.__stickerFavoritoV127=null;
 
   document.getElementById("chatStickerImgV127").src=url;
   const btn=document.getElementById("chatStickerFavoritoV127");
@@ -31821,6 +31843,7 @@ window.abrirStickerV127=async function(url,nome,tipo){
 
   try{
     stickerFavorito127=await consultarFavorito127(url);
+    window.__stickerFavoritoV127=stickerFavorito127||null;
     btn.textContent=stickerFavorito127?"Remover das favoritas":"Adicionar às favoritas";
   }catch(e){
     console.warn("[STICKER FAVORITO]",e);
@@ -31834,6 +31857,8 @@ window.fecharStickerV127=function(){
   document.getElementById("chatStickerViewV127")?.classList.remove("aberto");
   stickerAtual127=null;
   stickerFavorito127=null;
+  window.__stickerAtualV127=null;
+  window.__stickerFavoritoV127=null;
 };
 
 window.alternarFavoritoStickerV127=async function(){
@@ -32043,12 +32068,9 @@ let membros128=[],mensagens128=[],aba128="membros";
    Evita que ações/modais do grupo fechem o chat inteiro.
    Captura antes dos listeners globais antigos.
    --------------------------------------------------------- */
-document.addEventListener("click",function(e){
-  const dentroGrupo=
-    e.target.closest?.("#chatGrupoPerfilV128,#chatGrupoPerfilV127,#chatStickerViewV127,#chatPasteModalV125,#chatGrupoModalV125,#chatGrupoCallV125");
-  if(!dentroGrupo)return;
-  e.stopPropagation();
-},true);
+/* V12.9: proteção por capture removida.
+   Agora o listener original de pointerdown conhece os overlays do chat,
+   portanto os próprios botões Fechar continuam funcionando. */
 
 /* ---------------------------------------------------------
    PERFIL DO GRUPO
@@ -32135,7 +32157,7 @@ document.getElementById("chatGrupoFotoInputV128")?.addEventListener("change",asy
   try{
     if(f.size>5*1024*1024)throw new Error("Limite de 5 MB.");
     const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
-    const caminho=`grupos/${g.id}/perfil-${Date.now()}.${ext}`;
+    const caminho=`${usuarioLogado.id}/grupos/${g.id}/perfil-${Date.now()}.${ext}`;
     const up=await sb128().storage.from("chat-anexos").upload(caminho,f,{contentType:f.type||"image/jpeg",upsert:true});
     if(up.error)throw up.error;
     const {data:u}=sb128().storage.from("chat-anexos").getPublicUrl(caminho);
@@ -32281,6 +32303,286 @@ window.enviarFigurinhaV122=async function(id){
 };
 
 console.info("ERP V12.8: grupo estável + foto de grupo + favoritos corrigidos + figurinha envia no grupo.");
+})();
+</script>
+
+
+<style id="erp-v129-chat-fixes-style">
+/* ===== Foto do grupo explícita ===== */
+#chatGrupoFotoAcoesV129{
+  display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 4px
+}
+#chatGrupoFotoAcoesV129 button{
+  border:0;border-radius:9px;padding:8px 11px;background:#0046b8;color:#fff;
+  font-weight:900;cursor:pointer
+}
+#chatGrupoFotoAcoesV129 button.remover{background:#9d1830}
+#chatGrupoFotoStatusV129{display:block;margin-top:5px;min-height:18px;font-size:12px}
+
+/* fecha/abre modais independentemente sem afetar painel */
+#chatGrupoPerfilV128,#chatGrupoPerfilV127,#chatStickerViewV127,#chatPasteModalV125,
+#chatGrupoModalV125,#chatGrupoCallV125,#v698FotoModal,#v698PerfilModal{
+  pointer-events:auto!important;
+}
+</style>
+
+<script id="erp-v129-chat-fixes-js">
+(function(){
+"use strict";
+
+const sb129=()=>obterSupabaseClient();
+const g129=()=>window.__grupoAtualV125||null;
+const esc129=v=>{try{return chatEscV57(v)}catch(_){return String(v??"").replace(/[&<>"']/g,"")}};
+
+/* =========================================================
+   1. FOTO DO GRUPO — botão visível, não depende de clicar avatar
+   ========================================================= */
+function instalarFotoGrupo129(){
+  const card=document.getElementById("chatGrupoPerfilCardV128");
+  const topo=document.getElementById("chatGrupoPerfilTopV128");
+  if(!card||!topo||document.getElementById("chatGrupoFotoAcoesV129"))return;
+
+  const box=document.createElement("div");
+  box.id="chatGrupoFotoAcoesV129";
+  box.innerHTML=`
+    <button type="button" onclick="event.stopPropagation();document.getElementById('chatGrupoFotoInputV128').click()">📷 Alterar foto do grupo</button>
+    <button type="button" class="remover" onclick="event.stopPropagation();removerFotoGrupoV129()">🗑 Remover foto</button>
+    <span id="chatGrupoFotoStatusV129"></span>`;
+  topo.insertAdjacentElement("afterend",box);
+}
+
+window.removerFotoGrupoV129=async function(){
+  const g=g129();if(!g)return;
+  if(!confirm("Remover a foto deste grupo?"))return;
+  const st=document.getElementById("chatGrupoFotoStatusV129");
+  try{
+    if(st)st.textContent="Removendo...";
+    const {error}=await sb129().rpc("atualizar_foto_grupo_v128",{p_grupo_id:g.id,p_foto_url:""});
+    if(error)throw error;
+    g.foto_url=null;
+    const av=document.getElementById("chatGrupoPerfilAvatarV128");if(av)av.textContent="👥";
+    const cab=document.getElementById("chatCabecalhoAvatar");if(cab)cab.textContent="👥";
+    if(st)st.textContent="✓ Foto removida.";
+    await carregarGruposV125?.();
+  }catch(e){
+    if(st)st.textContent="";
+    alert("Erro ao remover foto do grupo: "+(e?.message||e));
+  }
+};
+
+/* Listener próprio substitui o anterior para mostrar feedback e usar pasta RLS correta.
+   stopImmediatePropagation evita dois uploads pelo listener antigo. */
+const inputFoto129=document.getElementById("chatGrupoFotoInputV128");
+inputFoto129?.addEventListener("change",async function(e){
+  const f=e.target.files?.[0];if(!f)return;
+  const g=g129();if(!g)return;
+  e.stopImmediatePropagation();
+
+  const st=document.getElementById("chatGrupoFotoStatusV129");
+  try{
+    if(f.size>5*1024*1024)throw new Error("Limite de 5 MB.");
+    if(st)st.textContent="Enviando foto...";
+
+    const ext=(f.name.split(".").pop()||"jpg").toLowerCase();
+    const caminho=`${usuarioLogado.id}/grupos/${g.id}/perfil-${Date.now()}.${ext}`;
+
+    const up=await sb129().storage.from("chat-anexos").upload(caminho,f,{
+      contentType:f.type||"image/jpeg",upsert:false
+    });
+    if(up.error)throw up.error;
+
+    const {data:urlData}=sb129().storage.from("chat-anexos").getPublicUrl(caminho);
+    const url=urlData?.publicUrl||"";
+    const {error}=await sb129().rpc("atualizar_foto_grupo_v128",{p_grupo_id:g.id,p_foto_url:url});
+    if(error)throw error;
+
+    g.foto_url=url;
+    const av=document.getElementById("chatGrupoPerfilAvatarV128");
+    if(av)av.innerHTML=`<img src="${esc129(url)}" alt="">`;
+
+    const cab=document.getElementById("chatCabecalhoAvatar");
+    if(cab)cab.innerHTML=`<img src="${esc129(url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+
+    if(st)st.textContent="✓ Foto do grupo atualizada.";
+    await carregarGruposV125?.();
+  }catch(err){
+    if(st)st.textContent="";
+    alert("Erro ao atualizar foto do grupo: "+(err?.message||err));
+  }finally{
+    e.target.value="";
+  }
+},true);
+
+/* =========================================================
+   2. FAVORITAR FIGURINHA — usa estado GLOBAL estável.
+   Corrige "Cannot read properties of null (reading 'url')"
+   ========================================================= */
+window.alternarFavoritoStickerV127=async function(){
+  const atual=window.__stickerAtualV127 ? {...window.__stickerAtualV127} : null;
+  if(!atual?.url||!usuarioLogado?.id){
+    alert("Não foi possível identificar esta figurinha.");
+    return;
+  }
+
+  const btn=document.getElementById("chatStickerFavoritoV127");
+  if(btn)btn.disabled=true;
+
+  try{
+    let fav=window.__stickerFavoritoV127||null;
+
+    if(!fav){
+      const q=await sb129().from("chat_figurinhas")
+        .select("id,caminho,url,origem_url")
+        .eq("user_id",usuarioLogado.id)
+        .eq("origem_url",atual.url)
+        .limit(1);
+      if(q.error)throw q.error;
+      fav=q.data?.[0]||null;
+    }
+
+    if(fav){
+      const del=await sb129().from("chat_figurinhas")
+        .delete().eq("id",fav.id).eq("user_id",usuarioLogado.id);
+      if(del.error)throw del.error;
+      if(fav.caminho){try{await sb129().storage.from("chat-anexos").remove([fav.caminho])}catch(_){}}
+      window.__stickerFavoritoV127=null;
+      if(btn)btn.textContent="Adicionar às favoritas";
+      try{await carregarFigurinhasV122()}catch(_){}
+      return;
+    }
+
+    const resp=await fetch(atual.url,{cache:"force-cache"});
+    if(!resp.ok)throw new Error("Não foi possível carregar a figurinha.");
+    const blob=await resp.blob();
+    const mime=atual.tipo||blob.type||"image/webp";
+    const ext=mime.includes("webp")?"webp":mime.includes("png")?"png":mime.includes("gif")?"gif":"jpg";
+    const arquivo=new File([blob],atual.nome||`figurinha.${ext}`,{type:mime});
+    const caminho=`${usuarioLogado.id}/figurinhas/${crypto.randomUUID()}.${ext}`;
+
+    const up=await sb129().storage.from("chat-anexos").upload(caminho,arquivo,{
+      contentType:mime,upsert:false,cacheControl:"31536000"
+    });
+    if(up.error)throw up.error;
+
+    const {data:urlData}=sb129().storage.from("chat-anexos").getPublicUrl(caminho);
+    const ins=await sb129().from("chat_figurinhas").insert({
+      user_id:usuarioLogado.id,
+      nome:arquivo.name,
+      url:urlData?.publicUrl||"",
+      caminho,
+      tipo:mime,
+      origem_url:atual.url
+    }).select("id,caminho,url,origem_url").single();
+
+    if(ins.error){
+      await sb129().storage.from("chat-anexos").remove([caminho]);
+      throw ins.error;
+    }
+
+    window.__stickerFavoritoV127=ins.data;
+    if(btn)btn.textContent="Remover das favoritas";
+    try{await carregarFigurinhasV122()}catch(_){}
+  }catch(e){
+    alert("Erro ao atualizar favoritas: "+(e?.message||e));
+  }finally{
+    if(btn)btn.disabled=false;
+  }
+};
+
+/* =========================================================
+   3. FIGURINHAS NO GRUPO
+   Não usa mais figurinhasCacheV122 (lexical/inacessível).
+   Busca a figurinha pelo ID direto na tabela.
+   ========================================================= */
+window.enviarFigurinhaV122=async function(id){
+  try{
+    const {data:f,error:fe}=await sb129().from("chat_figurinhas")
+      .select("id,nome,url,caminho,tipo")
+      .eq("id",id)
+      .eq("user_id",usuarioLogado.id)
+      .maybeSingle();
+    if(fe)throw fe;
+    if(!f)throw new Error("Figurinha não encontrada na sua coleção.");
+
+    const anexo={
+      nome:f.nome||"figurinha.webp",
+      tipo:f.tipo||"image/webp",
+      url:f.url,
+      caminho:f.caminho,
+      figurinha:true
+    };
+
+    const g=g129();
+    if(g){
+      const {data,error}=await sb129().rpc("enviar_mensagem_grupo_v125",{
+        p_grupo_id:g.id,
+        p_mensagem:"",
+        p_anexos:[anexo]
+      });
+      if(error)throw error;
+      fecharFigurinhasV122?.();
+      await carregarMensagensGrupoV125?.();
+      return;
+    }
+
+    if(!chatConversaAtualV57)throw new Error("Abra uma conversa.");
+    const {data,error}=await chatSbV57().rpc("enviar_mensagem_chat_v600",{
+      p_conversa_id:chatConversaAtualV57,
+      p_mensagem:"",
+      p_resposta_id:chatRespostaAtualV600?.id||null,
+      p_anexos:[anexo]
+    });
+    if(error)throw error;
+
+    fecharFigurinhasV122?.();
+    await carregarMensagensChatV57(true);
+  }catch(e){
+    alert("Não foi possível enviar a figurinha: "+(e?.message||e));
+  }
+};
+
+/* =========================================================
+   4. MODAIS FECHAM SEM FECHAR O CHAT
+   O listener original de pointerdown foi corrigido no próprio
+   código; aqui só garantimos funções de fechamento locais.
+   ========================================================= */
+window.fecharPerfilGrupoV128=(function(base){
+  return function(e){
+    e?.preventDefault?.();e?.stopPropagation?.();
+    document.getElementById("chatGrupoPerfilV128")?.classList.remove("aberto");
+  };
+})(window.fecharPerfilGrupoV128);
+
+const fecharStickerBase129=window.fecharStickerV127;
+window.fecharStickerV127=function(e){
+  e?.preventDefault?.();e?.stopPropagation?.();
+  document.getElementById("chatStickerViewV127")?.classList.remove("aberto");
+  window.__stickerAtualV127=null;
+  window.__stickerFavoritoV127=null;
+};
+
+/* ESC fecha o overlay superior, não o chat. */
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Escape")return;
+  const ordem=[
+    ["chatStickerViewV127",()=>fecharStickerV127(e)],
+    ["chatGrupoPerfilV128",()=>fecharPerfilGrupoV128(e)],
+    ["chatPasteModalV125",()=>fecharPasteImagemV125?.()],
+    ["chatGrupoModalV125",()=>fecharCriarGrupoV125?.()]
+  ];
+  for(const [id,fn] of ordem){
+    const el=document.getElementById(id);
+    if(el?.classList.contains("aberto")){
+      e.preventDefault();e.stopPropagation();fn();return;
+    }
+  }
+},true);
+
+new MutationObserver(instalarFotoGrupo129).observe(document.body,{childList:true,subtree:true});
+setInterval(instalarFotoGrupo129,1400);
+setTimeout(instalarFotoGrupo129,400);
+
+console.info("ERP V12.9: modais do chat fecham sem fechar chat + foto do grupo + favoritos + stickers em grupo corrigidos.");
 })();
 </script>
 
