@@ -33262,6 +33262,100 @@ console.info("ERP V13.7: cadastro voltou para confirmação por e-mail do Supaba
 })();
 </script>
 
+
+<style id="erp-v138-chat-scroll-usuarios">
+/* =========================================================
+   V13.8 — BARRA DE ROLAGEM NA LISTA DE USUÁRIOS DO CHAT
+   Mantém topo, busca e grupos visíveis; só a lista de pessoas rola.
+   ========================================================= */
+
+/* A coluna lateral precisa poder encolher dentro do painel */
+#chatPainel .chat-lateral{
+  min-height:0!important;
+  overflow:hidden!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+
+/* Cabeçalho e busca ficam fixos */
+#chatPainel .chat-lateral-topo,
+#chatPainel .chat-pesquisa-usuarios,
+#chatPainel #chatGruposBlocoV125{
+  flex:0 0 auto!important;
+}
+
+/* A lista de usuários passa a ocupar o restante da altura e rolar */
+#chatPainel #chatUsuarios{
+  flex:1 1 auto!important;
+  min-height:0!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+  overscroll-behavior:contain!important;
+  scrollbar-gutter:stable!important;
+  padding-right:3px!important;
+}
+
+/* Scrollbar visível e discreta */
+#chatPainel #chatUsuarios::-webkit-scrollbar{
+  width:9px;
+}
+#chatPainel #chatUsuarios::-webkit-scrollbar-track{
+  background:rgba(120,145,170,.12);
+  border-radius:999px;
+}
+#chatPainel #chatUsuarios::-webkit-scrollbar-thumb{
+  background:rgba(90,125,160,.55);
+  border-radius:999px;
+  border:2px solid transparent;
+  background-clip:padding-box;
+}
+#chatPainel #chatUsuarios::-webkit-scrollbar-thumb:hover{
+  background:rgba(65,110,155,.78);
+  background-clip:padding-box;
+}
+
+/* Firefox */
+#chatPainel #chatUsuarios{
+  scrollbar-width:thin;
+  scrollbar-color:rgba(90,125,160,.7) rgba(120,145,170,.12);
+}
+
+/* Dark mode */
+body.dark-mode #chatPainel #chatUsuarios::-webkit-scrollbar-track{
+  background:rgba(255,255,255,.06);
+}
+body.dark-mode #chatPainel #chatUsuarios::-webkit-scrollbar-thumb{
+  background:rgba(130,175,215,.5);
+  background-clip:padding-box;
+}
+body.dark-mode #chatPainel #chatUsuarios{
+  scrollbar-color:rgba(130,175,215,.6) rgba(255,255,255,.06);
+}
+</style>
+
+<script id="erp-v138-chat-scroll-usuarios-js">
+(function(){
+"use strict";
+
+/* Garante que a lista use o espaço disponível mesmo quando grupos aumentarem. */
+function ajustarListaUsuariosV138(){
+  const painel=document.getElementById("chatPainel");
+  const lateral=painel?.querySelector(".chat-lateral");
+  const usuarios=document.getElementById("chatUsuarios");
+  if(!painel||!lateral||!usuarios)return;
+
+  lateral.style.minHeight="0";
+  usuarios.style.minHeight="0";
+  usuarios.style.overflowY="auto";
+}
+
+window.addEventListener("resize",ajustarListaUsuariosV138);
+setTimeout(ajustarListaUsuariosV138,300);
+
+console.info("ERP V13.8: lista de usuários do chat com rolagem independente.");
+})();
+</script>
+
 </body>
 </html>
 
