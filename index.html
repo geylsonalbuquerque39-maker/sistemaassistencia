@@ -34275,6 +34275,259 @@ console.info("ERP V14.0: responsividade global ativada.");
 })();
 </script>
 
+
+<style id="erp-v141-mobile-fixes">
+/* =========================================================
+   ERP V14.1 — CORREÇÕES MOBILE
+   - menu ☰ volta a funcionar
+   - fechar do chat sempre visível
+   - remove badges técnicos do rodapé no celular
+   - remove seta duplicada do chat
+   - melhora topbar no celular
+   ========================================================= */
+
+@media(max-width:760px){
+
+  /* Sidebar: compatível com a classe ORIGINAL do ERP */
+  #sidebar.sidebar{
+    left:-290px!important;
+    width:min(280px,86vw)!important;
+    transition:left .22s ease!important;
+  }
+  #sidebar.sidebar.mobile-open,
+  #sidebar.sidebar.aberto,
+  body.menu-aberto #sidebar.sidebar{
+    left:0!important;
+  }
+
+  /* botão ☰ acima de tudo e realmente clicável */
+  .mobile-menu-btn{
+    display:flex!important;
+    position:relative!important;
+    left:auto!important;
+    top:auto!important;
+    z-index:51000!important;
+    width:42px!important;
+    height:42px!important;
+    align-items:center!important;
+    justify-content:center!important;
+    cursor:pointer!important;
+    pointer-events:auto!important;
+    font-size:25px!important;
+  }
+
+  /* remove badges de diagnóstico que estavam no meio da tela */
+  #erpVersionBadgeV7542,
+  #erpModoDemandaV7544{
+    display:none!important;
+  }
+
+  /* CHAT — lista */
+  #chatPainel .chat-lateral-topo{
+    position:relative!important;
+    padding-right:64px!important;
+  }
+
+  #chatPainel .chat-fechar-lista-v637{
+    display:flex!important;
+    position:absolute!important;
+    right:14px!important;
+    top:14px!important;
+    width:42px!important;
+    height:42px!important;
+    padding:0!important;
+    align-items:center!important;
+    justify-content:center!important;
+    border-radius:50%!important;
+    background:#e9eef5!important;
+    color:#001b3d!important;
+    border:1px solid #ccd6e1!important;
+    font-size:23px!important;
+    font-weight:900!important;
+    z-index:15!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+
+  body.dark-mode #chatPainel .chat-fechar-lista-v637{
+    background:#173957!important;
+    color:#fff!important;
+    border-color:#315a80!important;
+  }
+
+  /* V13.9 criou uma segunda seta. Mantém apenas a seta original do ERP. */
+  #chatVoltarMobileV139{
+    display:none!important;
+  }
+  #chatPainel .chat-voltar-mobile{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    border-radius:50%!important;
+  }
+
+  /* botão X da conversa sempre visível */
+  #chatPainel .chat-cabecalho .chat-fechar{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    visibility:visible!important;
+    opacity:1!important;
+    pointer-events:auto!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    background:#e9eef5!important;
+    color:#001b3d!important;
+  }
+
+  body.dark-mode #chatPainel .chat-cabecalho .chat-fechar{
+    background:#173957!important;
+    color:#fff!important;
+  }
+
+  /* Deixa os FABs fora da área de digitação */
+  #chatWrap{
+    right:14px!important;
+    bottom:88px!important;
+  }
+  #copilotoFab{
+    right:14px!important;
+    bottom:148px!important;
+  }
+
+  /* Topbar: não empilha data palavra por palavra */
+  .topbar{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-items:center!important;
+    gap:8px!important;
+    padding:8px 10px!important;
+  }
+  .topbar .mobile-menu-btn{
+    order:0!important;
+  }
+  .topbar > div:not(.mobile-menu-btn){
+    min-width:0!important;
+  }
+  #dataHoje,
+  #horaAtual{
+    white-space:nowrap!important;
+    width:auto!important;
+    max-width:100%!important;
+    font-size:13px!important;
+    line-height:1.25!important;
+  }
+
+  /* pesquisa ocupa uma linha própria */
+  .pesquisa-global-wrap{
+    order:20!important;
+    width:100%!important;
+    flex:1 0 100%!important;
+  }
+  .pesquisa-global-atalho{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  /* no celular não mostra atalho Ctrl K */
+  .pesquisa-global-atalho kbd{
+    display:none!important;
+  }
+}
+
+/* celular estreito */
+@media(max-width:430px){
+  #chatPainel .chat-lateral-topo h3{
+    padding-right:10px!important;
+  }
+
+  #chatPainel .chat-cabecalho-acoes{
+    gap:3px!important;
+  }
+
+  /* mantém X, telefone e vídeo; reduz tamanhos */
+  #chatPainel .chat-cabecalho-acoes .chat-acao-topo{
+    width:32px!important;
+    height:32px!important;
+    min-width:32px!important;
+  }
+}
+</style>
+
+<script id="erp-v141-mobile-fixes-js">
+(function(){
+"use strict";
+
+function fecharSidebarV141(){
+  const sb=document.getElementById("sidebar");
+  if(!sb)return;
+  sb.classList.remove("mobile-open","aberto");
+  document.body.classList.remove("menu-aberto");
+}
+
+/* Captura o ☰ antes do onclick antigo/overrides conflitantes.
+   Usa a classe original mobile-open do ERP. */
+document.addEventListener("click",function(e){
+  const btn=e.target.closest?.(".mobile-menu-btn");
+  if(!btn || !window.matchMedia("(max-width:760px)").matches)return;
+
+  e.preventDefault();
+  e.stopImmediatePropagation();
+
+  const sb=document.getElementById("sidebar");
+  if(!sb)return;
+
+  const abrir=!sb.classList.contains("mobile-open");
+  fecharSidebarV141();
+  if(abrir){
+    sb.classList.add("mobile-open");
+    document.body.classList.add("menu-aberto");
+  }
+},true);
+
+/* Menu escolhido -> fecha gaveta */
+document.addEventListener("click",function(e){
+  if(!window.matchMedia("(max-width:760px)").matches)return;
+  if(e.target.closest?.("#sidebar .menu")){
+    setTimeout(fecharSidebarV141,0);
+  }
+},true);
+
+/* Toque fora -> fecha gaveta */
+document.addEventListener("pointerdown",function(e){
+  if(!window.matchMedia("(max-width:760px)").matches)return;
+  const sb=document.getElementById("sidebar");
+  if(!sb?.classList.contains("mobile-open"))return;
+  if(e.target.closest?.("#sidebar,.mobile-menu-btn"))return;
+  fecharSidebarV141();
+},true);
+
+/* No mobile, voltar da conversa mostra a lista sem fechar o chat */
+document.addEventListener("click",function(e){
+  const voltar=e.target.closest?.("#chatPainel .chat-voltar-mobile");
+  if(!voltar || !window.matchMedia("(max-width:680px)").matches)return;
+  setTimeout(()=>document.getElementById("chatPainel")?.classList.remove("conversa-aberta"),0);
+},true);
+
+/* O fechamento do chat deve sempre limpar o modo conversa mobile */
+const fecharChatBaseV141=window.fecharChatV57;
+if(typeof fecharChatBaseV141==="function"){
+  window.fecharChatV57=function(){
+    document.getElementById("chatPainel")?.classList.remove("conversa-aberta");
+    return fecharChatBaseV141.apply(this,arguments);
+  };
+}
+
+console.info("ERP V14.1: mobile menu + fechamento do chat + badges técnicos corrigidos.");
+})();
+</script>
+
 </body>
 </html>
 
