@@ -34692,6 +34692,155 @@ console.info("ERP V14.2: informações técnicas removidas da interface visual."
 })();
 </script>
 
+
+<style id="erp-v143-interface-limpa-total">
+/* =========================================================
+   ERP V14.3 — LIMPEZA TOTAL DE INFORMAÇÕES TÉCNICAS VISÍVEIS
+   ========================================================= */
+
+/* Blocos e textos técnicos conhecidos */
+#backendStatus,
+#backendInfo,
+#backendMeta,
+#backendDiagnostics,
+#zeroRelationInfo,
+#zeroRelationBadge,
+#supabaseStatus,
+#supabaseInfo,
+#statusSupabase,
+#statusBackend,
+#intelBackendStatus,
+#dashboardBackendStatus,
+#buscaBackendStatus,
+[class*="backend-status"],
+[class*="backend-info"],
+[class*="backend-meta"],
+[class*="backend-diagnostic"],
+[class*="supabase-status"],
+[class*="supabase-info"],
+[class*="zero-relation"],
+[class*="tech-info"],
+[class*="technical-info"],
+[class*="diagnostic-info"],
+[data-debug],
+[data-diagnostic],
+[data-backend-status],
+[data-supabase-status]{
+  display:none!important;
+}
+</style>
+
+<script id="erp-v143-interface-limpa-total-js">
+(function(){
+"use strict";
+
+const FRASES_TECNICAS_V143 = [
+  "indicadores recebidos prontos do backend",
+  "supabase conectado",
+  "busca conectada ao banco supabase",
+  "zero relation dom",
+  "backend ativo",
+  "filtros carregados do servidor",
+  "dashboard calculado no backend",
+  "nenhuma rexpedlr completa foi baixada",
+  "carregado do servidor",
+  "carregados do servidor",
+  "calculado no backend",
+  "dados recebidos do backend",
+  "backend conectado",
+  "backend online",
+  "backend-first",
+  "modo backend",
+  "zero relation",
+  "supabase ativo",
+  "supabase online"
+];
+
+function normalizarV143(txt){
+  return String(txt||"")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g,"")
+    .replace(/\s+/g," ")
+    .trim()
+    .toLowerCase();
+}
+
+function ehTextoTecnicoV143(txt){
+  const t=normalizarV143(txt);
+  if(!t || t.length>220)return false;
+  return FRASES_TECNICAS_V143.some(f=>t.includes(normalizarV143(f)));
+}
+
+function ocultarNoV143(el){
+  if(!el || el===document.body || el===document.documentElement)return;
+
+  /* Não esconde cards/painéis inteiros grandes.
+     Procura o menor elemento visual que contenha só a mensagem técnica. */
+  const texto=normalizarV143(el.textContent);
+  if(!ehTextoTecnicoV143(texto))return;
+
+  const tagsSeguras=new Set([
+    "SPAN","SMALL","P","DIV","LABEL","B","STRONG","EM","I"
+  ]);
+  if(!tagsSeguras.has(el.tagName))return;
+
+  /* Se o elemento tem controles/conteúdo funcional, não toca nele. */
+  if(el.querySelector("button,input,select,textarea,table,canvas,svg,img,video,a"))return;
+
+  /* Não esconde containers grandes com muito conteúdo filho. */
+  const filhosTexto=[...el.children].filter(c=>normalizarV143(c.textContent)).length;
+  if(el.children.length>4 || filhosTexto>3)return;
+
+  el.style.setProperty("display","none","important");
+  el.setAttribute("aria-hidden","true");
+}
+
+function limparTecnicoV143(root=document){
+  const candidatos=root.querySelectorAll?.(
+    "span,small,p,label,b,strong,em,i,div"
+  )||[];
+
+  for(const el of candidatos){
+    if(ehTextoTecnicoV143(el.textContent)){
+      /* prefere esconder um descendente menor quando possível */
+      let menor=null;
+      for(const child of el.querySelectorAll("span,small,p,label,b,strong,em,i,div")){
+        if(
+          child!==el &&
+          ehTextoTecnicoV143(child.textContent) &&
+          !child.querySelector("button,input,select,textarea,table,canvas,svg,img,video,a")
+        ){
+          if(!menor || child.textContent.length < menor.textContent.length) menor=child;
+        }
+      }
+      ocultarNoV143(menor||el);
+    }
+  }
+}
+
+limparTecnicoV143();
+
+const obsV143=new MutationObserver(muts=>{
+  for(const m of muts){
+    for(const n of m.addedNodes){
+      if(n.nodeType!==1)continue;
+      limparTecnicoV143(n);
+      ocultarNoV143(n);
+    }
+  }
+});
+obsV143.observe(document.body,{childList:true,subtree:true});
+
+/* Limpa após abrir telas que criam conteúdo sob demanda */
+document.addEventListener("click",function(){
+  setTimeout(()=>limparTecnicoV143(),80);
+  setTimeout(()=>limparTecnicoV143(),400);
+},true);
+
+console.info("ERP V14.3: informações técnicas visuais ocultadas completamente.");
+})();
+</script>
+
 </body>
 </html>
 
