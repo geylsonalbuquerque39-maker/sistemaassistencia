@@ -34841,6 +34841,161 @@ console.info("ERP V14.3: informações técnicas visuais ocultadas completamente
 })();
 </script>
 
+
+<style id="erp-v144-sem-configurar-dossie">
+/* V14.4 — remove permanentemente o botão Configurar do Dossiê de mídias */
+#midiasConfigBtn,
+#btnConfigurarMidias,
+[id*="configurar"][id*="midia" i],
+[class*="configurar"][class*="midia" i]{
+  display:none!important;
+}
+</style>
+
+<script id="erp-v144-sem-configurar-dossie-js">
+(function(){
+"use strict";
+
+function removerConfigurarDossieV144(root=document){
+  const botoes=root.querySelectorAll?.("button,a,[role='button']")||[];
+  for(const el of botoes){
+    const txt=String(el.textContent||"").replace(/\s+/g," ").trim().toLowerCase();
+    if(txt==="configurar" || txt==="⚙ configurar" || txt==="⚙️ configurar"){
+      /* Restringe a remoção ao modal/painel de mídias quando identificável. */
+      const contexto=el.closest(
+        "[id*='midia' i],[class*='midia' i],[id*='dossie' i],[class*='dossie' i],.modal,[class*='modal']"
+      );
+      if(contexto && /dossi|m[ií]dia|foto|pdf|documento/i.test(contexto.textContent||"")){
+        el.remove();
+      }
+    }
+  }
+}
+
+removerConfigurarDossieV144();
+
+const obs=new MutationObserver(muts=>{
+  for(const m of muts){
+    for(const n of m.addedNodes){
+      if(n.nodeType===1) removerConfigurarDossieV144(n);
+    }
+  }
+});
+obs.observe(document.body,{childList:true,subtree:true});
+
+console.info("ERP V14.4: botão Configurar removido do Dossiê de mídias.");
+})();
+</script>
+
+
+<script id="erp-v145-exportacoes-colunas-padrao">
+(function(){
+"use strict";
+
+/* =========================================================
+   ERP V14.5 — PADRÃO ÚNICO PARA RELATÓRIOS DE O.S.
+   Ordem obrigatória:
+   O.S. | Data da O.S. | Destino | Loja de Origem | ALM | GR |
+   N.C.E | Desc. Mercadoria | Cód. Cor | Cor | Número de Série |
+   Rack | Status | Valor | Cubagem
+   ========================================================= */
+
+function primeiroV145(r,chaves){
+  for(const k of chaves){
+    const v=r?.[k];
+    if(v!==undefined && v!==null && String(v).trim()!=="") return v;
+  }
+  return "";
+}
+
+const COLUNAS_OS_V145=[
+  {label:"O.S.",value:r=>primeiroV145(r,["os","ordem_servico","numero_os"])},
+  {label:"Data da O.S.",value:r=>primeiroV145(r,["dt_geracao","data_os","data","dt_os","data_geracao"])},
+  {label:"Destino",value:r=>primeiroV145(r,["destino","__coleta_destino","pdv_destino","pdv_expedicao","loja_destino"])},
+  {label:"Loja de Origem",value:r=>primeiroV145(r,["loja_origem","loja_de_origem","pdv","loja","origem"])},
+  {label:"ALM",value:r=>primeiroV145(r,["alm","almoxarifado","al"])},
+  {label:"GR",value:r=>primeiroV145(r,["grupo","gr"])},
+  {label:"N.C.E",value:r=>primeiroV145(r,["nce","n_c_e","codigo_nce"])},
+  {label:"Desc. Mercadoria",value:r=>primeiroV145(r,["desc_mercadoria","desc_produto","produto","descricao_produto","descricao"])},
+  {label:"Cód. Cor",value:r=>primeiroV145(r,["cod_cor","codigo_cor","codcor","__coleta_cod_cor","__rascunho_cod_cor"])},
+  {label:"Cor",value:r=>primeiroV145(r,["cor","desc_cor"])},
+  {label:"Número de Série",value:r=>primeiroV145(r,["n_serie","numero_serie","serie"])},
+  {label:"Rack",value:r=>primeiroV145(r,["rack","__coleta_rack","endereco","posicao"])},
+  {label:"Status",value:r=>primeiroV145(r,["status","status_os","status_da_os","situacao"])},
+  {label:"Valor",value:r=>primeiroV145(r,["valor_transf","valor","valor_transferencia","valor_produto"])},
+  {label:"Cubagem",value:r=>primeiroV145(r,["cubagem","m3","volume_m3","volume"])}
+];
+
+window.ERP_COLUNAS_OS_V145=COLUNAS_OS_V145;
+
+function pareceRelatorioOSV145(dados){
+  if(!Array.isArray(dados)||!dados.length)return false;
+  return dados.some(r=>{
+    const os=primeiroV145(r,["os","ordem_servico","numero_os"]);
+    return String(os||"").trim()!=="";
+  });
+}
+
+/* Centraliza CSV / XLS / XLT.
+   Qualquer exportação de relação de O.S. que passe pelo ERP.Export
+   recebe exatamente as 15 colunas acima, nessa ordem. */
+function instalarPadraoExportV145(){
+  if(!window.ERP?.Export || typeof window.ERP.Export.exportar!=="function")return false;
+  if(window.ERP.Export.__padraoV145)return true;
+
+  const base=window.ERP.Export.exportar.bind(window.ERP.Export);
+
+  window.ERP.Export.exportar=function(opcoes={}){
+    const p={...opcoes};
+    if(pareceRelatorioOSV145(p.dados)){
+      p.colunas=COLUNAS_OS_V145;
+    }
+    return base(p);
+  };
+
+  window.ERP.Export.__padraoV145=true;
+  return true;
+}
+
+/* Relatório clássico antigo, que ainda gerava CSV diretamente. */
+window.exportarRelatorioCSV=function(){
+  let lista=[];
+  try{
+    if(typeof relatorioAtual!=="undefined" && Array.isArray(relatorioAtual)) lista=relatorioAtual;
+  }catch(_){}
+
+  if(!lista.length){
+    alert("Gere um relatório antes de exportar.");
+    return;
+  }
+
+  if(!instalarPadraoExportV145()){
+    alert("Exportador do ERP ainda não está disponível.");
+    return;
+  }
+
+  window.ERP.Export.exportar({
+    dados:lista,
+    colunas:COLUNAS_OS_V145,
+    nome:"relatorio_os",
+    formato:"CSV",
+    aba:"Relatório O.S."
+  });
+};
+
+/* Reforça depois que todos os módulos terminarem de inicializar. */
+if(!instalarPadraoExportV145()){
+  let tentativas=0;
+  const timer=setInterval(()=>{
+    tentativas++;
+    if(instalarPadraoExportV145() || tentativas>30) clearInterval(timer);
+  },200);
+}
+
+console.info("ERP V14.5: sequência padrão de 15 colunas aplicada às exportações de O.S.");
+})();
+</script>
+
 </body>
 </html>
 
