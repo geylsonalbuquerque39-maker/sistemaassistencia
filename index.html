@@ -33356,6 +33356,925 @@ console.info("ERP V13.8: lista de usuários do chat com rolagem independente.");
 })();
 </script>
 
+
+<style id="erp-v139-chat-responsive">
+/* =========================================================
+   V13.9 — CHAT MAIS RESPONSIVO
+   Desktop, notebook, tablet e celular
+   ========================================================= */
+
+/* Base fluida */
+#chatPainel.chat-painel{
+  width:min(920px,calc(100vw - 24px))!important;
+  height:min(760px,calc(100vh - 92px))!important;
+  right:12px!important;
+  top:72px!important;
+}
+
+/* Desktop/notebook */
+#chatPainel.aberto{
+  grid-template-columns:minmax(250px,300px) minmax(0,1fr)!important;
+}
+
+/* Coluna lateral nunca estoura */
+#chatPainel .chat-lateral{
+  min-width:0!important;
+  min-height:0!important;
+}
+
+/* Conversa usa todo o espaço restante */
+#chatPainel .chat-conversa{
+  min-width:0!important;
+  min-height:0!important;
+}
+
+/* Cabeçalho flexível */
+#chatPainel .chat-cabecalho{
+  min-width:0!important;
+  gap:8px!important;
+  padding:10px 12px!important;
+}
+#chatPainel .chat-cabecalho-info{
+  min-width:0!important;
+  overflow:hidden!important;
+}
+#chatPainel .chat-cabecalho-info b,
+#chatPainel .chat-cabecalho-info span{
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+#chatPainel .chat-cabecalho-acoes{
+  display:flex!important;
+  align-items:center!important;
+  gap:6px!important;
+  flex:0 0 auto!important;
+}
+#chatPainel .chat-cabecalho-acoes button{
+  flex:0 0 auto!important;
+}
+
+/* Mensagens adaptáveis */
+#chatPainel .chat-mensagens{
+  min-width:0!important;
+  min-height:0!important;
+  padding:12px!important;
+}
+#chatPainel .chat-msg{
+  max-width:82%!important;
+}
+#chatPainel .chat-msg-balao{
+  max-width:100%!important;
+}
+#chatPainel .chat-msg-balao img,
+#chatPainel .chat-msg-balao video{
+  max-width:min(320px,70vw)!important;
+  height:auto!important;
+}
+
+/* Composer responsivo */
+#chatPainel .chat-compositor{
+  min-width:0!important;
+  gap:7px!important;
+  padding:9px 10px!important;
+}
+#chatPainel .chat-tools{
+  display:flex!important;
+  gap:5px!important;
+  flex:0 0 auto!important;
+}
+#chatPainel .chat-tools button,
+#chatPainel #chatEnviar{
+  flex:0 0 auto!important;
+}
+#chatPainel #chatTexto{
+  min-width:0!important;
+  width:100%!important;
+}
+
+/* grupos: lista sem quebrar layout */
+#chatGruposBlocoV125{
+  max-height:180px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+#chatGruposListaV125{
+  min-width:0!important;
+}
+.chat-grupo-item-v125{
+  min-width:0!important;
+}
+.chat-grupo-item-v125 > span:last-child{
+  min-width:0!important;
+}
+.chat-grupo-item-v125 b{
+  display:block!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+}
+
+/* tablets */
+@media (max-width: 900px){
+  #chatPainel.chat-painel{
+    width:calc(100vw - 16px)!important;
+    height:calc(100vh - 80px)!important;
+    right:8px!important;
+    top:70px!important;
+  }
+
+  #chatPainel.aberto{
+    grid-template-columns:minmax(220px,260px) minmax(0,1fr)!important;
+  }
+
+  #chatPainel .chat-lateral-topo{
+    padding:12px!important;
+  }
+
+  #chatPainel .chat-usuario{
+    padding:9px 10px!important;
+    grid-template-columns:38px 1fr auto!important;
+    gap:8px!important;
+  }
+
+  #chatPainel .chat-avatar{
+    width:38px!important;
+    height:38px!important;
+  }
+}
+
+/* celular */
+@media (max-width: 680px){
+  #chatPainel.chat-painel{
+    inset:0!important;
+    width:100vw!important;
+    height:100dvh!important;
+    max-width:none!important;
+    max-height:none!important;
+    border-radius:0!important;
+    border:0!important;
+    z-index:32000!important;
+  }
+
+  #chatPainel.aberto{
+    display:block!important;
+  }
+
+  /* tela inicial do chat = lista */
+  #chatPainel .chat-lateral{
+    width:100%!important;
+    height:100%!important;
+    border-right:0!important;
+  }
+
+  /* conversa ocupa tela inteira quando aberta */
+  #chatPainel.conversa-aberta .chat-lateral{
+    display:none!important;
+  }
+
+  #chatPainel .chat-conversa{
+    display:none!important;
+    width:100%!important;
+    height:100%!important;
+  }
+
+  #chatPainel.conversa-aberta .chat-conversa{
+    display:flex!important;
+  }
+
+  #chatPainel .chat-cabecalho{
+    min-height:58px!important;
+    padding:8px 9px!important;
+  }
+
+  #chatPainel .chat-cabecalho-acoes{
+    gap:4px!important;
+  }
+
+  #chatPainel .chat-cabecalho-acoes button,
+  #chatPainel .chat-fechar{
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    padding:0!important;
+  }
+
+  #chatPainel .chat-cabecalho-info b{
+    font-size:13px!important;
+  }
+
+  #chatPainel .chat-cabecalho-info span{
+    font-size:9px!important;
+  }
+
+  #chatPainel .chat-mensagens{
+    padding:10px!important;
+  }
+
+  #chatPainel .chat-msg{
+    max-width:88%!important;
+  }
+
+  #chatPainel .chat-msg-balao img.chat-imagem{
+    max-width:min(260px,72vw)!important;
+  }
+
+  #chatPainel .chat-compositor{
+    padding:7px!important;
+    gap:5px!important;
+  }
+
+  #chatPainel .chat-tools{
+    gap:3px!important;
+  }
+
+  #chatPainel .chat-tools button{
+    width:34px!important;
+    height:34px!important;
+    padding:0!important;
+  }
+
+  #chatPainel #chatEnviar{
+    width:42px!important;
+    height:42px!important;
+    min-width:42px!important;
+  }
+
+  #chatPainel #chatTexto{
+    font-size:16px!important; /* evita zoom do iPhone */
+  }
+
+  /* lista */
+  #chatPainel .chat-lateral-topo{
+    padding:14px!important;
+  }
+
+  #chatPainel .chat-usuarios{
+    min-height:0!important;
+    overflow-y:auto!important;
+  }
+
+  #chatGruposBlocoV125{
+    max-height:145px!important;
+  }
+}
+
+/* celulares pequenos */
+@media (max-width: 430px){
+  #chatPainel .chat-cabecalho-acoes button:nth-of-type(n+4):not(.chat-fechar){
+    display:none!important;
+  }
+
+  #chatPainel .chat-msg{
+    max-width:92%!important;
+  }
+
+  #chatPainel .chat-tools button{
+    width:32px!important;
+    height:32px!important;
+  }
+
+  #chatPainel .chat-compositor{
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+  }
+}
+
+/* melhora em telas baixas */
+@media (max-height: 720px) and (min-width:681px){
+  #chatPainel.chat-painel{
+    top:64px!important;
+    height:calc(100vh - 72px)!important;
+  }
+}
+</style>
+
+<script id="erp-v139-chat-responsive-js">
+(function(){
+"use strict";
+
+/* Voltar para a lista no celular sem fechar o chat inteiro */
+function instalarVoltarMobileV139(){
+  const cab=document.getElementById("chatCabecalho");
+  if(!cab||document.getElementById("chatVoltarMobileV139"))return;
+
+  const b=document.createElement("button");
+  b.id="chatVoltarMobileV139";
+  b.type="button";
+  b.className="chat-acao-topo";
+  b.title="Voltar para conversas";
+  b.textContent="←";
+  b.style.cssText="display:none;width:34px;height:34px;border:0;border-radius:50%;font-size:20px;font-weight:900;cursor:pointer";
+
+  b.onclick=function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById("chatPainel")?.classList.remove("conversa-aberta");
+  };
+
+  cab.insertBefore(b,cab.firstChild);
+}
+
+function atualizarModoV139(){
+  instalarVoltarMobileV139();
+
+  const mobile=window.matchMedia("(max-width:680px)").matches;
+  const painel=document.getElementById("chatPainel");
+  const voltar=document.getElementById("chatVoltarMobileV139");
+
+  if(voltar)voltar.style.display=mobile?"inline-grid":"none";
+
+  if(!mobile && painel){
+    /* desktop sempre mantém as duas colunas */
+    painel.style.removeProperty("display");
+  }
+}
+
+/* quando abrir uma conversa em celular, muda para a tela da conversa */
+document.addEventListener("click",function(e){
+  if(!window.matchMedia("(max-width:680px)").matches)return;
+
+  const usuario=e.target.closest?.("#chatUsuarios .chat-usuario");
+  const grupo=e.target.closest?.("#chatGruposListaV125 .chat-grupo-item-v125");
+
+  if(usuario||grupo){
+    setTimeout(()=>document.getElementById("chatPainel")?.classList.add("conversa-aberta"),60);
+  }
+},true);
+
+window.addEventListener("resize",atualizarModoV139);
+setTimeout(atualizarModoV139,300);
+
+console.info("ERP V13.9: chat responsivo para desktop, notebook, tablet e celular.");
+})();
+</script>
+
+
+<style id="erp-v140-responsive-global">
+/* =========================================================
+   ERP V14.0 — RESPONSIVIDADE GLOBAL
+   Objetivo: manter desktop intacto e adaptar o ERP inteiro
+   para notebooks, tablets e celulares sem recriar módulos.
+   ========================================================= */
+
+/* ---------- BASE GLOBAL ---------- */
+html,body{
+  max-width:100%!important;
+  overflow-x:hidden!important;
+}
+*,*::before,*::after{
+  box-sizing:border-box!important;
+}
+img,video,canvas,svg{
+  max-width:100%;
+}
+input,select,textarea,button{
+  max-width:100%;
+}
+.main{
+  min-width:0!important;
+}
+.main > *{
+  min-width:0!important;
+}
+
+/* Evita que grids antigos forcem largura além da tela */
+[class*="grid"],
+[class*="cards"],
+[class*="dashboard"],
+[class*="painel"],
+[class*="conteudo"],
+[class*="container"]{
+  min-width:0;
+}
+
+/* Tabelas não quebram o layout: rolam horizontalmente dentro do módulo */
+.table-wrap,
+.tabela-wrap,
+.relatorio-tabela-wrap,
+.admin-tabela-wrap,
+.consulta-tabela-wrap,
+.intel-table-wrap{
+  max-width:100%!important;
+  overflow-x:auto!important;
+  overscroll-behavior-x:contain!important;
+  -webkit-overflow-scrolling:touch!important;
+}
+table{
+  max-width:100%;
+}
+
+/* Modais nunca passam da viewport */
+.modal,
+[class*="modal"],
+[class*="overlay"]{
+  max-width:100vw;
+}
+.modal-content,
+[class*="modal-box"],
+[class*="modal-card"],
+[class*="modal-conteudo"],
+.intel-modal-box{
+  max-width:calc(100vw - 24px)!important;
+  max-height:calc(100dvh - 24px)!important;
+}
+
+/* Formulários fluidos */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea{
+  min-width:0!important;
+}
+
+/* ---------- DESKTOP / NOTEBOOK ---------- */
+@media (max-width: 1280px){
+  .main{
+    padding-left:clamp(12px,2vw,26px)!important;
+    padding-right:clamp(12px,2vw,26px)!important;
+  }
+
+  .topbar{
+    gap:10px!important;
+    padding-left:16px!important;
+    padding-right:16px!important;
+  }
+
+  /* Cards */
+  .cards,
+  .dashboard-cards,
+  .admin-cards,
+  .intel-cards,
+  .cards-grid,
+  .dashboard-grid{
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr))!important;
+  }
+
+  /* Gráficos */
+  canvas{
+    height:auto!important;
+  }
+}
+
+/* ---------- TABLET / NOTEBOOK PEQUENO ---------- */
+@media (max-width: 1024px){
+  .sidebar{
+    width:220px!important;
+  }
+
+  .main{
+    margin-left:220px!important;
+    width:calc(100% - 220px)!important;
+  }
+
+  .topbar{
+    flex-wrap:wrap!important;
+    min-height:72px!important;
+    height:auto!important;
+  }
+
+  .topbar .company{
+    font-size:clamp(18px,2.4vw,26px)!important;
+  }
+
+  /* Qualquer grid rígido passa a auto-fit */
+  .dashboard-grid,
+  .cards-grid,
+  .admin-grid,
+  .intel-grid,
+  .relatorio-grid,
+  .estatisticas-grid,
+  .resumo-grid{
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr))!important;
+    gap:12px!important;
+  }
+
+  /* Barras de filtros */
+  .filtros,
+  .consulta-filtros,
+  .intel-filtros,
+  .relatorio-filtros,
+  .admin-filtros,
+  .toolbar,
+  .acoes,
+  .acoes-topo{
+    flex-wrap:wrap!important;
+    gap:8px!important;
+  }
+
+  .filtros > *,
+  .consulta-filtros > *,
+  .intel-filtros > *,
+  .relatorio-filtros > *{
+    min-width:160px!important;
+    flex:1 1 180px!important;
+  }
+
+  /* C.I e formulários longos */
+  .ci-container,
+  .ci-conteudo,
+  .form-grid,
+  .formulario-grid{
+    max-width:100%!important;
+  }
+
+  /* Modais maiores */
+  .intel-modal-box,
+  .modal-content,
+  [class*="modal-card"]{
+    width:min(94vw,920px)!important;
+  }
+}
+
+/* ---------- MOBILE / TABLET VERTICAL ---------- */
+@media (max-width: 760px){
+  body{
+    font-size:14px!important;
+  }
+
+  /* Sidebar vira gaveta */
+  .sidebar{
+    position:fixed!important;
+    left:-280px!important;
+    top:0!important;
+    bottom:0!important;
+    width:min(280px,86vw)!important;
+    height:100dvh!important;
+    z-index:50000!important;
+    overflow-y:auto!important;
+    overflow-x:hidden!important;
+    transition:left .22s ease!important;
+    box-shadow:12px 0 30px rgba(0,0,0,.25)!important;
+  }
+  .sidebar.aberto,
+  .sidebar.open,
+  body.menu-aberto .sidebar{
+    left:0!important;
+  }
+
+  /* Conteúdo ocupa a tela */
+  .main{
+    margin-left:0!important;
+    width:100%!important;
+    padding:0 10px 18px!important;
+  }
+
+  /* Topbar */
+  .topbar{
+    position:sticky!important;
+    top:0!important;
+    z-index:3000!important;
+    min-height:60px!important;
+    padding:8px 10px!important;
+    gap:8px!important;
+    display:grid!important;
+    grid-template-columns:auto minmax(0,1fr) auto!important;
+    align-items:center!important;
+  }
+
+  .mobile-menu-btn{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+
+  .topbar > div:first-of-type:not(.mobile-menu-btn),
+  .topbar .company{
+    min-width:0!important;
+  }
+
+  .topbar .company{
+    font-size:17px!important;
+    line-height:1.15!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+
+  /* Busca global */
+  .topbar input,
+  .topbar .pesquisa,
+  .topbar .search,
+  .topbar [class*="busca"]{
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  /* Seções */
+  .secao,
+  .section,
+  .painel,
+  .card-section,
+  .conteudo-card{
+    padding-left:8px!important;
+    padding-right:8px!important;
+  }
+
+  h1{font-size:22px!important}
+  h2{font-size:19px!important}
+  h3{font-size:17px!important}
+
+  /* Todos os grids operacionais passam a uma coluna */
+  .dashboard-grid,
+  .cards-grid,
+  .admin-grid,
+  .intel-grid,
+  .relatorio-grid,
+  .estatisticas-grid,
+  .resumo-grid,
+  .consulta-grid,
+  .coleta-grid,
+  .ci-grid{
+    grid-template-columns:1fr!important;
+    gap:10px!important;
+  }
+
+  /* Cards ocupam largura total */
+  .card,
+  [class*="-card"]:not(.login-card):not(.cadastro-card),
+  .dashboard-card,
+  .admin-card,
+  .intel-card{
+    max-width:100%!important;
+    min-width:0!important;
+  }
+
+  /* Botões e filtros */
+  .filtros,
+  .consulta-filtros,
+  .intel-filtros,
+  .relatorio-filtros,
+  .admin-filtros,
+  .toolbar,
+  .acoes,
+  .acoes-topo,
+  .botoes,
+  .buttons{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+  }
+
+  .filtros > *,
+  .consulta-filtros > *,
+  .intel-filtros > *,
+  .relatorio-filtros > *,
+  .admin-filtros > *{
+    flex:1 1 100%!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+
+  /* Tabelas */
+  table{
+    min-width:720px;
+  }
+  .tabela-responsiva,
+  .table-responsive,
+  .table-wrap,
+  .tabela-wrap,
+  [class*="tabela"]{
+    overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+  }
+
+  /* Inputs */
+  input,
+  select,
+  textarea{
+    font-size:16px!important; /* evita zoom automático no iPhone */
+  }
+
+  /* Modal ocupa quase a tela toda */
+  .modal-content,
+  .intel-modal-box,
+  [class*="modal-box"],
+  [class*="modal-card"]{
+    width:calc(100vw - 16px)!important;
+    max-width:calc(100vw - 16px)!important;
+    max-height:calc(100dvh - 16px)!important;
+    margin:8px!important;
+    border-radius:14px!important;
+  }
+
+  /* Central Inteligência */
+  #telaInteligencia,
+  .inteligencia,
+  .intel-container{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Administração */
+  #telaAdmin,
+  .admin-container,
+  .administracao{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Relatórios */
+  #telaRelatorios,
+  .relatorios,
+  .relatorio-container{
+    width:100%!important;
+    max-width:100%!important;
+    overflow-x:hidden!important;
+  }
+
+  /* Consulta */
+  #telaBusca,
+  .consulta-container,
+  .consulta-avancada{
+    width:100%!important;
+    max-width:100%!important;
+  }
+
+  /* Coletas */
+  .coleta-container,
+  #telaColeta,
+  [id*="coleta"]{
+    max-width:100%!important;
+  }
+
+  /* Perfil e usuário */
+  .usuario-topo{
+    min-width:0!important;
+  }
+
+  /* C.I: preserva documento mas permite rolar */
+  .ci-wrapper,
+  .ci-container,
+  [class*="ci-"]{
+    max-width:100%!important;
+  }
+}
+
+/* ---------- CELULAR PEQUENO ---------- */
+@media (max-width: 480px){
+  .main{
+    padding-left:6px!important;
+    padding-right:6px!important;
+  }
+
+  .topbar{
+    padding:6px!important;
+  }
+
+  .topbar .company{
+    font-size:15px!important;
+  }
+
+  .card,
+  [class*="-card"]{
+    border-radius:12px!important;
+  }
+
+  button{
+    min-height:34px;
+  }
+
+  /* títulos/card numbers não estouram */
+  .card h2,
+  .card h3,
+  [class*="-card"] h2,
+  [class*="-card"] h3{
+    overflow-wrap:anywhere!important;
+  }
+
+  /* painéis de progresso diário */
+  [class*="progress"],
+  [class*="progresso"],
+  [class*="diario"]{
+    max-width:100%!important;
+    overflow-x:auto!important;
+  }
+
+  /* Chart containers */
+  .chart-container,
+  [class*="chart"]{
+    min-width:0!important;
+    max-width:100%!important;
+    overflow:hidden!important;
+  }
+}
+
+/* ---------- ALTURA BAIXA ---------- */
+@media (max-height: 700px){
+  .modal-content,
+  .intel-modal-box,
+  [class*="modal-box"],
+  [class*="modal-card"]{
+    max-height:94dvh!important;
+    overflow-y:auto!important;
+  }
+}
+</style>
+
+<script id="erp-v140-responsive-global-js">
+(function(){
+"use strict";
+
+/* =========================================================
+   Comportamento móvel global da sidebar.
+   Reaproveita o botão ☰ que já existe no ERP.
+   ========================================================= */
+
+function sidebarV140(){
+  return document.getElementById("sidebar");
+}
+
+window.toggleMenu = (function(base){
+  return function(){
+    const sb=sidebarV140();
+
+    if(window.matchMedia("(max-width:760px)").matches && sb){
+      const abrir=!sb.classList.contains("aberto");
+      sb.classList.toggle("aberto",abrir);
+      document.body.classList.toggle("menu-aberto",abrir);
+      return;
+    }
+
+    if(typeof base==="function"){
+      return base.apply(this,arguments);
+    }
+  };
+})(window.toggleMenu);
+
+/* Ao escolher módulo no celular, fecha a gaveta automaticamente */
+document.addEventListener("click",function(e){
+  if(!window.matchMedia("(max-width:760px)").matches)return;
+  const item=e.target.closest?.("#sidebar .menu");
+  if(!item)return;
+
+  const sb=sidebarV140();
+  sb?.classList.remove("aberto");
+  document.body.classList.remove("menu-aberto");
+},true);
+
+/* Clicar fora da sidebar fecha */
+document.addEventListener("pointerdown",function(e){
+  if(!window.matchMedia("(max-width:760px)").matches)return;
+  const sb=sidebarV140();
+  if(!sb?.classList.contains("aberto"))return;
+  if(e.target.closest("#sidebar,.mobile-menu-btn"))return;
+
+  sb.classList.remove("aberto");
+  document.body.classList.remove("menu-aberto");
+},true);
+
+/* ESC fecha a gaveta no celular */
+document.addEventListener("keydown",function(e){
+  if(e.key!=="Escape")return;
+  const sb=sidebarV140();
+  if(sb?.classList.contains("aberto")){
+    sb.classList.remove("aberto");
+    document.body.classList.remove("menu-aberto");
+  }
+});
+
+/* Coloca wrappers automáticos em tabelas grandes que estejam soltas */
+function tornarTabelasResponsivasV140(){
+  document.querySelectorAll("table").forEach(table=>{
+    if(table.closest(".erp-table-responsive-v140"))return;
+    if(table.closest(".intel-modal-box,.modal-content,[class*='modal-box']"))return;
+
+    const pai=table.parentElement;
+    if(!pai)return;
+
+    const wrapper=document.createElement("div");
+    wrapper.className="erp-table-responsive-v140";
+    wrapper.style.cssText="max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch";
+    pai.insertBefore(wrapper,table);
+    wrapper.appendChild(table);
+  });
+}
+
+/* Execução leve, apenas na inicialização e após troca de módulos */
+setTimeout(tornarTabelasResponsivasV140,1200);
+document.addEventListener("click",function(e){
+  if(e.target.closest?.("#sidebar .menu")){
+    setTimeout(tornarTabelasResponsivasV140,250);
+  }
+},true);
+
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.responsiveV140Audit=function(){
+  const r={
+    largura:window.innerWidth,
+    altura:window.innerHeight,
+    mobile:window.matchMedia("(max-width:760px)").matches,
+    tabelasResponsivas:document.querySelectorAll(".erp-table-responsive-v140").length
+  };
+  console.info("[V14.0 RESPONSIVO]",r);
+  return r;
+};
+
+console.info("ERP V14.0: responsividade global ativada.");
+})();
+</script>
+
 </body>
 </html>
 
