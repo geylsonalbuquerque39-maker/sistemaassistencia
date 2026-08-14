@@ -32905,6 +32905,192 @@ console.info("ERP V13.2: removido ciclo infinito de MutationObserver que travava
 @media(max-width:700px){#chatMensagens .chat-msg-grupo-v130{max-width:82%!important}}
 </style>
 
+
+<style id="erp-v135-bolha-definitiva">
+/* =========================================================
+   V13.5 — CORREÇÃO DEFINITIVA DA BOLHA DO GRUPO
+   O problema não era só largura: regras antigas davam
+   flex-grow / stretch para .chat-msg e .chat-msg-balao.
+   Aqui zeramos isso especificamente nas mensagens de grupo.
+   ========================================================= */
+
+#chatMensagens .chat-msg-grupo-v130{
+  display:flex!important;
+  flex-direction:column!important;
+  flex:0 0 auto!important;
+  flex-grow:0!important;
+  flex-shrink:0!important;
+  flex-basis:auto!important;
+  align-self:flex-start!important;
+
+  width:auto!important;
+  min-width:0!important;
+  max-width:75%!important;
+
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+
+  margin:4px 0!important;
+  padding:0!important;
+}
+
+#chatMensagens .chat-msg-grupo-v130.minha{
+  align-self:flex-end!important;
+  align-items:flex-end!important;
+  margin-left:auto!important;
+  margin-right:0!important;
+}
+
+#chatMensagens .chat-msg-grupo-v130.outra{
+  align-self:flex-start!important;
+  align-items:flex-start!important;
+  margin-left:0!important;
+  margin-right:auto!important;
+}
+
+/* O balão NÃO pode esticar */
+#chatMensagens .chat-msg-grupo-v130 > .chat-msg-balao{
+  display:inline-block!important;
+  flex:0 0 auto!important;
+  flex-grow:0!important;
+  flex-basis:auto!important;
+
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+
+  height:auto!important;
+  min-height:0!important;
+  max-height:none!important;
+
+  margin:0!important;
+  padding:7px 10px!important;
+
+  box-sizing:border-box!important;
+  white-space:normal!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+  line-height:1.35!important;
+}
+
+/* Texto curto = balão curto */
+#chatMensagens .chat-msg-grupo-v130 .chat-grupo-texto-v130{
+  display:inline!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  white-space:pre-wrap!important;
+  word-break:normal!important;
+  overflow-wrap:break-word!important;
+}
+
+/* Remetente não força largura */
+#chatMensagens .chat-msg-grupo-v130 .chat-grupo-remetente-v125{
+  display:block!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:100%!important;
+  margin:0 0 2px 0!important;
+}
+
+/* Mensagem só com mídia/figurinha não recebe fundo azul */
+#chatMensagens .chat-msg-grupo-v130.so-midia{
+  max-width:300px!important;
+}
+#chatMensagens .chat-msg-grupo-v130.so-midia > .chat-msg-balao{
+  background:transparent!important;
+  box-shadow:none!important;
+  border:0!important;
+  padding:0!important;
+}
+
+/* Aparência mais próxima do WhatsApp */
+#chatMensagens .chat-msg-grupo-v130.minha:not(.so-midia) > .chat-msg-balao{
+  background:#d9fdd3!important;
+  color:#111b21!important;
+  border-radius:9px!important;
+  border-top-right-radius:2px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v130.outra:not(.so-midia) > .chat-msg-balao{
+  background:#ffffff!important;
+  color:#111b21!important;
+  border-radius:9px!important;
+  border-top-left-radius:2px!important;
+  box-shadow:0 1px 1px rgba(0,0,0,.08)!important;
+}
+
+/* Dark mode */
+body.dark-mode #chatMensagens .chat-msg-grupo-v130.minha:not(.so-midia) > .chat-msg-balao{
+  background:#005c4b!important;
+  color:#fff!important;
+}
+body.dark-mode #chatMensagens .chat-msg-grupo-v130.outra:not(.so-midia) > .chat-msg-balao{
+  background:#202c33!important;
+  color:#fff!important;
+}
+
+/* Hora não estica a mensagem */
+#chatMensagens .chat-msg-grupo-v130 .chat-msg-meta{
+  display:block!important;
+  flex:0 0 auto!important;
+  width:auto!important;
+  max-width:max-content!important;
+  margin-top:2px!important;
+  padding:0 2px!important;
+  align-self:flex-end!important;
+}
+
+/* Imagens e figurinhas */
+#chatMensagens .chat-msg-grupo-v130 .chat-figurinha-msg-v122{
+  display:block!important;
+  width:auto!important;
+  max-width:180px!important;
+  height:auto!important;
+  max-height:180px!important;
+}
+
+#chatMensagens .chat-msg-grupo-v130 .chat-imagem{
+  display:block!important;
+  width:auto!important;
+  max-width:280px!important;
+  height:auto!important;
+  max-height:300px!important;
+  margin:0!important;
+}
+
+/* Não deixar filhos genéricos herdarem width:100% */
+#chatMensagens .chat-msg-grupo-v130 > *,
+#chatMensagens .chat-msg-grupo-v130 .chat-msg-balao > *{
+  flex-grow:0!important;
+}
+
+/* Mobile */
+@media(max-width:700px){
+  #chatMensagens .chat-msg-grupo-v130{
+    max-width:85%!important;
+  }
+}
+</style>
+
+<script id="erp-v135-rerender-grupo">
+(function(){
+"use strict";
+
+/* Re-renderiza ao abrir grupo para garantir as classes corretas */
+setTimeout(()=>{
+  try{
+    if(window.__grupoAtualV125 && typeof carregarMensagensGrupoV125==="function"){
+      carregarMensagensGrupoV125();
+    }
+  }catch(_){}
+},250);
+
+console.info("ERP V13.5: flex/stretch das bolhas de grupo zerado definitivamente.");
+})();
+</script>
+
 </body>
 </html>
 
