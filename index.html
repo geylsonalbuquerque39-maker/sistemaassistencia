@@ -32808,64 +32808,86 @@ console.info("ERP V13.0: cabeçalho do grupo sem duplicidade + bolhas compactas 
 </script>
 
 
-<style id="erp-v131-grupo-header">
-/* V13.1 — sem botão de informações; clique no centro do cabeçalho */
+<style id="erp-v132-header-grupo-estavel">
+/* =========================================================
+   V13.2 — CORREÇÃO DO TRAVAMENTO NO LOGIN
+   Não remove/recria nós do DOM em loop.
+   Apenas oculta o botão de informações do grupo.
+   ========================================================= */
+
 #chatInfoGrupoBtnV127,
 #chatInfoGrupoBtnV128,
 #chatInfoGrupoBtnV130{
   display:none!important;
 }
 
-/* Nome/avatar/resumo do grupo viram a área clicável */
+/* Área central do cabeçalho do grupo fica clicável */
 #chatCabecalho.chat-grupo-header-v125 #chatCabecalhoAvatar,
-#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoInfo,
-#chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info{
+#chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info,
+#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoNome,
+#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoStatus{
   cursor:pointer!important;
 }
-#chatCabecalho.chat-grupo-header-v125 #chatCabecalhoInfo:hover,
+
 #chatCabecalho.chat-grupo-header-v125 .chat-cabecalho-info:hover{
   opacity:.88;
 }
 </style>
 
-<script id="erp-v131-grupo-header-js">
+<script id="erp-v132-header-grupo-estavel-js">
 (function(){
 "use strict";
 
-function removerInfoGrupoV131(){
-  document.querySelectorAll("#chatInfoGrupoBtnV127,#chatInfoGrupoBtnV128,#chatInfoGrupoBtnV130")
-    .forEach(el=>el.remove());
-}
+/* =========================================================
+   IMPORTANTE:
+   V13.1 travava porque um MutationObserver removia o botão,
+   enquanto outro MutationObserver da V13.0 recriava o mesmo botão.
+   Isso gerava um ciclo infinito de mutações no DOM.
 
-function cliquePerfilGrupoV131(e){
+   V13.2 NÃO remove elementos e NÃO cria observer adicional.
+   O botão fica apenas invisível via CSS.
+   ========================================================= */
+
+function abrirPerfilGrupoPeloCabecalhoV132(event){
   const cab=document.getElementById("chatCabecalho");
   if(!cab?.classList.contains("chat-grupo-header-v125")) return;
 
-  /* Não interfere nos botões de busca, ligação, vídeo e fechar */
-  if(e.target.closest(".chat-cabecalho-acoes,button")) return;
+  /* Não interceptar botões de ação */
+  if(event.target.closest(".chat-cabecalho-acoes,button")) return;
 
-  const alvo=e.target.closest(
-    "#chatCabecalhoAvatar,#chatCabecalhoInfo,.chat-cabecalho-info,#chatCabecalhoNome,#chatCabecalhoStatus"
+  const clicouCentro=event.target.closest(
+    "#chatCabecalhoAvatar,.chat-cabecalho-info,#chatCabecalhoNome,#chatCabecalhoStatus"
   );
-  if(!alvo) return;
 
-  e.preventDefault();
-  e.stopPropagation();
+  if(!clicouCentro) return;
+
+  event.preventDefault();
+  event.stopPropagation();
 
   if(typeof abrirPerfilGrupoV128==="function"){
     abrirPerfilGrupoV128();
+  }else if(typeof abrirPerfilGrupoV127==="function"){
+    abrirPerfilGrupoV127();
   }
 }
 
-document.addEventListener("click",cliquePerfilGrupoV131,true);
+/* Um único listener estável. Sem MutationObserver e sem setInterval. */
+document.addEventListener("click",abrirPerfilGrupoPeloCabecalhoV132,true);
 
-new MutationObserver(removerInfoGrupoV131)
-  .observe(document.body,{childList:true,subtree:true});
+window.ERP=window.ERP||{};
+ERP.Performance=ERP.Performance||{};
+ERP.Performance.v132Audit=function(){
+  const r={
+    botaoInfoOculto:true,
+    observerExtra:false,
+    intervalExtra:false,
+    estrategia:"CSS + listener único"
+  };
+  console.info("[V13.2]",r);
+  return r;
+};
 
-setInterval(removerInfoGrupoV131,800);
-setTimeout(removerInfoGrupoV131,50);
-
-console.info("ERP V13.1: perfil do grupo abre clicando no cabeçalho; botão de informações removido.");
+console.info("ERP V13.2: removido ciclo infinito de MutationObserver que travava o login.");
 })();
 </script>
 
