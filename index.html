@@ -34528,6 +34528,170 @@ console.info("ERP V14.1: mobile menu + fechamento do chat + badges técnicos cor
 })();
 </script>
 
+
+<style id="erp-v142-interface-limpa">
+/* =========================================================
+   ERP V14.2 — INTERFACE LIMPA
+   Remove da interface informações técnicas/diagnósticas.
+   Nenhuma funcionalidade/backend é removida.
+   ========================================================= */
+
+/* badges flutuantes/versionamento */
+#erpVersionBadgeV7542,
+#erpModoDemandaV7544,
+[id*="VersionBadge"],
+[id*="versionBadge"],
+[id*="ModoDemanda"],
+[id*="modoDemanda"],
+[class*="erp-version"],
+[class*="version-badge"],
+[class*="modo-demanda"],
+[class*="debug-badge"],
+[class*="diagnostic-badge"],
+[class*="status-tech"],
+[class*="tech-status"]{
+  display:none!important;
+}
+
+/* elementos técnicos conhecidos do ERP */
+.backend-status,
+.backend-indicator,
+.backend-badge,
+.backend-info,
+.backend-meta,
+.backend-label,
+.backend-time,
+.backend-mode,
+.zero-relation-badge,
+.zero-relation-dom,
+.erp-debug,
+.erp-diagnostico,
+.erp-diagnostic,
+.erp-build,
+.erp-versao,
+.erp-version{
+  display:none!important;
+}
+
+/* textos auxiliares técnicos em cards */
+[data-tech-info],
+[data-debug-info],
+[data-backend-info]{
+  display:none!important;
+}
+</style>
+
+<script id="erp-v142-interface-limpa-js">
+(function(){
+"use strict";
+
+/* ---------------------------------------------------------
+   Oculta SOMENTE nós visuais de diagnóstico.
+   Não remove nem altera chamadas ao backend.
+   --------------------------------------------------------- */
+const PADROES_V142=[
+  /^\s*ERP\s+V?\d/i,
+  /^\s*ERP\s+V\d/i,
+  /^\s*⚡\s*sob\s+demanda\s*$/i,
+  /^\s*sob\s+demanda\s*$/i,
+  /^\s*Backend\s+online\s*$/i,
+  /^\s*Backend\s*[•·\-]\s*\d{1,2}:\d{2}/i,
+  /^\s*Backend\s*\+\s*Zero\s+Relation\s+DOM\s*$/i,
+  /^\s*Backend\s*[•·\-]?\s*Zero\s+Relation\s+DOM\s*$/i,
+  /^\s*Zero\s+Relation\s+DOM\s*$/i,
+  /^\s*backend-first\s*$/i,
+  /^\s*carregado\s+do\s+backend\s*$/i,
+  /^\s*carregado\s+pelo\s+backend\s*$/i
+];
+
+function textoTecnicoV142(txt){
+  const t=String(txt||"").replace(/\s+/g," ").trim();
+  if(!t || t.length>90)return false;
+  return PADROES_V142.some(rx=>rx.test(t));
+}
+
+function ocultarInfoTecnicaV142(root=document){
+  const seletores=[
+    "#erpVersionBadgeV7542",
+    "#erpModoDemandaV7544",
+    "[id*='VersionBadge']",
+    "[id*='versionBadge']",
+    "[id*='ModoDemanda']",
+    "[id*='modoDemanda']",
+    "[class*='erp-version']",
+    "[class*='version-badge']",
+    "[class*='modo-demanda']",
+    "[class*='debug-badge']",
+    "[class*='diagnostic-badge']",
+    ".backend-status",
+    ".backend-indicator",
+    ".backend-badge",
+    ".backend-info",
+    ".backend-meta",
+    ".backend-label",
+    ".backend-time",
+    ".backend-mode",
+    ".zero-relation-badge",
+    ".zero-relation-dom",
+    ".erp-debug",
+    ".erp-diagnostico",
+    ".erp-diagnostic",
+    ".erp-build",
+    ".erp-versao",
+    ".erp-version",
+    "[data-tech-info]",
+    "[data-debug-info]",
+    "[data-backend-info]"
+  ];
+
+  try{
+    root.querySelectorAll?.(seletores.join(",")).forEach(el=>{
+      el.style.setProperty("display","none","important");
+      el.setAttribute("aria-hidden","true");
+    });
+  }catch(_){}
+
+  /* Procura apenas elementos pequenos de texto para não esconder cards inteiros. */
+  try{
+    root.querySelectorAll?.("small,span,badge,label,.muted,.sub,.meta,.status").forEach(el=>{
+      if(el.children.length>0)return;
+      if(textoTecnicoV142(el.textContent)){
+        el.style.setProperty("display","none","important");
+        el.setAttribute("aria-hidden","true");
+      }
+    });
+  }catch(_){}
+}
+
+/* primeira limpeza */
+ocultarInfoTecnicaV142();
+
+/* observa apenas novas inserções; sem loop de recriação */
+const obsV142=new MutationObserver(muts=>{
+  for(const m of muts){
+    for(const n of m.addedNodes){
+      if(n.nodeType!==1)continue;
+      if(textoTecnicoV142(n.textContent) && n.children.length===0){
+        n.style?.setProperty("display","none","important");
+        n.setAttribute?.("aria-hidden","true");
+      }
+      ocultarInfoTecnicaV142(n);
+    }
+  }
+});
+obsV142.observe(document.body,{childList:true,subtree:true});
+
+/* também limpa depois das trocas principais de tela */
+document.addEventListener("click",e=>{
+  if(e.target.closest?.("#sidebar .menu,.menu,[data-menu],button")){
+    setTimeout(ocultarInfoTecnicaV142,120);
+  }
+},true);
+
+console.info("ERP V14.2: informações técnicas removidas da interface visual.");
+})();
+</script>
+
 </body>
 </html>
 
