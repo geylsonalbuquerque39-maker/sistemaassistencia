@@ -36207,6 +36207,102 @@ if(typeof esconderTelas === "function" && !window.__estoqueIDBEsconderTelasInteg
 @media(max-width:950px){.estoque-idb-timeline-resumo{grid-template-columns:1fr 1fr}}
 </style>
 
+
+<style id="estoque-idb-etapa17-dark-fix">
+/* Controle de Estoque IDB — correção completa do modo escuro */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-painel,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-card{
+    background:#102a46!important;
+    border-color:#315273!important;
+    color:#edf5ff!important;
+}
+
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-painel h2,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-painel h3,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-painel strong{
+    color:#f4f8ff!important;
+}
+
+/* Cards brancos da Linha do Tempo */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-card,
+body.dark-mode #telaControleEstoqueIDB [class*="estoque-idb-diff"]{
+    background:#173654!important;
+    border-color:#365b7c!important;
+    color:#dce9f7!important;
+}
+
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-card strong,
+body.dark-mode #telaControleEstoqueIDB [class*="estoque-idb-diff"] strong{
+    color:#ffffff!important;
+}
+
+/* Botões/filtros da Linha do Tempo */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-filtros button,
+body.dark-mode #telaControleEstoqueIDB [class*="estoque-idb-diff"] button{
+    background:#173654!important;
+    color:#eaf3ff!important;
+    border-color:#426889!important;
+}
+
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-filtros button.ativo,
+body.dark-mode #telaControleEstoqueIDB [class*="estoque-idb-diff"] button.ativo{
+    background:#0f6ef7!important;
+    color:#fff!important;
+    border-color:#0f6ef7!important;
+}
+
+/* Tabela de comparação */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-tabela-wrap,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-tabela,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-tabela tbody,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-tabela td{
+    background:#0d2742!important;
+    color:#e5eef9!important;
+    border-color:#315273!important;
+}
+
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-tabela th{
+    background:#173654!important;
+    color:#ffffff!important;
+    border-color:#315273!important;
+}
+
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-diff-vazio{
+    background:#0d2742!important;
+    color:#9fb4ca!important;
+}
+
+/* Linha do tempo da consulta individual por N.C.E. */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-timeline-item{
+    background:#122f4d!important;
+    border-color:#365b7c!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-timeline-item .linha1{
+    color:#f4f8ff!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-timeline-item .linha2{
+    color:#b9cce0!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-timeline:before{
+    background:#416483!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-produto,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini{
+    background:#173654!important;
+    color:#dce9f7!important;
+    border-color:#365b7c!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini strong{
+    color:#fff!important;
+}
+
+/* Garante que áreas vazias/tabelas do módulo não fiquem brancas */
+body.dark-mode #telaControleEstoqueIDB table tbody,
+body.dark-mode #telaControleEstoqueIDB table td{
+    color:#e5eef9;
+}
+</style>
+
 </body>
 </html>
 
