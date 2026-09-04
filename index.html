@@ -5934,6 +5934,7 @@ html.dark #intelModal .intel-modal-box,
 
     <div class="menu active" data-menu="inicio" onclick="voltarInicio()">⌂ Página Inicial</div>
     <div class="menu" data-menu="coleta" onclick="abrirColeta()">▣ Coleta de O.S</div>
+    <div class="menu" data-menu="estoque-idb" onclick="abrirControleEstoqueIDB()">▦ Controle de Estoque IDB</div>
     
     <div class="menu" data-menu="ci" onclick="abrirTelaCI()">↩ C.I Devoluções</div>
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
@@ -35000,6 +35001,1210 @@ console.info("ERP V14.5: sequência padrão de 15 colunas aplicada às exportaç
 <style id="erp-v146-remocao-real-config-midias">
 #fotosos-config-btn{display:none!important}
 #fotosos-config{display:none!important}
+</style>
+
+
+
+<style id="erp-controle-estoque-idb-etapa3-css">
+.estoque-idb-tela{padding:32px 34px 55px;background:#eef3f8;min-height:calc(100vh - 110px)}
+.estoque-idb-wrap{width:1280px;max-width:100%;margin:0 auto}
+.estoque-idb-cabecalho{display:flex;align-items:center;justify-content:space-between;gap:22px;background:linear-gradient(135deg,#001b3d,#0046b8);color:#fff;border-radius:22px;padding:30px 32px;box-shadow:0 12px 30px rgba(0,27,61,.18)}
+.estoque-idb-kicker{font-size:12px;letter-spacing:1.7px;font-weight:900;color:#8fd4ff;margin-bottom:7px}.estoque-idb-cabecalho h1{font-size:34px;line-height:1.1;margin:0}.estoque-idb-cabecalho p{margin-top:9px;color:#dbeaff;font-size:16px}
+.estoque-idb-status{display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:999px;padding:11px 15px;font-weight:800;white-space:nowrap}.estoque-idb-status-ponto{width:10px;height:10px;border-radius:50%;background:#ffb020;box-shadow:0 0 0 5px rgba(255,176,32,.13)}.estoque-idb-status.ok .estoque-idb-status-ponto{background:#34d058;box-shadow:0 0 0 5px rgba(52,208,88,.14)}.estoque-idb-status.erro .estoque-idb-status-ponto{background:#ff5b5b;box-shadow:0 0 0 5px rgba(255,91,91,.14)}
+.estoque-idb-toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:22px 0}.estoque-idb-btn{border:0;border-radius:12px;padding:12px 17px;background:#fff;color:#001b3d;font-weight:900;cursor:pointer;box-shadow:0 5px 14px rgba(0,0,0,.10);font-size:14px}.estoque-idb-btn-primary{background:#006cff;color:#fff}.estoque-idb-btn:hover{transform:translateY(-1px)}.estoque-idb-ultima{margin-left:auto;color:#607086;font-size:13px;font-weight:700}
+.estoque-idb-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.estoque-idb-card{background:#fff;border-radius:18px;padding:20px 21px;box-shadow:0 8px 20px rgba(0,27,61,.09);border:1px solid #dce6f0;position:relative;overflow:hidden}.estoque-idb-card:before{content:"";position:absolute;left:0;top:0;width:6px;height:100%;background:#006cff}.estoque-idb-card.saida:before{background:#e5484d}.estoque-idb-card.saldo:before{background:#f5a524}.estoque-idb-card.valor:before{background:#17a673}.estoque-idb-card small{color:#667085;font-weight:900;letter-spacing:.7px}.estoque-idb-card strong{display:block;color:#001b3d;font-size:31px;margin-top:8px}.estoque-idb-card span{display:block;color:#7b8798;font-size:12px;margin-top:5px}
+.estoque-idb-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}.estoque-idb-painel{background:#fff;border-radius:18px;padding:20px;box-shadow:0 8px 20px rgba(0,27,61,.08);border:1px solid #dce6f0}.estoque-idb-painel-titulo{display:flex;justify-content:space-between;align-items:center;gap:12px;border-bottom:1px solid #e6edf5;padding-bottom:13px;margin-bottom:14px}.estoque-idb-painel-titulo h2{font-size:19px;color:#001b3d}.estoque-idb-painel-titulo span{font-size:12px;color:#607086;font-weight:800}.estoque-idb-vazio{min-height:170px;display:flex;align-items:center;justify-content:center;text-align:center;color:#8793a3;background:#f7f9fc;border:1px dashed #cbd7e4;border-radius:12px;padding:18px}.estoque-idb-historico{margin-top:18px}.estoque-idb-tabela-wrap{overflow:auto;max-height:340px}.estoque-idb-tabela{width:100%;border-collapse:collapse;font-size:13px}.estoque-idb-tabela th,.estoque-idb-tabela td{padding:11px 10px;border-bottom:1px solid #e5ebf2;text-align:left;white-space:nowrap;color:#20344c}.estoque-idb-tabela th{background:#f4f7fb;color:#001b3d;position:sticky;top:0}.estoque-idb-vazio-tabela{text-align:center!important;color:#8793a3!important;padding:30px!important}
+body.dark-mode .estoque-idb-tela{background:#061426}body.dark-mode .estoque-idb-card,body.dark-mode .estoque-idb-painel{background:#0d223a;border-color:#244466}body.dark-mode .estoque-idb-card strong,body.dark-mode .estoque-idb-painel-titulo h2,body.dark-mode .estoque-idb-tabela td{color:#eaf2ff}body.dark-mode .estoque-idb-vazio,body.dark-mode .estoque-idb-tabela th{background:#102b49;color:#d9e7f7;border-color:#244466}
+@media(max-width:950px){.estoque-idb-tela{padding:18px 14px 35px}.estoque-idb-cabecalho{align-items:flex-start;flex-direction:column;padding:23px 20px}.estoque-idb-cabecalho h1{font-size:27px}.estoque-idb-status{white-space:normal}.estoque-idb-cards,.estoque-idb-grid{grid-template-columns:1fr}.estoque-idb-ultima{width:100%;margin-left:0}.estoque-idb-btn{flex:1;text-align:center}}
+.estoque-idb-previa{margin-top:18px;display:none}.estoque-idb-previa.ativa{display:block}.estoque-idb-mapeamento{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0 16px}.estoque-idb-map-box{background:#f7f9fc;border:1px solid #dce6f0;border-radius:12px;padding:11px}.estoque-idb-map-box small{display:block;color:#6b7788;font-weight:800;margin-bottom:5px}.estoque-idb-map-box b{color:#001b3d;word-break:break-word}.estoque-idb-alerta{padding:12px 14px;border-radius:11px;background:#fff8e6;border-left:5px solid #f5a524;color:#6e5311;font-weight:700;margin:12px 0}.estoque-idb-alerta.ok{background:#edfff3;border-left-color:#17a673;color:#126843}.estoque-idb-previa-acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}.estoque-idb-btn-sucesso{background:#17a673;color:#fff}.estoque-idb-btn[disabled]{opacity:.5;cursor:not-allowed}.estoque-idb-tabela-previa{width:100%;border-collapse:collapse;font-size:12px}.estoque-idb-tabela-previa th,.estoque-idb-tabela-previa td{padding:8px;border-bottom:1px solid #e5ebf2;text-align:left;white-space:nowrap}.estoque-idb-tabela-previa th{background:#001b3d;color:#fff;position:sticky;top:0}.estoque-idb-tabela-previa-wrap{max-height:360px;overflow:auto;border:1px solid #dce6f0;border-radius:12px}.estoque-idb-loading{display:none;margin:14px 0;padding:12px;border-radius:10px;background:#eef6ff;color:#0046b8;font-weight:800}.estoque-idb-loading.ativo{display:block}body.dark-mode .estoque-idb-map-box{background:#102b49;border-color:#244466}body.dark-mode .estoque-idb-map-box b{color:#eaf2ff}@media(max-width:950px){.estoque-idb-mapeamento{grid-template-columns:1fr 1fr}}
+</style>
+
+<script id="erp-controle-estoque-idb-etapa2-supabase">
+/* =========================================================
+   Controle de Estoque IDB — Etapa 2
+   Supabase exclusivo do módulo de estoque.
+   IMPORTANTE: este cliente NÃO substitui o Supabase principal
+   e NÃO compartilha sessão de autenticação com o ERP.
+   ========================================================= */
+const ESTOQUE_IDB_SUPABASE_URL = "https://hfzbcivskqvrnzimcfvm.supabase.co";
+const ESTOQUE_IDB_SUPABASE_KEY = "sb_publishable_E5VKQrao4mH6IpLv3Zn-Ww_B2XoaqiR";
+
+let estoqueIDBSupabaseCliente = null;
+
+function obterSupabaseEstoqueIDB(){
+    if(!window.supabase || typeof window.supabase.createClient !== "function"){
+        throw new Error("Biblioteca do Supabase não carregada.");
+    }
+
+    if(!estoqueIDBSupabaseCliente){
+        estoqueIDBSupabaseCliente = window.supabase.createClient(
+            ESTOQUE_IDB_SUPABASE_URL,
+            ESTOQUE_IDB_SUPABASE_KEY,
+            {
+                auth:{
+                    persistSession:false,
+                    autoRefreshToken:false,
+                    detectSessionInUrl:false
+                }
+            }
+        );
+    }
+
+    return estoqueIDBSupabaseCliente;
+}
+
+async function testarConexaoEstoqueIDB(){
+    try{
+        const cliente = obterSupabaseEstoqueIDB();
+        const { error } = await cliente
+            .from("estoque_importacoes")
+            .select("id")
+            .limit(1);
+
+        if(error) throw error;
+
+        console.info("Controle de Estoque IDB: Supabase conectado com sucesso.");
+        return {ok:true};
+    }catch(error){
+        console.error("Controle de Estoque IDB: falha ao conectar ao Supabase.", error);
+        return {
+            ok:false,
+            erro:error?.message || String(error)
+        };
+    }
+}
+
+function garantirTelaControleEstoqueIDB(){
+    let tela=document.getElementById("telaControleEstoqueIDB");
+    if(tela) return tela;
+
+    tela=document.createElement("div");
+    tela.id="telaControleEstoqueIDB";
+    tela.className="estoque-idb-tela";
+    tela.style.display="none";
+    tela.innerHTML=`
+        <div class="estoque-idb-wrap">
+            <div class="estoque-idb-cabecalho">
+                <div>
+                    <div class="estoque-idb-kicker">LOGÍSTICA REVERSA • IDB</div>
+                    <h1>Controle de Estoque IDB</h1>
+                    <p>Acompanhe entradas, saídas, valores, lojas e histórico dos relatórios de estoque.</p>
+                </div>
+                <div class="estoque-idb-status" id="estoqueIDBStatusBanco">
+                    <span class="estoque-idb-status-ponto"></span>
+                    <span>Verificando banco...</span>
+                </div>
+            </div>
+
+            <div class="estoque-idb-toolbar">
+                <label class="estoque-idb-btn estoque-idb-btn-primary" for="estoqueIDBArquivo">
+                    ⬆ Importar Relatório de Estoque
+                </label>
+                <input id="estoqueIDBArquivo" type="file" accept=".xlsx,.xls,.xlt,.csv" hidden onchange="estoqueIDBArquivoSelecionado(this)">
+                <button type="button" class="estoque-idb-btn" onclick="atualizarPainelEstoqueIDB()">↻ Atualizar</button>
+                <div class="estoque-idb-ultima" id="estoqueIDBUltimaImportacao">Nenhum relatório carregado nesta tela.</div>
+            </div>
+
+            <div class="estoque-idb-cards">
+                <div class="estoque-idb-card entrada"><small>ENTRADAS</small><strong id="estoqueIDBEntradas">0</strong><span>movimentações</span></div>
+                <div class="estoque-idb-card saida"><small>SAÍDAS</small><strong id="estoqueIDBSaidas">0</strong><span>movimentações</span></div>
+                <div class="estoque-idb-card saldo"><small>SALDO ATUAL</small><strong id="estoqueIDBSaldo">0</strong><span>total final do relatório</span></div>
+                <div class="estoque-idb-card valor"><small>VALOR DE ESTOQUE</small><strong id="estoqueIDBValor">R$ 0,00</strong><span>valor final do estoque</span></div>
+            </div>
+
+            <section class="estoque-idb-painel estoque-idb-timeline-estoque" id="estoqueIDBTimelineEstoque">
+                <div class="estoque-idb-painel-titulo">
+                    <h2>Linha do Tempo do Estoque</h2>
+                    <span id="estoqueIDBTimelinePeriodo">Comparando os 2 últimos relatórios</span>
+                </div>
+                <div class="estoque-idb-timeline-info" id="estoqueIDBTimelineStatus">Carregando comparação...</div>
+                <div class="estoque-idb-timeline-resumo">
+                    <div class="estoque-idb-timeline-box"><small>Novos no estoque</small><strong id="estoqueIDBTimelineNovos">0</strong></div>
+                    <div class="estoque-idb-timeline-box"><small>Aumentaram</small><strong id="estoqueIDBTimelineAumentaram">0</strong></div>
+                    <div class="estoque-idb-timeline-box"><small>Diminuíram</small><strong id="estoqueIDBTimelineDiminuiram">0</strong></div>
+                    <div class="estoque-idb-timeline-box"><small>Zeraram</small><strong id="estoqueIDBTimelineZeraram">0</strong></div>
+                </div>
+                <div class="estoque-idb-timeline-filtros" id="estoqueIDBTimelineFiltros">
+                    <button type="button" class="ativo" data-filtro="todos" onclick="estoqueIDBFiltrarTimeline('todos',this)">Todos</button>
+                    <button type="button" data-filtro="novo" onclick="estoqueIDBFiltrarTimeline('novo',this)">Novos</button>
+                    <button type="button" data-filtro="aumentou" onclick="estoqueIDBFiltrarTimeline('aumentou',this)">Aumentaram</button>
+                    <button type="button" data-filtro="diminuiu" onclick="estoqueIDBFiltrarTimeline('diminuiu',this)">Diminuíram</button>
+                    <button type="button" data-filtro="zerou" onclick="estoqueIDBFiltrarTimeline('zerou',this)">Zeraram</button>
+                </div>
+                <div class="estoque-idb-timeline-tabela-wrap">
+                    <table class="estoque-idb-timeline-tabela">
+                        <thead><tr><th>TIPO</th><th>N.C.E.</th><th>PRODUTO</th><th>ANTERIOR</th><th>ATUAL</th><th>ALTERAÇÃO</th></tr></thead>
+                        <tbody id="estoqueIDBTimelineCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Aguardando dois relatórios de datas diferentes.</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <div class="estoque-idb-grid">
+                <section class="estoque-idb-painel">
+                    <div class="estoque-idb-painel-titulo"><h2>Ranking de Entradas</h2><span>Emitente • IDB ignorado</span></div>
+                    <div class="estoque-idb-vazio" id="estoqueIDBRankingEntradas">Importe um relatório para gerar o ranking.</div>
+                </section>
+                <section class="estoque-idb-painel">
+                    <div class="estoque-idb-painel-titulo"><h2>Ranking de Saídas</h2><span>Destino • IDB ignorado</span></div>
+                    <div class="estoque-idb-vazio" id="estoqueIDBRankingSaidas">Importe um relatório para gerar o ranking.</div>
+                </section>
+            </div>
+
+            <section class="estoque-idb-painel estoque-idb-previa" id="estoqueIDBPrevia">
+                <div class="estoque-idb-painel-titulo"><h2>Prévia do Relatório</h2><span id="estoqueIDBPreviaStatus">Nenhum arquivo lido</span></div>
+                <div class="estoque-idb-loading" id="estoqueIDBLoading">Lendo e analisando o relatório...</div>
+                <div id="estoqueIDBMapeamento" class="estoque-idb-mapeamento"></div>
+                <div id="estoqueIDBAlertaMapeamento"></div>
+                <div class="estoque-idb-tabela-previa-wrap">
+                    <table class="estoque-idb-tabela-previa">
+                        <thead><tr><th>COR</th><th>DESC</th><th>PRODUTO</th><th>DAT. NF</th><th>NF</th><th>EMITENTE</th><th>DESTINO</th><th>SÉRIE ESTOQUE</th><th>N.C.E.</th><th>ENTRADAS</th><th>SAÍDAS</th><th>SALDO ATUAL</th></tr></thead>
+                        <tbody id="estoqueIDBPreviaCorpo"><tr><td colspan="12" class="estoque-idb-vazio-tabela">Selecione um relatório.</td></tr></tbody>
+                    </table>
+                </div>
+                <div class="estoque-idb-previa-acoes">
+                    <button type="button" class="estoque-idb-btn" onclick="limparPreviaEstoqueIDB()">✕ Cancelar prévia</button>
+                    <button type="button" class="estoque-idb-btn estoque-idb-btn-sucesso" id="estoqueIDBBtnConfirmar" onclick="confirmarImportacaoEstoqueIDB()">✓ Confirmar e gravar no Supabase</button>
+                </div>
+            </section>
+
+            
+<section class="estoque-idb-busca-nce" id="estoqueIDBBuscaNCE">
+    <div class="estoque-idb-painel-titulo">
+        <h2>Consultar N.C.E.</h2>
+        <span>Entradas, saídas e linha do tempo</span>
+    </div>
+    <div class="estoque-idb-busca-nce-topo">
+        <input id="estoqueIDBInputNCE" type="text" inputmode="numeric" placeholder="Digite o N.C.E. da mercadoria" onkeydown="if(event.key==='Enter')consultarNCEEstoqueIDB()">
+        <button type="button" onclick="consultarNCEEstoqueIDB()">⌕ Pesquisar N.C.E.</button>
+    </div>
+    <div class="estoque-idb-busca-nce-status" id="estoqueIDBBuscaNCEStatus">Digite um N.C.E. para consultar o histórico da mercadoria.</div>
+    <div id="estoqueIDBBuscaNCEResultado"></div>
+</section>
+
+<section class="estoque-idb-painel estoque-idb-historico">
+                <div class="estoque-idb-painel-titulo"><h2>Histórico de Importações</h2><span id="estoqueIDBHistoricoStatus">Aguardando consulta</span></div>
+                <div class="estoque-idb-tabela-wrap">
+                    <table class="estoque-idb-tabela">
+                        <thead><tr><th>Data</th><th>Arquivo</th><th>Linhas</th><th>Entradas</th><th>Saídas</th><th>Usuário</th></tr></thead>
+                        <tbody id="estoqueIDBHistoricoCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Nenhuma importação carregada.</td></tr></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>`;
+
+    const main=document.querySelector(".main");
+    if(main) main.appendChild(tela);
+    else document.body.appendChild(tela);
+    return tela;
+}
+
+let estoqueIDBPreviaAtual=null;
+
+/* RESTOK fixo: A-O. F, G e K são ignoradas. Dados começam na linha 13. */
+const ESTOQUE_IDB_RESTOK = Object.freeze({
+    COR:0, DESCRICAO:1, PRODUTO:2, DATA_NF:3, NF:4,
+    EMITENTE:7, DESTINO:8, SERIE_ESTOQUE:9, NCE:11,
+    ENTRADAS:12, SAIDAS:13, SALDO_ATUAL:14,
+    LINHA_INICIAL:12
+});
+
+function estoqueIDBNumero(v){
+    if(typeof v==="number" && Number.isFinite(v)) return v;
+    let t=String(v??"").trim(); if(!t) return 0;
+    t=t.replace(/R\$/gi,"").replace(/\s/g,"");
+    if(t.includes(",") && t.includes(".")) t=t.replace(/\./g,"").replace(",",".");
+    else if(t.includes(",")) t=t.replace(",",".");
+    const n=Number(t.replace(/[^0-9.-]/g,"")); return Number.isFinite(n)?n:0;
+}
+function estoqueIDBNumeroOuNulo(v){
+    if(v===null || v===undefined || String(v).trim()==="") return null;
+    return estoqueIDBNumero(v);
+}
+function estoqueIDBDataISO(v){
+    if(!v && v!==0) return "";
+    if(v instanceof Date && !isNaN(v)) return v.toISOString().slice(0,10);
+    if(typeof v==="number" && window.XLSX?.SSF?.parse_date_code){
+        const d=XLSX.SSF.parse_date_code(v); if(d?.y) return `${String(d.y).padStart(4,"0")}-${String(d.m).padStart(2,"0")}-${String(d.d).padStart(2,"0")}`;
+    }
+    const t=String(v).trim();
+    let m=t.match(/^(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+    if(m){let a=m[3];if(a.length===2)a=(Number(a)>=70?"19":"20")+a;return `${a}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;}
+    m=t.match(/^(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/); if(m)return `${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}`;
+    return "";
+}
+function estoqueIDBDetectarDataRelatorio(aoa){
+    /* O RESTOK imprime o período no topo, ex.: 01.11.2025 A 03.09.2026. Usamos a data final. */
+    for(let r=0;r<Math.min(12,aoa.length);r++){
+        for(const cel of (aoa[r]||[])){
+            const t=String(cel??"").trim();
+            const datas=[...t.matchAll(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{4})/g)];
+            if(datas.length){
+                const m=datas[datas.length-1];
+                return `${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
+            }
+        }
+    }
+    return new Date().toISOString().slice(0,10);
+}
+function estoqueIDBEscape(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function estoqueIDBFormatarData(v){if(!v)return "-";const [a,m,d]=String(v).split("-");return d&&m&&a?`${d}/${m}/${a}`:v;}
+function estoqueIDBTexto(v){return String(v??"").trim();}
+
+function estoqueIDBExtrairLinhasRESTOK(aoa){
+    const linhas=[];
+    let contexto={cor:"",descricao:"",produto:""};
+
+    for(let i=ESTOQUE_IDB_RESTOK.LINHA_INICIAL;i<aoa.length;i++){
+        const row=Array.isArray(aoa[i])?aoa[i]:[];
+
+        /*
+         * O RESTOK possui, depois da relação detalhada de movimentações,
+         * uma segunda seção chamada "RESUMO DO MOVIMENTO POR COR".
+         * Essa seção usa as mesmas colunas físicas com outro significado
+         * (por isso DESTINO acabava virando 1, 2, 3, 5...).
+         * Ao encontrar o início do resumo, encerramos a leitura.
+         */
+        const textoLinha=row.map(v=>estoqueIDBTexto(v)).filter(Boolean).join(" ").toUpperCase();
+        if(textoLinha.includes("RESUMO DO") && textoLinha.includes("MOVIMENTO")) break;
+
+        if(!row.some(v=>estoqueIDBTexto(v)!=="")) continue;
+
+        const nf=estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.NF]);
+        if(/^SOMA$/i.test(nf)) continue;
+        if(/^[-\s]+$/.test(nf)) continue;
+
+        const dataNF=estoqueIDBDataISO(row[ESTOQUE_IDB_RESTOK.DATA_NF]);
+
+        /*
+         * Linha válida da relação detalhada precisa possuir data de NF.
+         * Isso também elimina cabeçalhos repetidos, paginação e textos soltos.
+         */
+        if(!dataNF) continue;
+
+        const cor=estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.COR]);
+        const descricao=estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.DESCRICAO]);
+        const produto=estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.PRODUTO]);
+        if(cor) contexto.cor=cor;
+        if(descricao) contexto.descricao=descricao;
+        if(produto) contexto.produto=produto;
+
+        const registro={
+            cor:cor||contexto.cor,
+            descricao:descricao||contexto.descricao,
+            produto:produto||contexto.produto,
+            data_nf:dataNF,
+            nf:nf||null,
+            emitente:estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.EMITENTE])||null,
+            destino:estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.DESTINO])||null,
+            serie_estoque:estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.SERIE_ESTOQUE])||null,
+            nce:estoqueIDBTexto(row[ESTOQUE_IDB_RESTOK.NCE])||null,
+            entradas:estoqueIDBNumero(row[ESTOQUE_IDB_RESTOK.ENTRADAS]),
+            saidas:estoqueIDBNumero(row[ESTOQUE_IDB_RESTOK.SAIDAS]),
+            saldo_atual:estoqueIDBNumeroOuNulo(row[ESTOQUE_IDB_RESTOK.SALDO_ATUAL]),
+            linha_excel:i+1
+        };
+
+        linhas.push(registro);
+    }
+    return linhas;
+}
+
+
+
+function estoqueIDBValorMonetarioRESTOK(v){
+    if(v===null || v===undefined || String(v).trim()==="") return null;
+    if(typeof v==="number" && Number.isFinite(v)) return v;
+
+    let t=String(v).trim().replace(/R\$/gi,"").replace(/\s+/g,"");
+
+    /*
+     * O RESTOK imprime valor no padrão 991,661.00:
+     * vírgula = separador de milhar
+     * ponto   = separador decimal
+     */
+    if(/^-?\d{1,3}(,\d{3})+\.\d{1,2}$/.test(t)){
+        const n=Number(t.replace(/,/g,""));
+        return Number.isFinite(n)?n:null;
+    }
+
+    /* Também aceita padrão brasileiro, ex.: 991.661,00 */
+    if(/^-?\d{1,3}(\.\d{3})+,\d{1,2}$/.test(t)){
+        const n=Number(t.replace(/\./g,"").replace(",","."));
+        return Number.isFinite(n)?n:null;
+    }
+
+    /* Decimal simples com ponto: 1661.00 */
+    if(/^-?\d+\.\d{1,2}$/.test(t)){
+        const n=Number(t);
+        return Number.isFinite(n)?n:null;
+    }
+
+    /* Decimal simples com vírgula: 1661,00 */
+    if(/^-?\d+,\d{1,2}$/.test(t)){
+        const n=Number(t.replace(",","."));
+        return Number.isFinite(n)?n:null;
+    }
+
+    const n=Number(t.replace(/[^0-9.-]/g,""));
+    return Number.isFinite(n)?n:null;
+}
+
+function estoqueIDBLerTotaisFinaisRESTOK(aoa){
+    /*
+     * No rodapé "RESUMO POR GRUPO", a linha "Totais" contém:
+     * - coluna C: quantidade/saldo atual total;
+     * - bloco D:F: valor total do estoque. O relatório pode quebrar o número
+     *   em mais de uma célula (ex.: D=99 e E="1,661.00").
+     */
+    let linhaTotais=null;
+
+    for(let i=aoa.length-1;i>=0;i--){
+        const row=Array.isArray(aoa[i])?aoa[i]:[];
+        const a=estoqueIDBTexto(row[0]).toUpperCase();
+        const b=estoqueIDBTexto(row[1]).toUpperCase();
+        const inicio=`${a}${b}`.replace(/\s+/g,"");
+        if(inicio==="TOTAIS" || a==="TOTAIS" || b==="TOTAIS"){
+            linhaTotais=row;
+            break;
+        }
+    }
+
+    if(!linhaTotais) return {saldo_atual:null,valor_estoque:null};
+
+    const saldo=estoqueIDBNumeroOuNulo(linhaTotais[2]);
+
+    const partes=[];
+    for(let c=3;c<=5;c++){
+        const bruto=linhaTotais[c];
+        if(bruto===null || bruto===undefined || String(bruto).trim()==="") continue;
+        partes.push(String(bruto).trim());
+    }
+
+    let valor=null;
+    if(partes.length){
+        /*
+         * Junta os fragmentos exatamente como são impressos no RESTOK.
+         * 99 + 1,661.00 => 991,661.00 => 991661.00
+         */
+        const unido=partes.join("").replace(/\s+/g,"");
+        valor=estoqueIDBValorMonetarioRESTOK(unido);
+    }
+
+    return {saldo_atual:saldo,valor_estoque:valor};
+}
+
+function estoqueIDBSaldoFinal(linhas){
+    const ultimos=new Map();
+    for(const r of linhas){
+        const chave=`${r.cor}|${r.descricao}|${r.produto}`;
+        if(r.saldo_atual!==null) ultimos.set(chave,r.saldo_atual);
+    }
+    return [...ultimos.values()].reduce((a,v)=>a+estoqueIDBNumero(v),0);
+}
+function estoqueIDBAtualizarResumoPrevia(linhas,totaisFinais){
+    const entradas=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.entradas),0);
+    const saidas=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.saidas),0);
+
+    const saldoRelatorio=totaisFinais?.saldo_atual;
+    const valorEstoque=totaisFinais?.valor_estoque;
+
+    document.getElementById("estoqueIDBEntradas").textContent=entradas.toLocaleString("pt-BR");
+    document.getElementById("estoqueIDBSaidas").textContent=saidas.toLocaleString("pt-BR");
+    document.getElementById("estoqueIDBSaldo").textContent=
+        saldoRelatorio!==null && saldoRelatorio!==undefined
+            ? estoqueIDBNumero(saldoRelatorio).toLocaleString("pt-BR")
+            : "-";
+    document.getElementById("estoqueIDBValor").textContent=
+        valorEstoque!==null && valorEstoque!==undefined
+            ? estoqueIDBNumero(valorEstoque).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})
+            : "R$ -";
+
+    const rank=(campo,localCampo)=>{const m=new Map();for(const r of linhas){const local=String(r[localCampo]||"").trim();if(!local || local.toUpperCase()==="IDB")continue;const q=estoqueIDBNumero(r[campo]);if(q)m.set(local,(m.get(local)||0)+q);}return [...m].filter(x=>x[1]>0).sort((a,b)=>b[1]-a[1]).slice(0,10);};
+    const render=(id,dados)=>{const el=document.getElementById(id);if(!el)return;el.className="";el.innerHTML=dados.length?`<table class="estoque-idb-tabela">${dados.map((x,i)=>`<tr><td><b>${i+1}º</b></td><td>${estoqueIDBEscape(x[0])}</td><td style="text-align:right"><b>${x[1].toLocaleString("pt-BR")}</b></td></tr>`).join("")}</table>`:"<div class=\"estoque-idb-vazio\">Nenhuma movimentação encontrada.</div>";};
+    render("estoqueIDBRankingEntradas",rank("entradas","emitente"));
+    render("estoqueIDBRankingSaidas",rank("saidas","destino"));
+}
+function estoqueIDBRenderizarPrevia(pre){
+    const sec=document.getElementById("estoqueIDBPrevia");if(sec)sec.classList.add("ativa");
+    const st=document.getElementById("estoqueIDBPreviaStatus");if(st)st.textContent=`${pre.linhas.length.toLocaleString("pt-BR")} linha(s) • relatório ${estoqueIDBFormatarData(pre.data_relatorio)}`;
+    const mapa=[
+        ["A","COR","cor"],["B","DESC","descricao"],["C","PRODUTO","produto"],["D","DAT. NF","data_nf"],["E","NF","nf"],
+        ["H","EMITENTE","emitente"],["I","DESTINO","destino"],["J","SÉRIE ESTOQUE","serie_estoque"],["L","N.C.E.","nce"],
+        ["M","ENTRADAS","entradas"],["N","SAÍDAS","saidas"],["O","SALDO ATUAL","saldo_atual"]
+    ];
+    const map=document.getElementById("estoqueIDBMapeamento");if(map)map.innerHTML=mapa.map(([col,n,campo])=>`<div class="estoque-idb-map-box"><small>Coluna ${col} • ${n}</small><b>${campo}</b></div>`).join("");
+    const alerta=document.getElementById("estoqueIDBAlertaMapeamento");if(alerta){alerta.className="estoque-idb-alerta ok";alerta.textContent="Layout RESTOK fixo reconhecido: dados a partir da linha 13. F, G e K ignoradas; linhas SOMA/cabeçalhos descartadas; a leitura é encerrada antes do RESUMO DO MOVIMENTO; COR, DESC e PRODUTO herdados nas continuações.";}
+    const corpo=document.getElementById("estoqueIDBPreviaCorpo");if(corpo){const amostra=pre.linhas.slice(0,120);corpo.innerHTML=amostra.map(r=>`<tr><td>${estoqueIDBEscape(r.cor)}</td><td>${estoqueIDBEscape(r.descricao)}</td><td>${estoqueIDBEscape(r.produto)}</td><td>${estoqueIDBEscape(estoqueIDBFormatarData(r.data_nf))}</td><td>${estoqueIDBEscape(r.nf)}</td><td>${estoqueIDBEscape(r.emitente)}</td><td>${estoqueIDBEscape(r.destino)}</td><td>${estoqueIDBEscape(r.serie_estoque)}</td><td>${estoqueIDBEscape(r.nce)}</td><td>${estoqueIDBEscape(r.entradas)}</td><td>${estoqueIDBEscape(r.saidas)}</td><td>${estoqueIDBEscape(r.saldo_atual===null?"":r.saldo_atual)}</td></tr>`).join("")||'<tr><td colspan="12" class="estoque-idb-vazio-tabela">Nenhuma linha válida encontrada.</td></tr>';}
+    estoqueIDBAtualizarResumoPrevia(pre.linhas,pre.totais_finais);
+}
+async function estoqueIDBArquivoSelecionado(input){
+    const arquivo=input?.files?.[0];if(!arquivo)return;
+    const ultima=document.getElementById("estoqueIDBUltimaImportacao"),loading=document.getElementById("estoqueIDBLoading"),sec=document.getElementById("estoqueIDBPrevia");
+    if(sec)sec.classList.add("ativa");if(loading)loading.classList.add("ativo");if(ultima)ultima.textContent=`Lendo: ${arquivo.name}`;
+    try{
+        if(typeof XLSX==="undefined")throw new Error("Biblioteca XLSX não carregada.");
+        const buf=await arquivo.arrayBuffer(),wb=XLSX.read(buf,{type:"array",cellDates:false});
+        const nomeAba=wb.SheetNames[0];if(!nomeAba)throw new Error("O arquivo não possui planilhas.");
+        const aoa=XLSX.utils.sheet_to_json(wb.Sheets[nomeAba],{header:1,raw:true,defval:""});
+        const dataRelatorio=estoqueIDBDetectarDataRelatorio(aoa);
+        const linhas=estoqueIDBExtrairLinhasRESTOK(aoa);
+        if(!linhas.length) throw new Error("Nenhuma linha válida foi encontrada a partir da linha 13 do RESTOK.");
+        const totaisFinais=estoqueIDBLerTotaisFinaisRESTOK(aoa);
+        estoqueIDBPreviaAtual={arquivo:arquivo.name,aba:nomeAba,data_relatorio:dataRelatorio,linhas,totais_finais:totaisFinais};
+        estoqueIDBRenderizarPrevia(estoqueIDBPreviaAtual);
+        if(ultima)ultima.textContent=`${arquivo.name} • ${linhas.length.toLocaleString("pt-BR")} linha(s) • ${estoqueIDBFormatarData(dataRelatorio)}`;
+    }catch(error){console.error("Estoque IDB: erro ao ler relatório",error);alert(`Não foi possível ler o relatório.\n\n${error?.message||error}`);if(ultima)ultima.textContent=`Erro ao ler: ${arquivo.name}`;}
+    finally{if(loading)loading.classList.remove("ativo");input.value="";}
+}
+function limparPreviaEstoqueIDB(){
+    estoqueIDBPreviaAtual=null;document.getElementById("estoqueIDBPrevia")?.classList.remove("ativa");
+    const ids=[["estoqueIDBEntradas","0"],["estoqueIDBSaidas","0"],["estoqueIDBSaldo","0"],["estoqueIDBValor","R$ 0,00"]];ids.forEach(([id,v])=>{const e=document.getElementById(id);if(e)e.textContent=v;});
+    const e=document.getElementById("estoqueIDBRankingEntradas");if(e){e.className="estoque-idb-vazio";e.textContent="Importe um relatório para gerar o ranking.";}const s=document.getElementById("estoqueIDBRankingSaidas");if(s){s.className="estoque-idb-vazio";s.textContent="Importe um relatório para gerar o ranking.";}
+    const u=document.getElementById("estoqueIDBUltimaImportacao");if(u)u.textContent="Nenhum relatório carregado nesta tela.";
+}
+async function confirmarImportacaoEstoqueIDB(){
+    const pre=estoqueIDBPreviaAtual;
+    if(!pre?.linhas?.length){alert("Importe e confira um relatório antes de gravar.");return;}
+    const btn=document.getElementById("estoqueIDBBtnConfirmar");
+    if(btn?.disabled)return;
+    if(btn){btn.disabled=true;btn.textContent="Gravando...";}
+    try{
+        const cliente=obterSupabaseEstoqueIDB();
+        const {data:existente,error:erroBusca}=await cliente
+            .from("estoque_importacoes")
+            .select("id,data_relatorio,nome_arquivo,total_linhas,total_entradas,total_saidas,valor_total")
+            .eq("data_relatorio",pre.data_relatorio)
+            .eq("nome_arquivo",pre.arquivo)
+            .limit(1);
+        if(erroBusca)throw erroBusca;
+
+        const totalEntradas=pre.linhas.reduce((a,r)=>a+estoqueIDBNumero(r.entradas),0);
+        const totalSaidas=pre.linhas.reduce((a,r)=>a+estoqueIDBNumero(r.saidas),0);
+        const valorEstoque=estoqueIDBNumero(pre.totais_finais?.valor_estoque);
+        const usuario=(typeof usuarioLogado!=="undefined" && usuarioLogado && (usuarioLogado.nome||usuarioLogado.email)) || "Usuário ERP";
+
+        let importacaoId=null;
+        let atualizandoExistente=false;
+
+        if(existente?.length){
+            /*
+             * Relatórios importados em versões antigas podem ter valor_total=0.
+             * Reimportar o mesmo arquivo atualiza os totais e o valor do estoque
+             * sem duplicar as movimentações já existentes.
+             */
+            importacaoId=existente[0].id;
+            atualizandoExistente=true;
+
+            const {data:atualizado,error:erroAtualiza}=await cliente
+                .from("estoque_importacoes")
+                .update({
+                    total_linhas:pre.linhas.length,
+                    total_entradas:totalEntradas,
+                    total_saidas:totalSaidas,
+                    valor_total:valorEstoque,
+                    usuario,
+                    criado_em:new Date().toISOString()
+                })
+                .eq("id",importacaoId)
+                .select("id,valor_total,total_entradas,total_saidas,criado_em")
+                .single();
+
+            if(erroAtualiza) throw erroAtualiza;
+
+            const valorConfirmado=estoqueIDBNumero(atualizado?.valor_total);
+            if(Math.abs(valorConfirmado-valorEstoque)>0.001){
+                throw new Error(
+                    `O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`
+                );
+            }
+        }else{
+            const {data:imp,error:erroImp}=await cliente.from("estoque_importacoes").insert({
+                data_relatorio:pre.data_relatorio,
+                nome_arquivo:pre.arquivo,
+                total_linhas:pre.linhas.length,
+                total_entradas:totalEntradas,
+                total_saidas:totalSaidas,
+                valor_total:valorEstoque,
+                usuario
+            }).select("id").single();
+
+            if(erroImp)throw erroImp;
+            importacaoId=imp.id;
+
+            const {data:confirmacao,error:erroConfirma}=await cliente
+                .from("estoque_importacoes")
+                .select("id,valor_total")
+                .eq("id",importacaoId)
+                .single();
+            if(erroConfirma) throw erroConfirma;
+
+            const valorConfirmado=estoqueIDBNumero(confirmacao?.valor_total);
+            if(Math.abs(valorConfirmado-valorEstoque)>0.001){
+                throw new Error(
+                    `O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`
+                );
+            }
+        }
+        if(!atualizandoExistente){
+            try{
+                const dados=pre.linhas.map(r=>({
+                    cor:r.cor||null,descricao:r.descricao||null,produto:r.produto||null,data_nf:r.data_nf||null,nf:r.nf||null,
+                    emitente:r.emitente||null,destino:r.destino||null,serie_estoque:r.serie_estoque||null,nce:r.nce||null,
+                    entradas:estoqueIDBNumero(r.entradas),saidas:estoqueIDBNumero(r.saidas),saldo_atual:r.saldo_atual,
+                    data_relatorio:pre.data_relatorio,arquivo_origem:pre.arquivo,importacao_id:importacaoId
+                }));
+                const lote=400;
+                for(let i=0;i<dados.length;i+=lote){
+                    const {error}=await cliente.from("estoque_movimentacoes").insert(dados.slice(i,i+lote));
+                    if(error)throw error;
+                }
+            }catch(erroLinhas){
+                await cliente.from("estoque_movimentacoes").delete().eq("importacao_id",importacaoId);
+                await cliente.from("estoque_importacoes").delete().eq("id",importacaoId);
+                throw erroLinhas;
+            }
+        }
+
+        alert(
+            atualizandoExistente
+                ? `Relatório já existente atualizado com sucesso!\n\nValor de estoque atualizado para ${valorEstoque.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}.`
+                : `Relatório importado com sucesso!\n\n${pre.linhas.length.toLocaleString("pt-BR")} linhas gravadas no Controle de Estoque IDB.`
+        );
+        estoqueIDBPreviaAtual=null;
+        document.getElementById("estoqueIDBPrevia")?.classList.remove("ativa");
+        await atualizarPainelEstoqueIDB();
+    }catch(error){
+        console.error("Estoque IDB: falha na importação",error);
+        alert(`Não foi possível gravar o relatório no Supabase.\n\n${error?.message||error}`);
+    }finally{
+        if(btn){btn.disabled=false;btn.textContent="✓ Confirmar e gravar no Supabase";}
+    }
+}
+
+
+function estoqueIDBNormalizarNCE(v){
+    return String(v??"").trim().replace(/\s+/g,"");
+}
+
+function estoqueIDBTipoMovimento(r){
+    const e=estoqueIDBNumero(r.entradas);
+    const s=estoqueIDBNumero(r.saidas);
+    if(e>0 && s>0) return "Entrada e saída";
+    if(e>0) return "Entrada";
+    if(s>0) return "Saída";
+    return "Movimentação";
+}
+
+
+async function estoqueIDBBuscarDescricaoRexpedlr(nce){
+    const alvo=estoqueIDBNormalizarNCE(nce);
+    if(!alvo) return "";
+
+    /*
+     * A descrição oficial do produto vem da REXPEDLR principal.
+     * Primeiro aproveitamos caches já carregados pelo ERP; se não houver
+     * correspondência, fazemos uma consulta pequena somente por esse N.C.E.
+     */
+    const caches=[];
+    try{
+        if(typeof rexpedlrIntelCacheV7543!=="undefined" && Array.isArray(rexpedlrIntelCacheV7543)) caches.push(rexpedlrIntelCacheV7543);
+    }catch(e){}
+    try{
+        if(typeof intelRegistros!=="undefined" && Array.isArray(intelRegistros)) caches.push(intelRegistros);
+    }catch(e){}
+
+    for(const lista of caches){
+        const achado=lista.find(r=>estoqueIDBNormalizarNCE(r?.nce)===alvo && String(r?.desc_produto??"").trim());
+        if(achado) return String(achado.desc_produto).trim();
+    }
+
+    try{
+        const supaPrincipal=obterSupabaseClient();
+        const {data,error}=await supaPrincipal
+            .from("rexpedlr")
+            .select("nce,desc_produto")
+            .eq("nce",alvo)
+            .not("desc_produto","is",null)
+            .limit(20);
+
+        if(error) throw error;
+        const lista=Array.isArray(data)?data:[];
+        const achado=lista.find(r=>String(r?.desc_produto??"").trim());
+        return achado?String(achado.desc_produto).trim():"";
+    }catch(error){
+        console.warn("Estoque IDB: não foi possível obter descrição na REXPEDLR",error);
+        return "";
+    }
+}
+
+async function consultarNCEEstoqueIDB(){
+    const input=document.getElementById("estoqueIDBInputNCE");
+    const status=document.getElementById("estoqueIDBBuscaNCEStatus");
+    const box=document.getElementById("estoqueIDBBuscaNCEResultado");
+    if(!input || !status || !box) return;
+
+    const nce=estoqueIDBNormalizarNCE(input.value);
+    if(!nce){
+        status.textContent="Digite um N.C.E. para pesquisar.";
+        box.innerHTML="";
+        input.focus();
+        return;
+    }
+
+    status.textContent=`Consultando N.C.E. ${nce}...`;
+    box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Carregando movimentações...</div>';
+
+    try{
+        const cliente=obterSupabaseEstoqueIDB();
+
+        const {data,error}=await cliente
+            .from("estoque_movimentacoes")
+            .select("id,cor,descricao,produto,data_nf,nf,emitente,destino,serie_estoque,nce,entradas,saidas,saldo_atual,data_relatorio,arquivo_origem,criado_em")
+            .eq("nce",nce)
+            .order("data_nf",{ascending:true})
+            .order("id",{ascending:true});
+
+        if(error) throw error;
+
+        const linhas=Array.isArray(data)?data:[];
+        if(!linhas.length){
+            status.textContent=`Nenhuma movimentação encontrada para o N.C.E. ${nce}.`;
+            box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">N.C.E. não localizado nas importações do Controle de Estoque IDB.</div>';
+            return;
+        }
+
+        const entradas=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.entradas),0);
+        const saidas=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.saidas),0);
+
+        const timeline=linhas
+            .filter(r=>r.data_nf)
+            .sort((a,b)=>{
+                const da=String(a.data_nf||"");
+                const db=String(b.data_nf||"");
+                if(da!==db) return da.localeCompare(db);
+                return estoqueIDBNumero(a.id)-estoqueIDBNumero(b.id);
+            });
+
+        const entradasComData=timeline.filter(r=>estoqueIDBNumero(r.entradas)>0);
+        const primeiraEntrada=entradasComData.length?entradasComData[0].data_nf:null;
+        const ultimaEntrada=entradasComData.length?entradasComData[entradasComData.length-1].data_nf:null;
+
+        const produtoLocal=linhas.find(r=>r.produto || r.descricao);
+        const descricaoRexpedlr=await estoqueIDBBuscarDescricaoRexpedlr(nce);
+        const nomeProduto=descricaoRexpedlr || [produtoLocal?.produto,produtoLocal?.descricao].filter(Boolean).join(" — ") || "Produto sem descrição";
+
+        const esc=estoqueIDBEscape;
+        const fmtData=v=>estoqueIDBFormatarData(v);
+
+        const htmlTimeline = timeline.length
+            ? timeline.map((r,idx)=>{
+                const e=estoqueIDBNumero(r.entradas);
+                const s=estoqueIDBNumero(r.saidas);
+                const tipo=e>0 && s>0 ? "Entrada e saída" : e>0 ? "Entrada" : s>0 ? "Saída" : "Movimentação";
+                const classe=s>0 && e<=0 ? "saida" : "";
+                const origem=String(r.emitente||"-");
+                const destino=String(r.destino||"-");
+                const qtd=[];
+                if(e>0) qtd.push(`<span style="color:#0b8a52">+${e.toLocaleString("pt-BR")} entrada</span>`);
+                if(s>0) qtd.push(`<span style="color:#d84355">-${s.toLocaleString("pt-BR")} saída</span>`);
+
+                return `<div class="estoque-idb-timeline-item ${classe}">
+                    <div class="linha1">
+                        <span>${idx+1}º • ${esc(fmtData(r.data_nf))} • ${esc(tipo)}</span>
+                        <span>${qtd.join(" &nbsp; ") || "-"}</span>
+                    </div>
+                    <div class="linha2">
+                        Emitente: <b>${esc(origem)}</b> • Destino: <b>${esc(destino)}</b>
+                        ${r.nf?` • NF: <b>${esc(r.nf)}</b>`:""}
+                        ${r.serie_estoque?` • Série: <b>${esc(r.serie_estoque)}</b>`:""}
+                    </div>
+                </div>`;
+            }).join("")
+            : '<div class="estoque-idb-vazio">As movimentações foram encontradas, mas não possuem data para montar a linha do tempo.</div>';
+
+        box.innerHTML=`
+            <div class="estoque-idb-nce-produto">
+                N.C.E. <b>${esc(nce)}</b> • ${esc(nomeProduto)}
+            </div>
+
+            <div class="estoque-idb-nce-resumo">
+                <div class="estoque-idb-nce-mini">
+                    <small>Primeira entrada</small>
+                    <strong>${primeiraEntrada?esc(fmtData(primeiraEntrada)):"-"}</strong>
+                </div>
+                <div class="estoque-idb-nce-mini">
+                    <small>Última entrada</small>
+                    <strong>${ultimaEntrada?esc(fmtData(ultimaEntrada)):"-"}</strong>
+                </div>
+                <div class="estoque-idb-nce-mini">
+                    <small>Total de entradas</small>
+                    <strong>${entradas.toLocaleString("pt-BR")}</strong>
+                </div>
+                <div class="estoque-idb-nce-mini">
+                    <small>Total de saídas</small>
+                    <strong>${saidas.toLocaleString("pt-BR")}</strong>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;padding-bottom:8px;border-bottom:1px solid #dbe5f0">
+                <h3 style="margin:0;color:#082347;font-size:18px">Linha do Tempo</h3>
+                <div style="margin-top:4px;color:#64748b;font-size:12px;font-weight:700">
+                    Histórico completo de entradas e saídas deste N.C.E.
+                </div>
+            </div>
+
+            <div class="estoque-idb-timeline">
+                ${htmlTimeline}
+            </div>
+        `;
+
+        status.textContent=`${linhas.length.toLocaleString("pt-BR")} movimentação(ões) encontrada(s) • ${timeline.length.toLocaleString("pt-BR")} evento(s) na linha do tempo.`;
+    }catch(error){
+        console.error("Estoque IDB: erro na consulta por N.C.E.",error);
+        status.textContent="Erro ao consultar o N.C.E.";
+        box.innerHTML=`<div class="estoque-idb-alerta" style="margin-top:14px">Não foi possível consultar o N.C.E.: ${estoqueIDBEscape(error?.message||error)}</div>`;
+    }
+}
+
+async function carregarHistoricoEstoqueIDB(){
+    const corpo=document.getElementById("estoqueIDBHistoricoCorpo");
+    const status=document.getElementById("estoqueIDBHistoricoStatus");
+    if(!corpo) return;
+    if(status) status.textContent="Consultando...";
+    try{
+        const cliente=obterSupabaseEstoqueIDB();
+        const {data,error}=await cliente.from("estoque_importacoes")
+            .select("data_relatorio,nome_arquivo,total_linhas,total_entradas,total_saidas,usuario,criado_em")
+            .order("criado_em",{ascending:false}).limit(20);
+        if(error) throw error;
+        const linhas=Array.isArray(data)?data:[];
+        if(!linhas.length){
+            corpo.innerHTML='<tr><td colspan="6" class="estoque-idb-vazio-tabela">Ainda não existem importações registradas.</td></tr>';
+            if(status) status.textContent="0 importações";
+            return;
+        }
+        const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+        const dataBR=v=>{if(!v)return "-";const [a,m,d]=String(v).slice(0,10).split("-");return d&&m&&a?`${d}/${m}/${a}`:v;};
+        corpo.innerHTML=linhas.map(r=>`<tr><td>${esc(dataBR(r.data_relatorio))}</td><td>${esc(r.nome_arquivo)}</td><td>${esc(r.total_linhas||0)}</td><td>${esc(r.total_entradas||0)}</td><td>${esc(r.total_saidas||0)}</td><td>${esc(r.usuario||"-")}</td></tr>`).join("");
+        if(status) status.textContent=`${linhas.length} importação(ões) recentes`;
+    }catch(error){
+        console.error("Estoque IDB: erro no histórico",error);
+        corpo.innerHTML='<tr><td colspan="6" class="estoque-idb-vazio-tabela">Não foi possível carregar o histórico.</td></tr>';
+        if(status) status.textContent="Erro ao consultar";
+    }
+}
+
+
+async function carregarUltimaImportacaoNoPainelEstoqueIDB(){
+    const cliente=obterSupabaseEstoqueIDB();
+    const ultimaEl=document.getElementById("estoqueIDBUltimaImportacao");
+
+    /*
+     * Primeiro localizamos a última importação confirmada.
+     * Os cards e rankings devem refletir exatamente esse lote,
+     * e não a soma de relatórios antigos.
+     */
+    const {data:imports,error:erroImp}=await cliente
+        .from("estoque_importacoes")
+        .select("id,data_relatorio,nome_arquivo,total_linhas,total_entradas,total_saidas,valor_total,usuario,criado_em")
+        .order("criado_em",{ascending:false})
+        .limit(20);
+
+    if(erroImp) throw erroImp;
+
+    const listaImports=Array.isArray(imports)?imports:[];
+    const impComValor=listaImports.find(r=>estoqueIDBNumero(r?.valor_total)>0);
+    const imp=impComValor || (listaImports.length?listaImports[0]:null);
+    if(!imp){
+        const ids=[
+            ["estoqueIDBEntradas","0"],
+            ["estoqueIDBSaidas","0"],
+            ["estoqueIDBSaldo","0"],
+            ["estoqueIDBValor","R$ 0,00"]
+        ];
+        ids.forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.textContent=v;});
+        if(ultimaEl) ultimaEl.textContent="Nenhum relatório importado no banco.";
+        return;
+    }
+
+    const entradas=estoqueIDBNumero(imp.total_entradas);
+    const saidas=estoqueIDBNumero(imp.total_saidas);
+    const saldo=entradas-saidas;
+    const valor=estoqueIDBNumero(imp.valor_total);
+
+    const elEntradas=document.getElementById("estoqueIDBEntradas");
+    const elSaidas=document.getElementById("estoqueIDBSaidas");
+    const elSaldo=document.getElementById("estoqueIDBSaldo");
+    const elValor=document.getElementById("estoqueIDBValor");
+
+    if(elEntradas) elEntradas.textContent=entradas.toLocaleString("pt-BR");
+    if(elSaidas) elSaidas.textContent=saidas.toLocaleString("pt-BR");
+    if(elSaldo) elSaldo.textContent=saldo.toLocaleString("pt-BR");
+    if(elValor){
+        elValor.textContent=valor.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+        elValor.title=`Valor carregado do Supabase: ${imp.valor_total ?? 0} | importação #${imp.id}`;
+    }
+
+    if(ultimaEl){
+        ultimaEl.textContent=`${imp.nome_arquivo||"Relatório"} • ${(imp.total_linhas||0).toLocaleString("pt-BR")} linha(s) • ${estoqueIDBFormatarData(imp.data_relatorio)}`;
+    }
+
+    /*
+     * Busca somente as linhas pertencentes à última importação.
+     * Paginação é necessária porque o Supabase costuma limitar cada resposta.
+     */
+    let linhas=[];
+    let inicio=0;
+    const lote=1000;
+    while(true){
+        const {data,error}=await cliente
+            .from("estoque_movimentacoes")
+            .select("emitente,destino,entradas,saidas")
+            .eq("importacao_id",imp.id)
+            .range(inicio,inicio+lote-1);
+
+        if(error) throw error;
+        const pagina=Array.isArray(data)?data:[];
+        linhas.push(...pagina);
+        if(pagina.length<lote) break;
+        inicio+=lote;
+        if(inicio>=100000) break;
+    }
+
+    const montarRank=(campo,localCampo)=>{
+        const mapa=new Map();
+        for(const r of linhas){
+            const local=String(r?.[localCampo]||"").trim();
+            if(!local || local.toUpperCase()==="IDB") continue;
+            const qtd=estoqueIDBNumero(r?.[campo]);
+            if(qtd>0) mapa.set(local,(mapa.get(local)||0)+qtd);
+        }
+        return [...mapa.entries()]
+            .filter(x=>x[1]>0)
+            .sort((a,b)=>b[1]-a[1])
+            .slice(0,10);
+    };
+
+    const renderRank=(id,dados)=>{
+        const el=document.getElementById(id);
+        if(!el) return;
+        el.className="";
+        el.innerHTML=dados.length
+            ? `<table class="estoque-idb-tabela">${dados.map((x,i)=>`<tr><td><b>${i+1}º</b></td><td>${estoqueIDBEscape(x[0])}</td><td style="text-align:right"><b>${x[1].toLocaleString("pt-BR")}</b></td></tr>`).join("")}</table>`
+            : '<div class="estoque-idb-vazio">Nenhuma movimentação encontrada.</div>';
+    };
+
+    renderRank("estoqueIDBRankingEntradas",montarRank("entradas","emitente"));
+    renderRank("estoqueIDBRankingSaidas",montarRank("saidas","destino"));
+}
+
+
+let estoqueIDBTimelineMudancas=[];
+
+function estoqueIDBClassificarMudanca(anterior,atual){
+    const a=estoqueIDBNumero(anterior), b=estoqueIDBNumero(atual);
+    if(a<=0 && b>0) return "novo";
+    if(a>0 && b<=0) return "zerou";
+    if(b>a) return "aumentou";
+    if(b<a) return "diminuiu";
+    return "igual";
+}
+
+function estoqueIDBLabelMudanca(tipo){
+    return {novo:"NOVO",aumentou:"AUMENTOU",diminuiu:"DIMINUIU",zerou:"ZEROU"}[tipo]||tipo.toUpperCase();
+}
+
+function estoqueIDBRenderTimelineEstoque(lista){
+    const corpo=document.getElementById("estoqueIDBTimelineCorpo");
+    if(!corpo) return;
+    if(!lista.length){
+        corpo.innerHTML='<tr><td colspan="6" class="estoque-idb-vazio-tabela">Nenhuma alteração de estoque entre os dois relatórios.</td></tr>';
+        return;
+    }
+    corpo.innerHTML=lista.map(r=>{
+        const delta=estoqueIDBNumero(r.atual)-estoqueIDBNumero(r.anterior);
+        const cls=delta>0?"estoque-idb-delta-pos":delta<0?"estoque-idb-delta-neg":"";
+        const sinal=delta>0?"+":"";
+        return `<tr>
+            <td><span class="estoque-idb-chip-mudanca estoque-idb-chip-${r.tipo}">${estoqueIDBEscape(estoqueIDBLabelMudanca(r.tipo))}</span></td>
+            <td><b>${estoqueIDBEscape(r.nce)}</b></td>
+            <td class="produto">${estoqueIDBEscape(r.nome||"Produto sem descrição")}</td>
+            <td>${estoqueIDBNumero(r.anterior).toLocaleString("pt-BR")}</td>
+            <td><b>${estoqueIDBNumero(r.atual).toLocaleString("pt-BR")}</b></td>
+            <td class="${cls}">${sinal}${delta.toLocaleString("pt-BR")}</td>
+        </tr>`;
+    }).join("");
+}
+
+function estoqueIDBFiltrarTimeline(filtro,botao){
+    document.querySelectorAll("#estoqueIDBTimelineFiltros button").forEach(b=>b.classList.remove("ativo"));
+    if(botao) botao.classList.add("ativo");
+    const lista=filtro==="todos"?estoqueIDBTimelineMudancas:estoqueIDBTimelineMudancas.filter(r=>r.tipo===filtro);
+    estoqueIDBRenderTimelineEstoque(lista);
+}
+
+async function estoqueIDBBuscarDescricoesTimeline(nces,fallbacks){
+    const mapa=new Map();
+    const alvos=[...new Set(nces.map(estoqueIDBNormalizarNCE).filter(Boolean))];
+    if(!alvos.length) return mapa;
+
+    /* Aproveita primeiro o cache principal da REXPEDLR, se já estiver carregado. */
+    try{
+        if(typeof rexpedlrIntelCacheV7543!=="undefined" && Array.isArray(rexpedlrIntelCacheV7543)){
+            for(const r of rexpedlrIntelCacheV7543){
+                const n=estoqueIDBNormalizarNCE(r?.nce);
+                if(n && alvos.includes(n) && String(r?.desc_produto??"").trim() && !mapa.has(n)) mapa.set(n,String(r.desc_produto).trim());
+            }
+        }
+    }catch(e){}
+
+    const faltantes=alvos.filter(n=>!mapa.has(n));
+    if(faltantes.length){
+        try{
+            const supa=obterSupabaseClient();
+            const tamanho=100;
+            for(let i=0;i<faltantes.length;i+=tamanho){
+                const lote=faltantes.slice(i,i+tamanho);
+                const {data,error}=await supa.from("rexpedlr").select("nce,desc_produto").in("nce",lote);
+                if(error) throw error;
+                for(const r of (data||[])){
+                    const n=estoqueIDBNormalizarNCE(r?.nce);
+                    const d=String(r?.desc_produto??"").trim();
+                    if(n&&d&&!mapa.has(n)) mapa.set(n,d);
+                }
+            }
+        }catch(error){console.warn("Estoque IDB: falha ao buscar descrições da timeline",error);}
+    }
+
+    for(const [n,v] of fallbacks.entries()) if(!mapa.has(n) && v) mapa.set(n,v);
+    return mapa;
+}
+
+async function carregarLinhaTempoEstoqueIDB(){
+    const status=document.getElementById("estoqueIDBTimelineStatus");
+    const periodo=document.getElementById("estoqueIDBTimelinePeriodo");
+    if(status) status.textContent="Comparando os dois últimos relatórios...";
+
+    const cliente=obterSupabaseEstoqueIDB();
+    const {data:imports,error:erroImp}=await cliente
+        .from("estoque_importacoes")
+        .select("id,data_relatorio,nome_arquivo,criado_em")
+        .order("data_relatorio",{ascending:false})
+        .order("criado_em",{ascending:false})
+        .limit(40);
+    if(erroImp) throw erroImp;
+
+    /* Um relatório por data: se houve reimportação no mesmo dia, usa o mais recente. */
+    const datasVistas=new Set(), escolhidos=[];
+    for(const imp of (imports||[])){
+        const d=String(imp?.data_relatorio||"");
+        if(!d || datasVistas.has(d)) continue;
+        datasVistas.add(d); escolhidos.push(imp);
+        if(escolhidos.length===2) break;
+    }
+
+    if(escolhidos.length<2){
+        estoqueIDBTimelineMudancas=[];
+        if(periodo) periodo.textContent="Aguardando 2 dias de relatório";
+        if(status) status.textContent="Importe relatórios de pelo menos duas datas diferentes para comparar o estoque.";
+        ["estoqueIDBTimelineNovos","estoqueIDBTimelineAumentaram","estoqueIDBTimelineDiminuiram","estoqueIDBTimelineZeraram"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="0";});
+        estoqueIDBRenderTimelineEstoque([]);
+        return;
+    }
+
+    const atualImp=escolhidos[0], anteriorImp=escolhidos[1];
+    if(periodo) periodo.textContent=`${estoqueIDBFormatarData(anteriorImp.data_relatorio)} → ${estoqueIDBFormatarData(atualImp.data_relatorio)}`;
+
+    async function carregarSnapshot(importacaoId){
+        const mapa=new Map(), fallback=new Map();
+        let inicio=0, lote=1000;
+        while(true){
+            const {data,error}=await cliente.from("estoque_movimentacoes")
+                .select("nce,entradas,saidas,produto,descricao")
+                .eq("importacao_id",importacaoId)
+                .range(inicio,inicio+lote-1);
+            if(error) throw error;
+            const pagina=data||[];
+            for(const r of pagina){
+                const n=estoqueIDBNormalizarNCE(r?.nce);
+                if(!n) continue;
+                const saldo=(mapa.get(n)||0)+estoqueIDBNumero(r.entradas)-estoqueIDBNumero(r.saidas);
+                mapa.set(n,saldo);
+                if(!fallback.has(n)){
+                    const nome=[r?.produto,r?.descricao].filter(Boolean).join(" — ").trim();
+                    if(nome) fallback.set(n,nome);
+                }
+            }
+            if(pagina.length<lote) break;
+            inicio+=lote;
+            if(inicio>=100000) break;
+        }
+        return {mapa,fallback};
+    }
+
+    const [ant,atu]=await Promise.all([carregarSnapshot(anteriorImp.id),carregarSnapshot(atualImp.id)]);
+    const todosNCE=[...new Set([...ant.mapa.keys(),...atu.mapa.keys()])];
+    const mudancas=[];
+    for(const nce of todosNCE){
+        const anterior=ant.mapa.get(nce)||0;
+        const atual=atu.mapa.get(nce)||0;
+        if(Math.abs(atual-anterior)<0.000001) continue;
+        const tipo=estoqueIDBClassificarMudanca(anterior,atual);
+        if(tipo==="igual") continue;
+        mudancas.push({nce,anterior,atual,tipo,nome:""});
+    }
+
+    mudancas.sort((a,b)=>Math.abs(b.atual-b.anterior)-Math.abs(a.atual-a.anterior));
+    const fallbacks=new Map([...ant.fallback,...atu.fallback]);
+    const descricoes=await estoqueIDBBuscarDescricoesTimeline(mudancas.map(r=>r.nce),fallbacks);
+    for(const r of mudancas) r.nome=descricoes.get(r.nce)||fallbacks.get(r.nce)||"Produto sem descrição";
+
+    estoqueIDBTimelineMudancas=mudancas;
+    const contar=t=>mudancas.filter(r=>r.tipo===t).length;
+    const vals={
+        estoqueIDBTimelineNovos:contar("novo"),
+        estoqueIDBTimelineAumentaram:contar("aumentou"),
+        estoqueIDBTimelineDiminuiram:contar("diminuiu"),
+        estoqueIDBTimelineZeraram:contar("zerou")
+    };
+    for(const [id,v] of Object.entries(vals)){const e=document.getElementById(id);if(e)e.textContent=v.toLocaleString("pt-BR");}
+    if(status) status.textContent=`${mudancas.length.toLocaleString("pt-BR")} N.C.E.(s) tiveram alteração entre os dois relatórios.`;
+
+    const btnTodos=document.querySelector('#estoqueIDBTimelineFiltros button[data-filtro="todos"]');
+    estoqueIDBFiltrarTimeline("todos",btnTodos);
+}
+
+async function atualizarPainelEstoqueIDB(){
+    const status=document.getElementById("estoqueIDBStatusBanco");
+    if(status){status.classList.remove("ok","erro");status.innerHTML='<span class="estoque-idb-status-ponto"></span><span>Verificando banco...</span>';}
+    const resultado=await testarConexaoEstoqueIDB();
+    if(status){
+        status.classList.add(resultado.ok?"ok":"erro");
+        status.innerHTML=`<span class="estoque-idb-status-ponto"></span><span>${resultado.ok?"Banco conectado":"Falha na conexão"}</span>`;
+        if(!resultado.ok) status.title=resultado.erro||"";
+    }
+    if(resultado.ok){
+        try{
+            await carregarUltimaImportacaoNoPainelEstoqueIDB();
+        }catch(error){
+            console.error("Estoque IDB: erro ao carregar última importação",error);
+        }
+        try{
+            await carregarLinhaTempoEstoqueIDB();
+        }catch(error){
+            console.error("Estoque IDB: erro ao carregar linha do tempo do estoque",error);
+            const st=document.getElementById("estoqueIDBTimelineStatus");
+            if(st) st.textContent="Não foi possível comparar os últimos relatórios.";
+        }
+        await carregarHistoricoEstoqueIDB();
+    }
+}
+
+async function abrirControleEstoqueIDB(){
+    if(typeof exigirPermissao === "function" && !exigirPermissao(["administrador","supervisor","consulta"],"Controle de Estoque IDB")) return;
+    const tela=garantirTelaControleEstoqueIDB();
+    if(typeof esconderTelas === "function") esconderTelas();
+    try{ definirMenuAtivo("estoque-idb"); }catch(e){}
+    tela.style.display="block";
+    document.getElementById("sidebar")?.classList.remove("mobile-open");
+    await atualizarPainelEstoqueIDB();
+}
+
+/* Faz a nova tela participar do mesmo sistema de navegação sem alterar o código antigo. */
+if(typeof esconderTelas === "function" && !window.__estoqueIDBEsconderTelasIntegrado){
+    const esconderTelasOriginalEstoqueIDB=esconderTelas;
+    esconderTelas=function(){
+        esconderTelasOriginalEstoqueIDB();
+        const tela=document.getElementById("telaControleEstoqueIDB");
+        if(tela) tela.style.display="none";
+    };
+    window.__estoqueIDBEsconderTelasIntegrado=true;
+}
+</script>
+
+<style id="erp-controle-estoque-idb-etapa10-css">
+.estoque-idb-busca-nce{
+    margin-top:18px;background:#fff;border:1px solid #d9e3ef;border-radius:18px;
+    padding:18px;box-shadow:0 10px 28px rgba(11,39,76,.08)
+}
+.estoque-idb-busca-nce-topo{
+    display:flex;gap:10px;align-items:center;flex-wrap:wrap
+}
+.estoque-idb-busca-nce-topo input{
+    flex:1;min-width:220px;border:1px solid #cad7e6;border-radius:10px;
+    padding:11px 12px;font-size:15px;outline:none
+}
+.estoque-idb-busca-nce-topo input:focus{border-color:#1778ff;box-shadow:0 0 0 3px rgba(23,120,255,.10)}
+.estoque-idb-busca-nce-topo button{
+    border:0;border-radius:10px;padding:11px 16px;font-weight:800;cursor:pointer;
+    background:#0f6ef7;color:#fff
+}
+.estoque-idb-busca-nce-status{margin-top:10px;color:#64748b;font-size:13px;font-weight:700}
+.estoque-idb-nce-resumo{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px
+}
+.estoque-idb-nce-mini{
+    border:1px solid #e1e8f0;border-radius:14px;padding:14px;background:#f8fbff
+}
+.estoque-idb-nce-mini small{display:block;color:#64748b;font-weight:800;font-size:11px;text-transform:uppercase}
+.estoque-idb-nce-mini strong{display:block;margin-top:5px;font-size:21px;color:#082347}
+.estoque-idb-nce-produto{
+    margin-top:14px;padding:12px 14px;border-radius:12px;background:#eef5ff;
+    color:#17365d;font-weight:700
+}
+.estoque-idb-timeline{
+    margin-top:18px;position:relative;padding-left:26px
+}
+.estoque-idb-timeline:before{
+    content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:#cdd9e7
+}
+.estoque-idb-timeline-item{
+    position:relative;margin-bottom:14px;padding:12px 14px;border:1px solid #dde6f0;
+    border-radius:12px;background:#fff
+}
+.estoque-idb-timeline-item:before{
+    content:"";position:absolute;left:-23px;top:17px;width:10px;height:10px;border-radius:50%;
+    background:#0f6ef7;border:3px solid #e9f2ff
+}
+.estoque-idb-timeline-item.saida:before{background:#e64b5d}
+.estoque-idb-timeline-item .linha1{
+    display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-weight:800;color:#0a2548
+}
+.estoque-idb-timeline-item .linha2{
+    margin-top:5px;color:#5f7188;font-size:13px
+}
+@media(max-width:900px){
+    .estoque-idb-nce-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:560px){
+    .estoque-idb-nce-resumo{grid-template-columns:1fr}
+}
+</style>
+
+
+<style id="erp-controle-estoque-idb-etapa16-timeline-estoque">
+.estoque-idb-timeline-estoque{margin-top:18px}
+.estoque-idb-timeline-resumo{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:15px 0}
+.estoque-idb-timeline-box{border:1px solid #dce5ef;border-radius:14px;padding:14px;background:#f8fbff}
+.estoque-idb-timeline-box small{display:block;color:#64748b;font-weight:800;font-size:11px;text-transform:uppercase}
+.estoque-idb-timeline-box strong{display:block;margin-top:5px;font-size:23px;color:#082347}
+.estoque-idb-timeline-info{margin:8px 0 13px;color:#586b82;font-size:13px;font-weight:700}
+.estoque-idb-timeline-filtros{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.estoque-idb-timeline-filtros button{border:1px solid #cbd8e6;background:#fff;color:#183653;border-radius:999px;padding:7px 12px;font-weight:800;cursor:pointer;font-size:12px}
+.estoque-idb-timeline-filtros button.ativo{background:#075fc7;color:#fff;border-color:#075fc7}
+.estoque-idb-timeline-tabela-wrap{overflow:auto;border:1px solid #dbe4ee;border-radius:12px;max-height:520px}
+.estoque-idb-timeline-tabela{width:100%;border-collapse:collapse;font-size:13px;background:#fff}
+.estoque-idb-timeline-tabela th,.estoque-idb-timeline-tabela td{padding:9px 10px;border-bottom:1px solid #e4eaf1;text-align:left;white-space:nowrap;color:#15334f}
+.estoque-idb-timeline-tabela th{background:#f1f6fb;position:sticky;top:0;z-index:1;font-weight:900}
+.estoque-idb-timeline-tabela td.produto{white-space:normal;min-width:260px}
+.estoque-idb-delta-pos{color:#087a46!important;font-weight:900}
+.estoque-idb-delta-neg{color:#c9384d!important;font-weight:900}
+.estoque-idb-chip-mudanca{display:inline-block;border-radius:999px;padding:4px 8px;font-size:10px;font-weight:900}
+.estoque-idb-chip-novo{background:#dff7e9;color:#087a46}
+.estoque-idb-chip-aumentou{background:#e6f2ff;color:#075fc7}
+.estoque-idb-chip-diminuiu{background:#fff0d8;color:#9b5c00}
+.estoque-idb-chip-zerou{background:#ffe6ea;color:#b42339}
+@media(max-width:950px){.estoque-idb-timeline-resumo{grid-template-columns:1fr 1fr}}
 </style>
 
 </body>
