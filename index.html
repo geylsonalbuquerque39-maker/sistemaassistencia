@@ -36020,16 +36020,35 @@ async function carregarLinhaTempoEstoqueIDB(){
         let inicio=0, lote=1000;
         while(true){
             const {data,error}=await cliente.from("estoque_movimentacoes")
-                .select("nce,entradas,saidas,produto,descricao")
+                .select("id,nce,data_nf,saldo_atual,produto,descricao")
                 .eq("importacao_id",importacaoId)
+                .order("data_nf",{ascending:true})
+                .order("id",{ascending:true})
                 .range(inicio,inicio+lote-1);
             if(error) throw error;
             const pagina=data||[];
             for(const r of pagina){
                 const n=estoqueIDBNormalizarNCE(r?.nce);
-                if(!n) continue;
-                const saldo=(mapa.get(n)||0)+estoqueIDBNumero(r.entradas)-estoqueIDBNumero(r.saidas);
-                mapa.set(n,saldo);
+                if(!n || !r?.data_nf) continue;
+
+                /*
+                 * ETAPA 19:
+                 * O saldo de cada N.C.E. NÃO é mais calculado por ENTRADAS - SAÍDAS.
+                 * Para cada relatório, usamos o SALDO ATUAL (coluna O) da linha cuja
+                 * DATA NF (coluna D) é a mais recente daquele N.C.E.
+                 * Se houver mais de uma linha na mesma data, prevalece a última linha.
+                 */
+                const data=String(r.data_nf||"");
+                const id=Number(r.id)||0;
+                const atual=mapa.get(n);
+                if(!atual || data>atual.data || (data===atual.data && id>=atual.id)){
+                    mapa.set(n,{
+                        saldo:estoqueIDBNumero(r.saldo_atual),
+                        data,
+                        id
+                    });
+                }
+
                 if(!fallback.has(n)){
                     const nome=[r?.produto,r?.descricao].filter(Boolean).join(" — ").trim();
                     if(nome) fallback.set(n,nome);
@@ -36046,8 +36065,8 @@ async function carregarLinhaTempoEstoqueIDB(){
     const todosNCE=[...new Set([...ant.mapa.keys(),...atu.mapa.keys()])];
     const mudancas=[];
     for(const nce of todosNCE){
-        const anterior=ant.mapa.get(nce)||0;
-        const atual=atu.mapa.get(nce)||0;
+        const anterior=ant.mapa.get(nce)?.saldo ?? 0;
+        const atual=atu.mapa.get(nce)?.saldo ?? 0;
         if(Math.abs(atual-anterior)<0.000001) continue;
         const tipo=estoqueIDBClassificarMudanca(anterior,atual);
         if(tipo==="igual") continue;
