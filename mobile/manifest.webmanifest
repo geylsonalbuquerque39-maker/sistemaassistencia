@@ -3,7 +3,7 @@
   "name": "ERP V10 Mobile",
   "short_name": "ERP V10",
   "description": "ERP V10 - versão mobile com as mesmas funções da versão Web",
-  "start_url": "./?v=M4",
+  "start_url": "./?v=M5",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
