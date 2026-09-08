@@ -3,7 +3,7 @@
   "name":"ERP V10 — Coleta de Fotos",
   "short_name":"Coleta Fotos",
   "description":"Aplicativo móvel dedicado à coleta de fotos por O.S. do ERP V10.",
-  "start_url":"./?v=CF2",
+  "start_url":"./?v=CF3",
   "scope":"./",
   "display":"standalone",
   "orientation":"portrait-primary",
