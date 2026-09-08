@@ -2,18 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
-<!-- ERP V10 MOBILE SEPARADO — ETAPA 01 / M1 -->
-<meta name="theme-color" content="#081a2d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ERP AT">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="format-detection" content="telephone=no">
-<link rel="manifest" href="./manifest.webmanifest">
-<link rel="apple-touch-icon" href="./apple-touch-icon.png">
-
-<title>ERP V10 Mobile — Assistência Técnica</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Assistência Técnica — Backend V10</title>
 <!-- V8.7.0: CLIENTES realmente Lazy DOM — sem dashboard/consulta pré-renderizados -->
 
 <style>
@@ -5868,111 +5858,15 @@ html.dark #intelModal .intel-modal-box,
 </style>
 
 
-<style id="erp-mobile-pwa-etapa01-css">
-/* =============================================================
-   ERP MOBILE PWA ETAPA 01
-   Arquivo exclusivo para iPhone/PWA. Não é CSS responsivo da web.
-   ============================================================= */
-html,body.erp-mobile-app{min-height:100%;background:#071727!important;overscroll-behavior-y:none}
-body.erp-mobile-app{margin:0!important;padding:0!important;color:#eaf2ff;-webkit-tap-highlight-color:transparent;-webkit-text-size-adjust:100%;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif!important}
-body.erp-mobile-app *{box-sizing:border-box}
-body.erp-mobile-app button,body.erp-mobile-app input,body.erp-mobile-app select,body.erp-mobile-app textarea{font-family:inherit;font-size:16px}
-body.erp-mobile-app .sidebar,body.erp-mobile-app #sidebar,body.erp-mobile-app .topbar{display:none!important}
-body.erp-mobile-app .main{margin:0!important;padding:calc(74px + env(safe-area-inset-top)) 12px calc(92px + env(safe-area-inset-bottom))!important;width:100%!important;max-width:none!important;min-height:100dvh!important;background:linear-gradient(180deg,#071727 0%,#0a2037 100%)!important;overflow:visible!important}
-body.erp-mobile-app .footer{display:none!important}
-body.erp-mobile-app.sem-login .erp-mobile-shell{display:none!important}
-
-/* App bar */
-.erp-mobile-shell{display:block}
-.erp-mobile-appbar{position:fixed;z-index:8000;left:0;right:0;top:0;height:calc(64px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 14px 0;display:flex;align-items:center;justify-content:space-between;background:rgba(7,23,39,.94);border-bottom:1px solid rgba(72,137,196,.28);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 8px 26px rgba(0,0,0,.22)}
-.erp-mobile-brand{display:flex;align-items:center;gap:10px;min-width:0}
-.erp-mobile-brand-mark{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(145deg,#147eff,#0057d6);box-shadow:0 7px 18px rgba(0,102,255,.28);font-weight:1000;color:#fff;font-size:14px;letter-spacing:.3px}
-.erp-mobile-brand-copy{display:flex;flex-direction:column;min-width:0}.erp-mobile-brand-copy b{font-size:16px;line-height:19px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:210px}.erp-mobile-brand-copy small{font-size:10px;color:#7f9bb8;font-weight:800;letter-spacing:.2px}
-.erp-mobile-appbar-actions{display:flex;gap:8px}.erp-mobile-appbar-actions button{position:relative;width:40px;height:40px;border:1px solid #244a6b;border-radius:12px;background:#102b46;color:#fff;font-size:18px;font-weight:900;display:grid;place-items:center;padding:0}.erp-mobile-appbar-actions button:active{transform:scale(.96)}
-#erpMobileChatBadge:not(:empty){position:absolute;right:-4px;top:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#ff3b4e;border:2px solid #071727;color:#fff;font:900 9px/13px Arial}
-
-/* Bottom nav */
-.erp-mobile-bottom-nav{position:fixed;z-index:8000;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));height:68px;border:1px solid rgba(68,126,180,.35);border-radius:22px;background:rgba(7,25,43,.96);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 14px 45px rgba(0,0,0,.42);display:grid;grid-template-columns:repeat(5,1fr);padding:5px 4px}
-.erp-mobile-bottom-nav button{border:0;background:transparent;color:#6f8eaa;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:0;font-weight:900}.erp-mobile-bottom-nav button span{font-size:20px;line-height:22px}.erp-mobile-bottom-nav button small{font-size:9px;line-height:11px;font-weight:900}.erp-mobile-bottom-nav button.ativo{background:#112f4d;color:#53a3ff}.erp-mobile-bottom-nav button.ativo span{filter:drop-shadow(0 0 8px rgba(35,128,255,.55))}
-
-/* Mais */
-.erp-mobile-sheet-backdrop{position:fixed;z-index:9000;inset:0;background:rgba(0,0,0,.56);opacity:0;visibility:hidden;transition:.22s;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px)}
-.erp-mobile-sheet-backdrop.aberto{opacity:1;visibility:visible}
-.erp-mobile-sheet{position:fixed;z-index:9001;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-height:78dvh;overflow:auto;background:#0b2138;border:1px solid #2b5376;border-radius:26px;padding:7px 14px 18px;box-shadow:0 22px 70px rgba(0,0,0,.58);transform:translateY(calc(100% + 30px));transition:transform .26s cubic-bezier(.2,.8,.2,1)}
-.erp-mobile-sheet.aberto{transform:translateY(0)}.erp-mobile-sheet-handle{width:46px;height:5px;background:#43627e;border-radius:5px;margin:3px auto 12px}.erp-mobile-sheet-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}.erp-mobile-sheet-head>div{display:flex;flex-direction:column}.erp-mobile-sheet-head b{font-size:20px;color:#fff}.erp-mobile-sheet-head small{font-size:11px;color:#829db7;font-weight:700}.erp-mobile-sheet-head>button{width:38px;height:38px;border:1px solid #284b6a;border-radius:12px;background:#102b46;color:#dcecff;font-size:16px}
-.erp-mobile-menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.erp-mobile-menu-grid button{min-height:94px;border:1px solid #244b6e;border-radius:18px;background:linear-gradient(180deg,#102e4b,#0d2740);color:#fff;text-align:left;padding:13px;display:grid;grid-template-columns:34px 1fr;grid-template-rows:auto auto;column-gap:9px;align-items:center}.erp-mobile-menu-grid button>span{grid-row:1/3;font-size:25px}.erp-mobile-menu-grid button>b{font-size:13px}.erp-mobile-menu-grid button>small{font-size:10px;color:#88a5c0;font-weight:800}.erp-mobile-install-note{margin-top:12px;padding:13px;border-radius:16px;background:#141f3a;border:1px solid #344c81;display:flex;flex-direction:column;gap:4px}.erp-mobile-install-note b{font-size:13px;color:#e6eeff}.erp-mobile-install-note span{font-size:11px;line-height:16px;color:#aabbd4}
-
-/* Conteúdo: app nativo, coluna única */
-body.erp-mobile-app .title{margin:0 0 12px!important;padding:0!important;text-align:left!important}body.erp-mobile-app .title h1{font-size:22px!important;line-height:27px!important;color:#fff!important;margin:0 0 4px!important}body.erp-mobile-app .title p{font-size:12px!important;line-height:17px!important;color:#8da7c0!important;margin:0!important}body.erp-mobile-app .title .underline{display:none!important}
-body.erp-mobile-app [class*="container"],body.erp-mobile-app [class*="wrap"],body.erp-mobile-app [class*="painel"],body.erp-mobile-app [class*="modulo"]{max-width:100%!important}
-body.erp-mobile-app .cards,body.erp-mobile-app .dashboard-grid,body.erp-mobile-app .admin-grid,body.erp-mobile-app .relatorio-grid,body.erp-mobile-app .intel-grid{grid-template-columns:1fr!important;gap:10px!important}
-body.erp-mobile-app .card{min-height:0!important;border-radius:18px!important}
-body.erp-mobile-app input,body.erp-mobile-app select,body.erp-mobile-app textarea{max-width:100%!important;border-radius:13px!important}
-body.erp-mobile-app button{min-height:42px;touch-action:manipulation}
-body.erp-mobile-app textarea{min-height:100px}
-
-/* Tabelas viram regiões roláveis sem remover nenhuma coluna/função */
-body.erp-mobile-app table{font-size:11px!important;min-width:720px!important}
-body.erp-mobile-app table th,body.erp-mobile-app table td{padding:9px 8px!important;white-space:nowrap!important}
-body.erp-mobile-app :is(.table-wrap,.tabela-wrap,.coleta-tabela-wrap,.ci-table-wrap,.relatorio-tabela-wrap,.estoque-idb-tabela-wrap,.estoque-idb-historico-wrap,.estoque-idb-timeline-table-wrap){width:100%!important;max-width:100%!important;overflow-x:auto!important;-webkit-overflow-scrolling:touch!important;border-radius:15px!important}
-
-/* Modais */
-body.erp-mobile-app [class*="modal"]{max-width:100vw}
-body.erp-mobile-app [class*="modal"] [class*="conteudo"],body.erp-mobile-app [class*="modal"] [class*="content"],body.erp-mobile-app .modal-content{width:calc(100vw - 18px)!important;max-width:calc(100vw - 18px)!important;max-height:86dvh!important;border-radius:22px!important;overflow:auto!important}
-
-/* Chat como tela de app */
-body.erp-mobile-app #chatPainel{position:fixed!important;z-index:9500!important;inset:calc(8px + env(safe-area-inset-top)) 8px calc(8px + env(safe-area-inset-bottom)) 8px!important;width:auto!important;height:auto!important;max-width:none!important;max-height:none!important;border-radius:24px!important;transform:none!important}
-body.erp-mobile-app #chatPainel:not(.aberto){display:none!important}
-body.erp-mobile-app #chatPainel.aberto{display:flex!important}
-
-/* Login exclusivo mobile */
-body.erp-mobile-app #telaLogin{padding:calc(18px + env(safe-area-inset-top)) 14px calc(18px + env(safe-area-inset-bottom))!important;background:radial-gradient(circle at 50% -15%,#1058a0 0%,#082847 38%,#061522 80%)!important}
-body.erp-mobile-app .login-card{width:100%!important;max-width:430px!important;border-radius:28px!important;padding:28px 20px!important;background:#0b2138!important;border:1px solid #27547c!important;color:#eaf2ff!important;box-shadow:0 28px 80px rgba(0,0,0,.5)!important}
-body.erp-mobile-app .login-logo{color:#fff!important;font-size:28px!important;line-height:29px!important}.erp-mobile-app .login-logo span{color:#42a1ff!important}.erp-mobile-app .login-sub{color:#89a5bf!important;font-size:11px!important}.erp-mobile-app .login-campo label{color:#dcecff!important}.erp-mobile-app .login-campo input{height:54px!important;background:#07192b!important;color:#fff!important;border:1px solid #2d6da5!important}.erp-mobile-app .login-btn{height:54px!important;border-radius:15px!important;background:linear-gradient(135deg,#0877ff,#005fd8)!important}.erp-mobile-app .login-demo{background:#102c49!important;color:#bcd1e4!important;border-left-color:#2b8dff!important}
-
-/* Estoque IDB mobile */
-body.erp-mobile-app #telaControleEstoqueIDB{padding:0!important;color:#eaf2ff!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-topo,body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-toolbar{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:9px!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-toolbar>*{width:100%!important;justify-content:center!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-grid,body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-resumo-grid,body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-nce-resumo{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-busca-nce-topo{display:grid!important;grid-template-columns:1fr!important;gap:9px!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-busca-nce-topo button{width:100%!important}
-body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-busca-nce,body.erp-mobile-app #telaControleEstoqueIDB .estoque-idb-painel{border-radius:20px!important;padding:14px!important}
-
-/* Coleta */
-body.erp-mobile-app #telaColeta .coleta-topo,body.erp-mobile-app #telaColeta .coleta-acoes,body.erp-mobile-app #telaColeta .coleta-filtros{display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:8px!important}
-body.erp-mobile-app #telaColeta .coleta-acoes button{width:100%!important}
-
-/* Pesquisa/relatórios/inteligência/admin: inputs e ações empilhadas */
-body.erp-mobile-app :is(#telaBusca,#telaRelatorios,#telaInteligencia,#telaAdmin) .acoes,body.erp-mobile-app :is(#telaBusca,#telaRelatorios,#telaInteligencia,#telaAdmin) .filtros{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
-body.erp-mobile-app :is(#telaBusca,#telaRelatorios,#telaInteligencia,#telaAdmin) .filtros>*{flex:1 1 100%!important;min-width:0!important}
-
-/* Scrollbar discreta */
-body.erp-mobile-app ::-webkit-scrollbar{height:5px;width:5px}body.erp-mobile-app ::-webkit-scrollbar-thumb{background:#315b7e;border-radius:6px}body.erp-mobile-app ::-webkit-scrollbar-track{background:transparent}
-</style>
-
-
-<style id="erp-mobile-separado-auth-css">
-/* Mobile separado: o estado visual de autenticação não depende do blur legado da versão Web. */
-body.erp-mobile-app.mobile-auth-pending #telaLogin{display:none!important}
-body.erp-mobile-app.sem-login{overflow:hidden!important}
-body.erp-mobile-app.sem-login .sidebar,
-body.erp-mobile-app.sem-login .main{filter:none!important;pointer-events:auto!important;user-select:auto!important}
-body.erp-mobile-app #telaLogin{z-index:100000!important;overscroll-behavior:contain;touch-action:pan-y}
-body.erp-mobile-app #telaLogin .login-card{max-height:calc(100dvh - 28px);overflow:auto;-webkit-overflow-scrolling:touch}
-@media (max-width:760px){
-  body.erp-mobile-app #telaLogin{padding:max(14px,env(safe-area-inset-top)) 14px max(14px,env(safe-area-inset-bottom))}
-  body.erp-mobile-app #telaLogin .login-card{width:100%;max-width:430px;border-radius:22px;padding:24px 20px}
-  body.erp-mobile-app #telaLogin .login-logo{font-size:28px;line-height:30px}
-  body.erp-mobile-app #telaLogin .login-sub{font-size:13px;margin:10px 0 18px}
-  body.erp-mobile-app #telaLogin .login-campo input{font-size:16px;height:50px}
-  body.erp-mobile-app #telaLogin .login-btn,body.erp-mobile-app #telaLogin .login-btn-secundario{min-height:50px}
-}
-</style>
-
+<link rel="manifest" href="./manifest.webmanifest?v=M2">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png?v=M2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="ERP V10">
+<meta name="theme-color" content="#001b3d">
 </head>
 
-<body class="erp-mobile-app mobile-auth-pending">
+<body class="sem-login">
 
 <div id="telaLogin">
     <div class="login-card">
@@ -10438,6 +10332,7 @@ function exportarAuditoriaCSV(){
 }
 
 
+recuperarSessao();
 if(usuarioLogado){
     baixarCSV();
 }
@@ -10750,6 +10645,7 @@ function duplicarHistoricoCI(id){
     registrarAuditoria("ci","C.I. duplicada: "+(x.numero_ci||x.id),{id:x.id,tipo:x.tipo_ci,os:x.lista_os});
 }
 
+recuperarSessao();
 if(usuarioLogado){
     baixarCSV();
 }
@@ -36883,125 +36779,15 @@ body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico td{
 }
 body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico tbody tr:hover td{background:#102d49!important}
 </style>
-
-<!-- ================= ERP MOBILE PWA ETAPA 01 ================= -->
-<div class="erp-mobile-shell" id="erpMobileShell">
-  <header class="erp-mobile-appbar">
-    <div class="erp-mobile-brand" onclick="erpMobileAbrir('inicio')" role="button" tabindex="0">
-      <span class="erp-mobile-brand-mark">AT</span>
-      <span class="erp-mobile-brand-copy"><b id="erpMobileTitulo">Início</b><small>Assistência Técnica • ERP</small></span>
-    </div>
-    <div class="erp-mobile-appbar-actions">
-      <button type="button" onclick="abrirPesquisaGlobal()" aria-label="Pesquisar">⌕</button>
-      <button type="button" onclick="erpMobileAbrirChat(event)" aria-label="Conversas">💬<span id="erpMobileChatBadge"></span></button>
-    </div>
-  </header>
-
-  <nav class="erp-mobile-bottom-nav" aria-label="Navegação principal">
-    <button type="button" data-mobile-tab="inicio" class="ativo" onclick="erpMobileAbrir('inicio')"><span>⌂</span><small>Início</small></button>
-    <button type="button" data-mobile-tab="coleta" onclick="erpMobileAbrir('coleta')"><span>▣</span><small>Coleta</small></button>
-    <button type="button" data-mobile-tab="estoque-idb" onclick="erpMobileAbrir('estoque-idb')"><span>▦</span><small>Estoque</small></button>
-    <button type="button" data-mobile-tab="consulta" onclick="erpMobileAbrir('consulta')"><span>⌕</span><small>O.S.</small></button>
-    <button type="button" data-mobile-tab="mais" onclick="erpMobileMenu(true)"><span>•••</span><small>Mais</small></button>
-  </nav>
-
-  <div class="erp-mobile-sheet-backdrop" id="erpMobileBackdrop" onclick="erpMobileMenu(false)"></div>
-  <section class="erp-mobile-sheet" id="erpMobileMenu" aria-label="Mais opções">
-    <div class="erp-mobile-sheet-handle"></div>
-    <div class="erp-mobile-sheet-head"><div><b>Mais opções</b><small>Acesso completo ao ERP</small></div><button type="button" onclick="erpMobileMenu(false)">✕</button></div>
-    <div class="erp-mobile-menu-grid">
-      <button onclick="erpMobileAbrir('ci')"><span>↩</span><b>C.I.</b><small>Devoluções</small></button>
-      <button onclick="erpMobileAbrir('relatorios')"><span>▥</span><b>Relatórios</b><small>Consultas</small></button>
-      <button onclick="erpMobileAbrir('inteligencia')"><span>✦</span><b>Inteligência</b><small>Análises</small></button>
-      <button onclick="erpMobileAbrir('fotos')"><span>📷</span><b>Fotos</b><small>Por O.S.</small></button>
-      <button onclick="erpMobileAbrir('admin')"><span>⚙</span><b>Administração</b><small>Gestão</small></button>
-      <button onclick="erpMobileAbrirPerfil()"><span>👤</span><b>Perfil</b><small>Minha conta</small></button>
-    </div>
-    <div class="erp-mobile-install-note" id="erpMobileInstallNote"><b>📲 Instalar no iPhone</b><span>No Safari, toque em Compartilhar e depois em “Adicionar à Tela de Início”.</span></div>
-  </section>
-</div>
-
-
-
-<script id="erp-mobile-separado-auth-js">
-(function(){
-  'use strict';
-  let iniciou=false;
-  async function iniciarAutenticacaoMobile(){
-    if(iniciou)return;
-    iniciou=true;
-    const body=document.body;
-    try{
-      await recuperarSessao();
-    }catch(e){
-      console.error('[ERP Mobile] falha ao recuperar sessão',e);
-      try{mostrarLogin();}catch(_){}
-    }finally{
-      body?.classList.remove('mobile-auth-pending');
-      /* recuperarSessao/mostrarLogin decide o estado final.
-         Se houver usuário válido, garantir que nenhuma classe visual antiga permaneça. */
-      if(typeof usuarioLogado!=='undefined' && usuarioLogado){
-        try{ocultarLogin();}catch(_){}
-      }
-    }
-  }
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',iniciarAutenticacaoMobile,{once:true});
-  else iniciarAutenticacaoMobile();
-})();
-</script>
-
-<script id="erp-mobile-separado-etapa01-js">
-(function(){
-  'use strict';
-  const titulos={
-    'inicio':'Início','coleta':'Coleta de O.S.','estoque-idb':'Estoque IDB','consulta':'Consultar O.S.',
-    'ci':'C.I. Devoluções','relatorios':'Relatórios','inteligencia':'Inteligência','fotos':'Fotos por O.S.','admin':'Administração'
-  };
-  function setTitulo(chave){
-    const e=document.getElementById('erpMobileTitulo');if(e)e.textContent=titulos[chave]||'ERP';
-    document.querySelectorAll('.erp-mobile-bottom-nav [data-mobile-tab]').forEach(b=>b.classList.toggle('ativo',b.dataset.mobileTab===chave));
-    if(!['inicio','coleta','estoque-idb','consulta'].includes(chave))document.querySelector('[data-mobile-tab="mais"]')?.classList.add('ativo');
-  }
-  window.erpMobileMenu=function(abrir){
-    document.getElementById('erpMobileMenu')?.classList.toggle('aberto',!!abrir);
-    document.getElementById('erpMobileBackdrop')?.classList.toggle('aberto',!!abrir);
-    document.body.style.overflow=abrir?'hidden':'';
-  };
-  window.erpMobileAbrir=async function(chave){
-    erpMobileMenu(false);
-    try{
-      if(chave==='inicio') return setTitulo(chave),window.voltarInicio?.();
-      if(chave==='coleta') return setTitulo(chave),window.abrirColeta?.();
-      if(chave==='estoque-idb') return setTitulo(chave),await window.abrirControleEstoqueIDB?.();
-      if(chave==='consulta') return setTitulo(chave),await window.abrirBusca?.();
-      if(chave==='ci') return setTitulo(chave),window.abrirTelaCI?.();
-      if(chave==='relatorios') return setTitulo(chave),window.abrirRelatorios?.();
-      if(chave==='inteligencia') return setTitulo(chave),await window.abrirInteligencia?.();
-      if(chave==='fotos') return setTitulo(chave),window.abrirFotosLoteV930?.();
-      if(chave==='admin') return setTitulo(chave),window.abrirAdmin?.();
-    }catch(e){console.error('[ERP Mobile] navegação',e)}
-  };
-  window.erpMobileAbrirPerfil=function(){erpMobileMenu(false);window.abrirPerfilUsuarioV610?.()};
-  window.erpMobileAbrirChat=function(ev){try{window.alternarChatV57?.(ev||new Event('click'))}catch(e){console.error(e)}};
-
-  function detectarTela(){
-    const mapa=[['telaInicio','inicio'],['telaColeta','coleta'],['telaControleEstoqueIDB','estoque-idb'],['telaBusca','consulta'],['telaCI','ci'],['telaRelatorios','relatorios'],['telaInteligencia','inteligencia'],['telaAdmin','admin']];
-    for(const [id,chave] of mapa){const e=document.getElementById(id);if(e&&getComputedStyle(e).display!=='none'){setTitulo(chave);return}}
-  }
-  function syncBadge(){const a=document.getElementById('chatContador'),b=document.getElementById('erpMobileChatBadge');if(!b)return;const n=(a?.textContent||'').trim();b.textContent=(n&&n!=='0')?n:''}
-  document.addEventListener('DOMContentLoaded',()=>{
-    document.body.classList.add('erp-mobile-app');
-    detectarTela();syncBadge();
-    const obs=new MutationObserver(()=>{detectarTela();syncBadge()});
-    obs.observe(document.body,{subtree:true,attributes:true,attributeFilter:['style','class'],childList:true,characterData:true});
-    if(window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone===true){document.getElementById('erpMobileInstallNote')?.remove()}
-  });
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')erpMobileMenu(false)});
-  if('serviceWorker' in navigator && location.protocol!=='file:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>r.update()).catch(e=>console.warn('[ERP Mobile] SW',e)));
-})();
-</script>
-
 </body>
 </html>
 
 <!-- V7.5.28: fotos e arquivos separados + editor de imagem com corte, giro e espelhamento -->
+
+<script id="erp-mobile-m2-pwa-register">
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('./sw.js?v=M2').catch(function(err){ console.warn('SW:', err); });
+  });
+}
+</script>

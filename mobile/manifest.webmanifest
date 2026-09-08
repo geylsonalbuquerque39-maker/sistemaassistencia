@@ -1,31 +1,16 @@
 {
   "id": "./",
-  "name": "ERP V10 Mobile — Assistência Técnica",
+  "name": "ERP V10 Mobile",
   "short_name": "ERP V10",
-  "description": "Versão mobile do ERP V10 da Assistência Técnica e Logística Reversa.",
-  "lang": "pt-BR",
-  "start_url": "./?v=M1",
+  "description": "ERP V10 - versão mobile com as mesmas funções da versão Web",
+  "start_url": "./?v=M2",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#071727",
-  "theme_color": "#081a2d",
-  "categories": [
-    "business",
-    "productivity"
-  ],
+  "background_color": "#ffffff",
+  "theme_color": "#001b3d",
   "icons": [
-    {
-      "src": "./icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "./icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    {"src":"./icon-192.png","sizes":"192x192","type":"image/png"},
+    {"src":"./icon-512.png","sizes":"512x512","type":"image/png"}
   ]
 }
