@@ -4,7 +4,7 @@
   "short_name": "ERP V10",
   "description": "ERP V10 — Assistência Técnica e Logística Reversa",
   "lang": "pt-BR",
-  "start_url": "./",
+  "start_url": "./?v=PW3",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",

@@ -1,9 +1,5 @@
-ERP V10 PWA — ETAPA 02
+ERP V10 PWA WEB + MOBILE — ETAPA03 / PW3
 
-- Um único index.html contém Web + Mobile.
-- Desktop: interface Web original.
-- iPhone/Android ou PWA instalado: interface Mobile.
-- Mesmo Supabase, usuários, permissões e funções.
-- Publicar todos os arquivos desta pasta na mesma raiz do GitHub Pages.
-- No iPhone: Safari > Compartilhar > Adicionar à Tela de Início.
-- Nas próximas etapas, substituir os arquivos na mesma URL; o app verifica atualização ao abrir.
+Correção Mobile/PWA: tela de login não permanece sobre o ERP quando a sessão Supabase já foi restaurada.
+Versão Web preservada.
+Link de teste: https://geylsonalbuquerque39-maker.github.io/sistemaassistencia/?v=PW3

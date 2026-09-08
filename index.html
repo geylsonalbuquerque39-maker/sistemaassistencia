@@ -36978,11 +36978,78 @@ body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico tbody tr:h
     });
     window.addEventListener('load',async()=>{
       try{
-        const reg=await navigator.serviceWorker.register('./sw.js?v=2');
+        const reg=await navigator.serviceWorker.register('./sw.js?v=PW3');
         await reg.update();
       }catch(e){console.warn('[ERP PWA] SW',e)}
     });
   }
+})();
+</script>
+
+<style id="erp-pwa-pw3-login-session-fix">
+/* PW3 — correção exclusiva Mobile/PWA: nunca deixa o overlay de login sobre uma sessão já restaurada. */
+body.erp-mobile-app.erp-mobile-sessao-ativa #telaLogin{
+  display:none!important;
+  visibility:hidden!important;
+  opacity:0!important;
+  pointer-events:none!important;
+}
+</style>
+<script id="erp-pwa-pw3-login-session-fix-js">
+(function(){
+  'use strict';
+  function ehMobilePWA(){
+    return document.body.classList.contains('erp-mobile-app') ||
+      window.matchMedia('(display-mode: standalone)').matches ||
+      window.navigator.standalone===true ||
+      /iPhone|iPad|iPod|Android/i.test(navigator.userAgent||'') ||
+      window.matchMedia('(max-width: 820px)').matches;
+  }
+  function sessaoERPAtiva(){
+    try{return typeof usuarioLogado!=='undefined' && !!usuarioLogado?.id && usuarioLogado?.ativo!==false}catch(e){return false}
+  }
+  function reconciliarLoginMobile(){
+    if(!ehMobilePWA())return;
+    const ativa=sessaoERPAtiva();
+    document.body.classList.toggle('erp-mobile-sessao-ativa',ativa);
+    if(ativa){
+      const tela=document.getElementById('telaLogin');
+      if(tela)tela.style.display='none';
+      document.body.classList.remove('sem-login');
+    }
+  }
+
+  /* Evita a corrida das duas restaurações de sessão existentes sem alterar o fluxo Web. */
+  if(typeof window.mostrarLogin==='function'){
+    const originalMostrar=window.mostrarLogin;
+    window.mostrarLogin=function(){
+      if(ehMobilePWA() && sessaoERPAtiva()){
+        reconciliarLoginMobile();
+        return;
+      }
+      document.body.classList.remove('erp-mobile-sessao-ativa');
+      return originalMostrar.apply(this,arguments);
+    };
+  }
+  if(typeof window.ocultarLogin==='function'){
+    const originalOcultar=window.ocultarLogin;
+    window.ocultarLogin=function(){
+      const r=originalOcultar.apply(this,arguments);
+      reconciliarLoginMobile();
+      return r;
+    };
+  }
+
+  document.addEventListener('DOMContentLoaded',()=>{
+    reconciliarLoginMobile();
+    const tela=document.getElementById('telaLogin');
+    if(tela){
+      const obs=new MutationObserver(()=>reconciliarLoginMobile());
+      obs.observe(tela,{attributes:true,attributeFilter:['style','class']});
+    }
+    /* cobre a restauração assíncrona do Supabase no primeiro carregamento do PWA */
+    [50,150,350,700,1200,2000,3500,5000].forEach(ms=>setTimeout(reconciliarLoginMobile,ms));
+  });
 })();
 </script>
 
