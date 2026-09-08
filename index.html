@@ -35101,7 +35101,9 @@ function garantirTelaControleEstoqueIDB(){
                     ⬆ Importar Relatório de Estoque
                 </label>
                 <input id="estoqueIDBArquivo" type="file" accept=".xlsx,.xls,.xlt,.csv" hidden onchange="estoqueIDBArquivoSelecionado(this)">
-                <button type="button" class="estoque-idb-btn" onclick="atualizarPainelEstoqueIDB()">↻ Atualizar</button>
+                <label class="estoque-idb-btn estoque-idb-btn-rest10a" for="estoqueIDBArquivoREST10A">📦 Importar REST10A</label>
+                <input id="estoqueIDBArquivoREST10A" type="file" accept=".xlsx,.xls,.xlt,.csv" hidden onchange="estoqueIDBArquivoREST10ASelecionado(this)">
+                <button type="button" class="estoque-idb-btn" onclick="atualizarPainelEstoqueIDB(true)">↻ Atualizar</button>
                 <div class="estoque-idb-ultima" id="estoqueIDBUltimaImportacao">Nenhum relatório carregado nesta tela.</div>
             </div>
 
@@ -35115,7 +35117,7 @@ function garantirTelaControleEstoqueIDB(){
             <section class="estoque-idb-painel estoque-idb-timeline-estoque" id="estoqueIDBTimelineEstoque">
                 <div class="estoque-idb-painel-titulo">
                     <h2>Linha do Tempo do Estoque</h2>
-                    <span id="estoqueIDBTimelinePeriodo">Comparando os 2 últimos relatórios</span>
+                    <span id="estoqueIDBTimelinePeriodo">Comparando os 2 últimos snapshots REST10A</span>
                 </div>
                 <div class="estoque-idb-timeline-info" id="estoqueIDBTimelineStatus">Carregando comparação...</div>
                 <div class="estoque-idb-timeline-resumo">
@@ -35134,7 +35136,7 @@ function garantirTelaControleEstoqueIDB(){
                 <div class="estoque-idb-timeline-tabela-wrap">
                     <table class="estoque-idb-timeline-tabela">
                         <thead><tr><th>TIPO</th><th>N.C.E.</th><th>PRODUTO</th><th>ANTERIOR</th><th>ATUAL</th><th>ALTERAÇÃO</th></tr></thead>
-                        <tbody id="estoqueIDBTimelineCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Aguardando dois relatórios de datas diferentes.</td></tr></tbody>
+                        <tbody id="estoqueIDBTimelineCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Aguardando dois snapshots REST10A de datas diferentes.</td></tr></tbody>
                     </table>
                 </div>
             </section>
@@ -35171,7 +35173,7 @@ function garantirTelaControleEstoqueIDB(){
 <section class="estoque-idb-busca-nce" id="estoqueIDBBuscaNCE">
     <div class="estoque-idb-painel-titulo">
         <h2>Consultar N.C.E.</h2>
-        <span>Entradas, saídas e linha do tempo</span>
+        <span>Quantidade por snapshot REST10A</span>
     </div>
     <div class="estoque-idb-busca-nce-topo">
         <input id="estoqueIDBInputNCE" type="text" inputmode="numeric" placeholder="Digite o N.C.E. da mercadoria" onkeydown="if(event.key==='Enter')consultarNCEEstoqueIDB()">
@@ -36141,6 +36143,291 @@ if(typeof esconderTelas === "function" && !window.__estoqueIDBEsconderTelasInteg
 }
 </script>
 
+<script id="erp-controle-estoque-idb-etapa20-rest10a">
+/* =========================================================
+   Controle de Estoque IDB — ETAPA 20 / REST10A
+   Escopo isolado: somente este módulo.
+   A linha do tempo deixa de usar ENTRADAS/SAÍDAS/SALDO ATUAL
+   e passa a comparar snapshots REST10A por N.C.E. + QUANTIDADE.
+   ========================================================= */
+const ESTOQUE_IDB_REST10A_TABELA="estoque_snapshot_rest10a";
+const ESTOQUE_IDB_REST10A_CACHE_KEY="erp_estoque_idb_rest10a_cache_v1";
+const ESTOQUE_IDB_REST10A_SCHEMA_KEY="erp_estoque_idb_rest10a_schema_v1";
+let estoqueIDBREST10ASchema=null;
+let estoqueIDBREST10AInicializadoSessao=false;
+
+const ESTOQUE_IDB_REST10A_COLUNAS=Object.freeze({
+    NCE:0, DESCRICAO:1, QUANTIDADE:2, CUBAGEM:3, PRECO_TRANSFERENCIA:4, PRECO_TOTAL:5,
+    CABECALHO:5, LINHA_INICIAL:8
+});
+
+function estoqueIDBDataLocalHoje(){
+    const d=new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+}
+function estoqueIDBNumeroREST10A(v){
+    if(typeof v==="number"&&Number.isFinite(v))return v;
+    let t=String(v??"").trim();if(!t)return 0;
+    t=t.replace(/R\$/gi,"").replace(/\s/g,"");
+    if(t.includes(",")&&t.includes(".")){
+        const ultVir=t.lastIndexOf(","),ultPon=t.lastIndexOf(".");
+        t=ultVir>ultPon?t.replace(/\./g,"").replace(",", "."):t.replace(/,/g,"");
+    }else if(t.includes(",")) t=t.replace(",", ".");
+    const n=Number(t.replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;
+}
+function estoqueIDBValidarCabecalhoREST10A(aoa){
+    const r=Array.isArray(aoa?.[ESTOQUE_IDB_REST10A_COLUNAS.CABECALHO])?aoa[ESTOQUE_IDB_REST10A_COLUNAS.CABECALHO]:[];
+    const norm=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+    const nce=norm(r[0]),desc=norm(r[1]),qtd=norm(r[2]);
+    if(!nce.includes("NCE")||!desc.includes("DESCR")||!qtd.includes("QUANT")){
+        throw new Error("Cabeçalho REST10A não reconhecido na linha 6. Esperado: A=N.C.E., B=Descrição e C=Quantidade.");
+    }
+}
+function estoqueIDBExtrairREST10A(aoa){
+    const mapa=new Map();
+    for(let i=ESTOQUE_IDB_REST10A_COLUNAS.LINHA_INICIAL;i<aoa.length;i++){
+        const r=Array.isArray(aoa[i])?aoa[i]:[];
+        const nce=estoqueIDBNormalizarNCE(r[ESTOQUE_IDB_REST10A_COLUNAS.NCE]);
+        if(!nce||!/\d/.test(nce))continue;
+        const descricao=estoqueIDBTexto(r[ESTOQUE_IDB_REST10A_COLUNAS.DESCRICAO]);
+        const item={
+            nce,
+            descricao,
+            quantidade:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.QUANTIDADE]),
+            cubagem:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.CUBAGEM]),
+            preco_transferencia:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.PRECO_TRANSFERENCIA]),
+            preco_total:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.PRECO_TOTAL]),
+            linha_excel:i+1
+        };
+        if(mapa.has(nce)){
+            const a=mapa.get(nce);
+            a.quantidade+=item.quantidade;
+            a.cubagem+=item.cubagem;
+            a.preco_total+=item.preco_total;
+            if(!a.descricao&&item.descricao)a.descricao=item.descricao;
+            if(!a.preco_transferencia&&item.preco_transferencia)a.preco_transferencia=item.preco_transferencia;
+        }else mapa.set(nce,item);
+    }
+    return [...mapa.values()];
+}
+
+async function estoqueIDBExisteColunaREST10A(nome){
+    try{
+        const {error}=await obterSupabaseEstoqueIDB().from(ESTOQUE_IDB_REST10A_TABELA).select(nome).limit(1);
+        return !error;
+    }catch(e){return false}
+}
+async function estoqueIDBDetectarSchemaREST10A(forcar=false){
+    if(!forcar&&estoqueIDBREST10ASchema)return estoqueIDBREST10ASchema;
+    if(!forcar){try{const c=JSON.parse(localStorage.getItem(ESTOQUE_IDB_REST10A_SCHEMA_KEY)||"null");if(c?.data&&c?.nce&&c?.quantidade){estoqueIDBREST10ASchema=c;return c}}catch(e){}}
+    const candidatos={
+        data:["data_snapshot","data_referencia","data_relatorio","data"],
+        nce:["nce","n_c_e","codigo_nce"],
+        descricao:["descricao","desc_produto","produto"],
+        quantidade:["quantidade","qtd","saldo","saldo_atual"],
+        cubagem:["cubagem","volume"],
+        preco_transferencia:["preco_transferencia","preco_transf","valor_transferencia"],
+        preco_total:["preco_total","valor_total","total"],
+        arquivo:["arquivo_origem","nome_arquivo","arquivo"]
+    };
+    const schema={};
+    for(const [campo,lista] of Object.entries(candidatos)){
+        for(const nome of lista){if(await estoqueIDBExisteColunaREST10A(nome)){schema[campo]=nome;break}}
+    }
+    if(!schema.data||!schema.nce||!schema.quantidade){
+        throw new Error("A tabela estoque_snapshot_rest10a não possui as colunas mínimas identificáveis de data, N.C.E. e quantidade.");
+    }
+    estoqueIDBREST10ASchema=schema;
+    try{localStorage.setItem(ESTOQUE_IDB_REST10A_SCHEMA_KEY,JSON.stringify(schema))}catch(e){}
+    return schema;
+}
+function estoqueIDBPayloadREST10A(item,data,arquivo,schema){
+    const o={};
+    o[schema.data]=data;o[schema.nce]=item.nce;o[schema.quantidade]=estoqueIDBNumero(item.quantidade);
+    if(schema.descricao)o[schema.descricao]=item.descricao||null;
+    if(schema.cubagem)o[schema.cubagem]=estoqueIDBNumero(item.cubagem);
+    if(schema.preco_transferencia)o[schema.preco_transferencia]=estoqueIDBNumero(item.preco_transferencia);
+    if(schema.preco_total)o[schema.preco_total]=estoqueIDBNumero(item.preco_total);
+    if(schema.arquivo)o[schema.arquivo]=arquivo||null;
+    return o;
+}
+async function estoqueIDBInserirLotesREST10A(dados){
+    const cliente=obterSupabaseEstoqueIDB(),lote=400;
+    for(let i=0;i<dados.length;i+=lote){const {error}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).insert(dados.slice(i,i+lote));if(error)throw error}
+}
+async function estoqueIDBArquivoREST10ASelecionado(input){
+    const arquivo=input?.files?.[0];if(!arquivo)return;
+    const status=document.getElementById("estoqueIDBTimelineStatus");
+    try{
+        if(typeof XLSX==="undefined")throw new Error("Biblioteca XLSX não carregada.");
+        if(status)status.textContent=`Lendo REST10A: ${arquivo.name}...`;
+        const buf=await arquivo.arrayBuffer(),wb=XLSX.read(buf,{type:"array",cellDates:false});
+        const aba=wb.SheetNames[0];if(!aba)throw new Error("O arquivo REST10A não possui planilha.");
+        const aoa=XLSX.utils.sheet_to_json(wb.Sheets[aba],{header:1,raw:true,defval:""});
+        estoqueIDBValidarCabecalhoREST10A(aoa);
+        const linhas=estoqueIDBExtrairREST10A(aoa);
+        if(!linhas.length)throw new Error("Nenhum N.C.E. válido foi encontrado a partir da linha 9 do REST10A.");
+        const hoje=estoqueIDBDataLocalHoje();
+        const totalQtd=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.quantidade),0);
+        if(!confirm(`REST10A reconhecido.\n\nData do snapshot: ${estoqueIDBFormatarData(hoje)}\nN.C.E.s: ${linhas.length.toLocaleString("pt-BR")}\nQuantidade total: ${totalQtd.toLocaleString("pt-BR")}\n\nSe já existir snapshot nesta data, ele será substituído. Continuar?`))return;
+        if(status)status.textContent="Gravando snapshot REST10A no Supabase...";
+        const schema=await estoqueIDBDetectarSchemaREST10A();
+        const cliente=obterSupabaseEstoqueIDB();
+        let backup=[];
+        const {data:existentes,error:erroBackup}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select("*").eq(schema.data,hoje);
+        if(erroBackup)throw erroBackup;
+        backup=Array.isArray(existentes)?existentes:[];
+        const {error:erroDel}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).delete().eq(schema.data,hoje);
+        if(erroDel)throw erroDel;
+        const payload=linhas.map(r=>estoqueIDBPayloadREST10A(r,hoje,arquivo.name,schema));
+        try{await estoqueIDBInserirLotesREST10A(payload)}catch(erroInsert){
+            console.error("Estoque IDB REST10A: falha após limpeza; tentando restaurar snapshot anterior",erroInsert);
+            if(backup.length){
+                const restaurar=backup.map(r=>{
+                    const o={};for(const k of Object.values(schema))if(k&&Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];return o;
+                });
+                try{await estoqueIDBInserirLotesREST10A(restaurar)}catch(e){console.error("Falha ao restaurar snapshot REST10A anterior",e)}
+            }
+            throw erroInsert;
+        }
+        localStorage.removeItem(ESTOQUE_IDB_REST10A_CACHE_KEY);
+        estoqueIDBREST10AInicializadoSessao=false;
+        alert(`REST10A importado com sucesso!\n\n${linhas.length.toLocaleString("pt-BR")} N.C.E.(s) gravados para ${estoqueIDBFormatarData(hoje)}.`);
+        await carregarLinhaTempoEstoqueIDB({forcar:true});
+        const nceBusca=document.getElementById("estoqueIDBInputNCE")?.value;if(nceBusca)await consultarNCEEstoqueIDB();
+    }catch(error){
+        console.error("Estoque IDB: erro ao importar REST10A",error);
+        if(status)status.textContent="Falha ao importar REST10A.";
+        alert(`Não foi possível importar o REST10A.\n\n${error?.message||error}`);
+    }finally{input.value=""}
+}
+
+async function estoqueIDBCarregarDataREST10A(data,schema){
+    const mapa=new Map(),fallback=new Map(),cliente=obterSupabaseEstoqueIDB();
+    let inicio=0,lote=1000;
+    while(true){
+        const cols=[schema.nce,schema.quantidade,schema.descricao].filter(Boolean).join(",");
+        const {data:rows,error}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select(cols).eq(schema.data,data).range(inicio,inicio+lote-1);
+        if(error)throw error;
+        const pagina=rows||[];
+        for(const r of pagina){
+            const n=estoqueIDBNormalizarNCE(r?.[schema.nce]);if(!n)continue;
+            mapa.set(n,(mapa.get(n)||0)+estoqueIDBNumero(r?.[schema.quantidade]));
+            const d=schema.descricao?String(r?.[schema.descricao]??"").trim():"";if(d&&!fallback.has(n))fallback.set(n,d);
+        }
+        if(pagina.length<lote)break;inicio+=lote;if(inicio>=200000)break;
+    }
+    return {mapa,fallback};
+}
+async function estoqueIDBObterDuasDatasREST10A(schema){
+    const cliente=obterSupabaseEstoqueIDB();
+    const {data:a,error:e1}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select(schema.data).order(schema.data,{ascending:false}).limit(1);
+    if(e1)throw e1;const atual=a?.[0]?.[schema.data];if(!atual)return [];
+    const {data:b,error:e2}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select(schema.data).lt(schema.data,atual).order(schema.data,{ascending:false}).limit(1);
+    if(e2)throw e2;const anterior=b?.[0]?.[schema.data];return anterior?[String(atual),String(anterior)]:[String(atual)];
+}
+function estoqueIDBSalvarCacheREST10A(cache){try{localStorage.setItem(ESTOQUE_IDB_REST10A_CACHE_KEY,JSON.stringify(cache))}catch(e){}}
+function estoqueIDBLerCacheREST10A(){try{return JSON.parse(localStorage.getItem(ESTOQUE_IDB_REST10A_CACHE_KEY)||"null")}catch(e){return null}}
+
+carregarLinhaTempoEstoqueIDB=async function(opcoes={}){
+    const forcar=opcoes===true||opcoes?.forcar===true;
+    const status=document.getElementById("estoqueIDBTimelineStatus"),periodo=document.getElementById("estoqueIDBTimelinePeriodo");
+    if(status)status.textContent="Comparando snapshots REST10A...";
+    try{
+        const schema=await estoqueIDBDetectarSchemaREST10A();
+        let cache=!forcar&&estoqueIDBREST10AInicializadoSessao?estoqueIDBLerCacheREST10A():null;
+        if(!cache?.datas?.length){
+            const datas=await estoqueIDBObterDuasDatasREST10A(schema);
+            cache={datas,gerado_em:new Date().toISOString(),snapshots:{}};
+            for(const d of datas){
+                const snap=await estoqueIDBCarregarDataREST10A(d,schema);
+                cache.snapshots[d]={q:Object.fromEntries(snap.mapa),d:Object.fromEntries(snap.fallback)};
+            }
+            estoqueIDBSalvarCacheREST10A(cache);
+        }
+        estoqueIDBREST10AInicializadoSessao=true;
+        const datas=cache.datas||[];
+        if(datas.length<2){
+            estoqueIDBTimelineMudancas=[];
+            if(periodo)periodo.textContent=datas.length?`Snapshot ${estoqueIDBFormatarData(datas[0])}`:"Aguardando REST10A";
+            if(status)status.textContent="Importe REST10A em pelo menos duas datas diferentes para comparar o estoque.";
+            ["estoqueIDBTimelineNovos","estoqueIDBTimelineAumentaram","estoqueIDBTimelineDiminuiram","estoqueIDBTimelineZeraram"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="0"});
+            estoqueIDBRenderTimelineEstoque([]);return;
+        }
+        const atualData=datas[0],anteriorData=datas[1];
+        if(periodo)periodo.textContent=`${estoqueIDBFormatarData(anteriorData)} → ${estoqueIDBFormatarData(atualData)} • REST10A`;
+        const aq=cache.snapshots?.[atualData]?.q||{},pq=cache.snapshots?.[anteriorData]?.q||{};
+        const fallbacks=new Map(Object.entries({...cache.snapshots?.[anteriorData]?.d,...cache.snapshots?.[atualData]?.d}));
+        const todos=[...new Set([...Object.keys(pq),...Object.keys(aq)])],mudancas=[];
+        for(const nce of todos){const anterior=estoqueIDBNumero(pq[nce]),atual=estoqueIDBNumero(aq[nce]);if(Math.abs(atual-anterior)<0.000001)continue;const tipo=estoqueIDBClassificarMudanca(anterior,atual);if(tipo!=="igual")mudancas.push({nce,anterior,atual,tipo,nome:""})}
+        mudancas.sort((a,b)=>Math.abs(b.atual-b.anterior)-Math.abs(a.atual-a.anterior));
+        const descricoes=await estoqueIDBBuscarDescricoesTimeline(mudancas.map(r=>r.nce),fallbacks);
+        for(const r of mudancas)r.nome=descricoes.get(r.nce)||fallbacks.get(r.nce)||"Produto sem descrição";
+        estoqueIDBTimelineMudancas=mudancas;
+        const contar=t=>mudancas.filter(r=>r.tipo===t).length;
+        const vals={estoqueIDBTimelineNovos:contar("novo"),estoqueIDBTimelineAumentaram:contar("aumentou"),estoqueIDBTimelineDiminuiram:contar("diminuiu"),estoqueIDBTimelineZeraram:contar("zerou")};
+        for(const [id,v] of Object.entries(vals)){const e=document.getElementById(id);if(e)e.textContent=v.toLocaleString("pt-BR")}
+        if(status)status.textContent=`${mudancas.length.toLocaleString("pt-BR")} N.C.E.(s) tiveram alteração de quantidade entre os dois snapshots REST10A.`;
+        const btn=document.querySelector('#estoqueIDBTimelineFiltros button[data-filtro="todos"]');estoqueIDBFiltrarTimeline("todos",btn);
+    }catch(error){
+        console.error("Estoque IDB REST10A: erro na timeline",error);
+        if(status)status.textContent=`Não foi possível carregar a timeline REST10A: ${error?.message||error}`;
+        estoqueIDBTimelineMudancas=[];estoqueIDBRenderTimelineEstoque([]);
+    }
+};
+
+consultarNCEEstoqueIDB=async function(){
+    const input=document.getElementById("estoqueIDBInputNCE"),status=document.getElementById("estoqueIDBBuscaNCEStatus"),box=document.getElementById("estoqueIDBBuscaNCEResultado");
+    if(!input||!status||!box)return;
+    const nce=estoqueIDBNormalizarNCE(input.value);if(!nce){status.textContent="Digite um N.C.E. para pesquisar.";box.innerHTML="";input.focus();return}
+    status.textContent=`Consultando snapshots REST10A do N.C.E. ${nce}...`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Carregando histórico REST10A...</div>';
+    try{
+        const schema=await estoqueIDBDetectarSchemaREST10A(),cliente=obterSupabaseEstoqueIDB();
+        const cols=[schema.data,schema.nce,schema.quantidade,schema.descricao].filter(Boolean).join(",");
+        const {data,error}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select(cols).eq(schema.nce,nce).order(schema.data,{ascending:true});
+        if(error)throw error;const rows=data||[];
+        if(!rows.length){status.textContent=`N.C.E. ${nce} não encontrado nos snapshots REST10A.`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Nenhum snapshot REST10A encontrado para este N.C.E.</div>';return}
+        const porData=new Map();let fallback="";
+        for(const r of rows){const d=String(r?.[schema.data]||"");if(!d)continue;porData.set(d,(porData.get(d)||0)+estoqueIDBNumero(r?.[schema.quantidade]));if(!fallback&&schema.descricao)fallback=String(r?.[schema.descricao]??"").trim()}
+        const hist=[...porData.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
+        const atual=hist.at(-1)||["",0],anterior=hist.length>1?hist.at(-2):["",0],dif=estoqueIDBNumero(atual[1])-estoqueIDBNumero(anterior[1]);
+        const oficial=await estoqueIDBBuscarDescricaoRexpedlr(nce),nome=oficial||fallback||"Produto sem descrição";
+        const esc=estoqueIDBEscape,sinal=dif>0?"+":"";
+        const linhasHist=hist.slice().reverse().map(([d,q],i)=>{const prev=hist[hist.length-2-i]?.[1];const delta=prev===undefined?null:estoqueIDBNumero(q)-estoqueIDBNumero(prev);return `<tr><td>${esc(estoqueIDBFormatarData(d))}</td><td><b>${estoqueIDBNumero(q).toLocaleString("pt-BR")}</b></td><td>${delta===null?"-":`${delta>0?"+":""}${delta.toLocaleString("pt-BR")}`}</td></tr>`}).join("");
+        box.innerHTML=`
+            <div class="estoque-idb-nce-produto"><b>${esc(nome)}</b></div>
+            <div class="estoque-idb-rest10a-note">N.C.E. ${esc(nce)} • comparação feita exclusivamente pelos snapshots REST10A.</div>
+            <div class="estoque-idb-nce-resumo">
+                <div class="estoque-idb-nce-mini"><small>Quantidade ontem</small><strong>${estoqueIDBNumero(anterior[1]).toLocaleString("pt-BR")}</strong><span>${esc(estoqueIDBFormatarData(anterior[0]))}</span></div>
+                <div class="estoque-idb-nce-mini"><small>Quantidade hoje</small><strong>${estoqueIDBNumero(atual[1]).toLocaleString("pt-BR")}</strong><span>${esc(estoqueIDBFormatarData(atual[0]))}</span></div>
+                <div class="estoque-idb-nce-mini"><small>Diferença</small><strong>${sinal}${dif.toLocaleString("pt-BR")}</strong></div>
+                <div class="estoque-idb-nce-mini"><small>Snapshots</small><strong>${hist.length.toLocaleString("pt-BR")}</strong></div>
+            </div>
+            <table class="estoque-idb-rest10a-historico"><thead><tr><th>Data</th><th>Quantidade</th><th>Diferença</th></tr></thead><tbody>${linhasHist}</tbody></table>`;
+        status.textContent=`${hist.length.toLocaleString("pt-BR")} snapshot(s) REST10A encontrado(s) para o N.C.E. ${nce}.`;
+    }catch(error){console.error("Estoque IDB REST10A: erro na consulta N.C.E.",error);status.textContent="Erro ao consultar o N.C.E. no REST10A.";box.innerHTML=`<div class="estoque-idb-alerta" style="margin-top:14px">${estoqueIDBEscape(error?.message||error)}</div>`}
+};
+
+/* Apenas o botão Atualizar força nova consulta REST10A; demais chamadas usam cache da sessão. */
+const estoqueIDBAtualizarPainelOriginalEtapa20=atualizarPainelEstoqueIDB;
+atualizarPainelEstoqueIDB=async function(forcarREST10A=false){
+    const r=await estoqueIDBAtualizarPainelOriginalEtapa20.apply(this,arguments);
+    if(forcarREST10A){localStorage.removeItem(ESTOQUE_IDB_REST10A_CACHE_KEY);estoqueIDBREST10AInicializadoSessao=false;await carregarLinhaTempoEstoqueIDB({forcar:true})}
+    return r;
+};
+</script>
+
+<style id="erp-controle-estoque-idb-etapa20-rest10a-css">
+#telaControleEstoqueIDB .estoque-idb-btn-rest10a{background:#6f42c1;color:#fff}
+#telaControleEstoqueIDB .estoque-idb-btn-rest10a:hover{background:#5a32a3}
+#telaControleEstoqueIDB .estoque-idb-rest10a-note{margin-top:10px;padding:10px 12px;border-left:5px solid #6f42c1;background:#f5f0ff;border-radius:9px;color:#35205d;font-weight:700;font-size:12px}
+#telaControleEstoqueIDB .estoque-idb-rest10a-historico{width:100%;border-collapse:collapse;margin-top:14px;font-size:12px}
+#telaControleEstoqueIDB .estoque-idb-rest10a-historico th,#telaControleEstoqueIDB .estoque-idb-rest10a-historico td{padding:8px;border-bottom:1px solid #dbe5f0;text-align:left;color:#082347}
+#telaControleEstoqueIDB .estoque-idb-rest10a-historico th{background:#eef3f8}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-note{background:#241a3d;color:#eadfff;border-color:#9c7be8}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico th{background:#102b49;color:#fff}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico td{color:#eaf2ff;border-color:#244466}
+</style>
 <style id="erp-controle-estoque-idb-etapa10-css">
 .estoque-idb-busca-nce{
     margin-top:18px;background:#fff;border:1px solid #d9e3ef;border-radius:18px;
