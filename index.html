@@ -36157,8 +36157,8 @@ let estoqueIDBREST10ASchema=null;
 let estoqueIDBREST10AInicializadoSessao=false;
 
 const ESTOQUE_IDB_REST10A_COLUNAS=Object.freeze({
-    NCE:0, DESCRICAO:1, QUANTIDADE:2, CUBAGEM:3, PRECO_TRANSFERENCIA:4, PRECO_TOTAL:5,
-    CABECALHO:5, LINHA_INICIAL:8
+    NCE:0, DESCRICAO:1, QUANTIDADE:2, CUBAGEM:3, PRECO_TRANSFERENCIA:4,
+    LINHA_INICIAL:8
 });
 
 function estoqueIDBDataLocalHoje(){
@@ -36175,20 +36175,30 @@ function estoqueIDBNumeroREST10A(v){
     }else if(t.includes(",")) t=t.replace(",", ".");
     const n=Number(t.replace(/[^0-9.-]/g,""));return Number.isFinite(n)?n:0;
 }
-function estoqueIDBValidarCabecalhoREST10A(aoa){
-    const r=Array.isArray(aoa?.[ESTOQUE_IDB_REST10A_COLUNAS.CABECALHO])?aoa[ESTOQUE_IDB_REST10A_COLUNAS.CABECALHO]:[];
-    const norm=v=>String(v??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toUpperCase().replace(/[^A-Z0-9]/g,"");
-    const nce=norm(r[0]),desc=norm(r[1]),qtd=norm(r[2]);
-    if(!nce.includes("NCE")||!desc.includes("DESCR")||!qtd.includes("QUANT")){
-        throw new Error("Cabeçalho REST10A não reconhecido na linha 6. Esperado: A=N.C.E., B=Descrição e C=Quantidade.");
+function estoqueIDBNormalizarNCEREST10A(v){
+    const bruto=String(v??"").replace(/\u00A0/g," ").trim();
+    if(!bruto)return "";
+
+    // O REST10A pode trazer o GRUPO antes do N.C.E. na mesma célula.
+    // Ex.: "1 110389", "5 110389". O último bloco numérico é o N.C.E.
+    const partes=bruto.split(/\s+/).filter(Boolean);
+    for(let i=partes.length-1;i>=0;i--){
+        const digitos=String(partes[i]).replace(/\D/g,"");
+        if(digitos.length>=4)return estoqueIDBNormalizarNCE(digitos);
     }
+
+    // Segurança para células com separadores diferentes de espaço.
+    const blocos=bruto.match(/\d{4,}/g);
+    if(blocos?.length)return estoqueIDBNormalizarNCE(blocos[blocos.length-1]);
+    return "";
 }
 function estoqueIDBExtrairREST10A(aoa){
     const mapa=new Map();
-    for(let i=ESTOQUE_IDB_REST10A_COLUNAS.LINHA_INICIAL;i<aoa.length;i++){
+    const inicio=ESTOQUE_IDB_REST10A_COLUNAS.LINHA_INICIAL;
+    for(let i=inicio;i<aoa.length;i++){
         const r=Array.isArray(aoa[i])?aoa[i]:[];
-        const nce=estoqueIDBNormalizarNCE(r[ESTOQUE_IDB_REST10A_COLUNAS.NCE]);
-        if(!nce||!/\d/.test(nce))continue;
+        const nce=estoqueIDBNormalizarNCEREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.NCE]);
+        if(!nce)continue;
         const descricao=estoqueIDBTexto(r[ESTOQUE_IDB_REST10A_COLUNAS.DESCRICAO]);
         const item={
             nce,
@@ -36196,14 +36206,13 @@ function estoqueIDBExtrairREST10A(aoa){
             quantidade:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.QUANTIDADE]),
             cubagem:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.CUBAGEM]),
             preco_transferencia:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.PRECO_TRANSFERENCIA]),
-            preco_total:estoqueIDBNumeroREST10A(r[ESTOQUE_IDB_REST10A_COLUNAS.PRECO_TOTAL]),
+            preco_total:0,
             linha_excel:i+1
         };
         if(mapa.has(nce)){
             const a=mapa.get(nce);
             a.quantidade+=item.quantidade;
             a.cubagem+=item.cubagem;
-            a.preco_total+=item.preco_total;
             if(!a.descricao&&item.descricao)a.descricao=item.descricao;
             if(!a.preco_transferencia&&item.preco_transferencia)a.preco_transferencia=item.preco_transferencia;
         }else mapa.set(nce,item);
@@ -36263,13 +36272,12 @@ async function estoqueIDBArquivoREST10ASelecionado(input){
         if(status)status.textContent=`Lendo REST10A: ${arquivo.name}...`;
         const buf=await arquivo.arrayBuffer(),wb=XLSX.read(buf,{type:"array",cellDates:false});
         const aba=wb.SheetNames[0];if(!aba)throw new Error("O arquivo REST10A não possui planilha.");
-        const aoa=XLSX.utils.sheet_to_json(wb.Sheets[aba],{header:1,raw:true,defval:""});
-        estoqueIDBValidarCabecalhoREST10A(aoa);
+        const aoa=XLSX.utils.sheet_to_json(wb.Sheets[aba],{header:1,raw:true,defval:"",range:0});
         const linhas=estoqueIDBExtrairREST10A(aoa);
-        if(!linhas.length)throw new Error("Nenhum N.C.E. válido foi encontrado a partir da linha 9 do REST10A.");
+        if(!linhas.length)throw new Error("Nenhum N.C.E. válido foi encontrado a partir da linha 9 do REST10A. A leitura esperada é A=N.C.E., B=Desc. Mercadoria, C=Quantidade, D=Cubagem e E=Preço de Transferência.");
         const hoje=estoqueIDBDataLocalHoje();
         const totalQtd=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.quantidade),0);
-        if(!confirm(`REST10A reconhecido.\n\nData do snapshot: ${estoqueIDBFormatarData(hoje)}\nN.C.E.s: ${linhas.length.toLocaleString("pt-BR")}\nQuantidade total: ${totalQtd.toLocaleString("pt-BR")}\n\nSe já existir snapshot nesta data, ele será substituído. Continuar?`))return;
+        if(!confirm(`REST10A reconhecido pelas colunas fixas A:E.\n\nData do snapshot: ${estoqueIDBFormatarData(hoje)}\nN.C.E.s: ${linhas.length.toLocaleString("pt-BR")}\nQuantidade total: ${totalQtd.toLocaleString("pt-BR")}\n\nSe já existir snapshot nesta data, ele será substituído. Continuar?`))return;
         if(status)status.textContent="Gravando snapshot REST10A no Supabase...";
         const schema=await estoqueIDBDetectarSchemaREST10A();
         const cliente=obterSupabaseEstoqueIDB();
