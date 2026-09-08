@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "index.html"
+      - "mobile/**"
       - ".github/workflows/deploy.yml"
 
   workflow_dispatch:
@@ -38,6 +39,7 @@ jobs:
         run: |
           mkdir site
           cp index.html site/index.html
+          cp -r mobile site/mobile
 
       - name: Criar pacote do site
         uses: actions/upload-pages-artifact@v3
