@@ -1,5 +1,4 @@
-ERP V10 PWA WEB + MOBILE — ETAPA03 / PW3
-
-Correção Mobile/PWA: tela de login não permanece sobre o ERP quando a sessão Supabase já foi restaurada.
-Versão Web preservada.
-Link de teste: https://geylsonalbuquerque39-maker.github.io/sistemaassistencia/?v=PW3
+ERP V10 PWA Web + Mobile — ETAPA 06 / PW6
+Correção de login no iPhone: login oculto por padrão no mobile e exibido somente quando o Supabase confirmar ausência de sessão.
+Web preservada.
+Teste: https://geylsonalbuquerque39-maker.github.io/sistemaassistencia/?v=PW6
