@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Coleta Fotos">
-<link rel="manifest" href="./manifest.webmanifest?v=CF2">
+<link rel="manifest" href="./manifest.webmanifest?v=CF4">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ERP V10 — Coleta de Fotos</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,7 +34,7 @@
 (() => {
 'use strict';
 const CFG={url:'https://sjututwxmjbhprvdhekl.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8',bucket:'midias-os',tabela:'midias_os'};
-const LS='ERP_COLETA_FOTOS_APP_CF3';
+const LS='ERP_COLETA_FOTOS_APP_CF4';
 let db=null,osFotoAtual='';
 const $=id=>document.getElementById(id);
 function client(){if(db)return db;if(!window.supabase?.createClient)throw new Error('Biblioteca Supabase não carregada.');db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});return db}
@@ -77,11 +77,13 @@ async function prepararFoto(file){
     return new File([blob],`${osFotoAtual||'foto'}-${Date.now()}.jpg`,{type:'image/jpeg',lastModified:Date.now()});
   }finally{fonte.close?.()}
 }
-function uploadStorageXHR(path,arquivo){
+function projectRef(){try{return new URL(CFG.url).hostname.split('.')[0]}catch(_){return ''}}
+function storageBases(){const ref=projectRef();return [ref?`https://${ref}.storage.supabase.co`:null,CFG.url].filter(Boolean)}
+function uploadStorageEmBase(base,path,arquivo){
   return new Promise((resolve,reject)=>{
     const xhr=new XMLHttpRequest();
     const safePath=path.split('/').map(encodeURIComponent).join('/');
-    xhr.open('POST',`${CFG.url}/storage/v1/object/${encodeURIComponent(CFG.bucket)}/${safePath}`,true);
+    xhr.open('POST',`${base}/storage/v1/object/${encodeURIComponent(CFG.bucket)}/${safePath}`,true);
     xhr.timeout=90000;
     xhr.setRequestHeader('apikey',CFG.key);
     xhr.setRequestHeader('Authorization','Bearer '+CFG.key);
@@ -90,16 +92,33 @@ function uploadStorageXHR(path,arquivo){
     xhr.setRequestHeader('Content-Type','image/jpeg');
     xhr.upload.onprogress=e=>{if(e.lengthComputable)setBusy(true,'Enviando foto…',`O.S. ${osFotoAtual} · ${Math.round(e.loaded/e.total*100)}%`)};
     xhr.onload=()=>{
-      if(xhr.status>=200&&xhr.status<300){resolve(true);return}
+      if(xhr.status>=200&&xhr.status<300){resolve({ok:true,base});return}
       let detalhe=xhr.responseText||('HTTP '+xhr.status);
-      try{const j=JSON.parse(xhr.responseText);detalhe=j.message||j.error||detalhe}catch(_){}
-      reject(new Error(`Storage HTTP ${xhr.status}: ${detalhe}`));
+      try{const j=JSON.parse(xhr.responseText);detalhe=j.message||j.error||j.msg||detalhe}catch(_){}
+      const err=new Error(`Storage HTTP ${xhr.status}: ${detalhe}`);err.http=true;reject(err);
     };
-    xhr.onerror=()=>reject(new Error('Storage sem resposta de rede. Verifique 4G/Wi‑Fi e tente novamente.'));
-    xhr.ontimeout=()=>reject(new Error('Storage demorou mais de 90 segundos para responder.'));
-    xhr.onabort=()=>reject(new Error('Envio ao Storage foi interrompido.'));
+    xhr.onerror=()=>{const err=new Error(`Sem resposta de rede em ${new URL(base).hostname}`);err.network=true;reject(err)};
+    xhr.ontimeout=()=>{const err=new Error(`Timeout em ${new URL(base).hostname}`);err.network=true;reject(err)};
+    xhr.onabort=()=>{const err=new Error('Envio ao Storage foi interrompido.');err.network=true;reject(err)};
     xhr.send(arquivo);
   });
+}
+async function uploadStorageXHR(path,arquivo){
+  const bases=storageBases();
+  const erros=[];
+  for(let i=0;i<bases.length;i++){
+    const base=bases[i];
+    try{
+      setBusy(true,'Enviando foto…',i===0?'Conectando ao Storage direto…':'Tentando rota alternativa…');
+      return await uploadStorageEmBase(base,path,arquivo);
+    }catch(e){
+      erros.push(e.message||String(e));
+      // Erro HTTP real (401/403/404 etc.) não é conectividade: mostrar imediatamente.
+      if(e.http)throw e;
+      console.warn('[CF4] falha de rede no Storage',base,e);
+    }
+  }
+  throw new Error('Storage inacessível pelo iPhone. Tentativas: '+erros.join(' | '));
 }
 async function removerStorage(path){try{await client().storage.from(CFG.bucket).remove([path])}catch(_){} }
 async function enviar(file,os){
@@ -122,7 +141,7 @@ async function enviar(file,os){
 async function processFiles(files){if(!osFotoAtual)return;const arr=[...files];if(!arr.length)return;try{for(let i=0;i<arr.length;i++){setBusy(true,`Enviando ${i+1} de ${arr.length}`,`O.S. ${osFotoAtual}`);await enviar(arr[i],osFotoAtual)}setBusy(false);msg(`${arr.length} foto(s) salva(s) na O.S. ${osFotoAtual}.`,'ok');await render()}catch(e){setBusy(false);console.error(e);msg('Erro ao enviar: '+(e.message||e),'err');alert('Não foi possível enviar a foto.\n\n'+(e.message||e)+'\n\nA foto não foi contabilizada como enviada.')}}
 $('addOS').onclick=addOS;$('osInput').addEventListener('keydown',e=>{if(e.key==='Enter')addOS()});$('cameraInput').addEventListener('change',e=>processFiles(e.target.files));$('galeriaInput').addEventListener('change',e=>processFiles(e.target.files));$('novaColeta').onclick=()=>{if(confirm('Iniciar uma nova coleta? A lista atual será limpa. As fotos já enviadas permanecem no ERP.')){save({inicio:new Date().toISOString(),itens:[]});render();msg('Nova coleta iniciada.','ok')}};$('finalizar').onclick=()=>{if(confirm('Finalizar e limpar a lista deste aparelho? As fotos enviadas NÃO serão apagadas.')){save({inicio:null,itens:[]});render();msg('Coleta finalizada. As fotos continuam no ERP.','ok')}};
 function net(){ $('netDot').classList.toggle('off',!navigator.onLine)}window.addEventListener('online',net);window.addEventListener('offline',net);net();render();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=CF3').catch(console.warn));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=CF4').catch(console.warn));
 })();
 </script>
 </body></html>
