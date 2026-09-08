@@ -35117,7 +35117,7 @@ function garantirTelaControleEstoqueIDB(){
             <section class="estoque-idb-painel estoque-idb-timeline-estoque" id="estoqueIDBTimelineEstoque">
                 <div class="estoque-idb-painel-titulo">
                     <h2>Linha do Tempo do Estoque</h2>
-                    <span id="estoqueIDBTimelinePeriodo">Comparando os 2 últimos snapshots REST10A</span>
+                    <span id="estoqueIDBTimelinePeriodo">Comparando os 2 últimos registros REST10A</span>
                 </div>
                 <div class="estoque-idb-timeline-info" id="estoqueIDBTimelineStatus">Carregando comparação...</div>
                 <div class="estoque-idb-timeline-resumo">
@@ -35136,7 +35136,7 @@ function garantirTelaControleEstoqueIDB(){
                 <div class="estoque-idb-timeline-tabela-wrap">
                     <table class="estoque-idb-timeline-tabela">
                         <thead><tr><th>TIPO</th><th>N.C.E.</th><th>PRODUTO</th><th>ANTERIOR</th><th>ATUAL</th><th>ALTERAÇÃO</th></tr></thead>
-                        <tbody id="estoqueIDBTimelineCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Aguardando dois snapshots REST10A de datas diferentes.</td></tr></tbody>
+                        <tbody id="estoqueIDBTimelineCorpo"><tr><td colspan="6" class="estoque-idb-vazio-tabela">Aguardando dois registros REST10A de datas diferentes.</td></tr></tbody>
                     </table>
                 </div>
             </section>
@@ -35173,7 +35173,7 @@ function garantirTelaControleEstoqueIDB(){
 <section class="estoque-idb-busca-nce" id="estoqueIDBBuscaNCE">
     <div class="estoque-idb-painel-titulo">
         <h2>Consultar N.C.E.</h2>
-        <span>Quantidade por snapshot REST10A</span>
+        <span>Histórico de quantidade REST10A</span>
     </div>
     <div class="estoque-idb-busca-nce-topo">
         <input id="estoqueIDBInputNCE" type="text" inputmode="numeric" placeholder="Digite o N.C.E. da mercadoria" onkeydown="if(event.key==='Enter')consultarNCEEstoqueIDB()">
@@ -36244,7 +36244,7 @@ async function estoqueIDBDetectarSchemaREST10A(forcar=false){
         for(const nome of lista){if(await estoqueIDBExisteColunaREST10A(nome)){schema[campo]=nome;break}}
     }
     if(!schema.data||!schema.nce||!schema.quantidade){
-        throw new Error("A tabela estoque_snapshot_rest10a não possui as colunas mínimas identificáveis de data, N.C.E. e quantidade.");
+        throw new Error("A tabela REST10A não possui as colunas mínimas identificáveis de data, N.C.E. e quantidade.");
     }
     estoqueIDBREST10ASchema=schema;
     try{localStorage.setItem(ESTOQUE_IDB_REST10A_SCHEMA_KEY,JSON.stringify(schema))}catch(e){}
@@ -36277,8 +36277,8 @@ async function estoqueIDBArquivoREST10ASelecionado(input){
         if(!linhas.length)throw new Error("Nenhum N.C.E. válido foi encontrado a partir da linha 9 do REST10A. A leitura esperada é A=N.C.E., B=Desc. Mercadoria, C=Quantidade, D=Cubagem e E=Preço de Transferência.");
         const hoje=estoqueIDBDataLocalHoje();
         const totalQtd=linhas.reduce((a,r)=>a+estoqueIDBNumero(r.quantidade),0);
-        if(!confirm(`REST10A reconhecido pelas colunas fixas A:E.\n\nData do snapshot: ${estoqueIDBFormatarData(hoje)}\nN.C.E.s: ${linhas.length.toLocaleString("pt-BR")}\nQuantidade total: ${totalQtd.toLocaleString("pt-BR")}\n\nSe já existir snapshot nesta data, ele será substituído. Continuar?`))return;
-        if(status)status.textContent="Gravando snapshot REST10A no Supabase...";
+        if(!confirm(`REST10A reconhecido pelas colunas fixas A:E.\n\nData do registro: ${estoqueIDBFormatarData(hoje)}\nN.C.E.s: ${linhas.length.toLocaleString("pt-BR")}\nQuantidade total: ${totalQtd.toLocaleString("pt-BR")}\n\nSe já existir registro nesta data, ele será substituído. Continuar?`))return;
+        if(status)status.textContent="Gravando registro REST10A no Supabase...";
         const schema=await estoqueIDBDetectarSchemaREST10A();
         const cliente=obterSupabaseEstoqueIDB();
         let backup=[];
@@ -36289,12 +36289,12 @@ async function estoqueIDBArquivoREST10ASelecionado(input){
         if(erroDel)throw erroDel;
         const payload=linhas.map(r=>estoqueIDBPayloadREST10A(r,hoje,arquivo.name,schema));
         try{await estoqueIDBInserirLotesREST10A(payload)}catch(erroInsert){
-            console.error("Estoque IDB REST10A: falha após limpeza; tentando restaurar snapshot anterior",erroInsert);
+            console.error("Estoque IDB REST10A: falha após limpeza; tentando restaurar registro anterior",erroInsert);
             if(backup.length){
                 const restaurar=backup.map(r=>{
                     const o={};for(const k of Object.values(schema))if(k&&Object.prototype.hasOwnProperty.call(r,k))o[k]=r[k];return o;
                 });
-                try{await estoqueIDBInserirLotesREST10A(restaurar)}catch(e){console.error("Falha ao restaurar snapshot REST10A anterior",e)}
+                try{await estoqueIDBInserirLotesREST10A(restaurar)}catch(e){console.error("Falha ao restaurar registro REST10A anterior",e)}
             }
             throw erroInsert;
         }
@@ -36340,7 +36340,7 @@ function estoqueIDBLerCacheREST10A(){try{return JSON.parse(localStorage.getItem(
 carregarLinhaTempoEstoqueIDB=async function(opcoes={}){
     const forcar=opcoes===true||opcoes?.forcar===true;
     const status=document.getElementById("estoqueIDBTimelineStatus"),periodo=document.getElementById("estoqueIDBTimelinePeriodo");
-    if(status)status.textContent="Comparando snapshots REST10A...";
+    if(status)status.textContent="Comparando registros REST10A...";
     try{
         const schema=await estoqueIDBDetectarSchemaREST10A();
         let cache=!forcar&&estoqueIDBREST10AInicializadoSessao?estoqueIDBLerCacheREST10A():null;
@@ -36357,7 +36357,7 @@ carregarLinhaTempoEstoqueIDB=async function(opcoes={}){
         const datas=cache.datas||[];
         if(datas.length<2){
             estoqueIDBTimelineMudancas=[];
-            if(periodo)periodo.textContent=datas.length?`Snapshot ${estoqueIDBFormatarData(datas[0])}`:"Aguardando REST10A";
+            if(periodo)periodo.textContent=datas.length?`Registro ${estoqueIDBFormatarData(datas[0])}`:"Aguardando REST10A";
             if(status)status.textContent="Importe REST10A em pelo menos duas datas diferentes para comparar o estoque.";
             ["estoqueIDBTimelineNovos","estoqueIDBTimelineAumentaram","estoqueIDBTimelineDiminuiram","estoqueIDBTimelineZeraram"].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent="0"});
             estoqueIDBRenderTimelineEstoque([]);return;
@@ -36375,7 +36375,7 @@ carregarLinhaTempoEstoqueIDB=async function(opcoes={}){
         const contar=t=>mudancas.filter(r=>r.tipo===t).length;
         const vals={estoqueIDBTimelineNovos:contar("novo"),estoqueIDBTimelineAumentaram:contar("aumentou"),estoqueIDBTimelineDiminuiram:contar("diminuiu"),estoqueIDBTimelineZeraram:contar("zerou")};
         for(const [id,v] of Object.entries(vals)){const e=document.getElementById(id);if(e)e.textContent=v.toLocaleString("pt-BR")}
-        if(status)status.textContent=`${mudancas.length.toLocaleString("pt-BR")} N.C.E.(s) tiveram alteração de quantidade entre os dois snapshots REST10A.`;
+        if(status)status.textContent=`${mudancas.length.toLocaleString("pt-BR")} N.C.E.(s) tiveram alteração de quantidade entre os dois registros REST10A.`;
         const btn=document.querySelector('#estoqueIDBTimelineFiltros button[data-filtro="todos"]');estoqueIDBFiltrarTimeline("todos",btn);
     }catch(error){
         console.error("Estoque IDB REST10A: erro na timeline",error);
@@ -36388,13 +36388,13 @@ consultarNCEEstoqueIDB=async function(){
     const input=document.getElementById("estoqueIDBInputNCE"),status=document.getElementById("estoqueIDBBuscaNCEStatus"),box=document.getElementById("estoqueIDBBuscaNCEResultado");
     if(!input||!status||!box)return;
     const nce=estoqueIDBNormalizarNCE(input.value);if(!nce){status.textContent="Digite um N.C.E. para pesquisar.";box.innerHTML="";input.focus();return}
-    status.textContent=`Consultando snapshots REST10A do N.C.E. ${nce}...`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Carregando histórico REST10A...</div>';
+    status.textContent=`Consultando histórico REST10A do N.C.E. ${nce}...`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Carregando histórico REST10A...</div>';
     try{
         const schema=await estoqueIDBDetectarSchemaREST10A(),cliente=obterSupabaseEstoqueIDB();
         const cols=[schema.data,schema.nce,schema.quantidade,schema.descricao].filter(Boolean).join(",");
         const {data,error}=await cliente.from(ESTOQUE_IDB_REST10A_TABELA).select(cols).eq(schema.nce,nce).order(schema.data,{ascending:true});
         if(error)throw error;const rows=data||[];
-        if(!rows.length){status.textContent=`N.C.E. ${nce} não encontrado nos snapshots REST10A.`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Nenhum snapshot REST10A encontrado para este N.C.E.</div>';return}
+        if(!rows.length){status.textContent=`N.C.E. ${nce} não encontrado no histórico REST10A.`;box.innerHTML='<div class="estoque-idb-vazio" style="margin-top:14px">Nenhum registro REST10A encontrado para este N.C.E.</div>';return}
         const porData=new Map();let fallback="";
         for(const r of rows){const d=String(r?.[schema.data]||"");if(!d)continue;porData.set(d,(porData.get(d)||0)+estoqueIDBNumero(r?.[schema.quantidade]));if(!fallback&&schema.descricao)fallback=String(r?.[schema.descricao]??"").trim()}
         const hist=[...porData.entries()].sort((a,b)=>a[0].localeCompare(b[0]));
@@ -36404,15 +36404,15 @@ consultarNCEEstoqueIDB=async function(){
         const linhasHist=hist.slice().reverse().map(([d,q],i)=>{const prev=hist[hist.length-2-i]?.[1];const delta=prev===undefined?null:estoqueIDBNumero(q)-estoqueIDBNumero(prev);return `<tr><td>${esc(estoqueIDBFormatarData(d))}</td><td><b>${estoqueIDBNumero(q).toLocaleString("pt-BR")}</b></td><td>${delta===null?"-":`${delta>0?"+":""}${delta.toLocaleString("pt-BR")}`}</td></tr>`}).join("");
         box.innerHTML=`
             <div class="estoque-idb-nce-produto"><b>${esc(nome)}</b></div>
-            <div class="estoque-idb-rest10a-note">N.C.E. ${esc(nce)} • comparação feita exclusivamente pelos snapshots REST10A.</div>
+            <div class="estoque-idb-rest10a-note">N.C.E. ${esc(nce)} • comparação feita exclusivamente pelo histórico REST10A.</div>
             <div class="estoque-idb-nce-resumo">
                 <div class="estoque-idb-nce-mini"><small>Quantidade ontem</small><strong>${estoqueIDBNumero(anterior[1]).toLocaleString("pt-BR")}</strong><span>${esc(estoqueIDBFormatarData(anterior[0]))}</span></div>
                 <div class="estoque-idb-nce-mini"><small>Quantidade hoje</small><strong>${estoqueIDBNumero(atual[1]).toLocaleString("pt-BR")}</strong><span>${esc(estoqueIDBFormatarData(atual[0]))}</span></div>
                 <div class="estoque-idb-nce-mini"><small>Diferença</small><strong>${sinal}${dif.toLocaleString("pt-BR")}</strong></div>
-                <div class="estoque-idb-nce-mini"><small>Snapshots</small><strong>${hist.length.toLocaleString("pt-BR")}</strong></div>
+                <div class="estoque-idb-nce-mini"><small>Registros</small><strong>${hist.length.toLocaleString("pt-BR")}</strong></div>
             </div>
             <table class="estoque-idb-rest10a-historico"><thead><tr><th>Data</th><th>Quantidade</th><th>Diferença</th></tr></thead><tbody>${linhasHist}</tbody></table>`;
-        status.textContent=`${hist.length.toLocaleString("pt-BR")} snapshot(s) REST10A encontrado(s) para o N.C.E. ${nce}.`;
+        status.textContent=`${hist.length.toLocaleString("pt-BR")} registro(s) REST10A encontrado(s) para o N.C.E. ${nce}.`;
     }catch(error){console.error("Estoque IDB REST10A: erro na consulta N.C.E.",error);status.textContent="Erro ao consultar o N.C.E. no REST10A.";box.innerHTML=`<div class="estoque-idb-alerta" style="margin-top:14px">${estoqueIDBEscape(error?.message||error)}</div>`}
 };
 
@@ -36707,6 +36707,71 @@ body.dark-mode #telaControleEstoqueIDB .estoque-idb-chip-zerou{
 }
 </style>
 
+
+<style id="erp-controle-estoque-idb-etapa20-3-dark-nce">
+/* ETAPA 20.3 — ajuste visual APENAS da consulta N.C.E. do Controle de Estoque IDB */
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce{
+  background:linear-gradient(180deg,#0b2035 0%,#0d2742 100%)!important;
+  border:1px solid #244e73!important;
+  box-shadow:0 16px 38px rgba(0,0,0,.28)!important;
+  color:#eaf2ff!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce .estoque-idb-painel-titulo{
+  border-bottom:1px solid #315273!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce .estoque-idb-painel-titulo h2{
+  color:#f4f8ff!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce .estoque-idb-painel-titulo span{
+  color:#b9cce0!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce-topo input{
+  background:#0a1d31!important;
+  color:#f8fbff!important;
+  border:1px solid #2380ff!important;
+  box-shadow:0 0 0 3px rgba(35,128,255,.10)!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce-topo input::placeholder{color:#7f98b2!important}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-busca-nce-status{color:#b9cce0!important}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-produto{
+  background:linear-gradient(90deg,#173d62,#1b466f)!important;
+  color:#f4f8ff!important;
+  border:1px solid #2d5f8a!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-note{
+  background:linear-gradient(90deg,#281a47,#24183f)!important;
+  color:#efe7ff!important;
+  border:1px solid #6848a6!important;
+  border-left:5px solid #9c63ff!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini{
+  background:linear-gradient(180deg,#102d49 0%,#0d2742 100%)!important;
+  color:#eaf2ff!important;
+  border:1px solid #2e587a!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.03)!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini small{color:#8ea8c2!important}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini strong{color:#ffffff!important}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-nce-mini span{color:#d4e2f1!important}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico{
+  background:#0b2138!important;
+  border-collapse:collapse!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico thead,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico th{
+  background:linear-gradient(180deg,#173e64,#143757)!important;
+  color:#ffffff!important;
+  border-color:#315273!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico tbody,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico tr,
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico td{
+  background:#0b2138!important;
+  color:#eaf2ff!important;
+  border-color:#315273!important;
+}
+body.dark-mode #telaControleEstoqueIDB .estoque-idb-rest10a-historico tbody tr:hover td{background:#102d49!important}
+</style>
 </body>
 </html>
 
