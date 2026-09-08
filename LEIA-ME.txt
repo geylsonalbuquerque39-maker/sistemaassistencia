@@ -1,0 +1,9 @@
+ERP V10 PWA — ETAPA 02
+
+- Um único index.html contém Web + Mobile.
+- Desktop: interface Web original.
+- iPhone/Android ou PWA instalado: interface Mobile.
+- Mesmo Supabase, usuários, permissões e funções.
+- Publicar todos os arquivos desta pasta na mesma raiz do GitHub Pages.
+- No iPhone: Safari > Compartilhar > Adicionar à Tela de Início.
+- Nas próximas etapas, substituir os arquivos na mesma URL; o app verifica atualização ao abrir.
