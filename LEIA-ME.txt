@@ -1,4 +1,0 @@
-ERP V10 PWA Web + Mobile — ETAPA 06 / PW7
-Correção de login no iPhone: login oculto por padrão no mobile e exibido somente quando o Supabase confirmar ausência de sessão.
-Web preservada.
-Teste: https://geylsonalbuquerque39-maker.github.io/sistemaassistencia/?v=PW7
