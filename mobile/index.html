@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Coleta Fotos">
-<link rel="manifest" href="./manifest.webmanifest?v=CF4">
+<link rel="manifest" href="./manifest.webmanifest?v=CF5">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ERP V10 — Coleta de Fotos</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -34,10 +34,19 @@
 (() => {
 'use strict';
 const CFG={url:'https://sjututwxmjbhprvdhekl.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8',bucket:'midias-os',tabela:'midias_os'};
-const LS='ERP_COLETA_FOTOS_APP_CF4';
+const LS='ERP_COLETA_FOTOS_APP_CF5';
 let db=null,osFotoAtual='';
 const $=id=>document.getElementById(id);
-function client(){if(db)return db;if(!window.supabase?.createClient)throw new Error('Biblioteca Supabase não carregada.');db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:false,autoRefreshToken:false,detectSessionInUrl:false}});return db}
+function client(){
+  if(db)return db;
+  if(!window.supabase?.createClient)throw new Error('Biblioteca Supabase não carregada.');
+  // Mesmo padrão do app Controle Marceneiro: cliente Supabase persistente + fetch sem cache.
+  db=window.supabase.createClient(CFG.url,CFG.key,{
+    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true},
+    global:{fetch:(url,options={})=>fetch(url,{...options,cache:'no-store'})}
+  });
+  return db;
+}
 function norm(v){return String(v??'').replace(/\D+/g,'').trim()}
 function load(){try{return JSON.parse(localStorage.getItem(LS)||'{"inicio":null,"itens":[]}')}catch{return {inicio:null,itens:[]}}}
 function save(s){localStorage.setItem(LS,JSON.stringify(s))}
@@ -51,97 +60,83 @@ function addOS(){const os=norm($('osInput').value);if(!os){msg('Informe o númer
 function abrirCamera(os){osFotoAtual=norm(os);$('cameraInput').value='';$('cameraInput').click()}
 function abrirGaleria(os){osFotoAtual=norm(os);$('galeriaInput').value='';$('galeriaInput').click()}
 async function dimensoes(file){return new Promise(resolve=>{try{const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{const d={largura:im.naturalWidth||null,altura:im.naturalHeight||null};URL.revokeObjectURL(url);resolve(d)};im.onerror=()=>{URL.revokeObjectURL(url);resolve({largura:null,altura:null})};im.src=url}catch{resolve({largura:null,altura:null})}})}
-async function carregarImagemParaCanvas(file){
-  // Safari/iPhone: tenta createImageBitmap; se falhar (ex.: HEIC), usa <img> + objectURL.
+async function optimizeImage(file){
+  // Cópia do mesmo fluxo usado no Controle Marceneiro.
   try{
-    if(typeof createImageBitmap==='function'){
-      const bmp=await createImageBitmap(file);
-      return {width:bmp.width,height:bmp.height,draw:(ctx,w,h)=>ctx.drawImage(bmp,0,0,w,h),close:()=>bmp.close?.()};
-    }
-  }catch(e){console.warn('createImageBitmap falhou; usando fallback IMG.',e)}
-  return await new Promise((resolve,reject)=>{
-    const url=URL.createObjectURL(file),img=new Image();
-    img.onload=()=>resolve({width:img.naturalWidth||img.width,height:img.naturalHeight||img.height,draw:(ctx,w,h)=>ctx.drawImage(img,0,0,w,h),close:()=>URL.revokeObjectURL(url)});
-    img.onerror=()=>{URL.revokeObjectURL(url);reject(new Error('O iPhone não conseguiu abrir a foto para preparar o envio.'))};
-    img.src=url;
-  });
-}
-async function prepararFoto(file){
-  const fonte=await carregarImagemParaCanvas(file);
-  try{
-    const max=1280,scale=Math.min(1,max/Math.max(fonte.width,fonte.height));
-    const w=Math.max(1,Math.round(fonte.width*scale)),h=Math.max(1,Math.round(fonte.height*scale));
-    const c=document.createElement('canvas');c.width=w;c.height=h;
-    const ctx=c.getContext('2d',{alpha:false});ctx.fillStyle='#fff';ctx.fillRect(0,0,w,h);fonte.draw(ctx,w,h);
-    const blob=await new Promise((res,rej)=>c.toBlob(b=>b?res(b):rej(new Error('Falha ao gerar JPEG para envio.')),'image/jpeg',.76));
-    return new File([blob],`${osFotoAtual||'foto'}-${Date.now()}.jpg`,{type:'image/jpeg',lastModified:Date.now()});
-  }finally{fonte.close?.()}
-}
-function projectRef(){try{return new URL(CFG.url).hostname.split('.')[0]}catch(_){return ''}}
-function storageBases(){const ref=projectRef();return [ref?`https://${ref}.storage.supabase.co`:null,CFG.url].filter(Boolean)}
-function uploadStorageEmBase(base,path,arquivo){
-  return new Promise((resolve,reject)=>{
-    const xhr=new XMLHttpRequest();
-    const safePath=path.split('/').map(encodeURIComponent).join('/');
-    xhr.open('POST',`${base}/storage/v1/object/${encodeURIComponent(CFG.bucket)}/${safePath}`,true);
-    xhr.timeout=90000;
-    xhr.setRequestHeader('apikey',CFG.key);
-    xhr.setRequestHeader('Authorization','Bearer '+CFG.key);
-    xhr.setRequestHeader('x-upsert','false');
-    xhr.setRequestHeader('cache-control','3600');
-    xhr.setRequestHeader('Content-Type','image/jpeg');
-    xhr.upload.onprogress=e=>{if(e.lengthComputable)setBusy(true,'Enviando foto…',`O.S. ${osFotoAtual} · ${Math.round(e.loaded/e.total*100)}%`)};
-    xhr.onload=()=>{
-      if(xhr.status>=200&&xhr.status<300){resolve({ok:true,base});return}
-      let detalhe=xhr.responseText||('HTTP '+xhr.status);
-      try{const j=JSON.parse(xhr.responseText);detalhe=j.message||j.error||j.msg||detalhe}catch(_){}
-      const err=new Error(`Storage HTTP ${xhr.status}: ${detalhe}`);err.http=true;reject(err);
-    };
-    xhr.onerror=()=>{const err=new Error(`Sem resposta de rede em ${new URL(base).hostname}`);err.network=true;reject(err)};
-    xhr.ontimeout=()=>{const err=new Error(`Timeout em ${new URL(base).hostname}`);err.network=true;reject(err)};
-    xhr.onabort=()=>{const err=new Error('Envio ao Storage foi interrompido.');err.network=true;reject(err)};
-    xhr.send(arquivo);
-  });
-}
-async function uploadStorageXHR(path,arquivo){
-  const bases=storageBases();
-  const erros=[];
-  for(let i=0;i<bases.length;i++){
-    const base=bases[i];
+    let imageSource,sourceWidth,sourceHeight,cleanup=()=>{};
     try{
-      setBusy(true,'Enviando foto…',i===0?'Conectando ao Storage direto…':'Tentando rota alternativa…');
-      return await uploadStorageEmBase(base,path,arquivo);
-    }catch(e){
-      erros.push(e.message||String(e));
-      // Erro HTTP real (401/403/404 etc.) não é conectividade: mostrar imediatamente.
-      if(e.http)throw e;
-      console.warn('[CF4] falha de rede no Storage',base,e);
+      const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
+      imageSource=bitmap;sourceWidth=bitmap.width;sourceHeight=bitmap.height;
+      cleanup=()=>bitmap.close?.();
+    }catch(_){
+      const objectUrl=URL.createObjectURL(file);
+      const image=await new Promise((resolve,reject)=>{
+        const element=new Image();
+        element.onload=()=>resolve(element);
+        element.onerror=()=>reject(new Error('Formato de imagem não reconhecido.'));
+        element.src=objectUrl;
+      });
+      imageSource=image;sourceWidth=image.naturalWidth;sourceHeight=image.naturalHeight;
+      cleanup=()=>URL.revokeObjectURL(objectUrl);
     }
+    const maxSide=1600;
+    const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
+    const width=Math.max(1,Math.round(sourceWidth*scale));
+    const height=Math.max(1,Math.round(sourceHeight*scale));
+    const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
+    const context=canvas.getContext('2d');context.fillStyle='#ffffff';context.fillRect(0,0,width,height);context.drawImage(imageSource,0,0,width,height);
+    cleanup();
+    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));
+    if(!blob)throw new Error('Não foi possível otimizar a imagem.');
+    return {blob,contentType:'image/jpeg',extension:'jpg',width,height};
+  }catch(error){
+    if(file.size>6*1024*1024)throw new Error('Esta imagem não pôde ser otimizada. Escolha uma foto menor que 6 MB.');
+    const extension=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
+    return {blob:file,contentType:file.type||'image/jpeg',extension,width:null,height:null};
   }
-  throw new Error('Storage inacessível pelo iPhone. Tentativas: '+erros.join(' | '));
 }
 async function removerStorage(path){try{await client().storage.from(CFG.bucket).remove([path])}catch(_){} }
 async function enviar(file,os){
   if(!navigator.onLine)throw new Error('Sem internet. Conecte-se antes de enviar.');
   const s=client(),original=file;
-  setBusy(true,'Preparando foto…',`O.S. ${os}`);
-  const arquivo=await prepararFoto(file),ext='jpg';
+  setBusy(true,'Otimizando foto…',`O.S. ${os}`);
+  const optimized=await optimizeImage(file);
   const uuid=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2));
-  const nome=`${os}-${Date.now()}.jpg`,path=`principal/${os}/${uuid}-${nome}`,dim=await dimensoes(arquivo);
-  // XHR direto é mais estável no Safari/iOS para envio binário que fetch do supabase-js.
-  await uploadStorageXHR(path,arquivo);
+  const nomeOriginal=original.name||`${os}.jpg`;
+  const nomeArmazenado=`${os}-${Date.now()}.${optimized.extension}`;
+  const path=`principal/${os}/${uuid}.${optimized.extension}`;
+
+  setBusy(true,'Enviando foto…',`O.S. ${os} · Supabase Storage`);
+  let up;
+  try{
+    up=await s.storage.from(CFG.bucket).upload(path,optimized.blob,{
+      cacheControl:'31536000',contentType:optimized.contentType,upsert:false
+    });
+  }catch(e){
+    throw new Error('Storage: '+(e?.message||String(e)));
+  }
+  if(up?.error)throw new Error('Storage: '+up.error.message);
+
   const st0=ensure(),meta=st0.itens.find(x=>x.os===os)||{};
   const detalhes=[meta.loja&&`Loja: ${meta.loja}`,meta.depreciacao&&`Depreciação: ${meta.depreciacao}`,meta.acessorios&&`Acessórios: ${meta.acessorios}`].filter(Boolean).join(' | ');
-  const payload={os:String(os),origem:'principal',tipo_midia:'imagem',categoria:'Outros',descricao:'Foto enviada pelo aplicativo de coleta'+(detalhes?' — '+detalhes:''),bucket:CFG.bucket,caminho_arquivo:path,nome_original:original.name||nome,nome_armazenado:nome,tipo_arquivo:'image/jpeg',extensao:ext,tamanho_original_bytes:original.size,tamanho_bytes:arquivo.size,largura:dim.largura,altura:dim.altura,usuario_nome:null,usuario_id:null};
-  let ins;
-  try{ins=await s.from(CFG.tabela).insert(payload)}catch(e){await removerStorage(path);throw new Error('Banco sem resposta: '+(e?.message||e))}
-  if(ins?.error){await removerStorage(path);throw new Error('Banco: '+ins.error.message)}
-  const st=ensure(),item=st.itens.find(x=>x.os===os);if(item){item.fotos=Number(item.fotos||0)+1;item.ultimaFoto=new Date().toISOString();save(st)}
+  const payload={
+    os:String(os),origem:'principal',tipo_midia:'imagem',categoria:'Outros',
+    descricao:'Foto enviada pelo aplicativo de coleta'+(detalhes?' — '+detalhes:''),
+    bucket:CFG.bucket,caminho_arquivo:path,nome_original:nomeOriginal,nome_armazenado:nomeArmazenado,
+    tipo_arquivo:optimized.contentType,extensao:optimized.extension,
+    tamanho_original_bytes:original.size,tamanho_bytes:optimized.blob.size,
+    largura:optimized.width,altura:optimized.height,usuario_nome:null,usuario_id:null
+  };
+  const ins=await s.from(CFG.tabela).insert(payload);
+  if(ins.error){await removerStorage(path);throw new Error('Banco midias_os: '+ins.error.message)}
+
+  const st=ensure(),item=st.itens.find(x=>x.os===os);
+  if(item){item.fotos=Number(item.fotos||0)+1;item.ultimaFoto=new Date().toISOString();save(st)}
 }
 async function processFiles(files){if(!osFotoAtual)return;const arr=[...files];if(!arr.length)return;try{for(let i=0;i<arr.length;i++){setBusy(true,`Enviando ${i+1} de ${arr.length}`,`O.S. ${osFotoAtual}`);await enviar(arr[i],osFotoAtual)}setBusy(false);msg(`${arr.length} foto(s) salva(s) na O.S. ${osFotoAtual}.`,'ok');await render()}catch(e){setBusy(false);console.error(e);msg('Erro ao enviar: '+(e.message||e),'err');alert('Não foi possível enviar a foto.\n\n'+(e.message||e)+'\n\nA foto não foi contabilizada como enviada.')}}
 $('addOS').onclick=addOS;$('osInput').addEventListener('keydown',e=>{if(e.key==='Enter')addOS()});$('cameraInput').addEventListener('change',e=>processFiles(e.target.files));$('galeriaInput').addEventListener('change',e=>processFiles(e.target.files));$('novaColeta').onclick=()=>{if(confirm('Iniciar uma nova coleta? A lista atual será limpa. As fotos já enviadas permanecem no ERP.')){save({inicio:new Date().toISOString(),itens:[]});render();msg('Nova coleta iniciada.','ok')}};$('finalizar').onclick=()=>{if(confirm('Finalizar e limpar a lista deste aparelho? As fotos enviadas NÃO serão apagadas.')){save({inicio:null,itens:[]});render();msg('Coleta finalizada. As fotos continuam no ERP.','ok')}};
 function net(){ $('netDot').classList.toggle('off',!navigator.onLine)}window.addEventListener('online',net);window.addEventListener('offline',net);net();render();
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=CF4').catch(console.warn));
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=CF5').catch(console.warn));
 })();
 </script>
 </body></html>
