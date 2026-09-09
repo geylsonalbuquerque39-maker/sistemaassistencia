@@ -1,9 +1,9 @@
 {
   "id": "./?app=coleta-fotos",
-  "name": "ERP V10 Coleta de Fotos CF6",
+  "name": "ERP V10 Coleta de Fotos CF7",
   "short_name": "Coleta Fotos",
   "description": "Aplicativo móvel dedicado à coleta de fotos por O.S. do ERP V10.",
-  "start_url": "./?v=CF6",
+  "start_url": "./?v=CF7",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait-primary",
