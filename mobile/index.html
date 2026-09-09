@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Coleta Fotos">
-<link rel="manifest" href="./manifest.webmanifest?v=CF8">
+<link rel="manifest" href="./manifest.webmanifest?v=CF9">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ERP V10 — Coleta de Fotos</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -149,7 +149,7 @@ async function enviar(file,os){
   if(ins.error){await removerStorage(path);throw new Error('Banco midias_os: '+ins.error.message)}
 
   const st=ensure(),item=st.itens.find(x=>x.os===os);
-  if(item){item.fotos=Number(item.fotos||0)+1;item.ultimaFoto=new Date().toISOString();save(st)}
+  if(item){item.fotos=Number(item.fotos||0)+1;item.ultimaFoto=new Date().toISOString();if(!Array.isArray(item.midia_paths))item.midia_paths=[];item.midia_paths.push(path);save(st)}
 }
 async function processFiles(files){if(!osFotoAtual)return;const arr=[...files];if(!arr.length)return;try{for(let i=0;i<arr.length;i++){setBusy(true,`Enviando ${i+1} de ${arr.length}`,`O.S. ${osFotoAtual}`);await enviar(arr[i],osFotoAtual)}setBusy(false);msg(`${arr.length} foto(s) salva(s) na O.S. ${osFotoAtual}.`,'ok');await render()}catch(e){setBusy(false);console.error(e);msg('Erro ao enviar: '+(e.message||e),'err');alert('Não foi possível enviar a foto.\n\n'+(e.message||e)+'\n\nA foto não foi contabilizada como enviada.')}}
 $('addOS').onclick=addOS;
@@ -169,7 +169,7 @@ async function salvarColetaNoSupabase(coleta){
     total_fotos:totalFotosColeta(coleta),
     itens:coleta.itens||[],
     dispositivo:'mobile',
-    versao_app:'CF8'
+    versao_app:'CF9'
   };
   const {data,error}=await s.from('coletas_mobile').insert(payload).select('id').single();
   if(error)throw new Error('Sincronização da coleta: '+error.message);
@@ -186,7 +186,7 @@ async function carregarHistoricoRemoto(){
     [...remoto,...local].forEach(c=>mapa.set(String(c.id||c.codigo),c));
     histSave([...mapa.values()].sort((a,b)=>new Date(b.fim||0)-new Date(a.fim||0)).slice(0,100));
     renderHistorico();
-  }catch(e){console.warn('[CF8] histórico remoto indisponível',e)}
+  }catch(e){console.warn('[CF9] histórico remoto indisponível',e)}
 }
 
 $('finalizar').onclick=async()=>{
@@ -221,9 +221,9 @@ async function limparPW2eRegistrarCF8(){
       const ehCF8=script.includes('/mobile/sw.js')&&script.includes('CF8');
       if(!ehCF8){try{await reg.unregister();removeuAntigo=true}catch(_){}}
     }
-    try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!=='erp-v10-coleta-fotos-cf7').map(k=>caches.delete(k)))}catch(_){ }
-    await navigator.serviceWorker.register('./sw.js?v=CF8',{scope:'./'});
-    if(removeuAntigo&&!sessionStorage.getItem('CF8_SW_LIMPO')){sessionStorage.setItem('CF8_SW_LIMPO','1');setTimeout(()=>location.replace('./?v=CF8&clean=1'),250)}
+    try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!=='erp-v10-coleta-fotos-cf9').map(k=>caches.delete(k)))}catch(_){ }
+    await navigator.serviceWorker.register('./sw.js?v=CF9',{scope:'./'});
+    if(removeuAntigo&&!sessionStorage.getItem('CF8_SW_LIMPO')){sessionStorage.setItem('CF8_SW_LIMPO','1');setTimeout(()=>location.replace('./?v=CF9&clean=1'),250)}
   }catch(e){console.warn('Limpeza/registro SW CF8:',e)}
 }
 window.addEventListener('load',limparPW2eRegistrarCF8);
