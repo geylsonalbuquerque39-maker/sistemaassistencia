@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Coleta Fotos">
-<link rel="manifest" href="./manifest.webmanifest?v=CF7">
+<link rel="manifest" href="./manifest.webmanifest?v=CF8">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ERP V10 — Coleta de Fotos</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -18,7 +18,7 @@
 
 .os-details{display:grid;grid-template-columns:1fr;gap:8px;margin-top:11px}.os-details label{font-size:10px;font-weight:900;color:#60758c}.os-details input,.os-details select{width:100%;margin-top:4px;border:1px solid #c8d6e5;border-radius:10px;padding:10px 11px;font-size:14px;color:#10243c;background:#f9fbfd}.upload-note{font-size:10px;color:#74869b;margin-top:7px;line-height:1.4}
 
-/* CF7 — histórico e modais */
+/* CF8 — histórico e modais */
 .final-card{border:2px solid #bfd7f2;background:linear-gradient(135deg,#f7fbff,#fff)}
 .final-card .btn-finalizar{width:100%;min-height:56px;font-size:16px;background:linear-gradient(135deg,#0755ad,#0b75d8);color:#fff}
 .historico-lista{display:grid;gap:10px}.hist-card{border:1px solid #d8e4f0;border-radius:14px;padding:12px;background:#fff}.hist-top{display:flex;gap:10px;align-items:flex-start}.hist-title{font-weight:950;color:#074f9d}.hist-sub{font-size:11px;color:#718398;margin-top:3px}.hist-badge{margin-left:auto;background:#eef6ff;color:#0757ad;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900}.hist-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.modal{position:fixed;inset:0;z-index:150;background:rgba(1,17,35,.72);display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.modal-box{width:min(760px,100%);max-height:92dvh;overflow:auto;background:#f6f9fd;border-radius:22px 22px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.25)}.modal-head{position:sticky;top:-16px;z-index:3;background:#f6f9fd;padding:8px 0 12px;display:flex;align-items:center;gap:10px}.modal-head h3{margin:0;font-size:17px}.modal-head .btn{margin-left:auto;min-height:40px}.hist-os{background:#fff;border:1px solid #d9e5f1;border-radius:15px;padding:12px;margin-bottom:10px}.hist-os h4{margin:0 0 8px;color:#074f9d;font-size:17px}.obs-grid{display:grid;gap:7px;font-size:12px}.obs-row{background:#f6f9fc;border-radius:9px;padding:8px}.obs-row b{display:block;font-size:9px;color:#718398;margin-bottom:2px}.hist-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.hist-photos img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid #d4dfeb}.hist-photo-empty{font-size:11px;color:#7b8ca0;padding:10px 0}.danger-link{border:0;background:transparent;color:#b42318;font-weight:800;padding:8px}.inicio-info{font-size:11px;color:#657a90;margin-top:8px}
@@ -30,7 +30,7 @@
 <section class="card hero"><div class="hero-title">Coleta rápida de O.S.</div><div class="hero-sub">Adicione a O.S. manualmente e tire quantas fotos precisar. Cada foto é enviada imediatamente para o mesmo banco de mídias usado pelo ERP Web.</div><div class="kpis"><div class="kpi"><strong id="kpiOS">0</strong><span>O.S. NA COLETA</span></div><div class="kpi"><strong id="kpiFotos">0</strong><span>FOTOS ENVIADAS</span></div><div class="kpi"><strong id="kpiPend">0</strong><span>PENDÊNCIAS</span></div></div></section>
 <section class="card"><label class="label" for="osInput">Número da O.S.</label><div class="os-row"><input class="input" id="osInput" inputmode="numeric" autocomplete="off" placeholder="Ex.: 32541"><button class="btn btn-primary" id="addOS">Adicionar O.S.</button></div><div id="msg" class="msg"></div></section>
 <section class="card"><div class="section-head"><h2>O.S. desta coleta</h2><span id="countLabel" class="counter">0 O.S.</span></div><div id="lista"></div></section>
-<section class="card final-card"><button class="btn btn-finalizar" id="finalizar">✅ Finalizar coleta</button><div id="inicioInfo" class="inicio-info"></div><div class="tiny">Ao finalizar, esta coleta vai para o histórico deste aparelho. As fotos permanecem no Supabase e no ERP completo.</div><button class="btn btn-secondary" id="novaColeta" style="width:100%">＋ Iniciar nova coleta vazia</button></section>
+<section class="card final-card"><button class="btn btn-finalizar" id="finalizar">✅ Finalizar coleta</button><div id="inicioInfo" class="inicio-info"></div><div class="tiny">Ao finalizar, a coleta é sincronizada com o Supabase e fica disponível também no ERP do computador.</div><button class="btn btn-secondary" id="novaColeta" style="width:100%">＋ Iniciar nova coleta vazia</button></section>
 <section class="card"><div class="section-head"><h2>Coletas finalizadas</h2><span id="histCount" class="counter">0 coleta(s)</span></div><div id="historico" class="historico-lista"></div></section>
 </main>
 <input id="cameraInput" class="hidden-input" type="file" accept="image/*" capture="environment">
@@ -41,8 +41,8 @@
 (() => {
 'use strict';
 const CFG={url:'https://sjututwxmjbhprvdhekl.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8',bucket:'midias-os',tabela:'midias_os'};
-const LS='ERP_COLETA_FOTOS_APP_CF7';
-const LS_HIST='ERP_COLETA_FOTOS_HIST_CF7';
+const LS='ERP_COLETA_FOTOS_APP_CF8';
+const LS_HIST='ERP_COLETA_FOTOS_HIST_CF8';
 let db=null,osFotoAtual='';
 const $=id=>document.getElementById(id);
 function client(){
@@ -159,24 +159,74 @@ $('galeriaInput').addEventListener('change',e=>processFiles(e.target.files));
 $('histModalClose').onclick=fecharHistorico;
 $('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))fecharHistorico()});
 $('novaColeta').onclick=()=>{const atual=ensure();if(atual.itens.length&&!confirm('Existe uma coleta em andamento. Iniciar outra vai limpar a lista atual sem salvar no histórico. Continuar?'))return;save({inicio:new Date().toISOString(),itens:[]});render();msg('Nova coleta iniciada.','ok')};
-$('finalizar').onclick=()=>{const atual=ensure();if(!atual.itens.length){msg('Adicione pelo menos uma O.S. antes de finalizar.','err');return}if(!confirm(`Finalizar esta coleta com ${atual.itens.length} O.S. e ${totalFotosColeta(atual)} foto(s) enviada(s)?`))return;const fim=new Date().toISOString(),h=histLoad();const codigo=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});h.unshift({id:'CF-'+Date.now().toString(36),codigo,inicio:atual.inicio,fim,itens:JSON.parse(JSON.stringify(atual.itens))});histSave(h);save({inicio:new Date().toISOString(),itens:[]});render();msg('Coleta finalizada e salva no histórico.','ok')};
+async function salvarColetaNoSupabase(coleta){
+  const s=client();
+  const payload={
+    codigo:coleta.codigo,
+    inicio:coleta.inicio,
+    fim:coleta.fim,
+    total_os:(coleta.itens||[]).length,
+    total_fotos:totalFotosColeta(coleta),
+    itens:coleta.itens||[],
+    dispositivo:'mobile',
+    versao_app:'CF8'
+  };
+  const {data,error}=await s.from('coletas_mobile').insert(payload).select('id').single();
+  if(error)throw new Error('Sincronização da coleta: '+error.message);
+  return data?.id||null;
+}
+
+async function carregarHistoricoRemoto(){
+  try{
+    const {data,error}=await client().from('coletas_mobile').select('*').order('fim',{ascending:false}).limit(100);
+    if(error)throw error;
+    const remoto=(data||[]).map(r=>({id:r.id,codigo:r.codigo,inicio:r.inicio,fim:r.fim,itens:Array.isArray(r.itens)?r.itens:[],sincronizada:true}));
+    const local=histLoad();
+    const mapa=new Map();
+    [...remoto,...local].forEach(c=>mapa.set(String(c.id||c.codigo),c));
+    histSave([...mapa.values()].sort((a,b)=>new Date(b.fim||0)-new Date(a.fim||0)).slice(0,100));
+    renderHistorico();
+  }catch(e){console.warn('[CF8] histórico remoto indisponível',e)}
+}
+
+$('finalizar').onclick=async()=>{
+  const atual=ensure();
+  if(!atual.itens.length){msg('Adicione pelo menos uma O.S. antes de finalizar.','err');return}
+  if(!confirm(`Finalizar esta coleta com ${atual.itens.length} O.S. e ${totalFotosColeta(atual)} foto(s) enviada(s)?`))return;
+  const btn=$('finalizar'); btn.disabled=true; btn.textContent='⏳ Sincronizando coleta…';
+  const fim=new Date().toISOString();
+  const codigo=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+  const coleta={id:'CF-'+Date.now().toString(36),codigo,inicio:atual.inicio,fim,itens:JSON.parse(JSON.stringify(atual.itens))};
+  try{
+    const idRemoto=await salvarColetaNoSupabase(coleta);
+    if(idRemoto)coleta.id=idRemoto;
+    coleta.sincronizada=true;
+    const h=histLoad();h.unshift(coleta);histSave(h);
+    save({inicio:new Date().toISOString(),itens:[]});
+    await render();
+    msg('Coleta finalizada e sincronizada com o ERP do computador.','ok');
+  }catch(e){
+    console.error(e);
+    msg('Não foi possível sincronizar a coleta: '+(e.message||e),'err');
+  }finally{btn.disabled=false;btn.textContent='✅ Finalizar coleta'}
+};
 function net(){ $('netDot').classList.toggle('off',!navigator.onLine)}window.addEventListener('online',net);window.addEventListener('offline',net);net();render();
-async function limparPW2eRegistrarCF7(){
+async function limparPW2eRegistrarCF8(){
   if(!('serviceWorker' in navigator))return;
   try{
     const regs=await navigator.serviceWorker.getRegistrations();
     let removeuAntigo=false;
     for(const reg of regs){
       const script=reg.active?.scriptURL||reg.waiting?.scriptURL||reg.installing?.scriptURL||'';
-      const ehCF7=script.includes('/mobile/sw.js')&&script.includes('CF7');
-      if(!ehCF7){try{await reg.unregister();removeuAntigo=true}catch(_){}}
+      const ehCF8=script.includes('/mobile/sw.js')&&script.includes('CF8');
+      if(!ehCF8){try{await reg.unregister();removeuAntigo=true}catch(_){}}
     }
     try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!=='erp-v10-coleta-fotos-cf7').map(k=>caches.delete(k)))}catch(_){ }
-    await navigator.serviceWorker.register('./sw.js?v=CF7',{scope:'./'});
-    if(removeuAntigo&&!sessionStorage.getItem('CF7_SW_LIMPO')){sessionStorage.setItem('CF7_SW_LIMPO','1');setTimeout(()=>location.replace('./?v=CF7&clean=1'),250)}
-  }catch(e){console.warn('Limpeza/registro SW CF7:',e)}
+    await navigator.serviceWorker.register('./sw.js?v=CF8',{scope:'./'});
+    if(removeuAntigo&&!sessionStorage.getItem('CF8_SW_LIMPO')){sessionStorage.setItem('CF8_SW_LIMPO','1');setTimeout(()=>location.replace('./?v=CF8&clean=1'),250)}
+  }catch(e){console.warn('Limpeza/registro SW CF8:',e)}
 }
-window.addEventListener('load',limparPW2eRegistrarCF7);
+window.addEventListener('load',limparPW2eRegistrarCF8);
 })();
 </script>
 </body></html>
