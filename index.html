@@ -35047,6 +35047,29 @@ function obterSupabaseEstoqueIDB(){
                     persistSession:false,
                     autoRefreshToken:false,
                     detectSessionInUrl:false
+                },
+                global:{
+                    fetch: async (url, options={}) => {
+                        let ultimoErro=null;
+                        for(let tentativa=1; tentativa<=3; tentativa++){
+                            const controller=new AbortController();
+                            const timer=setTimeout(()=>controller.abort(), 30000);
+                            try{
+                                const resp=await fetch(url,{
+                                    ...options,
+                                    cache:"no-store",
+                                    signal:controller.signal
+                                });
+                                clearTimeout(timer);
+                                return resp;
+                            }catch(err){
+                                clearTimeout(timer);
+                                ultimoErro=err;
+                                if(tentativa<3) await new Promise(r=>setTimeout(r, tentativa*1200));
+                            }
+                        }
+                        throw ultimoErro || new Error("Falha de comunicação com o Supabase do estoque.");
+                    }
                 }
             }
         );
@@ -35466,109 +35489,157 @@ function limparPreviaEstoqueIDB(){
     const e=document.getElementById("estoqueIDBRankingEntradas");if(e){e.className="estoque-idb-vazio";e.textContent="Importe um relatório para gerar o ranking.";}const s=document.getElementById("estoqueIDBRankingSaidas");if(s){s.className="estoque-idb-vazio";s.textContent="Importe um relatório para gerar o ranking.";}
     const u=document.getElementById("estoqueIDBUltimaImportacao");if(u)u.textContent="Nenhum relatório carregado nesta tela.";
 }
+async function estoqueIDBExecutarComRetry(acao, contexto="operação", tentativas=3){
+    let ultimoErro=null;
+    for(let tentativa=1; tentativa<=tentativas; tentativa++){
+        try{
+            const resultado=await acao();
+            if(resultado?.error) throw resultado.error;
+            return resultado;
+        }catch(error){
+            ultimoErro=error;
+            const msg=String(error?.message||error||"");
+            const transitório=/failed to fetch|fetch failed|network|timeout|abort|connection|load failed/i.test(msg) || error?.name==="AbortError" || error instanceof TypeError;
+            console.warn(`Estoque IDB: ${contexto} falhou (${tentativa}/${tentativas})`,error);
+            if(!transitório || tentativa>=tentativas) break;
+            await new Promise(r=>setTimeout(r, tentativa*1500));
+        }
+    }
+    const detalhe=ultimoErro?.message||String(ultimoErro||"erro desconhecido");
+    throw new Error(`${contexto}: ${detalhe}`);
+}
+
 async function confirmarImportacaoEstoqueIDB(){
     const pre=estoqueIDBPreviaAtual;
     if(!pre?.linhas?.length){alert("Importe e confira um relatório antes de gravar.");return;}
     const btn=document.getElementById("estoqueIDBBtnConfirmar");
     if(btn?.disabled)return;
-    if(btn){btn.disabled=true;btn.textContent="Gravando...";}
+    if(btn){btn.disabled=true;btn.textContent="Testando conexão...";}
+
+    let importacaoId=null;
+    let criouNovaImportacao=false;
+
     try{
         const cliente=obterSupabaseEstoqueIDB();
-        const {data:existente,error:erroBusca}=await cliente
-            .from("estoque_importacoes")
-            .select("id,data_relatorio,nome_arquivo,total_linhas,total_entradas,total_saidas,valor_total")
-            .eq("data_relatorio",pre.data_relatorio)
-            .eq("nome_arquivo",pre.arquivo)
-            .limit(1);
-        if(erroBusca)throw erroBusca;
+
+        // Teste real antes de começar a gravação. Evita criar cabeçalho pela metade.
+        await estoqueIDBExecutarComRetry(
+            ()=>cliente.from("estoque_importacoes").select("id").limit(1),
+            "Teste de conexão com o banco de estoque",
+            3
+        );
+
+        if(btn)btn.textContent="Verificando relatório...";
+        const {data:existente}=await estoqueIDBExecutarComRetry(
+            ()=>cliente
+                .from("estoque_importacoes")
+                .select("id,data_relatorio,nome_arquivo,total_linhas,total_entradas,total_saidas,valor_total")
+                .eq("data_relatorio",pre.data_relatorio)
+                .eq("nome_arquivo",pre.arquivo)
+                .limit(1),
+            "Consulta do relatório existente",
+            3
+        );
 
         const totalEntradas=pre.linhas.reduce((a,r)=>a+estoqueIDBNumero(r.entradas),0);
         const totalSaidas=pre.linhas.reduce((a,r)=>a+estoqueIDBNumero(r.saidas),0);
         const valorEstoque=estoqueIDBNumero(pre.totais_finais?.valor_estoque);
         const usuario=(typeof usuarioLogado!=="undefined" && usuarioLogado && (usuarioLogado.nome||usuarioLogado.email)) || "Usuário ERP";
-
-        let importacaoId=null;
         let atualizandoExistente=false;
 
         if(existente?.length){
-            /*
-             * Relatórios importados em versões antigas podem ter valor_total=0.
-             * Reimportar o mesmo arquivo atualiza os totais e o valor do estoque
-             * sem duplicar as movimentações já existentes.
-             */
             importacaoId=existente[0].id;
             atualizandoExistente=true;
+            if(btn)btn.textContent="Atualizando relatório...";
 
-            const {data:atualizado,error:erroAtualiza}=await cliente
-                .from("estoque_importacoes")
-                .update({
+            const {data:atualizado}=await estoqueIDBExecutarComRetry(
+                ()=>cliente
+                    .from("estoque_importacoes")
+                    .update({
+                        total_linhas:pre.linhas.length,
+                        total_entradas:totalEntradas,
+                        total_saidas:totalSaidas,
+                        valor_total:valorEstoque,
+                        usuario,
+                        criado_em:new Date().toISOString()
+                    })
+                    .eq("id",importacaoId)
+                    .select("id,valor_total,total_entradas,total_saidas,criado_em")
+                    .single(),
+                "Atualização do resumo do relatório",
+                3
+            );
+
+            const valorConfirmado=estoqueIDBNumero(atualizado?.valor_total);
+            if(Math.abs(valorConfirmado-valorEstoque)>0.001){
+                throw new Error(`O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`);
+            }
+        }else{
+            if(btn)btn.textContent="Criando importação...";
+            const {data:imp}=await estoqueIDBExecutarComRetry(
+                ()=>cliente.from("estoque_importacoes").insert({
+                    data_relatorio:pre.data_relatorio,
+                    nome_arquivo:pre.arquivo,
                     total_linhas:pre.linhas.length,
                     total_entradas:totalEntradas,
                     total_saidas:totalSaidas,
                     valor_total:valorEstoque,
-                    usuario,
-                    criado_em:new Date().toISOString()
-                })
-                .eq("id",importacaoId)
-                .select("id,valor_total,total_entradas,total_saidas,criado_em")
-                .single();
+                    usuario
+                }).select("id").single(),
+                "Criação do registro da importação",
+                3
+            );
 
-            if(erroAtualiza) throw erroAtualiza;
+            importacaoId=imp?.id;
+            criouNovaImportacao=true;
+            if(!importacaoId) throw new Error("O banco não retornou o ID da importação.");
 
-            const valorConfirmado=estoqueIDBNumero(atualizado?.valor_total);
-            if(Math.abs(valorConfirmado-valorEstoque)>0.001){
-                throw new Error(
-                    `O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`
-                );
-            }
-        }else{
-            const {data:imp,error:erroImp}=await cliente.from("estoque_importacoes").insert({
-                data_relatorio:pre.data_relatorio,
-                nome_arquivo:pre.arquivo,
-                total_linhas:pre.linhas.length,
-                total_entradas:totalEntradas,
-                total_saidas:totalSaidas,
-                valor_total:valorEstoque,
-                usuario
-            }).select("id").single();
-
-            if(erroImp)throw erroImp;
-            importacaoId=imp.id;
-
-            const {data:confirmacao,error:erroConfirma}=await cliente
-                .from("estoque_importacoes")
-                .select("id,valor_total")
-                .eq("id",importacaoId)
-                .single();
-            if(erroConfirma) throw erroConfirma;
+            const {data:confirmacao}=await estoqueIDBExecutarComRetry(
+                ()=>cliente.from("estoque_importacoes").select("id,valor_total").eq("id",importacaoId).single(),
+                "Confirmação do registro da importação",
+                3
+            );
 
             const valorConfirmado=estoqueIDBNumero(confirmacao?.valor_total);
             if(Math.abs(valorConfirmado-valorEstoque)>0.001){
-                throw new Error(
-                    `O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`
-                );
+                throw new Error(`O Supabase não confirmou o Valor de Estoque. Enviado: ${valorEstoque} | Retornado: ${valorConfirmado}`);
             }
         }
+
         if(!atualizandoExistente){
+            const dados=pre.linhas.map(r=>({
+                cor:r.cor||null,descricao:r.descricao||null,produto:r.produto||null,data_nf:r.data_nf||null,nf:r.nf||null,
+                emitente:r.emitente||null,destino:r.destino||null,serie_estoque:r.serie_estoque||null,nce:r.nce||null,
+                entradas:estoqueIDBNumero(r.entradas),saidas:estoqueIDBNumero(r.saidas),saldo_atual:r.saldo_atual,
+                data_relatorio:pre.data_relatorio,arquivo_origem:pre.arquivo,importacao_id:importacaoId
+            }));
+
+            // Lotes menores reduzem muito a chance de Failed to fetch em relatórios grandes.
+            const lote=100;
+            const totalLotes=Math.ceil(dados.length/lote);
             try{
-                const dados=pre.linhas.map(r=>({
-                    cor:r.cor||null,descricao:r.descricao||null,produto:r.produto||null,data_nf:r.data_nf||null,nf:r.nf||null,
-                    emitente:r.emitente||null,destino:r.destino||null,serie_estoque:r.serie_estoque||null,nce:r.nce||null,
-                    entradas:estoqueIDBNumero(r.entradas),saidas:estoqueIDBNumero(r.saidas),saldo_atual:r.saldo_atual,
-                    data_relatorio:pre.data_relatorio,arquivo_origem:pre.arquivo,importacao_id:importacaoId
-                }));
-                const lote=400;
                 for(let i=0;i<dados.length;i+=lote){
-                    const {error}=await cliente.from("estoque_movimentacoes").insert(dados.slice(i,i+lote));
-                    if(error)throw error;
+                    const n=Math.floor(i/lote)+1;
+                    if(btn)btn.textContent=`Gravando lote ${n}/${totalLotes}...`;
+                    const parte=dados.slice(i,i+lote);
+                    await estoqueIDBExecutarComRetry(
+                        ()=>cliente.from("estoque_movimentacoes").insert(parte),
+                        `Gravação do lote ${n}/${totalLotes}`,
+                        4
+                    );
+                    // pequena folga entre lotes para não saturar a conexão
+                    if(n<totalLotes) await new Promise(r=>setTimeout(r,120));
                 }
             }catch(erroLinhas){
-                await cliente.from("estoque_movimentacoes").delete().eq("importacao_id",importacaoId);
-                await cliente.from("estoque_importacoes").delete().eq("id",importacaoId);
+                if(btn)btn.textContent="Desfazendo importação incompleta...";
+                try{ await estoqueIDBExecutarComRetry(()=>cliente.from("estoque_movimentacoes").delete().eq("importacao_id",importacaoId),"Limpeza das movimentações incompletas",2); }catch(e){ console.warn(e); }
+                try{ await estoqueIDBExecutarComRetry(()=>cliente.from("estoque_importacoes").delete().eq("id",importacaoId),"Limpeza do cabeçalho incompleto",2); }catch(e){ console.warn(e); }
+                criouNovaImportacao=false;
                 throw erroLinhas;
             }
         }
 
+        if(btn)btn.textContent="Finalizando...";
         alert(
             atualizandoExistente
                 ? `Relatório já existente atualizado com sucesso!\n\nValor de estoque atualizado para ${valorEstoque.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}.`
@@ -35579,7 +35650,11 @@ async function confirmarImportacaoEstoqueIDB(){
         await atualizarPainelEstoqueIDB();
     }catch(error){
         console.error("Estoque IDB: falha na importação",error);
-        alert(`Não foi possível gravar o relatório no Supabase.\n\n${error?.message||error}`);
+        const detalhe=error?.message||String(error);
+        const dica=/failed to fetch|fetch failed|network|timeout|abort|connection|load failed/i.test(detalhe)
+            ? "\n\nA conexão com o banco caiu durante o envio. Esta versão já tenta novamente automaticamente e informa o lote exato caso volte a acontecer."
+            : "";
+        alert(`Não foi possível gravar o relatório no Supabase.\n\n${detalhe}${dica}`);
     }finally{
         if(btn){btn.disabled=false;btn.textContent="✓ Confirmar e gravar no Supabase";}
     }
