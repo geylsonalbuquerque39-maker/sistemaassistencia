@@ -36929,14 +36929,31 @@ function arrolMoeda(n){return Number(n||0).toLocaleString('pt-BR',{minimumFracti
 function arrolMsg(t,tipo=''){const e=document.getElementById('arrolMsg');if(!e)return;e.textContent=t;e.className='arrol-msg '+tipo;e.style.display=t?'block':'none'}
 function arrolNumerosTexto(v){return arrolTxt(v).split(/\s{2,}/).map(arrolNum).filter(n=>Number.isFinite(n)&&n!==0)}
 function arrolClassificar(g,h,i,saldo){
-  const gs=arrolTxt(g), partes=gs.split(/\s{2,}/).map(x=>arrolNum(x)).filter(n=>Number.isFinite(n));
-  if(partes.length>=2)return{conferido:partes[0]||0,falta:partes[1]||0,sobra:partes[2]||0};
-  const q=arrolNum(g), vlrFalta=arrolNum(h), valsI=arrolNumerosTexto(i);
-  if(!q)return{conferido:0,falta:0,sobra:0};
-  if(vlrFalta>0)return{conferido:0,falta:q,sobra:0};
-  if(q>saldo&&saldo>=0)return{conferido:saldo,falta:0,sobra:q-saldo};
-  if(valsI.length>=2)return{conferido:q,falta:0,sobra:0};
-  return{conferido:q,falta:0,sobra:0};
+  // CF17: H e I NÃO podem ser usados para decidir Conferido/Falta/Sobra.
+  // No GARROLA eles são campos financeiros de largura fixa e podem
+  // transbordar visualmente entre células. A quantidade vem de G.
+  const gs=arrolTxt(g);
+  const partes=gs.split(/\s{2,}/).map(x=>arrolNum(x)).filter(n=>Number.isFinite(n));
+
+  // Quando o próprio relatório trouxer mais de uma quantidade em G,
+  // respeitamos as posições: Conferido | Falta | Sobra.
+  if(partes.length>=2){
+    return{
+      conferido:Number(partes[0]||0),
+      falta:Number(partes[1]||0),
+      sobra:Number(partes[2]||0)
+    };
+  }
+
+  // Quando G contém somente uma quantidade, ela é CONFERIDO.
+  // A divergência é calculada comparando Conferido com Saldo Atual.
+  const conferido=gs?arrolNum(g):0;
+  const saldoNum=Number(saldo||0);
+  return{
+    conferido,
+    falta:Number(Math.max(saldoNum-conferido,0).toFixed(2)),
+    sobra:Number(Math.max(conferido-saldoNum,0).toFixed(2))
+  };
 }
 function arrolValoresFinanceiros(preco,saldo,div,h,i){
   // O relatório exporta H/I como texto de largura fixa e, em algumas linhas,
