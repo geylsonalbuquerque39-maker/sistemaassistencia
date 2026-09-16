@@ -37133,9 +37133,10 @@ function abrirComparativoArrolCF18(i){
 }
 function exportarRelacaoArrolCF23(i){
  const a=arrolHistoricoCF18[i];if(!a)return;if(typeof XLSX==='undefined'){alert('Biblioteca XLSX não carregada.');return}
- const itens=arrolRelacaoItensCF23(a),dados=itens.map(x=>({'N.C.E.':String(x.nce||''),'Descrição':x.descricao||'','Saldo Atual':Number(x.saldo_atual||0),'Conferido':Number(x.conferido||0),'Falta':Number(x.falta||0),'Sobra':Number(x.sobra||0),'Valor Falta':Number(x.valor_falta||0),'Valor Sobra':Number(x.valor_sobra||0)}));
- const totalF=itens.reduce((s,x)=>s+Number(x.valor_falta||0),0),totalS=itens.reduce((s,x)=>s+Number(x.valor_sobra||0),0);dados.push({'N.C.E.':'TOTAL','Descrição':'','Saldo Atual':'','Conferido':'','Falta':itens.reduce((s,x)=>s+Number(x.falta||0),0),'Sobra':itens.reduce((s,x)=>s+Number(x.sobra||0),0),'Valor Falta':totalF,'Valor Sobra':totalS});
- const ws=XLSX.utils.json_to_sheet(dados);ws['!cols']=[{wch:14},{wch:48},{wch:13},{wch:13},{wch:10},{wch:10},{wch:16},{wch:16}];
+ const gruposTxt=(typeof arrolGruposCF22==='function'?arrolGruposCF22(a.grupo):[]).join(', ')||'Grupo não informado';
+ const itens=arrolRelacaoItensCF23(a),dados=itens.map(x=>({'Grupo':gruposTxt,'N.C.E.':String(x.nce||''),'Descrição':x.descricao||'','Saldo Atual':Number(x.saldo_atual||0),'Conferido':Number(x.conferido||0),'Falta':Number(x.falta||0),'Sobra':Number(x.sobra||0),'Valor Falta':Number(x.valor_falta||0),'Valor Sobra':Number(x.valor_sobra||0)}));
+ const totalF=itens.reduce((s,x)=>s+Number(x.valor_falta||0),0),totalS=itens.reduce((s,x)=>s+Number(x.valor_sobra||0),0);dados.push({'Grupo':gruposTxt,'N.C.E.':'TOTAL','Descrição':'','Saldo Atual':'','Conferido':'','Falta':itens.reduce((s,x)=>s+Number(x.falta||0),0),'Sobra':itens.reduce((s,x)=>s+Number(x.sobra||0),0),'Valor Falta':totalF,'Valor Sobra':totalS});
+ const ws=XLSX.utils.json_to_sheet(dados);ws['!cols']=[{wch:28},{wch:14},{wch:48},{wch:13},{wch:13},{wch:10},{wch:10},{wch:16},{wch:16}];
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Faltas e Sobras');const data=String(a.data||'sem-data').slice(0,10),grupo=(a.grupo||'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,35);XLSX.writeFile(wb,`Arrolamento_${data}${grupo?'_'+grupo:''}_faltas_sobras.xlsx`);
 }
 </script>
