@@ -36989,9 +36989,69 @@ function arrolRender(){
  if(!itens.length){tb.innerHTML='<tr><td colspan="13" style="text-align:center;padding:28px;color:#789">Nenhum produto identificado.</td></tr>';return}
  tb.innerHTML=itens.map(x=>`<tr><td><b>${x.nce}</b></td><td>${x.descricao}</td><td>${x.cod_cor}</td><td>${x.cor}</td><td class="arrol-num">${arrolMoeda(x.preco_transferencia)}</td><td class="arrol-num">${x.saldo_atual}</td><td class="arrol-num"><span class="arrol-badge arrol-conf">${x.conferido}</span></td><td class="arrol-num"><span class="arrol-badge arrol-falta">${x.falta}</span></td><td class="arrol-num"><span class="arrol-badge arrol-sobra">${x.sobra}</span></td><td class="arrol-num">${arrolMoeda(x.valor_falta)}</td><td class="arrol-num">${arrolMoeda(x.valor_sobra)}</td><td class="arrol-num">${arrolMoeda(x.valor_saldo)}</td><td class="arrol-num">${arrolMoeda(x.valor_conferido)}</td></tr>`).join('');
 }
+/* CF20 — leitor fiel do relatório GARROLA exportado pelo NetTerm.
+   O Excel traz cada linha inteira em A. As colunas reais são posições fixas do texto. */
+function arrolDataDoRelatorioFixo(linhas){
+ const texto=linhas.slice(0,40).join('\n');
+ const mDia=texto.match(/Confronto\s+do\s+Dia\s*-\s*(\d{1,2})[.\/-](\d{1,2})(?:[.\/-](\d{2,4}))?/i);
+ if(!mDia)return null;
+ let ano=mDia[3];
+ if(!ano){const mAno=texto.match(/Em\s*:\s*\d{1,2}[.\/-]\d{1,2}[.\/-](\d{4})/i);ano=mAno?.[1]||String(new Date().getFullYear())}
+ if(String(ano).length===2)ano='20'+ano;
+ const d=String(mDia[1]).padStart(2,'0'),m=String(mDia[2]).padStart(2,'0');
+ return `${ano}-${m}-${d}`;
+}
+function arrolNumeroFixo(linha,inicio,fim){return arrolNum(linha.slice(inicio,fim))}
+function arrolParseRelatorioFixo(rows){
+ const linhas=rows.map(r=>String(r?.[0]??'').replace(/\u001b[^A-Za-z]*[A-Za-z]?/g,''));
+ const cab=linhas.find(x=>/N\.C\.E\./i.test(x)&&/Transferencia/i.test(x)&&/Conferido/i.test(x)&&/Vlr\s+Conferido/i.test(x));
+ if(!cab)return null;
+ const pos={
+  nce:cab.search(/N\.C\.E\./i),desc:cab.search(/Descricao/i),trans:cab.search(/Transferencia/i),saldo:cab.search(/\bSaldo\b/i),
+  conf:cab.search(/Conferido/i),falta:cab.search(/\bFalta\b/i),sobra:cab.search(/\bSobra\b/i),
+  vf:cab.search(/Vlr\s+Falta/i),vs:cab.search(/Vlr\s+Sobra/i),vSaldo:cab.search(/Vlr\s+Saldo/i),vConf:cab.search(/Vlr\s+Conferido/i)
+ };
+ if(Object.values(pos).some(v=>v<0))throw new Error('Cabeçalho do GARROLA foi encontrado, mas as posições das colunas estão incompletas.');
+ const itens=[];
+ for(const linha0 of linhas){
+  const linha=linha0.padEnd(Math.max(cab.length,220),' ');
+  const nce=(linha.slice(pos.nce,pos.desc).match(/\d{5,7}/)||[])[0];
+  if(!nce)continue;
+  const blocoProduto=linha.slice(pos.desc,pos.trans).trimEnd();
+  /* No bloco antes de Transferência, o código da cor é separado da descrição por vários espaços. */
+  let descricao=blocoProduto.trim(),cod_cor='',cor='';
+  const mc=blocoProduto.match(/^(.*?)\s{2,}(\d{1,5})\s+(.+?)\s*$/);
+  if(mc){descricao=mc[1].trim();cod_cor=mc[2].trim();cor=mc[3].trim()}
+  const preco=arrolNumeroFixo(linha,pos.trans,pos.saldo);
+  const saldo=arrolNumeroFixo(linha,pos.saldo,pos.conf);
+  /* AQUI está a correção principal: cada quantidade é lida pela posição física no relatório. */
+  const conferido=arrolNumeroFixo(linha,pos.conf,pos.falta);
+  const falta=arrolNumeroFixo(linha,pos.falta,pos.sobra);
+  const sobra=arrolNumeroFixo(linha,pos.sobra,pos.vf);
+  const valor_falta=arrolNumeroFixo(linha,pos.vf,pos.vs);
+  const valor_sobra=arrolNumeroFixo(linha,pos.vs,pos.vSaldo);
+  const valor_saldo=arrolNumeroFixo(linha,pos.vSaldo,pos.vConf);
+  const valor_conferido=arrolNum(linha.slice(pos.vConf));
+  itens.push({nce,descricao,cod_cor,cor,preco_transferencia:preco,saldo_atual:saldo,conferido,falta,sobra,valor_falta,valor_sobra,valor_saldo,valor_conferido});
+ }
+ return {itens,dataRelatorio:arrolDataDoRelatorioFixo(linhas)};
+}
 async function arrolArquivoSelecionado(input){
  const file=input?.files?.[0];if(!file)return;document.getElementById('arrolNomeArquivo').textContent=file.name;arrolMsg('Lendo relatório...');
- try{if(typeof XLSX==='undefined')throw new Error('Biblioteca XLSX não carregada.');const buf=await file.arrayBuffer();const wb=XLSX.read(buf,{type:'array',raw:true});const ws=wb.Sheets[wb.SheetNames[0]];const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});const itens=[];for(const r of rows){const x=arrolLinhaProduto(r);if(x)itens.push(x)}const dataEscolhida=document.getElementById('arrolDataRelatorio')?.value||new Date().toISOString().slice(0,10);arrolamentoIDBAtual={arquivo:file.name,itens,dataRelatorio:dataEscolhida,importacaoId:(crypto?.randomUUID?crypto.randomUUID():('arr-'+Date.now()+'-'+Math.random().toString(36).slice(2)))};arrolRender();arrolMsg(`${itens.length} produtos identificados. Conferido, Falta, Sobra e os quatro valores financeiros foram separados antes da gravação.`,'ok')}catch(e){console.error('[Arrolamento IDB leitura]',e);arrolamentoIDBAtual={arquivo:file.name,itens:[],dataRelatorio:null};arrolRender();arrolMsg('Não foi possível ler o relatório: '+(e?.message||e),'erro')}
+ try{
+  if(typeof XLSX==='undefined')throw new Error('Biblioteca XLSX não carregada.');
+  const buf=await file.arrayBuffer(),wb=XLSX.read(buf,{type:'array',raw:true}),ws=wb.Sheets[wb.SheetNames[0]];
+  const rows=XLSX.utils.sheet_to_json(ws,{header:1,raw:false,defval:''});
+  const fixo=arrolParseRelatorioFixo(rows);let itens=[],dataDetectada=null,modo='';
+  if(fixo&&fixo.itens.length){itens=fixo.itens;dataDetectada=fixo.dataRelatorio;modo='NetTerm por posição fixa'}
+  else{for(const r of rows){const x=arrolLinhaProduto(r);if(x)itens.push(x)}modo='planilha estruturada'}
+  const campoData=document.getElementById('arrolDataRelatorio');
+  if(dataDetectada&&campoData)campoData.value=dataDetectada;
+  const dataEscolhida=campoData?.value||dataDetectada||new Date().toISOString().slice(0,10);
+  arrolamentoIDBAtual={arquivo:file.name,itens,dataRelatorio:dataEscolhida,importacaoId:(crypto?.randomUUID?crypto.randomUUID():('arr-'+Date.now()+'-'+Math.random().toString(36).slice(2)))};
+  arrolRender();
+  arrolMsg(`${itens.length} produtos identificados (${modo}). Conferido, Falta e Sobra foram lidos pelas posições originais do relatório${dataDetectada?` e a data ${arrolDataBR(dataDetectada)} foi detectada automaticamente`:''}.`,'ok');
+ }catch(e){console.error('[Arrolamento IDB leitura]',e);arrolamentoIDBAtual={arquivo:file.name,itens:[],dataRelatorio:null};arrolRender();arrolMsg('Não foi possível ler o relatório: '+(e?.message||e),'erro')}
 }
 async function gravarArrolamentoIDB(){
  const itens=arrolamentoIDBAtual.itens||[];if(!itens.length)return;const dataInput=document.getElementById('arrolDataRelatorio');const dataEscolhida=dataInput?.value||arrolamentoIDBAtual.dataRelatorio;if(!dataEscolhida){arrolMsg('Informe a data do arrolamento antes de gravar.','erro');dataInput?.focus();return}arrolamentoIDBAtual.dataRelatorio=dataEscolhida;const btn=document.getElementById('arrolGravar');btn.disabled=true;btn.textContent='Gravando...';arrolMsg('Gravando no Supabase do Estoque IDB...');
