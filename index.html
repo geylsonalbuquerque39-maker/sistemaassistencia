@@ -16877,7 +16877,7 @@ async function coletarOS(){
             if(consultaDestino.error) throw consultaDestino.error;
 
             if(consultaDestino.data && consultaDestino.data.destino){
-                item.__coleta_destino=destinoFilialAtualizadoV25(origemPDV,consultaDestino.data.destino);
+                item.__coleta_destino=String(consultaDestino.data.destino).trim().toUpperCase();
             }
         }
 
@@ -16924,18 +16924,7 @@ async function coletarOS(){
     }finally{campo.disabled=false;focarCampoColeta();}
 }
 
-const FILIAIS_DESTINO_IMP_V25 = new Set(["ART","AUG","BUT","EPT","ITS","PNE","SBO","SPT","STN","PAM","TAQ"]);
-function destinoFilialAtualizadoV25(origem,destino){
-    const o=String(origem||"").trim().toUpperCase();
-    const d=String(destino||"").trim().toUpperCase();
-    if(FILIAIS_DESTINO_IMP_V25.has(o) || d==="ART") return "IMP";
-    return d;
-}
-function coletaDestino(i){
-    const origem=coletaTexto(i,["pdv","loja_origem","loja_de_origem"]).toUpperCase().trim();
-    const destino=coletaTexto(i,["__coleta_destino","destino","pdv_expedicao","pdv_destino"]);
-    return destinoFilialAtualizadoV25(origem,destino);
-}
+function coletaDestino(i){return coletaTexto(i,["__coleta_destino","destino","pdv_expedicao","pdv_destino"]);}
 function coletaLoja(i){return coletaTexto(i,["loja_origem","pdv","loja_de_origem"]);}
 function coletaCodCor(i){return coletaTexto(i,["__coleta_cod_cor","cod_cor","codigo_cor","codcor"]);}
 function coletaCubagem(i){return coletaTexto(i,["cubagem","m3","volume_m3"]);}
@@ -18212,7 +18201,7 @@ async function buscarItemColetaLote(os,supa){
         const origem=coletaTexto(item,["pdv"]).toUpperCase().trim();
         if(!coletaEhEnderecamento()&&origem){
             const d=await supa.from("destinos_filiais").select("destino").eq("origem",origem).maybeSingle();
-            if(!d.error&&d.data?.destino)item.__coleta_destino=destinoFilialAtualizadoV25(origem,d.data.destino);
+            if(!d.error&&d.data?.destino)item.__coleta_destino=String(d.data.destino).trim().toUpperCase();
         }
         const cor=coletaTexto(item,["cor"]).trim();
         if(cor){
