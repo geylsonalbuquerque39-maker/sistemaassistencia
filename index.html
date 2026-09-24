@@ -22195,6 +22195,13 @@ ERP.Export={
         const f=String(formato||"CSV").toUpperCase();
         const base=nomeSeguro(nome)+"_"+new Date().toISOString().slice(0,10);
 
+        if(f==="SHEETS" || f==="GOOGLE_SHEETS"){
+            if(typeof window.enviarRelacaoGoogleSheetsCF27!=="function"){alert("Integração com Google Sheets não carregada.");return}
+            const cabecalhos=cols.map(c=>c.label||c.titulo||c.key||c.campo);
+            const linhas=dados.map(r=>cols.map(c=>valor(r,c)));
+            return window.enviarRelacaoGoogleSheetsCF27({nomeAba:aba||nome,cabecalhos,linhas});
+        }
+
         if(f==="CSV"){
             const q=v=>'"'+texto(v).replace(/"/g,'""')+'"';
             const linhas=[cols.map(c=>q(c.label||c.titulo||c.key||c.campo)).join(";")];
@@ -28572,6 +28579,7 @@ function menuV109(type,idx){
       <button onclick="exportarBackendV109('${type}','CSV');this.closest('.erp-export-menu-v109').classList.remove('aberto')">CSV</button>
       <button onclick="exportarBackendV109('${type}','XLS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLS</button>
       <button onclick="exportarBackendV109('${type}','XLT');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLT</button>
+      <button onclick="exportarBackendV109('${type}','SHEETS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">Google Sheets</button>
     </div>
   </div>`;
 }
@@ -28687,6 +28695,7 @@ function menuExport110(type,idx){
       <button onclick="exportarBackendV109('${type}','CSV');this.closest('.erp-export-menu-v109').classList.remove('aberto')">CSV</button>
       <button onclick="exportarBackendV109('${type}','XLS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLS</button>
       <button onclick="exportarBackendV109('${type}','XLT');this.closest('.erp-export-menu-v109').classList.remove('aberto')">XLT</button>
+      <button onclick="exportarBackendV109('${type}','SHEETS');this.closest('.erp-export-menu-v109').classList.remove('aberto')">Google Sheets</button>
     </div>
   </div>`;
 }
@@ -28854,6 +28863,7 @@ function instalarBotaoConsulta110(){
       <button onclick="exportarConsultaFormato110('CSV')">CSV</button>
       <button onclick="exportarConsultaFormato110('XLS')">XLS</button>
       <button onclick="exportarConsultaFormato110('XLT')">XLT</button>
+      <button onclick="exportarConsultaFormato110('SHEETS')">Google Sheets</button>
     </div>`;
   btn.replaceWith(wrap);
 }
@@ -37128,7 +37138,7 @@ function abrirComparativoArrolCF18(i){
  document.querySelectorAll('.arrol-card-hist').forEach(el=>el.classList.toggle('ativo',Number(el.dataset.arr)===i));
  const itens=arrolRelacaoItensCF23(atual),qF=itens.reduce((s,x)=>s+Number(x.falta||0),0),qS=itens.reduce((s,x)=>s+Number(x.sobra||0),0),vF=itens.reduce((s,x)=>s+Number(x.valor_falta||0),0),vS=itens.reduce((s,x)=>s+Number(x.valor_sobra||0),0);
  const grupos=typeof arrolGruposCF22==='function'?arrolGruposCF22(atual.grupo):[];
- box.style.display='block';box.innerHTML=`<div class="arrol-rel-head"><div><h2 style="margin:0">Relação do Arrolamento — ${arrolDataBR(atual.data)}</h2><div style="color:#64748b;font-size:12px;margin-top:4px">${grupos.length?'Grupos: '+grupos.map(arrolEsc).join(', ')+' · ':''}${itens.length} N.C.E. com falta ou sobra</div></div><div class="arrol-rel-actions"><button type="button" class="arrol-export-btn" onclick="exportarRelacaoArrolCF23(${i})">⬇ Exportar Excel</button></div></div><div class="arrol-rel-resumo"><div class="arrol-rel-kpi"><small>Qtd. em falta</small><strong>${qF.toLocaleString('pt-BR')}</strong></div><div class="arrol-rel-kpi"><small>Valor em falta</small><strong>${arrolBRL(vF)}</strong></div><div class="arrol-rel-kpi"><small>Qtd. em sobra</small><strong>${qS.toLocaleString('pt-BR')}</strong></div><div class="arrol-rel-kpi"><small>Valor em sobra</small><strong>${arrolBRL(vS)}</strong></div></div><div class="arrol-rel-table-wrap"><table class="arrol-rel-table"><thead><tr><th>N.C.E.</th><th>Descrição</th><th>Saldo</th><th>Conferido</th><th>Falta</th><th>Sobra</th><th>Valor Falta</th><th>Valor Sobra</th></tr></thead><tbody>${itens.length?itens.map(x=>`<tr><td><b>${arrolEsc(x.nce)}</b></td><td>${arrolEsc(x.descricao)}</td><td>${Number(x.saldo_atual||0).toLocaleString('pt-BR')}</td><td>${Number(x.conferido||0).toLocaleString('pt-BR')}</td><td class="${Number(x.falta||0)?'arrol-rel-falta':'arrol-rel-zero'}">${Number(x.falta||0).toLocaleString('pt-BR')}</td><td class="${Number(x.sobra||0)?'arrol-rel-sobra':'arrol-rel-zero'}">${Number(x.sobra||0).toLocaleString('pt-BR')}</td><td>${arrolBRL(x.valor_falta)}</td><td>${arrolBRL(x.valor_sobra)}</td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:24px">Este arrolamento não possui N.C.E. com falta ou sobra.</td></tr>'}</tbody></table></div>`;
+ box.style.display='block';box.innerHTML=`<div class="arrol-rel-head"><div><h2 style="margin:0">Relação do Arrolamento — ${arrolDataBR(atual.data)}</h2><div style="color:#64748b;font-size:12px;margin-top:4px">${grupos.length?'Grupos: '+grupos.map(arrolEsc).join(', ')+' · ':''}${itens.length} N.C.E. com falta ou sobra</div></div><div class="arrol-rel-actions"><button type="button" class="arrol-export-btn" onclick="exportarRelacaoArrolCF23(${i})">⬇ Exportar Excel</button><button type="button" class="arrol-export-btn" onclick="enviarArrolGoogleSheetsCF27(${i})">☁ Google Sheets</button></div></div><div class="arrol-rel-resumo"><div class="arrol-rel-kpi"><small>Qtd. em falta</small><strong>${qF.toLocaleString('pt-BR')}</strong></div><div class="arrol-rel-kpi"><small>Valor em falta</small><strong>${arrolBRL(vF)}</strong></div><div class="arrol-rel-kpi"><small>Qtd. em sobra</small><strong>${qS.toLocaleString('pt-BR')}</strong></div><div class="arrol-rel-kpi"><small>Valor em sobra</small><strong>${arrolBRL(vS)}</strong></div></div><div class="arrol-rel-table-wrap"><table class="arrol-rel-table"><thead><tr><th>N.C.E.</th><th>Descrição</th><th>Saldo</th><th>Conferido</th><th>Falta</th><th>Sobra</th><th>Valor Falta</th><th>Valor Sobra</th></tr></thead><tbody>${itens.length?itens.map(x=>`<tr><td><b>${arrolEsc(x.nce)}</b></td><td>${arrolEsc(x.descricao)}</td><td>${Number(x.saldo_atual||0).toLocaleString('pt-BR')}</td><td>${Number(x.conferido||0).toLocaleString('pt-BR')}</td><td class="${Number(x.falta||0)?'arrol-rel-falta':'arrol-rel-zero'}">${Number(x.falta||0).toLocaleString('pt-BR')}</td><td class="${Number(x.sobra||0)?'arrol-rel-sobra':'arrol-rel-zero'}">${Number(x.sobra||0).toLocaleString('pt-BR')}</td><td>${arrolBRL(x.valor_falta)}</td><td>${arrolBRL(x.valor_sobra)}</td></tr>`).join(''):'<tr><td colspan="8" style="text-align:center;padding:24px">Este arrolamento não possui N.C.E. com falta ou sobra.</td></tr>'}</tbody></table></div>`;
  box.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function exportarRelacaoArrolCF23(i){
@@ -37140,7 +37150,61 @@ function exportarRelacaoArrolCF23(i){
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Faltas e Sobras');const data=String(a.data||'sem-data').slice(0,10),grupo=(a.grupo||'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,35);XLSX.writeFile(wb,`Arrolamento_${data}${grupo?'_'+grupo:''}_faltas_sobras.xlsx`);
 }
 </script>
-</body>
+\n<script id="cf27-google-sheets-integracao">
+(function(){
+"use strict";
+const GOOGLE_SHEETS_WEBAPP_CF27="https://script.google.com/macros/s/AKfycbxgpSI7M8P3x9BSfwGg0cPCQATCAcmAOiTxJUqIyFSrAQGmwbwgdavc5R-6Ncw6nVWH/exec";
+
+function nomeAbaCF27(nome){
+  const hoje=new Date().toLocaleDateString("pt-BR").replace(/\\//g,"-");
+  return (String(nome||"Exportação ERP").trim()+" - "+hoje).slice(0,95);
+}
+window.enviarRelacaoGoogleSheetsCF27=async function({nomeAba="Exportação ERP",cabecalhos=[],linhas=[]}={}){
+  if(!Array.isArray(cabecalhos)||!cabecalhos.length){alert("Não há colunas para enviar ao Google Sheets.");return}
+  if(!Array.isArray(linhas)||!linhas.length){alert("Não há dados para enviar ao Google Sheets.");return}
+  const payload={nomeAba:nomeAbaCF27(nomeAba),cabecalhos,linhas};
+  try{
+    await fetch(GOOGLE_SHEETS_WEBAPP_CF27,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
+    alert(`Relação enviada para o Google Sheets.\
+\
+Aba: ${payload.nomeAba}\
+Linhas: ${linhas.length}`);
+  }catch(e){
+    console.error("[CF27 GOOGLE SHEETS]",e);
+    alert("Não foi possível enviar para o Google Sheets: "+(e?.message||e));
+  }
+};
+
+window.enviarArrolGoogleSheetsCF27=function(i){
+  const a=window.arrolHistoricoCF18?.[i];
+  if(!a)return;
+  const gruposTxt=(typeof arrolGruposCF22==='function'?arrolGruposCF22(a.grupo):[]).join(', ')||'Grupo não informado';
+  const itens=typeof arrolRelacaoItensCF23==='function'?arrolRelacaoItensCF23(a):[];
+  if(!itens.length){alert('Não há N.C.E. com falta ou sobra para enviar.');return}
+  const cabecalhos=['Grupo','N.C.E.','Descrição','Saldo Atual','Conferido','Falta','Sobra','Valor Falta','Valor Sobra'];
+  const linhas=itens.map(x=>[gruposTxt,String(x.nce||''),x.descricao||'',Number(x.saldo_atual||0),Number(x.conferido||0),Number(x.falta||0),Number(x.sobra||0),Number(x.valor_falta||0),Number(x.valor_sobra||0)]);
+  linhas.push([gruposTxt,'TOTAL','','','',itens.reduce((s,x)=>s+Number(x.falta||0),0),itens.reduce((s,x)=>s+Number(x.sobra||0),0),itens.reduce((s,x)=>s+Number(x.valor_falta||0),0),itens.reduce((s,x)=>s+Number(x.valor_sobra||0),0)]);
+  const data=String(a.data||'sem-data').slice(0,10);
+  return window.enviarRelacaoGoogleSheetsCF27({nomeAba:`Arrolamento ${data} ${gruposTxt}`,cabecalhos,linhas});
+};
+
+// Adiciona Google Sheets aos menus de exportação padronizados que já existirem.
+function completarMenusCF27(){
+  document.querySelectorAll('.erp-export-menu-v109').forEach(menu=>{
+    if(menu.querySelector('[data-cf27-sheets]'))return;
+    const botoes=[...menu.querySelectorAll('button')];
+    const xlt=botoes.find(b=>/^XLT$/i.test((b.textContent||'').trim()));
+    if(!xlt)return;
+    const onclick=xlt.getAttribute('onclick')||'';
+    let novo=onclick.replace(/['\"]XLT['\"]/,'\'SHEETS\'');
+    if(novo===onclick)return;
+    const b=document.createElement('button');b.type='button';b.dataset.cf27Sheets='1';b.textContent='Google Sheets';b.setAttribute('onclick',novo);xlt.after(b);
+  });
+}
+document.addEventListener('DOMContentLoaded',()=>setTimeout(completarMenusCF27,2800),{once:true});
+setInterval(completarMenusCF27,4000);
+})();
+</script>\n</body>
 </html>
 
 <!-- V7.5.28: fotos e arquivos separados + editor de imagem com corte, giro e espelhamento -->
