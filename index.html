@@ -28547,7 +28547,7 @@ document.addEventListener("click",()=>{
 async function exportarBackendV109(type,formato){
   try{
     formato=String(formato||"CSV").toUpperCase();
-    if(!["CSV","XLS","XLT"].includes(formato))return;
+    if(!["CSV","XLS","XLT","SHEETS"].includes(formato))return;
 
     const d=await window.ERPBackendV100.api(`/relations/${encodeURIComponent(type)}?limit=1000&offset=0`);
     const lista=Array.isArray(d?.rows)?d.rows:[];
@@ -28963,6 +28963,7 @@ function menu111(tipo,uid,nome,aba,progress=false){
       <button onclick="exportar111('${tipo}','CSV','${nome}','${aba}',${progress});fecharMenus111?.()">📄 CSV</button>
       <button onclick="exportar111('${tipo}','XLS','${nome}','${aba}',${progress});fecharMenus111?.()">📊 Excel / LibreOffice (.xls)</button>
       <button onclick="exportar111('${tipo}','XLT','${nome}','${aba}',${progress});fecharMenus111?.()">📑 Modelo Excel (.xlt)</button>
+      <button onclick="exportar111('${tipo}','SHEETS','${nome}','${aba}',${progress});fecharMenus111?.()">☁ Google Sheets</button>
     </div>
   </div>`;
 }
@@ -34966,6 +34967,13 @@ function instalarPadraoExportV145(){
     if(pareceRelatorioOSV145(p.dados)){
       p.colunas=COLUNAS_OS_V145;
     }
+    if(String(p.formato||'').toUpperCase()==='SHEETS'){
+      const dados=Array.isArray(p.dados)?p.dados:[];
+      const cols=Array.isArray(p.colunas)&&p.colunas.length?p.colunas:(dados[0]?Object.keys(dados[0]).map(k=>({label:k,key:k})):[]);
+      const cabecalhos=cols.map(c=>String(c.label||c.key||''));
+      const linhas=dados.map(r=>cols.map(c=>{const v=r?.[c.key];return v===undefined||v===null?'':v;}));
+      return window.enviarRelacaoGoogleSheetsCF27({nomeAba:p.aba||p.nome||'Relação ERP',cabecalhos,linhas});
+    }
     return base(p);
   };
 
@@ -37150,7 +37158,7 @@ function exportarRelacaoArrolCF23(i){
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Faltas e Sobras');const data=String(a.data||'sem-data').slice(0,10),grupo=(a.grupo||'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,35);XLSX.writeFile(wb,`Arrolamento_${data}${grupo?'_'+grupo:''}_faltas_sobras.xlsx`);
 }
 </script>
-\n<script id="cf27-google-sheets-integracao">
+\n<script id="cf28-google-sheets-integracao">
 (function(){
 "use strict";
 const GOOGLE_SHEETS_WEBAPP_CF27="https://script.google.com/macros/s/AKfycbxgpSI7M8P3x9BSfwGg0cPCQATCAcmAOiTxJUqIyFSrAQGmwbwgdavc5R-6Ncw6nVWH/exec";
@@ -37176,7 +37184,7 @@ Linhas: ${linhas.length}`);
 };
 
 window.enviarArrolGoogleSheetsCF27=function(i){
-  const a=window.arrolHistoricoCF18?.[i];
+  const a=(typeof arrolHistoricoCF18!=='undefined'?arrolHistoricoCF18:window.arrolHistoricoCF18)?.[i];
   if(!a)return;
   const gruposTxt=(typeof arrolGruposCF22==='function'?arrolGruposCF22(a.grupo):[]).join(', ')||'Grupo não informado';
   const itens=typeof arrolRelacaoItensCF23==='function'?arrolRelacaoItensCF23(a):[];
@@ -37190,7 +37198,7 @@ window.enviarArrolGoogleSheetsCF27=function(i){
 
 // Adiciona Google Sheets aos menus de exportação padronizados que já existirem.
 function completarMenusCF27(){
-  document.querySelectorAll('.erp-export-menu-v109').forEach(menu=>{
+  document.querySelectorAll('.erp-export-menu-v109, .erp-native-export-menu-v111').forEach(menu=>{
     if(menu.querySelector('[data-cf27-sheets]'))return;
     const botoes=[...menu.querySelectorAll('button')];
     const xlt=botoes.find(b=>/^XLT$/i.test((b.textContent||'').trim()));
@@ -37201,8 +37209,10 @@ function completarMenusCF27(){
     const b=document.createElement('button');b.type='button';b.dataset.cf27Sheets='1';b.textContent='Google Sheets';b.setAttribute('onclick',novo);xlt.after(b);
   });
 }
-document.addEventListener('DOMContentLoaded',()=>setTimeout(completarMenusCF27,2800),{once:true});
-setInterval(completarMenusCF27,4000);
+document.addEventListener('DOMContentLoaded',()=>setTimeout(completarMenusCF27,500),{once:true});
+setTimeout(completarMenusCF27,100);
+setInterval(completarMenusCF27,1500);
+new MutationObserver(()=>completarMenusCF27()).observe(document.documentElement,{childList:true,subtree:true});
 })();
 </script>\n</body>
 </html>
