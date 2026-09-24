@@ -34971,7 +34971,17 @@ function instalarPadraoExportV145(){
       const dados=Array.isArray(p.dados)?p.dados:[];
       const cols=Array.isArray(p.colunas)&&p.colunas.length?p.colunas:(dados[0]?Object.keys(dados[0]).map(k=>({label:k,key:k})):[]);
       const cabecalhos=cols.map(c=>String(c.label||c.key||''));
-      const linhas=dados.map(r=>cols.map(c=>{const v=r?.[c.key];return v===undefined||v===null?'':v;}));
+      const linhas=dados.map(r=>cols.map(c=>{
+        let v='';
+        try{
+          if(typeof c.value==='function') v=c.value(r);
+          else {
+            const k=c.key||c.campo;
+            v=k?r?.[k]:'';
+          }
+        }catch(_){v='';}
+        return v===undefined||v===null?'':v;
+      }));
       return window.enviarRelacaoGoogleSheetsCF27({nomeAba:p.aba||p.nome||'Relação ERP',cabecalhos,linhas});
     }
     return base(p);
@@ -37167,16 +37177,34 @@ function nomeAbaCF27(nome){
   const hoje=new Date().toLocaleDateString("pt-BR").split("/").join("-");
   return (String(nome||"Exportação ERP").trim()+" - "+hoje).slice(0,95);
 }
+function valorSheetsCF31(v){
+  if(v===undefined||v===null)return "";
+  if(typeof v==="number")return Number.isFinite(v)?v:"";
+  if(typeof v==="boolean")return v;
+  if(v instanceof Date)return v.toISOString();
+  if(typeof v==="string")return v;
+  try{
+    if(Array.isArray(v))return v.map(x=>valorSheetsCF31(x)).join(" | ");
+    if(typeof v==="object")return JSON.stringify(v);
+  }catch(_){ }
+  return String(v);
+}
 window.enviarRelacaoGoogleSheetsCF27=async function({nomeAba="Exportação ERP",cabecalhos=[],linhas=[]}={}){
   if(!Array.isArray(cabecalhos)||!cabecalhos.length){alert("Não há colunas para enviar ao Google Sheets.");return}
   if(!Array.isArray(linhas)||!linhas.length){alert("Não há dados para enviar ao Google Sheets.");return}
-  const payload={nomeAba:nomeAbaCF27(nomeAba),cabecalhos,linhas};
+  /* CF31: o Sheets recebe exatamente as linhas preparadas pelo mesmo exportador do Excel,
+     mas todas as células são convertidas para valores aceitos pelo setValues do Apps Script. */
+  const linhasSeguras=linhas.map(l=>{
+    const a=Array.isArray(l)?l:[l];
+    return cabecalhos.map((_,i)=>valorSheetsCF31(a[i]));
+  });
+  const payload={nomeAba:nomeAbaCF27(nomeAba),cabecalhos:cabecalhos.map(valorSheetsCF31),linhas:linhasSeguras};
   try{
     await fetch(GOOGLE_SHEETS_WEBAPP_CF27,{method:"POST",mode:"no-cors",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify(payload)});
     alert(`Relação enviada para o Google Sheets.\
 \
 Aba: ${payload.nomeAba}\
-Linhas: ${linhas.length}`);
+Linhas: ${linhasSeguras.length}`);
   }catch(e){
     console.error("[CF27 GOOGLE SHEETS]",e);
     alert("Não foi possível enviar para o Google Sheets: "+(e?.message||e));
@@ -37214,7 +37242,11 @@ setTimeout(completarMenusCF27,100);
 setInterval(completarMenusCF27,1500);
 new MutationObserver(()=>completarMenusCF27()).observe(document.documentElement,{childList:true,subtree:true});
 })();
-</script>\n</body>
+</script>\n
+<script id="cf31-exportador-central-google-sheets">
+console.info("ERP CF31: Google Sheets usa as mesmas linhas do exportador central do Excel, com normalização de células para Apps Script.");
+</script>
+</body>
 </html>
 
 <!-- V7.5.28: fotos e arquivos separados + editor de imagem com corte, giro e espelhamento -->
