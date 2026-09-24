@@ -37164,7 +37164,7 @@ function exportarRelacaoArrolCF23(i){
 const GOOGLE_SHEETS_WEBAPP_CF27="https://script.google.com/macros/s/AKfycbxgpSI7M8P3x9BSfwGg0cPCQATCAcmAOiTxJUqIyFSrAQGmwbwgdavc5R-6Ncw6nVWH/exec";
 
 function nomeAbaCF27(nome){
-  const hoje=new Date().toLocaleDateString("pt-BR").replace(/\\//g,"-");
+  const hoje=new Date().toLocaleDateString("pt-BR").split("/").join("-");
   return (String(nome||"Exportação ERP").trim()+" - "+hoje).slice(0,95);
 }
 window.enviarRelacaoGoogleSheetsCF27=async function({nomeAba="Exportação ERP",cabecalhos=[],linhas=[]}={}){
