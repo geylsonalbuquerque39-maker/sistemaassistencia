@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Coleta Fotos">
-<link rel="manifest" href="./manifest.webmanifest?v=CF9">
+<link rel="manifest" href="./manifest.webmanifest?v=CF10">
 <link rel="apple-touch-icon" href="./apple-touch-icon.png">
 <title>ERP V10 — Coleta de Fotos</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,15 +22,16 @@
 .final-card{border:2px solid #bfd7f2;background:linear-gradient(135deg,#f7fbff,#fff)}
 .final-card .btn-finalizar{width:100%;min-height:56px;font-size:16px;background:linear-gradient(135deg,#0755ad,#0b75d8);color:#fff}
 .historico-lista{display:grid;gap:10px}.hist-card{border:1px solid #d8e4f0;border-radius:14px;padding:12px;background:#fff}.hist-top{display:flex;gap:10px;align-items:flex-start}.hist-title{font-weight:950;color:#074f9d}.hist-sub{font-size:11px;color:#718398;margin-top:3px}.hist-badge{margin-left:auto;background:#eef6ff;color:#0757ad;border-radius:999px;padding:6px 9px;font-size:10px;font-weight:900}.hist-actions{display:grid;grid-template-columns:1fr auto;gap:8px;margin-top:10px}.modal{position:fixed;inset:0;z-index:150;background:rgba(1,17,35,.72);display:none;align-items:flex-end;justify-content:center}.modal.show{display:flex}.modal-box{width:min(760px,100%);max-height:92dvh;overflow:auto;background:#f6f9fd;border-radius:22px 22px 0 0;padding:16px 14px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -20px 60px rgba(0,0,0,.25)}.modal-head{position:sticky;top:-16px;z-index:3;background:#f6f9fd;padding:8px 0 12px;display:flex;align-items:center;gap:10px}.modal-head h3{margin:0;font-size:17px}.modal-head .btn{margin-left:auto;min-height:40px}.hist-os{background:#fff;border:1px solid #d9e5f1;border-radius:15px;padding:12px;margin-bottom:10px}.hist-os h4{margin:0 0 8px;color:#074f9d;font-size:17px}.obs-grid{display:grid;gap:7px;font-size:12px}.obs-row{background:#f6f9fc;border-radius:9px;padding:8px}.obs-row b{display:block;font-size:9px;color:#718398;margin-bottom:2px}.hist-photos{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.hist-photos img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px;border:1px solid #d4dfeb}.hist-photo-empty{font-size:11px;color:#7b8ca0;padding:10px 0}.danger-link{border:0;background:transparent;color:#b42318;font-weight:800;padding:8px}.inicio-info{font-size:11px;color:#657a90;margin-top:8px}
+.thumb-wrap{position:relative;flex:0 0 auto}.thumb-wrap .thumb{display:block}.thumb-status{position:absolute;left:3px;right:3px;bottom:3px;border-radius:7px;background:rgba(7,26,51,.82);color:#fff;font-size:8px;font-weight:900;text-align:center;padding:3px 2px}.sync-note{margin-top:7px;font-size:10px;font-weight:800;color:#9a6700}.hist-badge.pending{background:#fff4d6;color:#8a5b00}
 </style>
 </head>
 <body>
 <header class="top"><div class="top-row"><div class="logo">📷</div><div><h1>Coleta de Fotos</h1><p>Fotos vinculadas diretamente à O.S. do ERP</p></div><span id="netDot" class="status-dot"></span></div></header>
 <main class="wrap">
-<section class="card hero"><div class="hero-title">Coleta rápida de O.S.</div><div class="hero-sub">Adicione a O.S. manualmente e tire quantas fotos precisar. Cada foto é enviada imediatamente para o mesmo banco de mídias usado pelo ERP Web.</div><div class="kpis"><div class="kpi"><strong id="kpiOS">0</strong><span>O.S. NA COLETA</span></div><div class="kpi"><strong id="kpiFotos">0</strong><span>FOTOS ENVIADAS</span></div><div class="kpi"><strong id="kpiPend">0</strong><span>PENDÊNCIAS</span></div></div></section>
+<section class="card hero"><div class="hero-title">Coleta rápida de O.S.</div><div class="hero-sub">Adicione a O.S. e tire as fotos mesmo sem internet. O app guarda tudo no aparelho e sincroniza automaticamente quando a conexão voltar.</div><div class="kpis"><div class="kpi"><strong id="kpiOS">0</strong><span>O.S. NA COLETA</span></div><div class="kpi"><strong id="kpiFotos">0</strong><span>FOTOS ENVIADAS</span></div><div class="kpi"><strong id="kpiPend">0</strong><span>FOTOS PENDENTES</span></div></div></section>
 <section class="card"><label class="label" for="osInput">Número da O.S.</label><div class="os-row"><input class="input" id="osInput" inputmode="numeric" autocomplete="off" placeholder="Ex.: 32541"><button class="btn btn-primary" id="addOS">Adicionar O.S.</button></div><div id="msg" class="msg"></div></section>
 <section class="card"><div class="section-head"><h2>O.S. desta coleta</h2><span id="countLabel" class="counter">0 O.S.</span></div><div id="lista"></div></section>
-<section class="card final-card"><button class="btn btn-finalizar" id="finalizar">✅ Finalizar coleta</button><div id="inicioInfo" class="inicio-info"></div><div class="tiny">Ao finalizar, a coleta é sincronizada com o Supabase e fica disponível também no ERP do computador.</div><button class="btn btn-secondary" id="novaColeta" style="width:100%">＋ Iniciar nova coleta vazia</button></section>
+<section class="card final-card"><button class="btn btn-finalizar" id="finalizar">✅ Finalizar coleta</button><div id="inicioInfo" class="inicio-info"></div><div class="tiny">Você pode finalizar mesmo offline. A coleta ficará aguardando e será sincronizada automaticamente quando a internet voltar.</div><button class="btn btn-secondary" id="novaColeta" style="width:100%">＋ Iniciar nova coleta vazia</button></section>
 <section class="card"><div class="section-head"><h2>Coletas finalizadas</h2><span id="histCount" class="counter">0 coleta(s)</span></div><div id="historico" class="historico-lista"></div></section>
 </main>
 <input id="cameraInput" class="hidden-input" type="file" accept="image/*" capture="environment">
@@ -43,190 +44,55 @@
 const CFG={url:'https://sjututwxmjbhprvdhekl.supabase.co',key:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNqdXR1dHd4bWpiaHBydmRoZWtsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYwMTU1MDIsImV4cCI6MjEwMTU5MTUwMn0.gczaOhKg227_nQbRRDrcDkEH59Swp9O-r8HY5od95q8',bucket:'midias-os',tabela:'midias_os'};
 const LS='ERP_COLETA_FOTOS_APP_CF8';
 const LS_HIST='ERP_COLETA_FOTOS_HIST_CF8';
-let db=null,osFotoAtual='';
+const IDB_NAME='ERP_COLETA_FOTOS_OFFLINE_CF11',IDB_STORE='fotos',IDB_VER=1;
+let db=null,osFotoAtual='',supabaseLoadPromise=null,syncEmAndamento=false;
 const $=id=>document.getElementById(id);
-function client(){
-  if(db)return db;
-  if(!window.supabase?.createClient)throw new Error('Biblioteca Supabase não carregada.');
-  // Mesmo padrão do app Controle Marceneiro: cliente Supabase persistente + fetch sem cache.
-  db=window.supabase.createClient(CFG.url,CFG.key,{
-    auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true},
-    global:{fetch:(url,options={})=>fetch(url,{...options,cache:'no-store'})}
-  });
-  return db;
-}
 function norm(v){return String(v??'').replace(/\D+/g,'').trim()}
 function load(){try{return JSON.parse(localStorage.getItem(LS)||'{"inicio":null,"itens":[]}')}catch{return {inicio:null,itens:[]}}}
-function save(s){localStorage.setItem(LS,JSON.stringify(s))}
+function save(x){localStorage.setItem(LS,JSON.stringify(x))}
 function histLoad(){try{const h=JSON.parse(localStorage.getItem(LS_HIST)||'[]');return Array.isArray(h)?h:[]}catch{return []}}
 function histSave(h){localStorage.setItem(LS_HIST,JSON.stringify(h.slice(0,100)))}
+function uid(){return crypto.randomUUID?crypto.randomUUID():'L'+Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function ensure(){const x=load();if(!x.inicio)x.inicio=new Date().toISOString();if(!x.localId)x.localId='COL-'+uid();if(!Array.isArray(x.itens))x.itens=[];save(x);return x}
 function fmtData(v){try{return new Date(v).toLocaleString('pt-BR')}catch{return String(v||'')}}
 function totalFotosColeta(c){return (c?.itens||[]).reduce((a,x)=>a+Number(x.fotos||0),0)}
-function ensure(){const s=load();if(!s.inicio)s.inicio=new Date().toISOString();if(!Array.isArray(s.itens))s.itens=[];save(s);return s}
-function msg(text,type='info'){const el=$('msg');el.textContent=text;el.className='msg show '+type;clearTimeout(el._t);el._t=setTimeout(()=>el.className='msg',4200)}
+function msg(text,type='info'){const el=$('msg');el.textContent=text;el.className='msg show '+type;clearTimeout(el._t);el._t=setTimeout(()=>el.className='msg',5000)}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function setBusy(on,title,sub){$('uploading').classList.toggle('show',!!on);if(title)$('uploadTitle').textContent=title;if(sub)$('uploadSub').textContent=sub}
-async function thumbsOS(os){try{const s=client();const q=await s.from(CFG.tabela).select('id,bucket,caminho_arquivo,criado_em,tipo_midia,origem').eq('os',String(os)).order('criado_em',{ascending:false}).limit(4);if(q.error)throw q.error;const rows=(q.data||[]).filter(r=>String(r.tipo_midia||'imagem').toLowerCase()==='imagem');const urls=[];for(const r of rows){if(!r.caminho_arquivo)continue;const sig=await s.storage.from(r.bucket||CFG.bucket).createSignedUrl(r.caminho_arquivo,1800);if(sig.data?.signedUrl)urls.push(sig.data.signedUrl)}return urls}catch(e){console.warn('thumbs',e);return []}}
-async function render(){const s=ensure();const totalFotos=s.itens.reduce((a,x)=>a+Number(x.fotos||0),0);$('inicioInfo').textContent='Coleta iniciada: '+fmtData(s.inicio);$('kpiOS').textContent=s.itens.length;$('kpiFotos').textContent=totalFotos;$('kpiPend').textContent='0';$('countLabel').textContent=s.itens.length+' O.S.';const box=$('lista');if(!s.itens.length){box.innerHTML='<div class="empty"><div class="ico">📸</div><strong>Nenhuma O.S. adicionada</strong><div style="font-size:12px;margin-top:5px">Digite a O.S. acima para começar.</div></div>';renderHistorico();return}box.innerHTML=s.itens.map(x=>`<article class="os-card" data-os="${esc(x.os)}"><div class="os-top"><div><div class="os-num">O.S. ${esc(x.os)}</div><div class="os-meta">Adicionada ${new Date(x.adicionada).toLocaleString('pt-BR')}</div></div><div class="pill">${Number(x.fotos||0)} foto(s)</div></div><div class="os-details"><label>LOJA<input data-field="loja" data-os="${esc(x.os)}" value="${esc(x.loja||'')}" placeholder="Informe a loja"></label><label>DEPRECIAÇÃO<select data-field="depreciacao" data-os="${esc(x.os)}"><option value="">Selecione</option>${[25,50,75,100].map(v=>`<option value="${v}%" ${x.depreciacao===v+'%'?'selected':''}>${v}%</option>`).join('')}</select></label><label>ACESSÓRIOS<input data-field="acessorios" data-os="${esc(x.os)}" value="${esc(x.acessorios||'')}" placeholder="Informe os acessórios"></label></div><div class="photo-grid" id="thumbs_${esc(x.os)}"></div><div class="os-actions"><button class="btn btn-success" data-camera="${esc(x.os)}">📷 Tirar foto</button><button class="btn btn-secondary" data-galeria="${esc(x.os)}" title="Escolher da galeria">＋</button></div></article>`).join('');box.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>abrirCamera(b.dataset.camera));box.querySelectorAll('[data-galeria]').forEach(b=>b.onclick=()=>abrirGaleria(b.dataset.galeria));box.querySelectorAll('[data-field]').forEach(inp=>inp.onchange=()=>{const st=ensure(),it=st.itens.find(z=>z.os===inp.dataset.os);if(it){it[inp.dataset.field]=inp.value.trim();save(st)}});for(const x of s.itens){thumbsOS(x.os).then(urls=>{const el=$('thumbs_'+x.os);if(!el)return;el.innerHTML=urls.map(u=>`<img class="thumb" src="${esc(u)}" alt="Foto da O.S. ${esc(x.os)}">`).join('')})}renderHistorico()}
-
-function renderHistorico(){const h=histLoad().sort((a,b)=>String(b.fim||'').localeCompare(String(a.fim||'')));$('histCount').textContent=h.length+' coleta(s)';const box=$('historico');if(!h.length){box.innerHTML='<div class="empty" style="padding:18px 8px"><strong>Nenhuma coleta finalizada ainda.</strong></div>';return}box.innerHTML=h.map(c=>`<article class="hist-card"><div class="hist-top"><div><div class="hist-title">Coleta ${esc(c.codigo||c.id||'')}</div><div class="hist-sub">${esc(fmtData(c.fim))} · ${(c.itens||[]).length} O.S.</div></div><div class="hist-badge">${totalFotosColeta(c)} foto(s)</div></div><div class="hist-actions"><button class="btn btn-secondary" data-open-hist="${esc(c.id)}">Abrir coleta</button><button class="danger-link" data-del-hist="${esc(c.id)}">Excluir</button></div></article>`).join('');box.querySelectorAll('[data-open-hist]').forEach(b=>b.onclick=()=>abrirHistorico(b.dataset.openHist));box.querySelectorAll('[data-del-hist]').forEach(b=>b.onclick=()=>excluirHistorico(b.dataset.delHist))}
-async function fotosHistoricoOS(os){try{const s=client();const q=await s.from(CFG.tabela).select('id,bucket,caminho_arquivo,nome_original,criado_em,tipo_midia').eq('os',String(os)).order('criado_em',{ascending:false}).limit(12);if(q.error)throw q.error;const urls=[];for(const r of (q.data||[])){const tipo=String(r.tipo_midia||'imagem').toLowerCase();if(tipo!=='imagem'||!r.caminho_arquivo)continue;const sig=await s.storage.from(r.bucket||CFG.bucket).createSignedUrl(r.caminho_arquivo,1800);if(sig.data?.signedUrl)urls.push({url:sig.data.signedUrl,nome:r.nome_original||'Foto'})}return urls}catch(e){console.warn('fotos historico',e);return []}}
-async function abrirHistorico(id){const c=histLoad().find(x=>String(x.id)===String(id));if(!c)return;$('histModalTitle').textContent='Coleta '+(c.codigo||c.id||'');const body=$('histModalBody');body.innerHTML=`<div class="card" style="margin-bottom:10px"><b>Início:</b> ${esc(fmtData(c.inicio))}<br><b>Finalizada:</b> ${esc(fmtData(c.fim))}<br><b>O.S.:</b> ${(c.itens||[]).length} · <b>Fotos enviadas:</b> ${totalFotosColeta(c)}</div>`+(c.itens||[]).map(x=>`<article class="hist-os"><h4>O.S. ${esc(x.os)}</h4><div class="obs-grid"><div class="obs-row"><b>LOJA</b>${esc(x.loja||'Não informado')}</div><div class="obs-row"><b>DEPRECIAÇÃO</b>${esc(x.depreciacao||'Não informado')}</div><div class="obs-row"><b>ACESSÓRIOS</b>${esc(x.acessorios||'Não informado')}</div><div class="obs-row"><b>FOTOS ENVIADAS NESTA COLETA</b>${Number(x.fotos||0)}</div></div><div class="hist-photos" id="histFotos_${esc(x.os)}"><div class="hist-photo-empty">Carregando fotos…</div></div></article>`).join('');$('histModal').classList.add('show');$('histModal').setAttribute('aria-hidden','false');for(const x of (c.itens||[])){const fotos=await fotosHistoricoOS(x.os),el=$('histFotos_'+x.os);if(el)el.innerHTML=fotos.length?fotos.map(f=>`<img src="${esc(f.url)}" alt="${esc(f.nome)}">`).join(''):'<div class="hist-photo-empty">Nenhuma foto disponível no Storage.</div>'}}
+function abrirIDB(){return new Promise((res,rej)=>{const r=indexedDB.open(IDB_NAME,IDB_VER);r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains(IDB_STORE)){const st=d.createObjectStore(IDB_STORE,{keyPath:'id'});st.createIndex('status','status');st.createIndex('coletaLocalId','coletaLocalId');st.createIndex('os','os')}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)})}
+async function idbPut(x){const d=await abrirIDB();return new Promise((res,rej)=>{const t=d.transaction(IDB_STORE,'readwrite');t.objectStore(IDB_STORE).put(x);t.oncomplete=()=>res(x);t.onerror=()=>rej(t.error)})}
+async function idbDelete(id){const d=await abrirIDB();return new Promise((res,rej)=>{const t=d.transaction(IDB_STORE,'readwrite');t.objectStore(IDB_STORE).delete(id);t.oncomplete=()=>res();t.onerror=()=>rej(t.error)})}
+async function idbAll(){const d=await abrirIDB();return new Promise((res,rej)=>{const r=d.transaction(IDB_STORE).objectStore(IDB_STORE).getAll();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>rej(r.error)})}
+async function pendentes(filtro={}){return (await idbAll()).filter(x=>x.status!=='enviada'&&(!filtro.os||x.os===filtro.os)&&(!filtro.coletaLocalId||x.coletaLocalId===filtro.coletaLocalId))}
+function carregarScriptSupabase(src,timeoutMs=9000){return new Promise((resolve,reject)=>{if(window.supabase?.createClient){resolve(true);return}const sc=document.createElement('script');sc.src=src;sc.async=true;sc.crossOrigin='anonymous';let acabou=false;const timer=setTimeout(()=>{if(acabou)return;acabou=true;sc.remove();reject(new Error('Tempo esgotado ao carregar Supabase.'))},timeoutMs);sc.onload=()=>{if(acabou)return;acabou=true;clearTimeout(timer);window.supabase?.createClient?resolve(true):reject(new Error('Biblioteca carregou sem inicializar.'))};sc.onerror=()=>{if(acabou)return;acabou=true;clearTimeout(timer);sc.remove();reject(new Error('Falha ao carregar biblioteca.'))};document.head.appendChild(sc)})}
+async function garantirSupabase(){if(window.supabase?.createClient)return true;if(!navigator.onLine)throw new Error('Sem internet.');if(supabaseLoadPromise)return supabaseLoadPromise;supabaseLoadPromise=(async()=>{let ultimo;for(let rodada=0;rodada<2;rodada++)for(const src of ['https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2','https://unpkg.com/@supabase/supabase-js@2'])try{await carregarScriptSupabase(src);if(window.supabase?.createClient)return true}catch(e){ultimo=e}throw new Error('Não foi possível carregar a conexão com o Supabase.'+(ultimo?.message?' '+ultimo.message:''))})().finally(()=>supabaseLoadPromise=null);return supabaseLoadPromise}
+function client(){if(db)return db;if(!window.supabase?.createClient)throw new Error('Conexão Supabase ainda não está pronta.');db=window.supabase.createClient(CFG.url,CFG.key,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true},global:{fetch:(url,o={})=>fetch(url,{...o,cache:'no-store'})}});return db}
+async function optimizeImage(file){try{let imageSource,sourceWidth,sourceHeight,cleanup=()=>{};try{const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});imageSource=bitmap;sourceWidth=bitmap.width;sourceHeight=bitmap.height;cleanup=()=>bitmap.close?.()}catch(_){const u=URL.createObjectURL(file);const im=await new Promise((res,rej)=>{const e=new Image();e.onload=()=>res(e);e.onerror=()=>rej(new Error('Formato de imagem não reconhecido.'));e.src=u});imageSource=im;sourceWidth=im.naturalWidth;sourceHeight=im.naturalHeight;cleanup=()=>URL.revokeObjectURL(u)}const maxSide=1600,scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight)),width=Math.max(1,Math.round(sourceWidth*scale)),height=Math.max(1,Math.round(sourceHeight*scale));const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,width,height);ctx.drawImage(imageSource,0,0,width,height);cleanup();const blob=await new Promise(r=>canvas.toBlob(r,'image/jpeg',.82));if(!blob)throw new Error('Não foi possível otimizar a imagem.');return {blob,contentType:'image/jpeg',extension:'jpg',width,height}}catch(e){if(file.size>6*1024*1024)throw new Error('Esta imagem não pôde ser otimizada. Escolha uma foto menor que 6 MB.');return {blob:file,contentType:file.type||'image/jpeg',extension:(file.name.split('.').pop()||'jpg').replace(/[^a-z0-9]/gi,''),width:null,height:null}}}
+async function guardarFotoOffline(file,os){const atual=ensure();const opt=await optimizeImage(file);const rec={id:'F-'+uid(),coletaLocalId:atual.localId,os:String(os),blob:opt.blob,contentType:opt.contentType,extension:opt.extension,width:opt.width,height:opt.height,nomeOriginal:file.name||`${os}.jpg`,tamanhoOriginal:file.size,criadoEm:new Date().toISOString(),status:'pendente',tentativas:0};await idbPut(rec);return rec}
+async function atualizarContagemDepoisUpload(rec,path){let atual=load();if(atual.localId===rec.coletaLocalId){const it=atual.itens.find(x=>x.os===rec.os);if(it){it.fotos=Number(it.fotos||0)+1;if(!Array.isArray(it.midia_paths))it.midia_paths=[];if(!it.midia_paths.includes(path))it.midia_paths.push(path);save(atual);return}}const h=histLoad();const c=h.find(x=>x.localId===rec.coletaLocalId);if(c){const it=(c.itens||[]).find(x=>x.os===rec.os);if(it){it.fotos=Number(it.fotos||0)+1;if(!Array.isArray(it.midia_paths))it.midia_paths=[];if(!it.midia_paths.includes(path))it.midia_paths.push(path);histSave(h)}}}
+async function uploadRegistro(rec){await garantirSupabase();const s=client(),uuid=uid(),path=`principal/${rec.os}/${uuid}.${rec.extension||'jpg'}`;const up=await s.storage.from(CFG.bucket).upload(path,rec.blob,{cacheControl:'31536000',contentType:rec.contentType||'image/jpeg',upsert:false});if(up.error)throw new Error('Storage: '+up.error.message);const atual=load(),hist=histLoad(),coleta=atual.localId===rec.coletaLocalId?atual:hist.find(x=>x.localId===rec.coletaLocalId),meta=(coleta?.itens||[]).find(x=>x.os===rec.os)||{};const detalhes=[meta.loja&&`Loja: ${meta.loja}`,meta.depreciacao&&`Depreciação: ${meta.depreciacao}`,meta.acessorios&&`Acessórios: ${meta.acessorios}`].filter(Boolean).join(' | ');const ins=await s.from(CFG.tabela).insert({os:rec.os,origem:'principal',tipo_midia:'imagem',categoria:'Outros',descricao:'Foto enviada pelo aplicativo de coleta'+(detalhes?' — '+detalhes:''),bucket:CFG.bucket,caminho_arquivo:path,nome_original:rec.nomeOriginal,nome_armazenado:`${rec.os}-${Date.now()}.${rec.extension||'jpg'}`,tipo_arquivo:rec.contentType,extensao:rec.extension,tamanho_original_bytes:rec.tamanhoOriginal,tamanho_bytes:rec.blob.size,largura:rec.width,altura:rec.height,usuario_nome:null,usuario_id:null});if(ins.error){try{await s.storage.from(CFG.bucket).remove([path])}catch(_){}throw new Error('Banco midias_os: '+ins.error.message)}await atualizarContagemDepoisUpload(rec,path);await idbDelete(rec.id)}
+async function sincronizarPendentes(silencioso=false){if(syncEmAndamento||!navigator.onLine)return;syncEmAndamento=true;try{const lista=await pendentes();if(lista.length&&!silencioso)setBusy(true,'Sincronizando fotos…',`${lista.length} pendente(s)`);for(let i=0;i<lista.length;i++){try{if(!silencioso)setBusy(true,`Enviando ${i+1} de ${lista.length}`,`O.S. ${lista[i].os}`);await uploadRegistro(lista[i])}catch(e){lista[i].tentativas=Number(lista[i].tentativas||0)+1;lista[i].ultimoErro=String(e.message||e);await idbPut(lista[i]);if(!navigator.onLine)break;console.warn('sync foto',e)}}}finally{syncEmAndamento=false;setBusy(false);await sincronizarColetasFinalizadas();await render()}}
+async function fotosPendentesOS(os,coletaLocalId){return (await pendentes({os:String(os)})).filter(x=>!coletaLocalId||x.coletaLocalId===coletaLocalId)}
+async function thumbsOS(os,coletaLocalId){const out=[];for(const p of await fotosPendentesOS(os,coletaLocalId))out.push({url:URL.createObjectURL(p.blob),status:'Pendente',local:true});if(navigator.onLine)try{await garantirSupabase();const q=await client().from(CFG.tabela).select('bucket,caminho_arquivo,tipo_midia').eq('os',String(os)).order('criado_em',{ascending:false}).limit(4);for(const r of (q.data||[])){if(!r.caminho_arquivo)continue;const sig=await client().storage.from(r.bucket||CFG.bucket).createSignedUrl(r.caminho_arquivo,1800);if(sig.data?.signedUrl)out.push({url:sig.data.signedUrl,status:'Enviada'})}}catch(e){console.warn('thumbs remoto',e)}return out.slice(0,8)}
+async function render(){const s=ensure(),pend=await pendentes(),pendAtual=pend.filter(x=>x.coletaLocalId===s.localId).length;$('inicioInfo').textContent='Coleta iniciada: '+fmtData(s.inicio)+(navigator.onLine?'':' · OFFLINE');$('kpiOS').textContent=s.itens.length;$('kpiFotos').textContent=totalFotosColeta(s);$('kpiPend').textContent=pend.length;$('countLabel').textContent=s.itens.length+' O.S.';const box=$('lista');if(!s.itens.length)box.innerHTML='<div class="empty"><div class="ico">📸</div><strong>Nenhuma O.S. adicionada</strong><div style="font-size:12px;margin-top:5px">Digite a O.S. acima para começar.</div></div>';else{box.innerHTML=s.itens.map(x=>`<article class="os-card"><div class="os-top"><div><div class="os-num">O.S. ${esc(x.os)}</div><div class="os-meta">Adicionada ${new Date(x.adicionada).toLocaleString('pt-BR')}</div></div><div class="pill">${Number(x.fotos||0)} enviada(s)</div></div><div class="os-details"><label>LOJA<input data-field="loja" data-os="${esc(x.os)}" value="${esc(x.loja||'')}"></label><label>DEPRECIAÇÃO<select data-field="depreciacao" data-os="${esc(x.os)}"><option value="">Selecione</option>${[25,50,75,100].map(v=>`<option value="${v}%" ${x.depreciacao===v+'%'?'selected':''}>${v}%</option>`).join('')}</select></label><label>ACESSÓRIOS<input data-field="acessorios" data-os="${esc(x.os)}" value="${esc(x.acessorios||'')}"></label></div><div class="photo-grid" id="thumbs_${esc(x.os)}"></div><div class="os-actions"><button class="btn btn-success" data-camera="${esc(x.os)}">📷 Tirar foto</button><button class="btn btn-secondary" data-galeria="${esc(x.os)}">＋</button></div></article>`).join('');box.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>abrirCamera(b.dataset.camera));box.querySelectorAll('[data-galeria]').forEach(b=>b.onclick=()=>abrirGaleria(b.dataset.galeria));box.querySelectorAll('[data-field]').forEach(inp=>inp.onchange=()=>{const st=ensure(),it=st.itens.find(z=>z.os===inp.dataset.os);if(it){it[inp.dataset.field]=inp.value.trim();save(st)}});for(const x of s.itens)thumbsOS(x.os,s.localId).then(urls=>{const el=$('thumbs_'+x.os);if(el)el.innerHTML=urls.map(u=>`<div class="thumb-wrap"><img class="thumb" src="${esc(u.url)}"><span class="thumb-status">${esc(u.status)}</span></div>`).join('')})}renderHistorico()}
+function renderHistorico(){const h=histLoad().sort((a,b)=>String(b.fim||'').localeCompare(String(a.fim||'')));$('histCount').textContent=h.length+' coleta(s)';const box=$('historico');if(!h.length){box.innerHTML='<div class="empty" style="padding:18px 8px"><strong>Nenhuma coleta finalizada ainda.</strong></div>';return}box.innerHTML=h.map(c=>`<article class="hist-card"><div class="hist-top"><div><div class="hist-title">Coleta ${esc(c.codigo||c.id||'')}</div><div class="hist-sub">${esc(fmtData(c.fim))} · ${(c.itens||[]).length} O.S.${c.sincronizada?'':' · aguardando sincronização'}</div></div><div class="hist-badge ${c.sincronizada?'':'pending'}">${c.sincronizada?'Sincronizada':'Pendente'}</div></div><div class="hist-actions"><button class="btn btn-secondary" data-open-hist="${esc(c.id)}">Abrir coleta</button><button class="danger-link" data-del-hist="${esc(c.id)}">Excluir</button></div></article>`).join('');box.querySelectorAll('[data-open-hist]').forEach(b=>b.onclick=()=>abrirHistorico(b.dataset.openHist));box.querySelectorAll('[data-del-hist]').forEach(b=>b.onclick=()=>excluirHistorico(b.dataset.delHist))}
+async function fotosHistoricoOS(os,localId){const loc=await fotosPendentesOS(os,localId),out=loc.map(x=>({url:URL.createObjectURL(x.blob),nome:'Foto pendente'}));if(navigator.onLine)try{await garantirSupabase();const q=await client().from(CFG.tabela).select('bucket,caminho_arquivo,nome_original,tipo_midia').eq('os',String(os)).order('criado_em',{ascending:false}).limit(12);for(const r of q.data||[]){if(!r.caminho_arquivo)continue;const sig=await client().storage.from(r.bucket||CFG.bucket).createSignedUrl(r.caminho_arquivo,1800);if(sig.data?.signedUrl)out.push({url:sig.data.signedUrl,nome:r.nome_original||'Foto'})}}catch(_){}return out}
+async function abrirHistorico(id){const c=histLoad().find(x=>String(x.id)===String(id));if(!c)return;$('histModalTitle').textContent='Coleta '+(c.codigo||c.id||'');const body=$('histModalBody');body.innerHTML=`<div class="card"><b>Início:</b> ${esc(fmtData(c.inicio))}<br><b>Finalizada:</b> ${esc(fmtData(c.fim))}<br><b>Status:</b> ${c.sincronizada?'Sincronizada':'Aguardando internet/sincronização'}</div>`+(c.itens||[]).map(x=>`<article class="hist-os"><h4>O.S. ${esc(x.os)}</h4><div class="obs-grid"><div class="obs-row"><b>LOJA</b>${esc(x.loja||'Não informado')}</div><div class="obs-row"><b>DEPRECIAÇÃO</b>${esc(x.depreciacao||'Não informado')}</div><div class="obs-row"><b>ACESSÓRIOS</b>${esc(x.acessorios||'Não informado')}</div><div class="obs-row"><b>FOTOS ENVIADAS</b>${Number(x.fotos||0)}</div></div><div class="hist-photos" id="histFotos_${esc(x.os)}"><div class="hist-photo-empty">Carregando fotos…</div></div></article>`).join('');$('histModal').classList.add('show');$('histModal').setAttribute('aria-hidden','false');for(const x of c.itens||[]){const fotos=await fotosHistoricoOS(x.os,c.localId),el=$('histFotos_'+x.os);if(el)el.innerHTML=fotos.length?fotos.map(f=>`<img src="${esc(f.url)}" alt="${esc(f.nome)}">`).join(''):'<div class="hist-photo-empty">Nenhuma foto disponível.</div>'}}
 function fecharHistorico(){$('histModal').classList.remove('show');$('histModal').setAttribute('aria-hidden','true');$('histModalBody').innerHTML=''}
-function excluirHistorico(id){if(!confirm('Excluir este registro do histórico deste aparelho? As fotos da O.S. NÃO serão apagadas.'))return;histSave(histLoad().filter(x=>String(x.id)!==String(id)));renderHistorico()}
-function addOS(){const os=norm($('osInput').value);if(!os){msg('Informe o número da O.S.','err');return}const s=ensure();let item=s.itens.find(x=>x.os===os);if(!item){item={os,adicionada:new Date().toISOString(),fotos:0,loja:'',depreciacao:'',acessorios:''};s.itens.unshift(item);save(s);msg('O.S. '+os+' adicionada.','ok')}else msg('Essa O.S. já está na coleta.','info');$('osInput').value='';$('osInput').focus();render()}
-function abrirCamera(os){osFotoAtual=norm(os);$('cameraInput').value='';$('cameraInput').click()}
-function abrirGaleria(os){osFotoAtual=norm(os);$('galeriaInput').value='';$('galeriaInput').click()}
-async function dimensoes(file){return new Promise(resolve=>{try{const url=URL.createObjectURL(file),im=new Image();im.onload=()=>{const d={largura:im.naturalWidth||null,altura:im.naturalHeight||null};URL.revokeObjectURL(url);resolve(d)};im.onerror=()=>{URL.revokeObjectURL(url);resolve({largura:null,altura:null})};im.src=url}catch{resolve({largura:null,altura:null})}})}
-async function optimizeImage(file){
-  // Cópia do mesmo fluxo usado no Controle Marceneiro.
-  try{
-    let imageSource,sourceWidth,sourceHeight,cleanup=()=>{};
-    try{
-      const bitmap=await createImageBitmap(file,{imageOrientation:'from-image'});
-      imageSource=bitmap;sourceWidth=bitmap.width;sourceHeight=bitmap.height;
-      cleanup=()=>bitmap.close?.();
-    }catch(_){
-      const objectUrl=URL.createObjectURL(file);
-      const image=await new Promise((resolve,reject)=>{
-        const element=new Image();
-        element.onload=()=>resolve(element);
-        element.onerror=()=>reject(new Error('Formato de imagem não reconhecido.'));
-        element.src=objectUrl;
-      });
-      imageSource=image;sourceWidth=image.naturalWidth;sourceHeight=image.naturalHeight;
-      cleanup=()=>URL.revokeObjectURL(objectUrl);
-    }
-    const maxSide=1600;
-    const scale=Math.min(1,maxSide/Math.max(sourceWidth,sourceHeight));
-    const width=Math.max(1,Math.round(sourceWidth*scale));
-    const height=Math.max(1,Math.round(sourceHeight*scale));
-    const canvas=document.createElement('canvas');canvas.width=width;canvas.height=height;
-    const context=canvas.getContext('2d');context.fillStyle='#ffffff';context.fillRect(0,0,width,height);context.drawImage(imageSource,0,0,width,height);
-    cleanup();
-    const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.82));
-    if(!blob)throw new Error('Não foi possível otimizar a imagem.');
-    return {blob,contentType:'image/jpeg',extension:'jpg',width,height};
-  }catch(error){
-    if(file.size>6*1024*1024)throw new Error('Esta imagem não pôde ser otimizada. Escolha uma foto menor que 6 MB.');
-    const extension=(file.name.split('.').pop()||'jpg').toLowerCase().replace(/[^a-z0-9]/g,'')||'jpg';
-    return {blob:file,contentType:file.type||'image/jpeg',extension,width:null,height:null};
-  }
-}
-async function removerStorage(path){try{await client().storage.from(CFG.bucket).remove([path])}catch(_){} }
-async function enviar(file,os){
-  if(!navigator.onLine)throw new Error('Sem internet. Conecte-se antes de enviar.');
-  const s=client(),original=file;
-  setBusy(true,'Otimizando foto…',`O.S. ${os}`);
-  const optimized=await optimizeImage(file);
-  const uuid=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2));
-  const nomeOriginal=original.name||`${os}.jpg`;
-  const nomeArmazenado=`${os}-${Date.now()}.${optimized.extension}`;
-  const path=`principal/${os}/${uuid}.${optimized.extension}`;
-
-  setBusy(true,'Enviando foto…',`O.S. ${os} · Supabase Storage`);
-  let up;
-  try{
-    up=await s.storage.from(CFG.bucket).upload(path,optimized.blob,{
-      cacheControl:'31536000',contentType:optimized.contentType,upsert:false
-    });
-  }catch(e){
-    throw new Error('Storage: '+(e?.message||String(e)));
-  }
-  if(up?.error)throw new Error('Storage: '+up.error.message);
-
-  const st0=ensure(),meta=st0.itens.find(x=>x.os===os)||{};
-  const detalhes=[meta.loja&&`Loja: ${meta.loja}`,meta.depreciacao&&`Depreciação: ${meta.depreciacao}`,meta.acessorios&&`Acessórios: ${meta.acessorios}`].filter(Boolean).join(' | ');
-  const payload={
-    os:String(os),origem:'principal',tipo_midia:'imagem',categoria:'Outros',
-    descricao:'Foto enviada pelo aplicativo de coleta'+(detalhes?' — '+detalhes:''),
-    bucket:CFG.bucket,caminho_arquivo:path,nome_original:nomeOriginal,nome_armazenado:nomeArmazenado,
-    tipo_arquivo:optimized.contentType,extensao:optimized.extension,
-    tamanho_original_bytes:original.size,tamanho_bytes:optimized.blob.size,
-    largura:optimized.width,altura:optimized.height,usuario_nome:null,usuario_id:null
-  };
-  const ins=await s.from(CFG.tabela).insert(payload);
-  if(ins.error){await removerStorage(path);throw new Error('Banco midias_os: '+ins.error.message)}
-
-  const st=ensure(),item=st.itens.find(x=>x.os===os);
-  if(item){item.fotos=Number(item.fotos||0)+1;item.ultimaFoto=new Date().toISOString();if(!Array.isArray(item.midia_paths))item.midia_paths=[];item.midia_paths.push(path);save(st)}
-}
-async function processFiles(files){if(!osFotoAtual)return;const arr=[...files];if(!arr.length)return;try{for(let i=0;i<arr.length;i++){setBusy(true,`Enviando ${i+1} de ${arr.length}`,`O.S. ${osFotoAtual}`);await enviar(arr[i],osFotoAtual)}setBusy(false);msg(`${arr.length} foto(s) salva(s) na O.S. ${osFotoAtual}.`,'ok');await render()}catch(e){setBusy(false);console.error(e);msg('Erro ao enviar: '+(e.message||e),'err');alert('Não foi possível enviar a foto.\n\n'+(e.message||e)+'\n\nA foto não foi contabilizada como enviada.')}}
-$('addOS').onclick=addOS;
-$('osInput').addEventListener('keydown',e=>{if(e.key==='Enter')addOS()});
-$('cameraInput').addEventListener('change',e=>processFiles(e.target.files));
-$('galeriaInput').addEventListener('change',e=>processFiles(e.target.files));
-$('histModalClose').onclick=fecharHistorico;
-$('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))fecharHistorico()});
-$('novaColeta').onclick=()=>{const atual=ensure();if(atual.itens.length&&!confirm('Existe uma coleta em andamento. Iniciar outra vai limpar a lista atual sem salvar no histórico. Continuar?'))return;save({inicio:new Date().toISOString(),itens:[]});render();msg('Nova coleta iniciada.','ok')};
-async function salvarColetaNoSupabase(coleta){
-  const s=client();
-  const payload={
-    codigo:coleta.codigo,
-    inicio:coleta.inicio,
-    fim:coleta.fim,
-    total_os:(coleta.itens||[]).length,
-    total_fotos:totalFotosColeta(coleta),
-    itens:coleta.itens||[],
-    dispositivo:'mobile',
-    versao_app:'CF9'
-  };
-  const {data,error}=await s.from('coletas_mobile').insert(payload).select('id').single();
-  if(error)throw new Error('Sincronização da coleta: '+error.message);
-  return data?.id||null;
-}
-
-async function carregarHistoricoRemoto(){
-  try{
-    const {data,error}=await client().from('coletas_mobile').select('*').order('fim',{ascending:false}).limit(100);
-    if(error)throw error;
-    const remoto=(data||[]).map(r=>({id:r.id,codigo:r.codigo,inicio:r.inicio,fim:r.fim,itens:Array.isArray(r.itens)?r.itens:[],sincronizada:true}));
-    const local=histLoad();
-    const mapa=new Map();
-    [...remoto,...local].forEach(c=>mapa.set(String(c.id||c.codigo),c));
-    histSave([...mapa.values()].sort((a,b)=>new Date(b.fim||0)-new Date(a.fim||0)).slice(0,100));
-    renderHistorico();
-  }catch(e){console.warn('[CF9] histórico remoto indisponível',e)}
-}
-
-$('finalizar').onclick=async()=>{
-  const atual=ensure();
-  if(!atual.itens.length){msg('Adicione pelo menos uma O.S. antes de finalizar.','err');return}
-  if(!confirm(`Finalizar esta coleta com ${atual.itens.length} O.S. e ${totalFotosColeta(atual)} foto(s) enviada(s)?`))return;
-  const btn=$('finalizar'); btn.disabled=true; btn.textContent='⏳ Sincronizando coleta…';
-  const fim=new Date().toISOString();
-  const codigo=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-  const coleta={id:'CF-'+Date.now().toString(36),codigo,inicio:atual.inicio,fim,itens:JSON.parse(JSON.stringify(atual.itens))};
-  try{
-    const idRemoto=await salvarColetaNoSupabase(coleta);
-    if(idRemoto)coleta.id=idRemoto;
-    coleta.sincronizada=true;
-    const h=histLoad();h.unshift(coleta);histSave(h);
-    save({inicio:new Date().toISOString(),itens:[]});
-    await render();
-    msg('Coleta finalizada e sincronizada com o ERP do computador.','ok');
-  }catch(e){
-    console.error(e);
-    msg('Não foi possível sincronizar a coleta: '+(e.message||e),'err');
-  }finally{btn.disabled=false;btn.textContent='✅ Finalizar coleta'}
-};
-function net(){ $('netDot').classList.toggle('off',!navigator.onLine)}window.addEventListener('online',net);window.addEventListener('offline',net);net();render();
-async function limparPW2eRegistrarCF8(){
-  if(!('serviceWorker' in navigator))return;
-  try{
-    const regs=await navigator.serviceWorker.getRegistrations();
-    let removeuAntigo=false;
-    for(const reg of regs){
-      const script=reg.active?.scriptURL||reg.waiting?.scriptURL||reg.installing?.scriptURL||'';
-      const ehCF8=script.includes('/mobile/sw.js')&&script.includes('CF8');
-      if(!ehCF8){try{await reg.unregister();removeuAntigo=true}catch(_){}}
-    }
-    try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!=='erp-v10-coleta-fotos-cf9').map(k=>caches.delete(k)))}catch(_){ }
-    await navigator.serviceWorker.register('./sw.js?v=CF9',{scope:'./'});
-    if(removeuAntigo&&!sessionStorage.getItem('CF8_SW_LIMPO')){sessionStorage.setItem('CF8_SW_LIMPO','1');setTimeout(()=>location.replace('./?v=CF9&clean=1'),250)}
-  }catch(e){console.warn('Limpeza/registro SW CF8:',e)}
-}
-window.addEventListener('load',limparPW2eRegistrarCF8);
+function excluirHistorico(id){if(!confirm('Excluir este registro do histórico deste aparelho?'))return;histSave(histLoad().filter(x=>String(x.id)!==String(id)));renderHistorico()}
+function addOS(){const os=norm($('osInput').value);if(!os){msg('Informe o número da O.S.','err');return}const s=ensure();if(!s.itens.find(x=>x.os===os)){s.itens.unshift({os,adicionada:new Date().toISOString(),fotos:0,loja:'',depreciacao:'',acessorios:''});save(s);msg('O.S. '+os+' adicionada.','ok')}else msg('Essa O.S. já está na coleta.','info');$('osInput').value='';$('osInput').focus();render()}
+function abrirCamera(os){osFotoAtual=norm(os);$('cameraInput').value='';$('cameraInput').click()}function abrirGaleria(os){osFotoAtual=norm(os);$('galeriaInput').value='';$('galeriaInput').click()}
+async function processFiles(files){if(!osFotoAtual)return;const arr=[...files];if(!arr.length)return;try{setBusy(true,'Salvando no aparelho…',`O.S. ${osFotoAtual}`);for(let i=0;i<arr.length;i++)await guardarFotoOffline(arr[i],osFotoAtual);setBusy(false);msg(`${arr.length} foto(s) guardada(s) com segurança no aparelho.${navigator.onLine?' Sincronizando…':' Será enviada quando a internet voltar.'}`,'ok');await render();if(navigator.onLine)sincronizarPendentes(true)}catch(e){setBusy(false);console.error(e);alert('Não foi possível guardar a foto no aparelho.\n\n'+(e.message||e))}}
+async function salvarColetaNoSupabase(coleta){await garantirSupabase();const {data,error}=await client().from('coletas_mobile').insert({codigo:coleta.codigo,inicio:coleta.inicio,fim:coleta.fim,total_os:(coleta.itens||[]).length,total_fotos:totalFotosColeta(coleta),itens:coleta.itens||[],dispositivo:'mobile',versao_app:'CF11'}).select('id').single();if(error)throw new Error('Sincronização da coleta: '+error.message);return data?.id||null}
+async function sincronizarColetasFinalizadas(){if(!navigator.onLine)return;const h=histLoad();let mudou=false;for(const c of h){if(c.sincronizada)continue;if((await pendentes({coletaLocalId:c.localId})).length)continue;try{const id=await salvarColetaNoSupabase(c);if(id)c.id=id;c.sincronizada=true;c.sincronizadaEm=new Date().toISOString();mudou=true}catch(e){console.warn('sync coleta',e)}}if(mudou)histSave(h)}
+async function carregarHistoricoRemoto(){if(!navigator.onLine)return;try{await garantirSupabase();const {data,error}=await client().from('coletas_mobile').select('*').order('fim',{ascending:false}).limit(100);if(error)throw error;const remoto=(data||[]).map(r=>({id:r.id,codigo:r.codigo,inicio:r.inicio,fim:r.fim,itens:Array.isArray(r.itens)?r.itens:[],sincronizada:true}));const local=histLoad(),mapa=new Map();[...remoto,...local].forEach(c=>mapa.set(String(c.localId||c.id||c.codigo),c));histSave([...mapa.values()].sort((a,b)=>new Date(b.fim||0)-new Date(a.fim||0)).slice(0,100));renderHistorico()}catch(e){console.warn('histórico remoto indisponível',e)}}
+$('addOS').onclick=addOS;$('osInput').addEventListener('keydown',e=>{if(e.key==='Enter')addOS()});$('cameraInput').addEventListener('change',e=>processFiles(e.target.files));$('galeriaInput').addEventListener('change',e=>processFiles(e.target.files));$('histModalClose').onclick=fecharHistorico;$('histModal').addEventListener('click',e=>{if(e.target===$('histModal'))fecharHistorico()});
+$('novaColeta').onclick=()=>{const atual=ensure();if(atual.itens.length&&!confirm('Existe uma coleta em andamento. Iniciar outra vai limpar a lista atual. Fotos pendentes já capturadas continuarão guardadas para sincronização. Continuar?'))return;save({localId:'COL-'+uid(),inicio:new Date().toISOString(),itens:[]});render();msg('Nova coleta iniciada.','ok')};
+$('finalizar').onclick=async()=>{const atual=ensure();if(!atual.itens.length){msg('Adicione pelo menos uma O.S. antes de finalizar.','err');return}const qtdPend=(await pendentes({coletaLocalId:atual.localId})).length;if(!confirm(`Finalizar esta coleta com ${atual.itens.length} O.S.?${qtdPend?` ${qtdPend} foto(s) ficarão aguardando sincronização.`:''}`))return;const fim=new Date().toISOString(),codigo=new Date().toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}),coleta={id:'CF-'+Date.now().toString(36),localId:atual.localId,codigo,inicio:atual.inicio,fim,itens:JSON.parse(JSON.stringify(atual.itens)),sincronizada:false};const h=histLoad();h.unshift(coleta);histSave(h);save({localId:'COL-'+uid(),inicio:new Date().toISOString(),itens:[]});await render();msg(qtdPend||!navigator.onLine?'Coleta finalizada. Ela será sincronizada automaticamente quando a internet estiver disponível.':'Coleta finalizada. Sincronizando…','ok');if(navigator.onLine)sincronizarPendentes(true)};
+function net(){$('netDot').classList.toggle('off',!navigator.onLine)}
+window.addEventListener('online',()=>{net();msg('Internet voltou. Sincronizando fotos e coletas pendentes…','info');sincronizarPendentes(true)});window.addEventListener('offline',()=>{net();msg('Sem internet. Continue coletando: as fotos ficarão salvas no aparelho.','info')});net();render().then(()=>{if(navigator.onLine)sincronizarPendentes(true)});
+async function registrarSW(){if(!('serviceWorker' in navigator))return;try{const keys=await caches.keys();await Promise.all(keys.filter(k=>k!=='erp-v10-coleta-fotos-cf11').map(k=>caches.delete(k)));await navigator.serviceWorker.register('./sw.js?v=CF11',{scope:'./'})}catch(e){console.warn('SW CF11',e)}}
+window.addEventListener('load',registrarSW);
 })();
 </script>
 </body></html>
