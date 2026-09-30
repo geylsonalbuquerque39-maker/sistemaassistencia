@@ -17186,10 +17186,51 @@ async function finalizarColeta(){
         const supa=obterSupabaseClient();
         const usuario=typeof usuarioLogado!=="undefined"?usuarioLogado:null;
 
+        // CF33: antes de finalizar, sincroniza TODOS os itens da coleta no banco.
+        // Isso evita finalizar apenas o cabeçalho quando o salvamento em tempo real falhar.
+        const itensParaSalvar=coletaOSItens.map((item,indice)=>({
+            coleta_id:id,
+            ordem:indice+1,
+            os:coletaTexto(item,["os","OS"]),
+            dt_geracao:coletaTexto(item,["dt_geracao","data_os"]),
+            destino:coletaDestino(item),
+            pdv:coletaLoja(item),
+            alm:coletaTexto(item,["alm"]),
+            grupo:coletaTexto(item,["grupo","grup"]),
+            nce:coletaTexto(item,["nce"]),
+            desc_produto:coletaTexto(item,["desc_produto","descricao_produto"]),
+            cod_cor:coletaCodCor(item),
+            cor:coletaTexto(item,["cor"]),
+            n_serie:coletaTexto(item,["n_serie","numero_serie"]),
+            rack:coletaRack(item),
+            status_os:coletaTexto(item,["status","status_da_os"]),
+            valor:String(coletaValor(item)||""),
+            cubagem:String(coletaCubagem(item)||""),
+            dados:item
+        }));
+
+        coletaMensagem("Salvando "+itensParaSalvar.length+" O.S. no histórico...","");
+
+        // Substitui somente os itens da coleta ATUAL. Coletas antigas não são tocadas.
+        const {error:erroLimpar}=await supa.from("coleta_os_itens").delete().eq("coleta_id",id);
+        if(erroLimpar)throw new Error("Não foi possível preparar os itens da coleta: "+erroLimpar.message);
+
+        const {error:erroSalvarItens}=await supa.from("coleta_os_itens").insert(itensParaSalvar);
+        if(erroSalvarItens)throw new Error("Não foi possível salvar as O.S. da coleta: "+erroSalvarItens.message);
+
+        const {count:itensConfirmados,error:erroConferencia}=await supa
+            .from("coleta_os_itens")
+            .select("id",{count:"exact",head:true})
+            .eq("coleta_id",id);
+        if(erroConferencia)throw new Error("Não foi possível conferir os itens salvos: "+erroConferencia.message);
+        if(Number(itensConfirmados)!==itensParaSalvar.length){
+            throw new Error("A coleta não foi finalizada: o ERP tentou salvar "+itensParaSalvar.length+" O.S., mas confirmou "+Number(itensConfirmados||0)+" no banco.");
+        }
+
         const {error}=await supa.from("coletas_os").update({
             status:"finalizada",
             finalizado_em:new Date().toISOString(),
-            quantidade:coletaOSItens.length,
+            quantidade:itensParaSalvar.length,
             ultima_os:coletaUltimaOS||null,
             ultima_atividade_em:new Date().toISOString(),
             editor_id:usuario?.id||null,
@@ -19268,7 +19309,7 @@ async function abrirDetalheColetaSupabase(id){
         renderizarDetalheColetaHistorico();
         if(!coletaHistoricoItensAtual.length && Number(coleta.quantidade||0)>0){
             const corpo=document.getElementById("coletaHistDetalheCorpo");
-            if(corpo) corpo.innerHTML='<tr><td colspan="'+colunasColetaHistorico().length+'" style="padding:18px;color:#b45309;font-weight:800">Esta coleta informa '+Number(coleta.quantidade||0)+' O.S., mas os itens não estão visíveis no banco. Execute o SQL CF32 de leitura do histórico no Supabase e abra a relação novamente.</td></tr>';
+            if(corpo) corpo.innerHTML='<tr><td colspan="'+colunasColetaHistorico().length+'" style="padding:18px;color:#b45309;font-weight:800">Esta coleta informa '+Number(coleta.quantidade||0)+' O.S., mas os itens não estão visíveis no banco. Os itens detalhados desta coleta antiga não foram gravados. As novas coletas usam o salvamento corrigido do CF33.</td></tr>';
         }
     }catch(e){
         document.getElementById("coletaHistDetalheCorpo").innerHTML=
