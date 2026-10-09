@@ -6702,7 +6702,7 @@ html.dark #intelModal .intel-modal-box,
                 <input class="coleta-filtro" id="coletaFiltroBusca" placeholder="Pesquisar na coleta..." oninput="renderizarColeta()">
                 <select class="coleta-filtro" id="coletaFiltroDestino" onchange="renderizarColeta()"><option value="">Todos os destinos</option></select>
                 <select class="coleta-filtro" id="coletaFiltroStatus" onchange="renderizarColeta()"><option value="">Todos os status</option></select>
-                <select class="coleta-filtro" id="coletaFiltroSituacaoMercadoria" onchange="renderizarColeta()"><option value="">Todas as situações — Sit. da mercadoria</option></select>
+                <select class="coleta-filtro" id="coletaFiltroSituacaoMercadoria" onchange="renderizarColeta()"><option value="">Todos os Status da O.S.</option></select>
                 <select class="coleta-filtro" id="coletaFiltroRack" onchange="renderizarColeta()"><option value="">Todos os racks</option></select>
             </div>
 
@@ -6717,7 +6717,7 @@ html.dark #intelModal .intel-modal-box,
             <div class="coleta-tabela-wrap">
                 <table class="coleta-tabela" id="coletaTabela">
                     <thead><tr>
-                        <th>#</th><th>O.S.</th><th>Data da O.S.</th><th id="coletaThDestino">Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Sit. da mercadoria</th><th>Valor</th><th>Ação</th>
+                        <th>#</th><th>O.S.</th><th>Data da O.S.</th><th id="coletaThDestino">Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Status da O.S.</th><th>Valor</th><th>Ação</th>
                     </tr></thead>
                     <tbody id="coletaTabelaCorpo"><tr><td colspan="17" class="coleta-vazio">Nenhuma O.S. coletada.</td></tr></tbody>
                 </table>
@@ -16838,7 +16838,7 @@ function montarCabecalhoColeta(){
     const thead=document.querySelector("#coletaTabela thead");
     if(!thead)return;
     const destino=coletaEhEnderecamento()?"":"<th>Destino</th>";
-    thead.innerHTML="<tr><th>#</th><th class=\"col-os\">O.S.</th><th>Data da O.S.</th>"+destino+"<th class=\"col-loja\">Loja de Origem</th><th>ALM</th><th class=\"col-grupo\">GRUPO</th><th class=\"col-nce\">N.C.E.</th><th class=\"col-produto\">Descrição do produto</th><th class=\"col-codcor\">Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th class=\"col-rack\">Rack</th><th>Status</th><th>Sit. da mercadoria</th><th>Valor</th><th>Ação</th></tr>";
+    thead.innerHTML="<tr><th>#</th><th class=\"col-os\">O.S.</th><th>Data da O.S.</th>"+destino+"<th class=\"col-loja\">Loja de Origem</th><th>ALM</th><th class=\"col-grupo\">GRUPO</th><th class=\"col-nce\">N.C.E.</th><th class=\"col-produto\">Descrição do produto</th><th class=\"col-codcor\">Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th class=\"col-rack\">Rack</th><th>Status</th><th>Status da O.S.</th><th>Valor</th><th>Ação</th></tr>";
 }
 
 async function coletarOS(){
@@ -16930,7 +16930,7 @@ function coletaLoja(i){return coletaTexto(i,["loja_origem","pdv","loja_de_origem
 function coletaCodCor(i){return coletaTexto(i,["__coleta_cod_cor","cod_cor","codigo_cor","codcor"]);}
 function coletaCubagem(i){return coletaTexto(i,["cubagem","m3","volume_m3"]);}
 function coletaValor(i){return coletaTexto(i,["valor_transf","valor","valor_transferencia"]);}
-function coletaSituacaoMercadoria(i){return coletaTexto(i,["sit_mercadoria","Sit. da mercadoria","sit. da mercadoria","sit_da_mercadoria","sit_mercadoria_desc","sit_mercadoria_texto","situacao_mercadoria","situacao_da_mercadoria","situacaoMercadoria","situação da mercadoria","situação_mercadoria","situacao","sit","status_mercadoria","status_produto","sit_merc","sitmercadoria"]);}
+function coletaStatusOS(i){return coletaTexto(i,["status_da_os","STATUS DA OS","STATUS DA O.S.","Status da O.S","status da o.s","status_os","statusOS","situacao_os","situacao_da_os"]);}
 
 function atualizarColetaKPIs(){
     const total=coletaOSItens.length;
@@ -16946,7 +16946,7 @@ function preencherSelectColeta(id,lista,rotulo){const el=document.getElementById
 function atualizarFiltrosColeta(){
     preencherSelectColeta("coletaFiltroDestino",valoresUnicos(coletaDestino),"Todos os destinos");
     preencherSelectColeta("coletaFiltroStatus",valoresUnicos(i=>coletaTexto(i,["status","status_da_os"])),"Todos os status");
-    preencherSelectColeta("coletaFiltroSituacaoMercadoria",valoresUnicos(coletaSituacaoMercadoria),"Todas as situações — Sit. da mercadoria");
+    preencherSelectColeta("coletaFiltroSituacaoMercadoria",valoresUnicos(coletaStatusOS),"Todos os Status da O.S.");
     preencherSelectColeta("coletaFiltroRack",valoresUnicos(coletaRack),"Todos os racks");
 }
 
@@ -16955,7 +16955,7 @@ function itensColetaFiltrados(){
     const dest=coletaEhEnderecamento()?"":(document.getElementById("coletaFiltroDestino")?.value||""), status=document.getElementById("coletaFiltroStatus")?.value||"", situacaoMercadoria=document.getElementById("coletaFiltroSituacaoMercadoria")?.value||"", rack=document.getElementById("coletaFiltroRack")?.value||"";
     return coletaOSItens.filter(i=>{
         const hay=Object.values(i).join(" ").toLowerCase();
-        return (!busca||hay.includes(busca))&&(!dest||coletaDestino(i)===dest)&&(!status||coletaTexto(i,["status","status_da_os"])===status)&&(!situacaoMercadoria||coletaSituacaoMercadoria(i)===situacaoMercadoria)&&(!rack||coletaRack(i)===rack);
+        return (!busca||hay.includes(busca))&&(!dest||coletaDestino(i)===dest)&&(!status||coletaTexto(i,["status","status_da_os"])===status)&&(!situacaoMercadoria||coletaStatusOS(i)===situacaoMercadoria)&&(!rack||coletaRack(i)===rack);
     });
 }
 
@@ -17108,7 +17108,7 @@ function renderizarColeta(novoId){
         const serieCampo=manual?input("n_serie",coletaTexto(i,["n_serie","numero_serie"])):coletaEsc(coletaTexto(i,["n_serie","numero_serie"]));
         const rackCampo=manual&&!coletaEhEnderecamento()?input("__coleta_rack",coletaRack(i)):rack;
         const statusCampo=manual?input("status",coletaTexto(i,["status","status_da_os"])):coletaEsc(coletaTexto(i,["status","status_da_os"]));
-        const situacaoMercadoriaCampo=manual?input("sit_mercadoria",coletaSituacaoMercadoria(i)):coletaEsc(coletaSituacaoMercadoria(i));
+        const situacaoMercadoriaCampo=manual?input("status_da_os",coletaStatusOS(i)):coletaEsc(coletaStatusOS(i));
         const valorCampo=manual?input("valor_transf",coletaTexto(i,["valor_transf","valor"])):coletaEsc(val?coletaMoeda(val):"");
         const classeLinha=manual?(cls?cls.replace(' class="',' class="coleta-nao-encontrada '):' class="coleta-nao-encontrada"'):cls;
 
