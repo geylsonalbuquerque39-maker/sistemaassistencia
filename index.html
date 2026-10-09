@@ -6580,6 +6580,7 @@ html.dark #intelModal .intel-modal-box,
                 <div id="coletaHistDetalheInfo"></div>
                 <div class="coleta-hist-modal-acoes">
                     <button class="coleta-btn sec" type="button" onclick="exportarColetaHistoricoAtual()">⇩ Exportar arquivo ▾</button>
+                    <button class="coleta-btn" type="button" onclick="exportarColetaHistoricoGoogleSheetsCF40()">▦ Google Sheets</button>
                     <button class="coleta-btn" type="button" onclick="imprimirColetaHistoricoAtual()">🖨 Imprimir</button>
                 </div>
                 <div class="coletas-hist-detalhe-wrap">
@@ -6606,6 +6607,7 @@ html.dark #intelModal .intel-modal-box,
                     <button class="coleta-btn green" type="button" onclick="novoRascunhoAba()">＋ Nova aba</button>
                     <button class="coleta-btn" type="button" onclick="duplicarRascunhoAba()">⧉ Duplicar aba</button>
                     <button class="coleta-btn sec" type="button" onclick="exportarRascunhoCSV()">⇩ Exportar arquivo ▾</button>
+                    <button class="coleta-btn" type="button" onclick="exportarRascunhoGoogleSheetsCF40()">▦ Google Sheets</button>
                     <button class="coleta-btn red" type="button" onclick="excluirRascunhoAba()">🗑 Excluir aba</button>
                 </div>
             </div>
@@ -37251,7 +37253,48 @@ function exportarRelacaoArrolCF23(i){
  const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Faltas e Sobras');const data=String(a.data||'sem-data').slice(0,10),grupo=(a.grupo||'').replace(/[^a-zA-Z0-9_-]+/g,'_').slice(0,35);XLSX.writeFile(wb,`Arrolamento_${data}${grupo?'_'+grupo:''}_faltas_sobras.xlsx`);
 }
 </script>
-\n<script id="cf28-google-sheets-integracao">
+\n<script id="cf40-google-sheets-todas-coletas">
+async function enviarLinhasColetaSheetsCF40(nomeAba,cabecalhos,linhas){
+  if(typeof window.enviarRelacaoGoogleSheetsCF27!=="function"){
+    alert("Integração com Google Sheets não carregada. Atualize a página e tente novamente.");return;
+  }
+  if(!linhas||!linhas.length){alert("Não há linhas para enviar ao Google Sheets.");return;}
+  return window.enviarRelacaoGoogleSheetsCF27({nomeAba,cabecalhos,linhas});
+}
+async function exportarColetaHistoricoGoogleSheetsCF40(){
+  if(!window.coletaHistoricoAtual||!Array.isArray(window.coletaHistoricoItensAtual)||!window.coletaHistoricoItensAtual.length){
+    if(typeof coletaHistoricoAtual==="undefined"||!coletaHistoricoAtual||!Array.isArray(coletaHistoricoItensAtual)||!coletaHistoricoItensAtual.length){alert("Abra uma coleta do histórico com itens antes de exportar.");return;}
+  }
+  const cols=colunasColetaHistorico();
+  const linhas=coletaHistoricoItensAtual.map(item=>cols.map(c=>item[c[0]]??""));
+  const id=coletaHistoricoAtual?.id||"historico";
+  const tipo=coletaHistoricoAtual?.tipo||"coleta";
+  const data=new Date().toLocaleDateString("pt-BR").split("/").join("-");
+  return enviarLinhasColetaSheetsCF40(("Coleta Histórico "+id+" "+tipo+" "+data).slice(0,95),cols.map(c=>c[1]),linhas);
+}
+async function exportarRascunhoGoogleSheetsCF40(){
+  const aba=typeof rascunhoAtivo==="function"?rascunhoAtivo():null;
+  const itens=aba?.itens||[];
+  if(!aba||!itens.length){if(typeof rascunhoMensagem==="function")rascunhoMensagem("Não há linhas para enviar ao Google Sheets.");else alert("Não há linhas para enviar ao Google Sheets.");return;}
+  const colunas=colunasAtuaisRascunho(aba);
+  const valorCampo=(item,campo)=>{
+    if(campo==="os")return rascunhoTexto(item,["os","OS"]);
+    if(campo==="grupo")return rascunhoTexto(item,["grupo","grup"]);
+    if(campo==="desc_produto")return rascunhoTexto(item,["desc_produto","descricao_produto"]);
+    if(campo==="__rascunho_cod_cor")return rascunhoTexto(item,["__rascunho_cod_cor","cod_cor"]);
+    if(campo==="n_serie")return rascunhoTexto(item,["n_serie","numero_serie"]);
+    if(campo==="__rascunho_rack")return rascunhoTexto(item,["__rascunho_rack","rack"]);
+    if(campo==="status")return rascunhoTexto(item,["status","status_da_os"]);
+    return rascunhoTexto(item,[campo]);
+  };
+  const cabecalhos=colunas.map(c=>c.titulo);
+  const linhas=itens.map(item=>colunas.map(c=>valorCampo(item,c.campo)));
+  const data=new Date().toLocaleDateString("pt-BR").split("/").join("-");
+  return enviarLinhasColetaSheetsCF40(("Rascunho "+(aba.nome||"Planilha")+" "+data).slice(0,95),cabecalhos,linhas);
+}
+</script>
+
+<script id="cf28-google-sheets-integracao">
 (function(){
 "use strict";
 const GOOGLE_SHEETS_WEBAPP_CF27="https://script.google.com/macros/s/AKfycbxgpSI7M8P3x9BSfwGg0cPCQATCAcmAOiTxJUqIyFSrAQGmwbwgdavc5R-6Ncw6nVWH/exec";
