@@ -6708,6 +6708,7 @@ html.dark #intelModal .intel-modal-box,
 
             <div class="coleta-acoes">
                 <button class="coleta-btn" type="button" onclick="exportarColetaCSV()">⇩ Exportar arquivo ▾</button>
+                <button class="coleta-btn" type="button" onclick="exportarColetaGoogleSheetsCF38()">▦ Google Sheets</button>
                 <button class="coleta-btn sec" type="button" onclick="imprimirColeta()">🖨 Imprimir</button>
                 <button class="coleta-btn orange" type="button" onclick="salvarColetaLocal()">💾 Salvar coleta</button>
                 <button class="coleta-btn green" type="button" onclick="finalizarColeta()">✓ Finalizar coleta</button>
@@ -17276,6 +17277,26 @@ function exportarColetaCSV(){
     coletaMensagem("Arquivo CSV da coleta "+coletaNomeTipo()+" gerado com "+itens.length+" O.S.","ok");
     focarCampoColeta();
 }
+async function exportarColetaGoogleSheetsCF38(){
+    const itens=itensColetaFiltrados();
+    if(!itens.length){coletaMensagem("Não há dados para enviar ao Google Sheets.","alerta");return;}
+    if(typeof window.enviarRelacaoGoogleSheetsCF27!=="function"){
+        alert("Integração com Google Sheets não carregada.");return;
+    }
+    const cabecalhos=["O.S.","Data da O.S."];
+    if(!coletaEhEnderecamento()) cabecalhos.push("Destino");
+    cabecalhos.push("Loja de Origem","ALM","GRUPO","N.C.E.","Descrição do produto","Cód. Cor","Cor","Nº de Série","Rack","Status","Status da O.S.","Valor");
+    const linhas=itens.map(i=>{
+        const linha=[coletaTexto(i,["os","OS"]),coletaTexto(i,["dt_geracao","data_os","data_da_os"])];
+        if(!coletaEhEnderecamento()) linha.push(coletaDestino(i));
+        linha.push(coletaLoja(i),coletaTexto(i,["alm"]),coletaTexto(i,["grupo"]),coletaTexto(i,["nce"]),coletaTexto(i,["desc_produto"]),coletaCodCor(i),coletaTexto(i,["cor"]),coletaTexto(i,["n_serie","numero_serie"]),coletaRack(i),coletaTexto(i,["status"]),coletaStatusOS(i),coletaValor(i));
+        return linha;
+    });
+    const data=new Date().toLocaleDateString("pt-BR").split("/").join("-");
+    const nomeAba=("Coleta "+coletaNomeTipo()+" "+data).slice(0,95);
+    await window.enviarRelacaoGoogleSheetsCF27({nomeAba,cabecalhos,linhas});
+}
+
 function imprimirColeta(){
     const itens=itensColetaFiltrados();if(!itens.length){coletaMensagem("Não há dados para imprimir.","alerta");return;}
     const tabela=document.getElementById('coletaTabela').outerHTML;const w=window.open('','_blank');
@@ -22399,8 +22420,22 @@ window.exportarRascunhoCSV=function(){
             return rascunhoTexto(item,[c.campo]);
         }
     })));
-    ERP.Export.exportar({dados:itens,colunas:cols,nome:"rascunho_"+String(aba.nome||"planilha")});
-    typeof rascunhoMensagem==="function"&&rascunhoMensagem("CSV exportado no padrão O.S. → GR → N.C.E.");
+    const nomeRascunho="rascunho_"+String(aba.nome||"planilha");
+    const formato=(prompt("Exportar rascunho para: CSV, XLS, XLT ou Google Sheets?","CSV")||"CSV").trim().toUpperCase();
+    if(formato==="SHEETS"||formato==="GOOGLE SHEETS"||formato==="GOOGLE SHEETS"){
+        if(typeof window.enviarRelacaoGoogleSheetsCF27!=="function"){
+            alert("Integração com Google Sheets não carregada.");return;
+        }
+        const cabecalhos=cols.map(c=>c.label||c.campo||"");
+        const linhas=itens.map(item=>cols.map(c=>{
+            try{return typeof c.value==="function"?c.value(item):(c.key?item[c.key]:item[c.campo]??"")}catch(_){return ""}
+        }));
+        window.enviarRelacaoGoogleSheetsCF27({nomeAba:nomeRascunho,cabecalhos,linhas});
+        return;
+    }
+    if(!["CSV","XLS","XLT"].includes(formato)){alert("Formato inválido. Use CSV, XLS, XLT ou Google Sheets.");return}
+    ERP.Export.exportar({dados:itens,colunas:cols,formato,nome:nomeRascunho,aba:String(aba.nome||"Rascunho")});
+    typeof rascunhoMensagem==="function"&&rascunhoMensagem("Rascunho exportado no padrão O.S. → GR → N.C.E.");
 };
 
 console.info("ERP.Export V8.2.0 ativo: O.S. → GR → N.C.E. → demais colunas.");
