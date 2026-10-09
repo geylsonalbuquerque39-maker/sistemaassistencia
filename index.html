@@ -6717,7 +6717,7 @@ html.dark #intelModal .intel-modal-box,
             <div class="coleta-tabela-wrap">
                 <table class="coleta-tabela" id="coletaTabela">
                     <thead><tr>
-                        <th>#</th><th>O.S.</th><th>Data da O.S.</th><th id="coletaThDestino">Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Valor</th><th>Cubagem</th><th>Ação</th>
+                        <th>#</th><th>O.S.</th><th>Data da O.S.</th><th id="coletaThDestino">Destino</th><th>Loja de Origem</th><th>ALM</th><th>GRUPO</th><th>N.C.E.</th><th>Descrição do produto</th><th>Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th>Rack</th><th>Status</th><th>Sit. da mercadoria</th><th>Valor</th><th>Ação</th>
                     </tr></thead>
                     <tbody id="coletaTabelaCorpo"><tr><td colspan="17" class="coleta-vazio">Nenhuma O.S. coletada.</td></tr></tbody>
                 </table>
@@ -16838,7 +16838,7 @@ function montarCabecalhoColeta(){
     const thead=document.querySelector("#coletaTabela thead");
     if(!thead)return;
     const destino=coletaEhEnderecamento()?"":"<th>Destino</th>";
-    thead.innerHTML="<tr><th>#</th><th class=\"col-os\">O.S.</th><th>Data da O.S.</th>"+destino+"<th class=\"col-loja\">Loja de Origem</th><th>ALM</th><th class=\"col-grupo\">GRUPO</th><th class=\"col-nce\">N.C.E.</th><th class=\"col-produto\">Descrição do produto</th><th class=\"col-codcor\">Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th class=\"col-rack\">Rack</th><th>Status</th><th>Valor</th><th>Cubagem</th><th>Ação</th></tr>";
+    thead.innerHTML="<tr><th>#</th><th class=\"col-os\">O.S.</th><th>Data da O.S.</th>"+destino+"<th class=\"col-loja\">Loja de Origem</th><th>ALM</th><th class=\"col-grupo\">GRUPO</th><th class=\"col-nce\">N.C.E.</th><th class=\"col-produto\">Descrição do produto</th><th class=\"col-codcor\">Cód. Cor</th><th>Cor</th><th>Nº de Série</th><th class=\"col-rack\">Rack</th><th>Status</th><th>Sit. da mercadoria</th><th>Valor</th><th>Ação</th></tr>";
 }
 
 async function coletarOS(){
@@ -17108,11 +17108,11 @@ function renderizarColeta(novoId){
         const serieCampo=manual?input("n_serie",coletaTexto(i,["n_serie","numero_serie"])):coletaEsc(coletaTexto(i,["n_serie","numero_serie"]));
         const rackCampo=manual&&!coletaEhEnderecamento()?input("__coleta_rack",coletaRack(i)):rack;
         const statusCampo=manual?input("status",coletaTexto(i,["status","status_da_os"])):coletaEsc(coletaTexto(i,["status","status_da_os"]));
+        const situacaoMercadoriaCampo=manual?input("sit_mercadoria",coletaSituacaoMercadoria(i)):coletaEsc(coletaSituacaoMercadoria(i));
         const valorCampo=manual?input("valor_transf",coletaTexto(i,["valor_transf","valor"])):coletaEsc(val?coletaMoeda(val):"");
-        const cubCampo=manual?input("cubagem",coletaTexto(i,["cubagem"])):coletaEsc(cub);
         const classeLinha=manual?(cls?cls.replace(' class="',' class="coleta-nao-encontrada '):' class="coleta-nao-encontrada"'):cls;
 
-        return '<tr'+classeLinha+'><td>'+(idx+1)+'</td><td class="coleta-os col-os">'+osCampo+'</td><td>'+dataCampo+'</td>'+destino+'<td class="col-loja">'+lojaCampo+'</td><td>'+almCampo+'</td><td class="col-grupo">'+grupoCampo+'</td><td class="col-nce">'+nceCampo+'</td><td class="col-produto">'+produtoCampo+'</td><td class="col-codcor">'+codCorCampo+'</td><td>'+corCampo+'</td><td>'+serieCampo+'</td><td class="col-rack">'+rackCampo+'</td><td>'+statusCampo+'</td><td>'+valorCampo+'</td><td>'+cubCampo+'</td><td><button class="coleta-remover" onclick="removerOSColeta(\''+String(id)+'\')">Remover</button></td></tr>';
+        return '<tr'+classeLinha+'><td>'+(idx+1)+'</td><td class="coleta-os col-os">'+osCampo+'</td><td>'+dataCampo+'</td>'+destino+'<td class="col-loja">'+lojaCampo+'</td><td>'+almCampo+'</td><td class="col-grupo">'+grupoCampo+'</td><td class="col-nce">'+nceCampo+'</td><td class="col-produto">'+produtoCampo+'</td><td class="col-codcor">'+codCorCampo+'</td><td>'+corCampo+'</td><td>'+serieCampo+'</td><td class="col-rack">'+rackCampo+'</td><td>'+statusCampo+'</td><td>'+situacaoMercadoriaCampo+'</td><td>'+valorCampo+'</td><td><button class="coleta-remover" onclick="removerOSColeta(\''+String(id)+'\')">Remover</button></td></tr>';
     }).join('');
     setTimeout(coletaAplicarVisualSelecaoRack,0);
 }
