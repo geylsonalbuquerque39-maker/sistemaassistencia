@@ -5941,6 +5941,7 @@ html.dark #intelModal .intel-modal-box,
     <div class="menu" data-menu="consulta" onclick="abrirBusca()">⌕ Consultar O.S</div>
     <div class="menu" data-menu="relatorios" onclick="abrirRelatorios()">▥ Relatórios</div>
     <div class="menu" data-menu="inteligencia" onclick="abrirInteligencia()">✦ Inteligência</div>
+    <div class="menu" data-menu="acao-tecnicos" onclick="abrirAcompanhamentoAcaoTecnicos()">📊 Acompanhamento da Ação</div>
 
     <div class="menu" id="menuColetasMobileCF8" data-menu="coletas-mobile" onclick="abrirColetasMobileCF8()">📱 Coletas do Celular</div>
 <div class="menu" id="menuFotosLoteV932" data-menu="fotos-lote" onclick="abrirFotosLoteV930()">
@@ -7268,6 +7269,67 @@ html.dark #intelModal .intel-modal-box,
 
 
 
+
+<div id="telaAcompanhamentoAcaoTecnicos" style="display:none">
+<style>
+#telaAcompanhamentoAcaoTecnicos{padding:28px 3%;color:#001b3d}
+.aat-wrap{max-width:1450px;margin:0 auto}
+.aat-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;flex-wrap:wrap;margin:10px 0 24px}
+.aat-heading h1{font-size:clamp(26px,3vw,38px);font-weight:900;color:#001b3d}
+.aat-heading p{color:#52657b;margin-top:8px;font-size:16px}
+.aat-panel{background:#fff;border:1px solid #d9e2ec;border-radius:16px;padding:20px;box-shadow:0 5px 18px rgba(0,27,61,.07);margin-bottom:20px}
+.aat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:20px}
+.aat-kpi{background:#fff;border:1px solid #d9e2ec;border-radius:14px;padding:18px;box-shadow:0 4px 12px rgba(0,27,61,.05)}
+.aat-kpi small{display:block;color:#607187;font-weight:700;margin-bottom:9px}.aat-kpi strong{font-size:30px;color:#0046b8}.aat-kpi span{display:block;color:#6b7788;font-size:12px;margin-top:5px}
+.aat-form{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.aat-field label{display:block;font-weight:800;font-size:13px;margin-bottom:7px;color:#33465c}
+.aat-field input,.aat-field select,.aat-field textarea{width:100%;min-height:43px;border:1px solid #c7d3e0;border-radius:9px;padding:9px 11px;font-size:15px;background:#fff;color:#102a43}
+.aat-btn{border:0;border-radius:9px;background:#0046b8;color:#fff;font-weight:800;padding:11px 16px;cursor:pointer;margin:4px 5px 4px 0}
+.aat-btn.secondary{background:#eaf1f8;color:#12385f}.aat-btn.danger{background:#a82432}
+.aat-table-wrap{overflow:auto;margin-top:14px}.aat-table{width:100%;border-collapse:collapse;min-width:850px}.aat-table th,.aat-table td{padding:11px 10px;border-bottom:1px solid #e3eaf1;text-align:left;font-size:13px}.aat-table th{background:#eef4fa;color:#203a56;white-space:nowrap}.aat-pill{display:inline-block;padding:5px 9px;border-radius:999px;font-size:11px;font-weight:900;background:#e7f6ec;color:#187443}.aat-note{background:#f0f6ff;border-left:4px solid #2d78d4;padding:13px 15px;border-radius:8px;color:#38536f;line-height:1.5;margin:14px 0}.aat-section-title{font-size:20px;margin-bottom:7px}.aat-muted{color:#6b7788;font-size:13px}.aat-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+@media(max-width:1050px){.aat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aat-form{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){#telaAcompanhamentoAcaoTecnicos{padding:18px 10px}.aat-grid,.aat-form{grid-template-columns:1fr}.aat-panel{padding:14px}.aat-kpi strong{font-size:25px}}
+</style>
+<div class="aat-wrap">
+  <div class="aat-heading"><div><h1>📊 Acompanhamento Diário dos Técnicos</h1><p>Ação especial • controle da hora extra e produtividade por técnico</p></div><button class="aat-btn secondary" onclick="aatExportarCSV()">⇩ Exportar relatório CSV</button></div>
+  <div class="aat-note"><b>Primeira versão funcional:</b> permite registrar a ação e os resultados diários. Os registros ficam salvos neste navegador. A sincronização compartilhada no ERP e a leitura automática das O.S. dependem da tabela de acompanhamento no Supabase e da confirmação da regra de produtividade.</div>
+  <div class="aat-panel">
+    <h2 class="aat-section-title">Configuração da ação</h2>
+    <div class="aat-form">
+      <div class="aat-field"><label for="aatNomeAcao">Nome da ação</label><input id="aatNomeAcao" placeholder="Ex.: Mutirão de O.S."></div>
+      <div class="aat-field"><label for="aatInicio">Data inicial</label><input id="aatInicio" type="date"></div>
+      <div class="aat-field"><label for="aatFim">Data final</label><input id="aatFim" type="date"></div>
+      <div class="aat-field"><label for="aatMeta">Meta de O.S. na hora extra (por técnico)</label><input id="aatMeta" type="number" min="0" step="1" placeholder="Definir meta"></div>
+    </div>
+    <div style="margin-top:12px"><button class="aat-btn" onclick="aatSalvarConfig()">Salvar configuração</button><span class="aat-muted" id="aatConfigMsg"></span></div>
+  </div>
+  <div class="aat-grid">
+    <div class="aat-kpi"><small>Técnicos acompanhados</small><strong id="aatKpiTecnicos">0</strong><span>Com registro no período</span></div>
+    <div class="aat-kpi"><small>O.S. concluídas na hora extra</small><strong id="aatKpiConcluidas">0</strong><span>Soma dos registros diários</span></div>
+    <div class="aat-kpi"><small>Horas extras registradas</small><strong id="aatKpiHoras">0h</strong><span>Tempo informado nos registros</span></div>
+    <div class="aat-kpi"><small>Atingimento da meta</small><strong id="aatKpiMeta">—</strong><span>Calculado quando a meta estiver definida</span></div>
+  </div>
+  <div class="aat-panel">
+    <h2 class="aat-section-title">Registrar acompanhamento diário</h2>
+    <p class="aat-muted" style="margin-bottom:16px">Informe o técnico, a data e o resultado específico da hora adicional.</p>
+    <div class="aat-form">
+      <div class="aat-field"><label for="aatData">Data do acompanhamento</label><input id="aatData" type="date"></div>
+      <div class="aat-field"><label for="aatTecnico">Técnico</label><input id="aatTecnico" list="aatListaTecnicos" placeholder="Nome do técnico"><datalist id="aatListaTecnicos"></datalist></div>
+      <div class="aat-field"><label for="aatOS">O.S. trabalhadas/concluídas na hora extra</label><input id="aatOS" type="number" min="0" step="1" value="0"></div>
+      <div class="aat-field"><label for="aatMinutos">Tempo extra realizado (minutos)</label><input id="aatMinutos" type="number" min="0" max="180" step="5" value="60"></div>
+      <div class="aat-field"><label for="aatStatus">Situação do acompanhamento</label><select id="aatStatus"><option value="Concluído">Concluído</option><option value="Parcial">Parcial</option><option value="Não realizado">Não realizado</option></select></div>
+      <div class="aat-field"><label for="aatObservacao">Observação (opcional)</label><input id="aatObservacao" placeholder="Impedimentos, ocorrências..."></div>
+    </div>
+    <div style="margin-top:14px"><button class="aat-btn" onclick="aatAdicionarRegistro()">＋ Salvar registro diário</button><button class="aat-btn secondary" onclick="aatLimparFormulario()">Limpar campos</button></div>
+    <div id="aatMensagem" class="aat-muted" role="status"></div>
+  </div>
+  <div class="aat-panel">
+    <div class="aat-heading" style="margin:0"><div><h2 class="aat-section-title">Desempenho por técnico</h2><p class="aat-muted">Resumo baseado nos registros salvos neste navegador.</p></div><div class="aat-actions"><input id="aatFiltroData" type="date" aria-label="Filtrar data" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px" onchange="aatRenderizar()"><input id="aatFiltroTecnico" placeholder="Filtrar técnico..." oninput="aatRenderizar()" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px"></div></div>
+    <div class="aat-table-wrap"><table class="aat-table"><thead><tr><th>Data</th><th>Técnico</th><th>O.S. na hora extra</th><th>Tempo extra</th><th>Atingimento da meta</th><th>Situação</th><th>Observação</th><th>Ação</th></tr></thead><tbody id="aatTabela"><tr><td colspan="8">Nenhum registro ainda. Preencha o formulário acima.</td></tr></tbody></table></div>
+  </div>
+</div>
+</div>
+
 <div class="footer">Sistema de Assistência Técnica - Logística Reversa</div>
 
 </div>
@@ -7625,7 +7687,7 @@ function esconderTelas(){
     [
         "telaInicio","telaColeta","telaCI","telaBusca","telaFicha","telaGerarCI","telaPlanilhaCI",
         "telaAdmin","telaAdminAtualizar","telaAdminUsuarios","telaAdminPresenca","telaAdminLojas",
-        "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia"
+        "telaAdminHistorico","telaAdminHistoricoCI","telaAdminAuditoria","telaAdminConfig","telaAdminBackup","telaRelatorios","telaInteligencia", "telaAcompanhamentoAcaoTecnicos"
     ].forEach(function(id){
         const el = document.getElementById(id);
         if(el) el.style.display = "none";
@@ -37372,6 +37434,63 @@ new MutationObserver(()=>completarMenusCF27()).observe(document.documentElement,
 <script id="cf31-exportador-central-google-sheets">
 console.info("ERP CF31: Google Sheets usa as mesmas linhas do exportador central do Excel, com normalização de células para Apps Script.");
 </script>
+
+<script id="acompanhamento-acao-tecnicos-v1">
+(function(){
+const KEY='erp_acompanhamento_acao_tecnicos_v1';
+const CFG='erp_acompanhamento_acao_tecnicos_config_v1';
+function el(id){return document.getElementById(id)}
+function hoje(){return new Date().toLocaleDateString('en-CA')}
+function ler(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
+function config(){try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch(e){return {}}}
+function gravar(lista){localStorage.setItem(KEY,JSON.stringify(lista))}
+window.abrirAcompanhamentoAcaoTecnicos=function(){
+ if(typeof esconderTelas==='function')esconderTelas();
+ if(typeof definirMenuAtivo==='function')definirMenuAtivo('acao-tecnicos');
+ el('telaAcompanhamentoAcaoTecnicos').style.display='block';
+ const c=config();
+ if(c.nome)el('aatNomeAcao').value=c.nome;
+ if(c.inicio)el('aatInicio').value=c.inicio;
+ if(c.fim)el('aatFim').value=c.fim;
+ if(c.meta!==undefined)el('aatMeta').value=c.meta;
+ if(!el('aatData').value)el('aatData').value=hoje();
+ aatRenderizar();
+ el('sidebar')?.classList.remove('mobile-open');
+};
+window.aatSalvarConfig=function(){
+ const c={nome:el('aatNomeAcao').value.trim(),inicio:el('aatInicio').value,fim:el('aatFim').value,meta:Math.max(0,Number(el('aatMeta').value)||0)};
+ if(c.inicio&&c.fim&&c.fim<c.inicio){el('aatConfigMsg').textContent='A data final não pode ser anterior à inicial.';return}
+ localStorage.setItem(CFG,JSON.stringify(c));el('aatConfigMsg').textContent='Configuração salva neste navegador.';aatRenderizar();
+};
+window.aatAdicionarRegistro=function(){
+ const data=el('aatData').value,tecnico=el('aatTecnico').value.trim(),os=Number(el('aatOS').value),min=Number(el('aatMinutos').value);
+ if(!data||!tecnico){el('aatMensagem').textContent='Informe a data e o nome do técnico.';return}
+ if(!Number.isFinite(os)||os<0||!Number.isFinite(min)||min<0||min>180){el('aatMensagem').textContent='Confira as quantidades e o tempo informado.';return}
+ const lista=ler();lista.unshift({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),data,tecnico,os,minutos:min,status:el('aatStatus').value,observacao:el('aatObservacao').value.trim(),criadoEm:new Date().toISOString()});gravar(lista);
+ el('aatMensagem').textContent='Registro salvo neste navegador.';aatLimparFormulario(false);aatRenderizar();
+};
+window.aatLimparFormulario=function(limparData=true){if(limparData)el('aatData').value=hoje();el('aatTecnico').value='';el('aatOS').value='0';el('aatMinutos').value='60';el('aatStatus').value='Concluído';el('aatObservacao').value='';};
+window.aatExcluirRegistro=function(id){if(!confirm('Excluir este registro diário?'))return;gravar(ler().filter(r=>r.id!==id));aatRenderizar()};
+window.aatRenderizar=function(){
+ const lista=ler(),c=config(),fd=el('aatFiltroData')?.value||'',ft=(el('aatFiltroTecnico')?.value||'').toLowerCase();
+ const filtrada=lista.filter(r=>(!fd||r.data===fd)&&(!ft||r.tecnico.toLowerCase().includes(ft))&&(!c.inicio||r.data>=c.inicio)&&(!c.fim||r.data<=c.fim));
+ const tecnicos=new Set(filtrada.map(r=>r.tecnico.toLowerCase()));
+ const os=filtrada.reduce((a,r)=>a+(Number(r.os)||0),0),mins=filtrada.reduce((a,r)=>a+(Number(r.minutos)||0),0);
+ el('aatKpiTecnicos').textContent=tecnicos.size;el('aatKpiConcluidas').textContent=os;el('aatKpiHoras').textContent=(mins/60).toLocaleString('pt-BR',{maximumFractionDigits:1})+'h';
+ el('aatKpiMeta').textContent=c.meta>0?(filtrada.length?Math.round(os/(c.meta*filtrada.length)*100)+'%':'0%'):'—';
+ const tb=el('aatTabela');
+ if(!filtrada.length){tb.innerHTML='<tr><td colspan="8">Nenhum registro para os filtros selecionados.</td></tr>';return}
+ tb.innerHTML=filtrada.map(r=>{const ating=c.meta>0?Math.round((Number(r.os)||0)/c.meta*100)+'%':'—';return '<tr><td>'+esc(r.data)+'</td><td><b>'+esc(r.tecnico)+'</b></td><td>'+Number(r.os||0)+'</td><td>'+Number(r.minutos||0)+' min</td><td>'+ating+'</td><td><span class="aat-pill" style="'+(r.status==='Não realizado'?'background:#fde8e8;color:#a82432':r.status==='Parcial'?'background:#fff1d6;color:#925500':'')+'">'+esc(r.status)+'</span></td><td>'+esc(r.observacao||'—')+'</td><td><button class="aat-btn danger" onclick="aatExcluirRegistro('+JSON.stringify(r.id).replace(/"/g,'&quot;')+')">Excluir</button></td></tr>'}).join('');
+};
+function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+window.aatExportarCSV=function(){
+ const rows=ler(),c=config();const arr=[['Data','Tecnico','OS na hora extra','Tempo extra minutos','Situacao','Observacao'],...rows.map(r=>[r.data,r.tecnico,r.os,r.minutos,r.status,r.observacao])];
+ const csv=arr.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
+ const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='acompanhamento_tecnicos_'+(new Date().toISOString().slice(0,10))+'.csv';a.click();URL.revokeObjectURL(url);
+};
+})();
+</script>
+
 </body>
 </html>
 
