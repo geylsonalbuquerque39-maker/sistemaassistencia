@@ -37448,8 +37448,23 @@ function gravar(lista){localStorage.setItem(KEY,JSON.stringify(lista))}
 window.abrirAcompanhamentoAcaoTecnicos=function(){
  if(typeof esconderTelas==='function')esconderTelas();
  if(typeof definirMenuAtivo==='function')definirMenuAtivo('acao-tecnicos');
- el('telaAcompanhamentoAcaoTecnicos').style.display='block';
- window.scrollTo({top:0,left:0,behavior:'instant'});
+ const tela=el('telaAcompanhamentoAcaoTecnicos');
+ const principal=document.querySelector('.main');
+ const topo=principal?.querySelector('.topbar');
+ // Mantém esta tela logo abaixo do cabeçalho, sem herdar o espaço vertical
+ // acumulado pelas outras telas do ERP. Nenhuma outra tela é modificada.
+ if(tela&&principal&&topo&&tela.previousElementSibling!==topo){
+   principal.insertBefore(tela,topo.nextSibling);
+ }
+ if(tela)tela.style.display='block';
+ const voltarTopo=()=>{
+   window.scrollTo({top:0,left:0,behavior:'auto'});
+   document.documentElement.scrollTop=0;
+   document.body.scrollTop=0;
+   if(principal)principal.scrollTop=0;
+ };
+ voltarTopo();
+ requestAnimationFrame(()=>requestAnimationFrame(voltarTopo));
  const c=config();
  if(c.nome)el('aatNomeAcao').value=c.nome;
  if(c.inicio)el('aatInicio').value=c.inicio;
