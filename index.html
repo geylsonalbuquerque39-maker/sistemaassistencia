@@ -7293,7 +7293,7 @@ html.dark #intelModal .intel-modal-box,
 </style>
 <div class="aat-wrap">
   <div class="aat-heading"><div><h1>📊 Acompanhamento Diário dos Técnicos</h1><p>Ação especial • controle da hora extra e produtividade por técnico</p></div><button class="aat-btn secondary" onclick="aatExportarCSV()">⇩ Exportar relatório CSV</button></div>
-  <div class="aat-note"><b>Primeira versão funcional:</b> permite registrar a ação e os resultados diários. Os registros ficam salvos neste navegador. A sincronização compartilhada no ERP e a leitura automática das O.S. dependem da tabela de acompanhamento no Supabase e da confirmação da regra de produtividade.</div>
+  <div class="aat-note"><b>Acompanhamento integrado:</b> consulte as O.S. diretamente na base REXPEDLR, marque cada uma como <b>Avaliada</b> ou <b>Consertada</b> e salve os registros no Supabase para consultar em outros computadores. É necessário criar as tabelas usando o SQL fornecido junto deste arquivo.</div>
   <div class="aat-panel">
     <h2 class="aat-section-title">Configuração da ação</h2>
     <div class="aat-form">
@@ -7306,7 +7306,7 @@ html.dark #intelModal .intel-modal-box,
   </div>
   <div class="aat-grid">
     <div class="aat-kpi"><small>Técnicos acompanhados</small><strong id="aatKpiTecnicos">0</strong><span>Com registro no período</span></div>
-    <div class="aat-kpi"><small>O.S. concluídas na hora extra</small><strong id="aatKpiConcluidas">0</strong><span>Soma dos registros diários</span></div>
+    <div class="aat-kpi"><small>O.S. acompanhadas na hora extra</small><strong id="aatKpiConcluidas">0</strong><span>Soma dos registros diários</span></div>
     <div class="aat-kpi"><small>Horas extras registradas</small><strong id="aatKpiHoras">0h</strong><span>Tempo informado nos registros</span></div>
     <div class="aat-kpi"><small>Atingimento da meta</small><strong id="aatKpiMeta">—</strong><span>Calculado quando a meta estiver definida</span></div>
   </div>
@@ -7316,17 +7316,17 @@ html.dark #intelModal .intel-modal-box,
     <div class="aat-form">
       <div class="aat-field"><label for="aatData">Data do acompanhamento</label><input id="aatData" type="date"></div>
       <div class="aat-field"><label for="aatTecnico">Técnico</label><input id="aatTecnico" list="aatListaTecnicos" placeholder="Nome do técnico"><datalist id="aatListaTecnicos"></datalist></div>
-      <div class="aat-field"><label for="aatOS">O.S. trabalhadas/concluídas na hora extra</label><input id="aatOS" type="number" min="0" step="1" value="0"></div>
+      <div class="aat-field"><label for="aatOSBusca">Número da O.S. (REXPEDLR)</label><input id="aatOSBusca" inputmode="numeric" placeholder="Digite o número da O.S."><button class="aat-btn secondary" type="button" onclick="aatBuscarOS()">Buscar O.S.</button></div>
       <div class="aat-field"><label for="aatMinutos">Tempo extra realizado (minutos)</label><input id="aatMinutos" type="number" min="0" max="180" step="5" value="60"></div>
       <div class="aat-field"><label for="aatStatus">Situação do acompanhamento</label><select id="aatStatus"><option value="Concluído">Concluído</option><option value="Parcial">Parcial</option><option value="Não realizado">Não realizado</option></select></div>
       <div class="aat-field"><label for="aatObservacao">Observação (opcional)</label><input id="aatObservacao" placeholder="Impedimentos, ocorrências..."></div>
     </div>
-    <div style="margin-top:14px"><button class="aat-btn" onclick="aatAdicionarRegistro()">＋ Salvar registro diário</button><button class="aat-btn secondary" onclick="aatLimparFormulario()">Limpar campos</button></div>
+    <div id="aatOSResultado" class="aat-note" style="display:none"></div><div id="aatOSLista" class="aat-table-wrap"></div><div style="margin-top:14px"><button class="aat-btn" onclick="aatAdicionarOSSelecionada()">＋ Adicionar O.S. ao técnico</button><button class="aat-btn" onclick="aatAdicionarRegistro()">Salvar acompanhamento no Supabase</button><button class="aat-btn secondary" onclick="aatLimparFormulario()">Limpar campos</button></div>
     <div id="aatMensagem" class="aat-muted" role="status"></div>
   </div>
   <div class="aat-panel">
-    <div class="aat-heading" style="margin:0"><div><h2 class="aat-section-title">Desempenho por técnico</h2><p class="aat-muted">Resumo baseado nos registros salvos neste navegador.</p></div><div class="aat-actions"><input id="aatFiltroData" type="date" aria-label="Filtrar data" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px" onchange="aatRenderizar()"><input id="aatFiltroTecnico" placeholder="Filtrar técnico..." oninput="aatRenderizar()" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px"></div></div>
-    <div class="aat-table-wrap"><table class="aat-table"><thead><tr><th>Data</th><th>Técnico</th><th>O.S. na hora extra</th><th>Tempo extra</th><th>Atingimento da meta</th><th>Situação</th><th>Observação</th><th>Ação</th></tr></thead><tbody id="aatTabela"><tr><td colspan="8">Nenhum registro ainda. Preencha o formulário acima.</td></tr></tbody></table></div>
+    <div class="aat-heading" style="margin:0"><div><h2 class="aat-section-title">Desempenho por técnico</h2><p class="aat-muted">Resumo dos registros compartilhados no Supabase.</p></div><div class="aat-actions"><input id="aatFiltroData" type="date" aria-label="Filtrar data" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px" onchange="aatRenderizar()"><input id="aatFiltroTecnico" placeholder="Filtrar técnico..." oninput="aatRenderizar()" style="padding:9px;border:1px solid #c7d3e0;border-radius:8px"></div></div>
+    <div class="aat-table-wrap"><table class="aat-table"><thead><tr><th>Data</th><th>Técnico</th><th>O.S. (avaliação/conserto)</th><th>Tempo extra</th><th>Atingimento da meta</th><th>Situação</th><th>Observação</th><th>Ação</th></tr></thead><tbody id="aatTabela"><tr><td colspan="8">Nenhum registro ainda. Preencha o formulário acima.</td></tr></tbody></table></div>
   </div>
 </div>
 </div>
@@ -37436,75 +37436,85 @@ new MutationObserver(()=>completarMenusCF27()).observe(document.documentElement,
 console.info("ERP CF31: Google Sheets usa as mesmas linhas do exportador central do Excel, com normalização de células para Apps Script.");
 </script>
 
-<script id="acompanhamento-acao-tecnicos-v1">
+<script id="acompanhamento-acao-tecnicos-v2">
 (function(){
-const KEY='erp_acompanhamento_acao_tecnicos_v1';
-const CFG='erp_acompanhamento_acao_tecnicos_config_v1';
+const TABLE='erp_acompanhamento_acao_registros';
+const CONFIG_TABLE='erp_acompanhamento_acao_config';
+let registros=[],configCache={},osSelecionada=null,osDoRegistro=[];
 function el(id){return document.getElementById(id)}
-function hoje(){return new Date().toLocaleDateString('en-CA')}
-function ler(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return []}}
-function config(){try{return JSON.parse(localStorage.getItem(CFG)||'{}')}catch(e){return {}}}
-function gravar(lista){localStorage.setItem(KEY,JSON.stringify(lista))}
-window.abrirAcompanhamentoAcaoTecnicos=function(){
- if(typeof esconderTelas==='function')esconderTelas();
- if(typeof definirMenuAtivo==='function')definirMenuAtivo('acao-tecnicos');
- const tela=el('telaAcompanhamentoAcaoTecnicos');
- const principal=document.querySelector('.main');
- const topo=principal?.querySelector('.topbar');
- // Mantém esta tela logo abaixo do cabeçalho, sem herdar o espaço vertical
- // acumulado pelas outras telas do ERP. Nenhuma outra tela é modificada.
- if(tela&&principal&&topo&&tela.previousElementSibling!==topo){
-   principal.insertBefore(tela,topo.nextSibling);
- }
- if(tela)tela.style.display='block';
- const voltarTopo=()=>{
-   window.scrollTo({top:0,left:0,behavior:'auto'});
-   document.documentElement.scrollTop=0;
-   document.body.scrollTop=0;
-   if(principal)principal.scrollTop=0;
- };
- voltarTopo();
- requestAnimationFrame(()=>requestAnimationFrame(voltarTopo));
- const c=config();
- if(c.nome)el('aatNomeAcao').value=c.nome;
- if(c.inicio)el('aatInicio').value=c.inicio;
- if(c.fim)el('aatFim').value=c.fim;
- if(c.meta!==undefined)el('aatMeta').value=c.meta;
- if(!el('aatData').value)el('aatData').value=hoje();
- aatRenderizar();
- el('sidebar')?.classList.remove('mobile-open');
-};
-window.aatSalvarConfig=function(){
- const c={nome:el('aatNomeAcao').value.trim(),inicio:el('aatInicio').value,fim:el('aatFim').value,meta:Math.max(0,Number(el('aatMeta').value)||0)};
- if(c.inicio&&c.fim&&c.fim<c.inicio){el('aatConfigMsg').textContent='A data final não pode ser anterior à inicial.';return}
- localStorage.setItem(CFG,JSON.stringify(c));el('aatConfigMsg').textContent='Configuração salva neste navegador.';aatRenderizar();
-};
-window.aatAdicionarRegistro=function(){
- const data=el('aatData').value,tecnico=el('aatTecnico').value.trim(),os=Number(el('aatOS').value),min=Number(el('aatMinutos').value);
- if(!data||!tecnico){el('aatMensagem').textContent='Informe a data e o nome do técnico.';return}
- if(!Number.isFinite(os)||os<0||!Number.isFinite(min)||min<0||min>180){el('aatMensagem').textContent='Confira as quantidades e o tempo informado.';return}
- const lista=ler();lista.unshift({id:(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random()),data,tecnico,os,minutos:min,status:el('aatStatus').value,observacao:el('aatObservacao').value.trim(),criadoEm:new Date().toISOString()});gravar(lista);
- el('aatMensagem').textContent='Registro salvo neste navegador.';aatLimparFormulario(false);aatRenderizar();
-};
-window.aatLimparFormulario=function(limparData=true){if(limparData)el('aatData').value=hoje();el('aatTecnico').value='';el('aatOS').value='0';el('aatMinutos').value='60';el('aatStatus').value='Concluído';el('aatObservacao').value='';};
-window.aatExcluirRegistro=function(id){if(!confirm('Excluir este registro diário?'))return;gravar(ler().filter(r=>r.id!==id));aatRenderizar()};
-window.aatRenderizar=function(){
- const lista=ler(),c=config(),fd=el('aatFiltroData')?.value||'',ft=(el('aatFiltroTecnico')?.value||'').toLowerCase();
- const filtrada=lista.filter(r=>(!fd||r.data===fd)&&(!ft||r.tecnico.toLowerCase().includes(ft))&&(!c.inicio||r.data>=c.inicio)&&(!c.fim||r.data<=c.fim));
- const tecnicos=new Set(filtrada.map(r=>r.tecnico.toLowerCase()));
- const os=filtrada.reduce((a,r)=>a+(Number(r.os)||0),0),mins=filtrada.reduce((a,r)=>a+(Number(r.minutos)||0),0);
- el('aatKpiTecnicos').textContent=tecnicos.size;el('aatKpiConcluidas').textContent=os;el('aatKpiHoras').textContent=(mins/60).toLocaleString('pt-BR',{maximumFractionDigits:1})+'h';
- el('aatKpiMeta').textContent=c.meta>0?(filtrada.length?Math.round(os/(c.meta*filtrada.length)*100)+'%':'0%'):'—';
- const tb=el('aatTabela');
- if(!filtrada.length){tb.innerHTML='<tr><td colspan="8">Nenhum registro para os filtros selecionados.</td></tr>';return}
- tb.innerHTML=filtrada.map(r=>{const ating=c.meta>0?Math.round((Number(r.os)||0)/c.meta*100)+'%':'—';return '<tr><td>'+esc(r.data)+'</td><td><b>'+esc(r.tecnico)+'</b></td><td>'+Number(r.os||0)+'</td><td>'+Number(r.minutos||0)+' min</td><td>'+ating+'</td><td><span class="aat-pill" style="'+(r.status==='Não realizado'?'background:#fde8e8;color:#a82432':r.status==='Parcial'?'background:#fff1d6;color:#925500':'')+'">'+esc(r.status)+'</span></td><td>'+esc(r.observacao||'—')+'</td><td><button class="aat-btn danger" onclick="aatExcluirRegistro('+JSON.stringify(r.id).replace(/"/g,'&quot;')+')">Excluir</button></td></tr>'}).join('');
-};
+function hoje(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function supa(){if(typeof obterSupabaseClient!=='function')throw new Error('Cliente Supabase do ERP não está disponível.');return obterSupabaseClient()}
+function msg(id,t){if(el(id))el(id).textContent=t}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-window.aatExportarCSV=function(){
- const rows=ler(),c=config();const arr=[['Data','Tecnico','OS na hora extra','Tempo extra minutos','Situacao','Observacao'],...rows.map(r=>[r.data,r.tecnico,r.os,r.minutos,r.status,r.observacao])];
- const csv=arr.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');
- const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='acompanhamento_tecnicos_'+(new Date().toISOString().slice(0,10))+'.csv';a.click();URL.revokeObjectURL(url);
+function normOS(v){return String(v??'').trim().replace(/\s+/g,'').replace(/\.0$/,'').toUpperCase()}
+function registroPayload(r){return {id:r.id,data:r.data,tecnico:r.tecnico,minutos:r.minutos,status_acompanhamento:r.status_acompanhamento,observacao:r.observacao||'',os_itens:r.os_itens||[],created_at:r.created_at}}
+window.abrirAcompanhamentoAcaoTecnicos=async function(){
+ if(typeof esconderTelas==='function')esconderTelas();if(typeof definirMenuAtivo==='function')definirMenuAtivo('acao-tecnicos');
+ const tela=el('telaAcompanhamentoAcaoTecnicos'),principal=document.querySelector('.main'),topo=principal?.querySelector('.topbar');
+ if(tela&&principal&&topo&&tela.previousElementSibling!==topo)principal.insertBefore(tela,topo.nextSibling);if(tela)tela.style.display='block';
+ const top=()=>{window.scrollTo({top:0,left:0,behavior:'auto'});document.documentElement.scrollTop=0;document.body.scrollTop=0;if(principal)principal.scrollTop=0};top();requestAnimationFrame(()=>requestAnimationFrame(top));el('sidebar')?.classList.remove('mobile-open');
+ if(!el('aatData').value)el('aatData').value=hoje();
+ await aatCarregarSupabase();
 };
+async function aatCarregarSupabase(){
+ msg('aatMensagem','Carregando acompanhamento compartilhado do Supabase...');
+ try{
+  const client=supa();
+  const [rr,cc]=await Promise.all([client.from(TABLE).select('*').order('data',{ascending:false}).order('created_at',{ascending:false}),client.from(CONFIG_TABLE).select('*').eq('id',1).maybeSingle()]);
+  if(rr.error)throw rr.error;if(cc.error)throw cc.error;
+  registros=(rr.data||[]).map(r=>({...r,os_itens:Array.isArray(r.os_itens)?r.os_itens:[]}));configCache=cc.data||{};
+  if(configCache.nome!=null)el('aatNomeAcao').value=configCache.nome||'';if(configCache.inicio)el('aatInicio').value=configCache.inicio;if(configCache.fim)el('aatFim').value=configCache.fim;if(configCache.meta!=null)el('aatMeta').value=configCache.meta;
+  aatRenderizar();msg('aatMensagem','Dados carregados do Supabase. As alterações ficam disponíveis em outros computadores.');
+ }catch(e){msg('aatMensagem','Não foi possível carregar do Supabase: '+(e.message||e)+'. Confira se executou o SQL de configuração e se a sessão tem permissão.');}
+}
+window.aatSalvarConfig=async function(){
+ const c={id:1,nome:el('aatNomeAcao').value.trim(),inicio:el('aatInicio').value||null,fim:el('aatFim').value||null,meta:Math.max(0,Number(el('aatMeta').value)||0),updated_at:new Date().toISOString()};
+ if(c.inicio&&c.fim&&c.fim<c.inicio){msg('aatConfigMsg','A data final não pode ser anterior à inicial.');return}
+ try{const {error}=await supa().from(CONFIG_TABLE).upsert(c,{onConflict:'id'});if(error)throw error;configCache=c;msg('aatConfigMsg','Configuração salva no Supabase.');aatRenderizar()}catch(e){msg('aatConfigMsg','Erro ao salvar no Supabase: '+(e.message||e))}
+};
+window.aatBuscarOS=async function(){
+ const numero=normOS(el('aatOSBusca').value);if(!numero){msg('aatMensagem','Digite o número da O.S. para buscar.');return}
+ const box=el('aatOSResultado');box.style.display='block';box.textContent='Consultando a base REXPEDLR...';osSelecionada=null;
+ try{
+  let lista=await buscarTodaRexpedlr();
+  let r=lista.find(x=>normOS(x.os)===numero);
+  if(!r){const {data,error}=await supa().from('rexpedlr').select('os,dt_geracao,pdv,nf,grupo,nce,desc_produto,cor,n_serie,tecnico,rack,status,dt_expedicao,pdv_expedicao,analise_do_defeito,dt_conserto,obs_status,obs_ordem_de_servico,solicitante_cpp,data_cpp,nr_cpp,sit_cpp,recebedor_cpp,data_recebedor,dt_ult_entrada,dt_saida_oficina,dt_recb_at,status_da_os,tipo_garantia').eq('os',numero).limit(1);if(error)throw error;r=(data||[])[0]||null}
+  if(!r){box.textContent='O.S. não encontrada na base REXPEDLR. Confira o número.';return}
+  osSelecionada={os:String(r.os),pdv:r.pdv||'',grupo:r.grupo||'',nce:r.nce||'',desc_produto:r.desc_produto||'',cor:r.cor||'',n_serie:r.n_serie||'',rack:r.rack||'',status_rexpedlr:r.status_da_os||r.status||'',dt_geracao:r.dt_geracao||null,tecnico_rexpedlr:r.tecnico||''};
+  box.innerHTML='<b>O.S. '+esc(r.os)+'</b> — '+esc(r.desc_produto||'Produto não informado')+'<br>PDV/Loja: '+esc(r.pdv||'—')+' · Grupo: '+esc(r.grupo||'—')+' · Cor: '+esc(r.cor||'—')+'<br>Status REXPEDLR: '+esc(r.status_da_os||r.status||'—')+' · Técnico na base: '+esc(r.tecnico||'—')+'<div class="aat-field" style="margin-top:10px"><label for="aatOSStatusEscolhido">Resultado desta O.S.</label><select id="aatOSStatusEscolhido"><option value="Avaliada">Avaliada</option><option value="Consertada">Consertada</option></select></div>';
+ }catch(e){box.textContent='Erro ao consultar REXPEDLR: '+(e.message||e)}
+};
+window.aatAdicionarOSSelecionada=function(){
+ if(!osSelecionada){msg('aatMensagem','Primeiro busque uma O.S. válida no REXPEDLR.');return}
+ const status=el('aatOSStatusEscolhido')?.value||'Avaliada';
+ if(osDoRegistro.some(x=>normOS(x.os)===normOS(osSelecionada.os))){msg('aatMensagem','Essa O.S. já foi adicionada ao registro.');return}
+ osDoRegistro.push({...osSelecionada,status_resultado:status});osSelecionada=null;el('aatOSBusca').value='';el('aatOSResultado').style.display='none';aatRenderOSLista();msg('aatMensagem','O.S. adicionada. Você pode incluir outras antes de salvar.');
+};
+function aatRenderOSLista(){const box=el('aatOSLista');if(!osDoRegistro.length){box.innerHTML='<p class="aat-muted">Nenhuma O.S. adicionada ainda.</p>';return}
+ box.innerHTML='<table class="aat-table"><thead><tr><th>O.S.</th><th>Produto</th><th>Loja/PDV</th><th>Resultado</th><th>Ação</th></tr></thead><tbody>'+osDoRegistro.map((o,i)=>'<tr><td><b>'+esc(o.os)+'</b></td><td>'+esc(o.desc_produto||'—')+'</td><td>'+esc(o.pdv||'—')+'</td><td><select aria-label="Resultado da O.S. '+esc(o.os)+'" onchange="aatMudarStatusOS('+i+',this.value)"><option value="Avaliada" '+(o.status_resultado==='Avaliada'?'selected':'')+'>Avaliada</option><option value="Consertada" '+(o.status_resultado==='Consertada'?'selected':'')+'>Consertada</option></select></td><td><button class="aat-btn danger" onclick="aatRemoverOS('+i+')">Remover</button></td></tr>').join('')+'</tbody></table>';
+}
+window.aatMudarStatusOS=function(i,v){if(osDoRegistro[i])osDoRegistro[i].status_resultado=v};window.aatRemoverOS=function(i){osDoRegistro.splice(i,1);aatRenderOSLista()};
+window.aatAdicionarRegistro=async function(){
+ const data=el('aatData').value,tecnico=el('aatTecnico').value.trim(),minutos=Number(el('aatMinutos').value),status=el('aatStatus').value,observacao=el('aatObservacao').value.trim();
+ if(!data||!tecnico){msg('aatMensagem','Informe a data e o nome do técnico.');return}if(!osDoRegistro.length){msg('aatMensagem','Adicione pelo menos uma O.S. consultada no REXPEDLR.');return}if(!Number.isFinite(minutos)||minutos<0||minutos>180){msg('aatMensagem','O tempo extra deve estar entre 0 e 180 minutos.');return}
+ const row={data,tecnico,minutos,status_acompanhamento:status,observacao,os_itens:osDoRegistro.map(o=>({...o})),created_at:new Date().toISOString()};
+ msg('aatMensagem','Salvando no Supabase...');
+ try{const {data:saved,error}=await supa().from(TABLE).insert(row).select('*').single();if(error)throw error;registros.unshift({...saved,os_itens:Array.isArray(saved.os_itens)?saved.os_itens:row.os_itens});osDoRegistro=[];aatRenderOSLista();aatLimparFormulario(false);aatRenderizar();msg('aatMensagem','Registro salvo no Supabase com sucesso. Ele poderá ser consultado em outros computadores.')}catch(e){msg('aatMensagem','Falha ao salvar no Supabase: '+(e.message||e)+'. Confira as tabelas e permissões RLS.')}
+};
+window.aatLimparFormulario=function(limparData=true){if(limparData)el('aatData').value=hoje();el('aatTecnico').value='';el('aatOSBusca').value='';el('aatMinutos').value='60';el('aatStatus').value='Concluído';el('aatObservacao').value='';osSelecionada=null;osDoRegistro=[];el('aatOSResultado').style.display='none';aatRenderOSLista()};
+window.aatExcluirRegistro=async function(id){if(!confirm('Excluir este registro diário do Supabase?'))return;try{const {error}=await supa().from(TABLE).delete().eq('id',id);if(error)throw error;registros=registros.filter(r=>r.id!==id);aatRenderizar()}catch(e){alert('Não foi possível excluir no Supabase: '+(e.message||e))}};
+window.aatRenderizar=function(){
+ const c=configCache||{},fd=el('aatFiltroData')?.value||'',ft=(el('aatFiltroTecnico')?.value||'').toLowerCase();
+ const filtrada=registros.filter(r=>(!fd||r.data===fd)&&(!ft||String(r.tecnico||'').toLowerCase().includes(ft))&&(!c.inicio||r.data>=c.inicio)&&(!c.fim||r.data<=c.fim));
+ const tecnicos=new Set(filtrada.map(r=>String(r.tecnico||'').toLowerCase()));const os=filtrada.reduce((a,r)=>a+((r.os_itens||[]).length),0),mins=filtrada.reduce((a,r)=>a+(Number(r.minutos)||0),0);
+ el('aatKpiTecnicos').textContent=tecnicos.size;el('aatKpiConcluidas').textContent=os;el('aatKpiHoras').textContent=(mins/60).toLocaleString('pt-BR',{maximumFractionDigits:1})+'h';el('aatKpiMeta').textContent=c.meta>0?(filtrada.length?Math.round(os/(c.meta*filtrada.length)*100)+'%':'0%'):'—';
+ const tb=el('aatTabela');if(!filtrada.length){tb.innerHTML='<tr><td colspan="8">Nenhum registro no Supabase para os filtros selecionados.</td></tr>';return}
+ tb.innerHTML=filtrada.map(r=>{const itens=r.os_itens||[],consertadas=itens.filter(o=>o.status_resultado==='Consertada').length,avaliadas=itens.filter(o=>o.status_resultado==='Avaliada').length,ating=c.meta>0?Math.round(itens.length/c.meta*100)+'%':'—';return '<tr><td>'+esc(r.data)+'</td><td><b>'+esc(r.tecnico)+'</b><br><small>'+itens.length+' O.S. ('+consertadas+' consertadas, '+avaliadas+' avaliadas)</small></td><td>'+itens.map(o=>esc(o.os)+' — '+esc(o.status_resultado)).join('<br>')+'</td><td>'+Number(r.minutos||0)+' min</td><td>'+ating+'</td><td><span class="aat-pill" style="'+(r.status_acompanhamento==='Não realizado'?'background:#fde8e8;color:#a82432':r.status_acompanhamento==='Parcial'?'background:#fff1d6;color:#925500':'')+'">'+esc(r.status_acompanhamento||'—')+'</span></td><td>'+esc(r.observacao||'—')+'</td><td><button class="aat-btn danger" onclick="aatExcluirRegistro('+JSON.stringify(r.id).replace(/"/g,'&quot;')+')">Excluir</button></td></tr>'}).join('');
+};
+function aatExportRows(){return registros.map(r=>{const itens=r.os_itens||[];return [r.data,r.tecnico,itens.map(o=>o.os+': '+o.status_resultado).join(' | '),itens.length,r.minutos,r.status_acompanhamento,r.observacao||'']})}
+window.aatExportarCSV=function(){const arr=[['Data','Técnico','O.S. e resultado','Quantidade de O.S.','Tempo extra minutos','Situação','Observação'],...aatExportRows()];const csv=arr.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='acompanhamento_tecnicos_'+hoje()+'.csv';a.click();URL.revokeObjectURL(url)};
+// Ao abrir a tela, mantém a lista de O.S. selecionadas vazia e visível.
+aatRenderOSLista();
 })();
 </script>
 
